@@ -1,1 +1,11 @@
-
+{
+  "GPU": "GPU",
+  "CPU": "CPU",
+  "Chinese": "中文",
+  "English": "英文",
+  "Auto": "自动",
+  "text": "文本",
+  "one by one": "逐个处理",
+  "images": "图像",
+  "video": "视频"
+}
