@@ -64,7 +64,7 @@ The supported model types are synchronized with llama_cpp_python version. Common
 
 
 ## Changelog
-#### 2026-02-05
+#### 2026-02-08
 - Added multiple new preset prompt templates: Bilingual Prompt Generate, Ultra HD Image Reverse
 - Optimized model loading and inference workflow for improved efficiency
 - Enhanced Chinese localization support
