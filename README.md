@@ -6,7 +6,7 @@ Run LLM/VLM models natively in ComfyUI based on llama.cpp, supporting multimodal
 
 ## Project Introduction
 
-ComfyUI-llama-cpp-vlmforQo is a comprehensive and performance-optimized ComfyUI plugin, deeply refactored and enhanced based on the ComfyUI-llama-cpp-vlm plugin, focusing on providing localized, efficient multimodal AI inference capabilities.
+ComfyUI-llama-cpp-vlmforQo is a comprehensive and performance-optimized ComfyUI plugin, deeply refactored and enhanced based on the ComfyUI-llama-cpp-vlm plugin, focusing on providing localized, efficient multimodal AI inference capabilities. Currently supporting over 40 VLM models and 200 LLM models, the plugin offers rich parameter adjustment options, allowing users to select different models and parameter configurations based on their needs to achieve optimal inference results.
 
 Compared to similar plugins, this project has achieved significant breakthroughs in the following aspects:
 - **More comprehensive multimodal support**: Not only supports text and images, but also adds video input and analysis capabilities
@@ -20,12 +20,11 @@ Compared to similar plugins, this project has achieved significant breakthroughs
 ## Core Features
 
 - **Multimodal Full Support**: Process text, image, and video inputs, enabling cross-modal understanding and generation
-- **Wide Model Compatibility**: Support for multiple mainstream VLM/LLM models, including the latest professional AI models, with dynamic support functionality—when llama_cpp_python updates and supports new model versions, users can directly download and use them without modifying plugin code
+- **Wide Model Compatibility**: Support for multiple mainstream VLM/LLM models, including the latest professional AI models
 - **Intelligent Hardware Adaptation**: Automatically adjust parameters based on VRAM size to maximize hardware performance
 - **Efficient Inference Engine**: Optimized model loading and inference workflow, significantly improving operational speed
 - **Professional Prompt System**: Built-in rich preset templates covering full-scenario needs from basic description to professional model optimization
 - **Flexible Parameter Control**: Detailed inference parameter settings to meet customized needs for different scenarios
-
 - **Video Processing Capability**: Added video input support, enabling video content analysis and reverse generation
 - **CPU/GPU Mode**: Freely switch between runtime modes to adapt to different hardware configurations
 - **Hardware Detection Optimization**: Automatically detect hardware performance and recommend optimal parameter configurations
@@ -37,32 +36,28 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
 
 ## Supported Models
 
-- LLaVA-1.6
-- nanoLLaVA
+The supported model types are synchronized with llama_cpp_python version. Common mainstream models include:
+
+- Qwen2.5-VL
+- Qwen3-VL-Instruct
+- olmOCR-2-7B-1025
+- llava-1.6-mistral-7b
+- nanoLLaVA-1.5
 - MiniCPM-V-4.5
+- MiniCPM-Llama3-V 2.5
 - GLM-4.6V
 - llama-joycaption
-- moondream3-preview
 - Moondream2
-- InternLM-XComposer2-VL
+- gemma-3-12b
+- Youtu-VL-4B-Instruct
+- EraX-VL-7B-V1.5
+- MiMo-VL-7B-RL
 - DreamOmni2
-- MiniCPM-Llama3-V 2.5
-- Llama-3.2-11B-Vision-Instruct
-- CogVLM2
-- CogVLM-MOE
 - Phi-3.5-vision-instruct
-- Phi-3-vision-128k-instruct
-- Qwen2.5-VL
-- Qwen3-VL
-- Qwen3-VL-Chat
-- Qwen3-VL-Instruct
+- Llama-3.2-11B-Vision-Instruct
 - LLaMA-3.1-Vision
-- Zhipu-Vision
-- ZhiPu AI-Vision
-- olmOCR-2
-- InternVL-1.5
-- InternVL-2.0
-- Yi-VL-2.0
+- Yi-VL-6B
+- LightOnOCR-2-1B
 
 > Note: The plugin already supports multiple model loading, specific support depends on llama_cpp_python version
 
@@ -83,8 +78,9 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
 - Optimized model name inference logic to automatically generate model names based on ChatHandler naming conventions
 - Expanded model support list to ensure backward compatibility with all previously supported models
 - Implemented model list deduplication functionality to keep the interface clean and organized
-- Added support for multiple models: moondream3-preview, InternLM-XComposer2-VL, DreamOmni2, MiniCPM-Llama3-V 2.5, Llama-3.2-11B-Vision-Instruct, Phi-3.5-vision-instruct, Moondream2, olmOCR-2, InternVL-1.5, InternVL-2.0, Yi-VL-2.0
+- Added support for multiple models: olmOCR-2-7B-1025, llava-1.6-mistral-7b, nanoLLaVA-1.5, MiniCPM-Llama3-V 2.5, Moondream2, gemma-3-12b, Youtu-VL-4B-Instruct, EraX-VL-7B-V1.5, MiMo-VL-7B-RL, DreamOmni2, Phi-3.5-vision-instruct, Llama-3.2-11B-Vision-Instruct, LLaMA-3.1-Vision, Yi-VL-6B, LightOnOCR-2-1B
 - Added dynamic support functionality, when llama_cpp_python updates and releases support for new model versions, users can directly download and use the models
+- Optimized and fixed known bugs
 
 #### 2026-01-29
 - Restructured file directory, please delete old version files when installing, do not overwrite
@@ -94,12 +90,12 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
   - **LTX-2**: Specialized for LTX-2 video generation model with dynamic video prompts supporting 4K audio-visual synchronized output
   - **Qwen - Image Layered**: Created for Qwen-Image-Layered model with detailed layered prompts for complex compositions
   - **Qwen - Image Edit Combined**: Comprehensive editing prompt enhancer for image editing tasks
-  - **Qwen - Image Dual**: Designed for Qwen Image series (including Qwen Image and Qwen Image 2512) with high-resolution generation capabilities
-  - **Video - Reverse Prompt**: Video reverse prompt generator for creating detailed video descriptions (600-1000 words) based on video content
-  - **WAN - T2V**: Cinematic director style template adding cinematic elements (time, light source, light intensity, light angle, color tone, shooting angle, lens size, composition)
-  - **WAN - I2V**: Video description prompt rewriting expert emphasizing dynamic content 
-  - **WAN - I2V Empty**: Video description prompt writing expert generating video descriptions from images with imagination 
-  - **WAN - FLF2V**: Prompt optimizer optimizing prompts based on video first and last frame images, emphasizing motion information and camera movement
+  - **Qwen - Image Dual**: Designed for Qwen Image 2512 model with high-resolution generation capabilities
+  - **Video - Reverse Prompt**: Video reverse prompt generator for creating detailed video descriptions based on video content
+  - **WAN - Text to Video**: Cinematic director style template adding cinematic elements (time, light source, light intensity, light angle, color tone, shooting angle, lens size, composition)
+  - **WAN - Image to Video**: Video description prompt rewriting expert emphasizing dynamic content 
+  - **WAN - Image to Video Empty**: Video description prompt writing expert generating video descriptions from images with imagination 
+  - **WAN - FLF to Video**: Prompt optimizer optimizing prompts based on video first and last frame images, emphasizing motion information and camera movement
 - Enhanced preset prompt categorization for better user experience:
   - Basic templates: Empty - Nothing, Normal - Describe
   - Prompt Style templates: Tags, Simple, Detailed, Comprehensive Expansion, Refine & Expand Prompt
@@ -107,7 +103,7 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
   - Vision templates: Bounding Box
   - Professional Model templates: ZIMAGE - Turbo, FLUX2 - Klein, LTX-2, Qwen - Image Layered, Qwen - Image Edit Combined, Qwen - Image Dual
   - Video templates: Video - Reverse Prompt
-  - Cinematic Style templates: WAN - T2V, WAN - I2V, WAN - I2V Empty, WAN - FLF2V
+  - Cinematic Style templates: WAN - Text to Video, WAN - Image to Video, WAN - Image to Video Empty, WAN - FLF to Video
 - Optimized Chinese-English switching function for better language adaptation
 - Provided bilingual preset templates (English and Chinese) for better compatibility with different language models (exclusive presets have word count limits to meet model generation needs while ensuring efficient results, if they cannot meet requirements, please input in the preset box or use external custom presets)
 - Added Chinese-English switching function for generated results
@@ -140,43 +136,11 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
 
 ## Model Downloads
 
-### Common Model Downloads
+Please see (./doc/model_series_introduction_and_links.md)
 
-#### Reverse Models
-- **llama-joycaption**: https://huggingface.co/mradermacher/llama-joycaption-beta-one-hf-llava-GGUF
-- **mmproj model**: https://huggingface.co/concedo/llama-joycaption-beta-one-hf-llava-mmproj-gguf
+## Node Parameter Settings and Recommended Configurations
 
-#### Lightweight Models
-- **MobileVLM**: https://huggingface.co/Blombert/MobileVLM-3B-GGUF
-- **nanoLLaVA**: https://huggingface.co/saiphyohein/nanollava-1.5-gguf
-- **Moondream2**: https://huggingface.co/Hahasb/moondream2-20250414-GGUF
-- **moondream3-preview**: https://huggingface.co/vikhyatk/moondream3
-
-#### Multimodal Models
-- **Qwen3-VL**: https://huggingface.co/mradermacher/Qwen3-VL-8B-Instruct-abliterated-v2.0-GGUF
-- **Qwen2.5-VL**: https://huggingface.co/Qwen/Qwen2.5-VL-2B-Instruct-GGUF
-- **GLM-4.6V**: https://huggingface.co/huihui-ai/Huihui-GLM-4.6V-Flash-abliterated-GGUF
-- **MiniCPM-V-4.5**: https://huggingface.co/openbmb/MiniCPM-V-4_5-gguf
-- **MiniCPM-Llama3-V 2.5**: https://huggingface.co/openbmb/MiniCPM-Llama3-V-2_5
-- **Phi-3.5-vision-instruct**: https://huggingface.co/microsoft/Phi-3.5-vision-instruct
-- **Phi-3-vision-128k-instruct**: https://huggingface.co/microsoft/Phi-3-vision-128k-instruct
-- **Llama-3.2-11B-Vision-Instruct**: https://huggingface.co/meta-llama/Llama-3.2-11B-Vision-Instruct
-- **InternLM-XComposer2-VL**: https://huggingface.co/InternLM/InternLM-XComposer2-VL
-- **InternVL-1.5**: https://huggingface.co/OpenGVLab/InternVL-1.5
-- **InternVL-2.0**: https://huggingface.co/OpenGVLab/InternVL-2.0
-- **DreamOmni2**: https://huggingface.co/DreamOmni/DreamOmni2
-- **CogVLM2**: https://huggingface.co/THUDM/CogVLM2
-- **CogVLM-MOE**: https://huggingface.co/THUDM/CogVLM-MOE
-- **LLaMA-3.1-Vision**: https://huggingface.co/meta-llama/Llama-3.1-8B-Vision-Instruct
-- **Yi-VL-2.0**: https://huggingface.co/01-ai/Yi-VL-2.0
-- **olmOCR-2**: https://huggingface.co/allenai/olmOCR-2
-
-### Quantization Level Selection
-
-- **Q4_K_M**: Balanced size and quality (recommended)
-- **Q5_K_M**: Higher quality, slightly larger file
-- **Q3_K_M**: Smaller file, suitable for low VRAM devices
-- **Q2_K**: Smallest file, lower quality
+Please see (./doc/Parameter-Explanation-and-Recommended-Settings.md)
 
 ## Installation Instructions
 
@@ -208,7 +172,7 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
 
 ![Workflow Example - Text Mode](./workflows/TEXT.png)
 
-![Workflow Example - Image Mode](./workflows/Images.png)
+![Workflow Example - Image Mode](./workflows/Image.png)
 
 ![Workflow Example - Video Mode](./workflows/Video.png)
 
@@ -234,6 +198,8 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
 4. **Manage Resources**:
    - Use the `Llama-cpp Clean Session` node to release session resources
    - Use the `Llama-cpp Unload Model` node to release model resources
+
+Note: For detailed parameter explanations, please see (./doc/Parameter-Explanation-and-Recommended-Settings.md)
 
 ### 1.1 CPU/GPU Runtime Mode Selection
 
@@ -284,6 +250,12 @@ The plugin automatically selects appropriate runtime mode based on hardware perf
 
 ### 2. Recommended Workflows
 
+#### Prompt Generation Workflow
+1. Load model (e.g., Qwen3-VL)
+2. Disable "Auto Configuration" option
+3. Input prompt content
+4. Select "Prompt Style" series or dedicated model presets
+
 #### Image Description Workflow
 1. Load model (e.g., Moondream2)
 2. Connect image input
@@ -297,13 +269,9 @@ The plugin automatically selects appropriate runtime mode based on hardware perf
 4. Configure max_frames parameter
 5. Execute inference to get video summary
 
-#### Bounding Box Generation Workflow
-1. Load model (e.g., Qwen3-VL)
-2. Connect image input
-3. Select "Vision - Bounding Box" preset
-4. Use `JSON to Bounding Box` node to visualize results
-
 ## Common Questions
+
+It is recommended to run workflows in separate blocks for generation, avoiding combined workflows like prompt generation + image generation, which can lead to high resource usage.
 
 ### 1. Model Loading Issues
 
@@ -337,12 +305,14 @@ The plugin automatically selects appropriate runtime mode based on hardware perf
 - Model is too large
 - GPU layers setting is too low
 - Hardware performance limitations
+- Unrestricted system_prompts word count
 
 **Solutions**:
 - Use a smaller model
 - Increase `n_gpu_layers` value
 - Reduce `n_ctx` value
 - Close unnecessary applications
+- Add word count limit, such as within 300 words, fewer words means faster inference
 
 ### 4. Poor Generation Quality
 
@@ -420,15 +390,15 @@ The plugin includes various prompt templates for different scenarios:
 - **LTX-2**: Designed for LTX-2 model, creating detailed and dynamic video generation prompts, supporting high-quality, audio-visual synchronized 4K video
 - **Qwen - Image Layered**: Designed for Qwen-Image-Layered model, creating detailed layered prompts for complex compositions
 - **Qwen - Image Edit Combined**: Comprehensive editing prompt enhancer for image editing tasks, supporting add, delete, replace and other operations
-- **Qwen - Image Dual**: Designed for Qwen Image series (including Qwen Image and Qwen Image 2512) models, creating high-quality image generation prompts
+- **Qwen - Image Dual**: Designed for Qwen Image 2512 model, creating high-quality image generation prompts
 
 ### Cinematic Style Templates
-- **WAN - T2V**: Cinematic director style, adding cinematic elements (time, light source, light intensity, light angle, color tone, shooting angle, lens size, composition, etc.) to original prompts
-- **WAN - I2V**: Video description prompt rewriting expert, rewriting video descriptions based on images and input prompts, emphasizing dynamic content
-- **WAN - I2V Empty**: Video description prompt writing expert, generating video descriptions from images with imagination
-- **WAN - FLF2V**: Prompt optimizer, optimizing and rewriting prompts based on video first and last frame images, emphasizing motion information and camera movement
+- **WAN - Text to Video**: Cinematic director style, adding cinematic elements (time, light source, light intensity, light angle, color tone, shooting angle, lens size, composition, etc.) to original prompts
+- **WAN - Image to Video**: Video description prompt rewriting expert, rewriting video descriptions based on images and input prompts, emphasizing dynamic content
+- **WAN - Image to Video Empty**: Video description prompt writing expert, generating video descriptions from images with imagination
+- **WAN - FLF to Video**: Prompt optimizer, optimizing and rewriting prompts based on video first and last frame images, emphasizing motion information and camera movement
 
-## Credits  
+## Acknowledgments  
 - [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
 - [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng  
 - [ComfyUI-llama-cpp](https://github.com/kijai/ComfyUI-llama-cpp) @kijai  
