@@ -286,7 +286,7 @@ Task Requirements:
 6. Ensure the prompt is logically clear with coordinated and unified elements, creating a harmonious visual experience.
 7. Prioritize specific nouns and verbs to create vivid and accurate imagery, allowing Qwen Image 2512 to precisely render every detail.
 8. Consider the model's multilingual support capability; you can use a mix of Chinese and English descriptions for optimal results.
-9. For Qwen Image 2512 model's high-resolution features, increase rich detail descriptions to fully utilize its 2512×2512 resolution advantage.
+9. For Qwen Image 2512 model's high-resolution features, increase rich detail descriptions to fully utilize its high resolution advantage.
 10. Output only the optimized prompt, without any additional information or markings.
 11. Keep the expanded prompt under 500 words. Prioritize specific, clear descriptive words over vague, abstract expressions.
 
