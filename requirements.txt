@@ -5,14 +5,17 @@ pillow
 gguf
 tqdm
 
-# for Windows
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp310-cp310-win_amd64.whl; python_version == "3.10" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp311-cp311-win_amd64.whl; python_version == "3.11" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp312-cp312-win_amd64.whl; python_version == "3.12" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp313-cp313-win_amd64.whl; python_version == "3.13" and platform_system == "Windows"
+# for Windows - CUDA 12.6
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp310-cp310-win_amd64.whl; python_version == "3.10" and platform_system == "Windows"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp311-cp311-win_amd64.whl; python_version == "3.11" and platform_system == "Windows"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp312-cp312-win_amd64.whl; python_version == "3.12" and platform_system == "Windows"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp313-cp313-win_amd64.whl; python_version == "3.13" and platform_system == "Windows"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp314-cp314-win_amd64.whl; python_version == "3.14" and platform_system == "Windows"
 
-# for Linux
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp310-cp310-linux_amd64.whl; python_version == "3.10" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp311-cp311-linux_amd64.whl; python_version == "3.11" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp312-cp312-linux_amd64.whl; python_version == "3.12" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.22-cu126-Basic-win-20260118/llama_cpp_python-0.3.22-cp313-cp313-linux_amd64.whl; python_version == "3.13" and platform_system == "Linux"
+# for Linux - CUDA 12.6
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp310-cp310-linux_x86_64.whl; python_version == "3.10" and platform_system == "Linux"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp311-cp311-linux_x86_64.whl; python_version == "3.11" and platform_system == "Linux"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp312-cp312-linux_x86_64.whl; python_version == "3.12" and platform_system == "Linux"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp313-cp313-linux_x86_64.whl; python_version == "3.13" and platform_system == "Linux"
+llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp314-cp314-linux_x86_64.whl; python_version == "3.14" and platform_system == "Linux"
+
