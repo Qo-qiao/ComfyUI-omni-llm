@@ -1,5 +1,7 @@
 # ComfyUI-llama-cpp-vlmforQo
 
+Update notice: Due to the addition of many new features in the new version, the calling of the new qwen3.5 model cannot be updated and added in a timely manner. Currently, the function addition has been completed, but the plug-in still needs a lot of time for debugging and improvement. I am seizing my free time after work to debug, striving to release and share it as soon as possible.
+
 Run LLM/VLM models natively in ComfyUI based on llama.cpp, supporting multimodal inference, visual language understanding, and various AI tasks.
 
 **[📃中文版](./README_zh.md)**
