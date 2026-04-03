@@ -229,19 +229,19 @@ This update achieves a comprehensive upgrade from audio processing to full-modal
 
 ## Model Recommendations and Links (for reference only)
 
-Please see [Model Recommendations and Links](./doc/Model Recommendations and Links.md)
+Please see [Model Recommendations and Links](./doc/Model_Recommendations_and_Links.md)
 
 ## Inference Node Parameter Explanation and Recommended Settings (for reference only)
 
-Please see [Explanation of Inference Node Parameters and Recommended Settings](./doc/Explanation of Inference Node Parameters and Recommended Settings.md)
+Please see [Explanation of Inference Node Parameters and Recommended Settings](./doc/Explanation_of_Inference_Node_Parameters_and_Recommended_Settings.md)
 
 ## Multi-Image Input Node Usage Guide (for reference only)
 
-Please see [Multi-Image Input Usage Guide](./doc/Multi-Image Input Usage Guide.md)
+Please see [Multi-Image Input Usage Guide](./doc/Multi_Image_Input_Usage_Guide.md)
 
 ## Audio Node Parameter Explanation (for reference only)
 
-Please see [Audio Node Parameters Guide](./doc/Audio Node Parameters Guide.md)
+Please see [Audio Node Parameters Guide](./doc/Audio_Node_Parameters_Guide.md)
 
 ## Installation Instructions
 
@@ -357,7 +357,7 @@ Please see [Audio Node Parameters Guide](./doc/Audio Node Parameters Guide.md)
    - Use the `llama_cpp_clean_states` node to release session resources
    - Use the `llama_cpp_unload_model` node to release model resources
 
-Note: For detailed parameter explanations>=0.3.30, please see [推理节点参数说明与推荐设置](./doc/推理节点参数说明与推荐设置.md)
+Note: For detailed parameter explanations>=0.3.30, please see [Explanation of Inference Node Parameters and Recommended Settings](./doc/Explanation_of_Inference_Node_Parameters_and_Recommended_Settings.md)
 
 ### 2. CPU/GPU Runtime Mode Selection
 
