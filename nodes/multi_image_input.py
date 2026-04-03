@@ -1,10 +1,21 @@
-# @亲卿于情 修改版本
 # -*- coding: utf-8 -*-
 """
+ComfyUI-omni-llm Multi-Image Input Node
+
 多图输入节点 - 用于分析多张图像并创作故事内容
+
+Author: 亲卿于情 (@Qo-qiao)
+GitHub: https://github.com/Qo-qiao
+License: See LICENSE file for details
 """
 import numpy as np
-from ..common import (
+import sys
+import os
+
+# 添加项目根目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common import (
     HARDWARE_INFO, any_type, image2base64, scale_image
 )
 
@@ -28,69 +39,75 @@ class MultiImageInput:
                 "image4": ("IMAGE",),
                 "image5": ("IMAGE",),
                 "image6": ("IMAGE",),
-                "mode": (["Image Mode", "Text Mode"], {"default": "Image Mode", "tooltip": "选择工作模式：图像模式分析图像内容，文本模式根据选项生成提示词"}),
+                "image7": ("IMAGE",),
+                "image8": ("IMAGE",),
+                "image9": ("IMAGE",),
+                "image10": ("IMAGE",),
+                "image11": ("IMAGE",),
+                "image12": ("IMAGE",),
+                "mode": (["图像模式", "文本模式"], {"default": "图像模式", "tooltip": "选择工作模式：图像模式分析图像内容，文本模式根据选项生成提示词"}),
                 "story_type": ([
-                    "Coherent Story",
-                    "Storyboard Description",
-                    "Scene Analysis",
-                    "Character Development",
-                    "Emotional Progression",
-                    "Creative Writing",
-                    "Script Creation",
-                    "Advertising Copy",
-                    "Product Introduction",
-                    "Educational Content"
-                ], {"default": "Coherent Story", "tooltip": "选择内容创作类型"}),
+                    "连贯故事",
+                    "分镜描述",
+                    "场景分析",
+                    "角色发展",
+                    "情感递进",
+                    "创意写作",
+                    "脚本创作",
+                    "广告文案",
+                    "产品介绍",
+                    "教育内容"
+                ], {"default": "连贯故事", "tooltip": "选择内容创作类型"}),
                 "story_length": ([
-                    "Short (200 words or less)",
-                    "Medium (400 words or less)",
-                    "Detailed (600 words or less)",
-                    "Complete (1000 words or less)"
-                ], {"default": "Medium (400 words or less)", "tooltip": "选择内容长度"}),
+                    "简短（200字以内）",
+                    "中等（400字以内）",
+                    "详细（600字以内）",
+                    "完整（1000字以内）"
+                ], {"default": "中等（400字以内）", "tooltip": "选择内容长度"}),
                 "language": (["中文", "English"], {"default": "中文", "tooltip": "选择输出语言"}),
                 "max_size": ("INT", {"default": 256, "min": 128, "max": 512, "step": 32, "tooltip": "图像最大尺寸（像素）"}),
                 "custom_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "自定义提示词，用于指导内容创作"}),
                 "include_image_descriptions": ("BOOLEAN", {"default": True, "tooltip": "是否在故事前包含每张图像的描述"}),
                 "story_theme": ([
-                    "No Specific Theme",
-                    "Adventure Story",
-                    "Romance Story",
-                    "Mystery Story",
-                    "Sci-Fi Story",
-                    "Fantasy Story",
-                    "Daily Life",
-                    "Historical Story",
-                    "Future Technology",
-                    "Business Marketing",
-                    "Educational Popularization",
-                    "Entertainment Comedy"
-                ], {"default": "No Specific Theme", "tooltip": "选择内容主题"}),
+                    "无特定主题",
+                    "冒险故事",
+                    "浪漫故事",
+                    "悬疑故事",
+                    "科幻故事",
+                    "奇幻故事",
+                    "日常生活",
+                    "历史故事",
+                    "未来科技",
+                    "商业营销",
+                    "科普教育",
+                    "娱乐喜剧"
+                ], {"default": "无特定主题", "tooltip": "选择内容主题"}),
                 "narrative_style": ([
-                    "First Person",
-                    "Third Person",
-                    "Omniscient Perspective",
-                    "Multi-Perspective Switching"
-                ], {"default": "Third Person", "tooltip": "选择叙事风格"}),
+                    "第一人称",
+                    "第三人称",
+                    "全知视角",
+                    "多视角切换"
+                ], {"default": "第三人称", "tooltip": "选择叙事风格"}),
                 "content_focus": ([
-                    "Balanced Development",
-                    "Emphasize Plot",
-                    "Emphasize Characters",
-                    "Emphasize Emotions",
-                    "Emphasize Visuals",
-                    "Emphasize Dialogue"
-                ], {"default": "Balanced Development", "tooltip": "选择内容重点"}),
+                    "平衡发展",
+                    "强调情节",
+                    "强调角色",
+                    "强调情感",
+                    "强调视觉",
+                    "强调对话"
+                ], {"default": "平衡发展", "tooltip": "选择内容重点"}),
                 "target_audience": ([
-                    "General Public",
-                    "Teenagers",
-                    "Children",
-                    "Professionals",
-                    "Specific Groups"
-                ], {"default": "General Public", "tooltip": "选择目标受众"}),
+                    "普通大众",
+                    "青少年",
+                    "儿童",
+                    "专业人士",
+                    "特定群体"
+                ], {"default": "普通大众", "tooltip": "选择目标受众"}),
                 "video_model": ([
                     "WAN2.2",
                     "LTX2",
-                    "General Video",
-                    "Custom"
+                    "通用视频",
+                    "自定义"
                 ], {"default": "WAN2.2", "tooltip": "选择视频生成模型类型，不同模型需要不同的提示词格式"}),
             }
         }
@@ -101,7 +118,7 @@ class MultiImageInput:
     FUNCTION = "process_multi_images"
     CATEGORY = "llama-cpp-vlm"
     
-    def process_multi_images(self, image1=None, image2=None, image3=None, image4=None, image5=None, image6=None, mode="Image Mode", story_type="Coherent Story", story_length="Medium (400 words or less)", language="中文", max_size=256, 
+    def process_multi_images(self, image1=None, image2=None, image3=None, image4=None, image5=None, image6=None, image7=None, image8=None, image9=None, image10=None, image11=None, image12=None, mode="Image Mode", story_type="Coherent Story", story_length="Medium (400 words or less)", language="中文", max_size=256, 
                           custom_prompt="", include_image_descriptions=True, 
                           story_theme="No Specific Theme", narrative_style="Third Person",
                           content_focus="Balanced Development", target_audience="General Public", video_model="WAN2.2"):
@@ -115,6 +132,12 @@ class MultiImageInput:
         - image4: 第四张输入图像
         - image5: 第五张输入图像
         - image6: 第六张输入图像
+        - image7: 第七张输入图像
+        - image8: 第八张输入图像
+        - image9: 第九张输入图像
+        - image10: 第十张输入图像
+        - image11: 第十一张输入图像
+        - image12: 第十二张输入图像
         - mode: 工作模式（图像模式/文本模式）
         - story_type: 内容创作类型
         - story_length: 内容长度
@@ -131,7 +154,7 @@ class MultiImageInput:
         
         if mode == "Image Mode":
             return self._process_image_mode(
-                image1, image2, image3, image4, image5, image6, story_type, story_length, language, max_size,
+                image1, image2, image3, image4, image5, image6, image7, image8, image9, image10, image11, image12, story_type, story_length, language, max_size,
                 custom_prompt, include_image_descriptions, story_theme, narrative_style, video_model
             )
         else:
@@ -140,7 +163,7 @@ class MultiImageInput:
                 story_theme, narrative_style, content_focus, target_audience, video_model
             )
     
-    def _process_image_mode(self, image1, image2, image3, image4, image5, image6, story_type, story_length, language, max_size,
+    def _process_image_mode(self, image1, image2, image3, image4, image5, image6, image7, image8, image9, image10, image11, image12, story_type, story_length, language, max_size,
                           custom_prompt, include_image_descriptions, story_theme, narrative_style, video_model):
         """
         图像模式：分析图像内容进行故事创作
@@ -160,6 +183,18 @@ class MultiImageInput:
             all_images.append(image5)
         if image6 is not None:
             all_images.append(image6)
+        if image7 is not None:
+            all_images.append(image7)
+        if image8 is not None:
+            all_images.append(image8)
+        if image9 is not None:
+            all_images.append(image9)
+        if image10 is not None:
+            all_images.append(image10)
+        if image11 is not None:
+            all_images.append(image11)
+        if image12 is not None:
+            all_images.append(image12)
         
         # 检查是否有图像输入
         if len(all_images) == 0:

@@ -1,11 +1,20 @@
-# @亲卿于情 修改版本
 # -*- coding: utf-8 -*-
 """
-JSON to Bounding Box Node
+ComfyUI-omni-llm JSON to Bounding Box Node
+
+Author: 亲卿于情 (@Qo-qiao)
+GitHub: https://github.com/Qo-qiao
+License: See LICENSE file for details
 """
 import torch
 import numpy as np
-from ..common import parse_json, draw_bbox, qwen3bbox
+import sys
+import os
+
+# 添加项目根目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common import parse_json, draw_bbox, qwen3bbox
 
 class json_to_bbox:
     @classmethod
@@ -74,3 +83,11 @@ class json_to_bbox:
             cursor += count
         
         return (output_bboxes, restructured_images_list)
+
+NODE_CLASS_MAPPINGS = {
+    "json_to_bbox": json_to_bbox
+}
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "json_to_bbox": "JSON to Bounding Box"
+}

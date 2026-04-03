@@ -1,9 +1,19 @@
-# @亲卿于情 修改版本
 # -*- coding: utf-8 -*-
 """
-Llama-cpp Unload Model Node
+ComfyUI-omni-llm Unload Model Node
+
+Author: 亲卿于情 (@Qo-qiao)
+GitHub: https://github.com/Qo-qiao
+License: See LICENSE file for details
 """
-from ..common import any_type, LLAMA_CPP_STORAGE
+import sys
+import os
+import torch
+
+# 添加项目根目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common import any_type, LLAMA_CPP_STORAGE
 
 class llama_cpp_unload_model:
     @classmethod
@@ -16,5 +26,44 @@ class llama_cpp_unload_model:
     CATEGORY = "llama-cpp-vlm"
     
     def process(self, any):
+        # 清理LLM模型和相关资源
         LLAMA_CPP_STORAGE.clean()
+        
+        # 清理TTS模型
+        try:
+            from .llama_cpp_tts_loader import llama_cpp_tts_loader
+            # 获取所有TTS加载器实例并清理
+            import gc
+            for obj in gc.get_objects():
+                if isinstance(obj, llama_cpp_tts_loader):
+                    if hasattr(obj, 'loaded_model') and obj.loaded_model:
+                        # 调用模型的clean方法（如果有）
+                        if hasattr(obj.loaded_model, 'clean'):
+                            obj.loaded_model.clean()
+                        obj.loaded_model = None
+                        print(f"【资源释放】已清理TTS模型")
+        except Exception as e:
+            print(f"【提示】清理TTS模型失败（忽略）：{e}")
+        
+        # 清理ASR模型
+        try:
+            from .llama_cpp_asr_loader import llama_cpp_asr_loader
+            # 获取所有ASR加载器实例并清理
+            import gc
+            for obj in gc.get_objects():
+                if isinstance(obj, llama_cpp_asr_loader):
+                    if hasattr(obj, 'loaded_model') and obj.loaded_model:
+                        # 调用模型的clean方法（如果有）
+                        if hasattr(obj.loaded_model, 'clean'):
+                            obj.loaded_model.clean()
+                        obj.loaded_model = None
+                        print(f"【资源释放】已清理ASR模型")
+        except Exception as e:
+            print(f"【提示】清理ASR模型失败（忽略）：{e}")
+        
+        # 强制垃圾回收
+        import gc
+        gc.collect()
+        torch.cuda.empty_cache()
+        
         return (any,)

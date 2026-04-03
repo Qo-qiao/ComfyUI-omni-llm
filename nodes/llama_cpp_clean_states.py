@@ -1,9 +1,18 @@
-# @亲卿于情 修改版本
 # -*- coding: utf-8 -*-
 """
-Llama-cpp Clean States Node
+ComfyUI-omni-llm Clean States Node
+
+Author: 亲卿于情 (@Qo-qiao)
+GitHub: https://github.com/Qo-qiao
+License: See LICENSE file for details
 """
-from ..common import any_type, LLAMA_CPP_STORAGE
+import sys
+import os
+
+# 添加项目根目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from common import any_type, LLAMA_CPP_STORAGE
 
 class llama_cpp_clean_states:
     @classmethod
