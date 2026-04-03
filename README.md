@@ -229,19 +229,19 @@ This update achieves a comprehensive upgrade from audio processing to full-modal
 
 ## Model Recommendations and Links (for reference only)
 
-Please see [模型推荐与链接](./doc/模型推荐与链接.md)
+Please see [Model Recommendations and Links](./doc/Model Recommendations and Links.md)
 
 ## Inference Node Parameter Explanation and Recommended Settings (for reference only)
 
-Please see [推理节点参数说明与推荐设置](./doc/推理节点参数说明与推荐设置.md)
+Please see [Explanation of Inference Node Parameters and Recommended Settings](./doc/Explanation of Inference Node Parameters and Recommended Settings.md)
 
 ## Multi-Image Input Node Usage Guide (for reference only)
 
-Please see [多图输入节点使用说明](./doc/多图输入节点使用说明.md)
+Please see [Multi-Image Input Usage Guide](./doc/Multi-Image Input Usage Guide.md)
 
 ## Audio Node Parameter Explanation (for reference only)
 
-Please see [音频类节点参数说明](./doc/音频类节点参数说明.md)
+Please see [Audio Node Parameters Guide](./doc/Audio Node Parameters Guide.md)
 
 ## Installation Instructions
 
