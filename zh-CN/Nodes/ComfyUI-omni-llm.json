@@ -1,0 +1,902 @@
+{
+  "json_to_bbox": {
+    "title": "JSON转边界框",
+    "inputs": {
+      "json": "JSON数据",
+      "mode": "模式",
+      "label": "标签过滤",
+      "image": "图像"
+    },
+    "widgets": {
+      "json": "JSON数据",
+      "mode": "模式",
+      "label": "标签过滤"
+    },
+    "outputs": {
+      "bboxes": "边界框",
+      "image_list": "图像列表"
+    },
+    "tooltips": {
+      "json": "包含边界框信息的JSON字符串\n• 从推理节点获取的目标检测结果",
+      "mode": "选择解析模式\n• simple：简单解析模式\n• Qwen3-VL：Qwen3-VL模型格式\n• Qwen2.5-VL：Qwen2.5-VL模型格式",
+      "label": "按标签过滤边界框\n• 留空表示不过滤\n• 输入标签名称只显示匹配的边界框",
+      "image": "可选的输入图像\n• 用于在图像上绘制边界框",
+      "bboxes": "解析出的边界框列表\n• 包含位置和标签信息",
+      "image_list": "绘制了边界框的图像列表\n• 可视化检测结果"
+    }
+  },
+  "llama_cpp_api_model_config": {
+    "title": "API配置管理器",
+    "inputs": {
+      "model_name": "模型名称",
+      "api_provider": "API提供商",
+      "api_base": "API地址",
+      "api_key": "API密钥",
+      "max_tokens": "最大token数",
+      "temperature": "生成温度"
+    },
+    "widgets": {
+      "model_name": "模型名称",
+      "api_provider": "API提供商",
+      "api_base": "API地址",
+      "api_key": "API密钥",
+      "max_tokens": "最大token数",
+      "temperature": "生成温度"
+    },
+    "outputs": {
+      "api_config": "API配置",
+      "preview": "预览"
+    },
+    "tooltips": {
+      "model_name": "API模型名称\n• 自定义模型时使用",
+      "api_provider": "选择API服务商\n• 会自动切换对应的模型列表",
+      "api_base": "API基础URL\n• 如：https://api.openai.com/v1",
+      "api_key": "API密钥\n• 用于身份验证\n• 请妥善保管",
+      "max_tokens": "最大生成token数\n• 控制输出长度",
+      "temperature": "温度参数\n• 0.0-2.0\n• 值越高越随机",
+      "api_config": "API配置",
+      "preview": "配置预览信息"
+    }
+  },
+  "llama_cpp_api_inference": {
+    "title": "API多媒体推理",
+    "inputs": {
+      "api_config": "API配置",
+      "inference_mode": "推理模式",
+      "preset_prompt": "预设模板",
+      "system_prompt": "系统提示词",
+      "text_input": "用户输入",
+      "prompt_language": "提示词语言",
+      "response_language": "响应语言",
+      "video_max_frames": "视频最大帧数",
+      "video_sampling": "视频抽帧模式",
+      "video_manual_indices": "视频手动帧索引",
+      "image_max_size": "图像最大尺寸",
+      "tts_voice": "TTS音色",
+      "tts_emotion": "情感风格",
+      "tts_language": "TTS语言",
+      "tts_speed": "语速",
+      "seed": "随机种子",
+      "images": "图像",
+      "video": "视频",
+      "audio": "音频"
+    },
+    "widgets": {
+      "api_config": "API配置",
+      "inference_mode": "推理模式",
+      "preset_prompt": "预设模板",
+      "system_prompt": "系统提示词",
+      "text_input": "用户输入",
+      "prompt_language": "提示词语言",
+      "response_language": "响应语言",
+      "video_max_frames": "视频最大帧数",
+      "video_sampling": "视频抽帧模式",
+      "video_manual_indices": "视频手动帧索引",
+      "image_max_size": "图像最大尺寸",
+      "tts_voice": "TTS音色",
+      "tts_emotion": "情感风格",
+      "tts_language": "TTS语言",
+      "tts_speed": "语速",
+      "seed": "随机种子"
+    },
+    "outputs": {
+      "text": "文本输出",
+      "audio": "音频输出"
+    },
+    "tooltips": {
+      "api_config": "API配置\n• 从API模型配置节点获取",
+      "inference_mode": "选择推理模式\n• [VL] 图像理解：处理单张或多张图片\n• [VL] 视频理解：从视频中提取帧进行分析\n• [VL] 单图逐个处理：逐张处理图片序列\n• [LLM] 纯文本对话：仅文本交互",
+      "preset_prompt": "选择预设提示词模板",
+      "system_prompt": "系统提示词，定义AI助手的角色和行为\n• 可包含预设模板占位符#\n• 与预设模板配合使用时，可设置AI的角色扮演",
+      "text_input": "用户输入文本\n• 作为对话的用户消息内容\n• 支持多行文本输入\n• 可替换预设模板中的#占位符",
+      "prompt_language": "提示词语言\n• 中文：使用中文提示词\n• English：使用英文提示词",
+      "response_language": "响应语言\n• 自动检测：自动检测语言\n• 中文：强制中文输出\n• English：强制英文输出",
+      "video_max_frames": "视频处理的最大帧数\n• 控制视频抽帧数量\n• 影响处理时间和API调用成本",
+      "video_sampling": "视频抽帧模式\n• 自动均匀采样：均匀抽取帧\n• 手动指定帧索引：按指定索引抽帧",
+      "video_manual_indices": "手动模式下的帧索引\n• 仅在video_sampling为手动时生效\n• 格式：逗号分隔的数字或范围（如：0,10,20 或 0-10）",
+      "image_max_size": "图像处理的最大尺寸\n• 控制图像缩放大小\n• 影响API调用成本和速度",
+      "tts_voice": "TTS音色选择\n• 👩 女声 (nova)\n• 👨 男声 (onyx)\n• 🧒 萝莉音 (shimmer)\n• 👦 正太音 (echo)\n• 💃 御姐音 (fable)\n• 👴 大叔音 (alloy)",
+      "tts_emotion": "TTS情感风格\n• 开心/悲伤/愤怒/平静/兴奋/温柔/默认",
+      "tts_speed": "TTS语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
+      "seed": "随机种子\n• 影响生成结果的可重复性\n• 相同种子产生相同结果",
+      "images": "图像输入\n• 支持单张或多张图像",
+      "video": "视频输入\n• 自动抽帧处理",
+      "audio": "音频输入\n• 用于音频理解"
+    }
+  },
+
+  "llama_cpp_asr_loader": {
+    "title": "Llama-cpp ASR模型加载器",
+    "inputs": {
+      "asr_model": "ASR模型",
+      "n_gpu_layers": "GPU模型层数",
+      "language": "语言",
+      "task": "任务类型",
+      "backend": "推理后端",
+      "enable_timestamps": "启用时间戳",
+      "max_new_tokens": "最大生成token数",
+      "batch_size": "批处理大小",
+      "flash_attention": "启用FlashAttention2"
+    },
+    "widgets": {
+      "asr_model": "ASR模型",
+      "n_gpu_layers": "GPU模型层数",
+      "language": "语言",
+      "task": "任务类型",
+      "backend": "推理后端",
+      "enable_timestamps": "启用时间戳",
+      "max_new_tokens": "最大生成token数",
+      "batch_size": "批处理大小",
+      "flash_attention": "启用FlashAttention2"
+    },
+    "outputs": {
+      "asr_model": "ASR模型"
+    },
+    "tooltips": {
+      "asr_model": "选择ASR模型文件\n• 支持Whisper等语音识别模型\n• 格式：.gguf、.safetensors、.pt、.pth、.bin",
+      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载\n• GPU模式有效",
+      "language": "识别语言\n• auto：自动检测\n• zh：中文\n• en：英文\n• ja：日文\n• ko：韩文",
+      "task": "任务类型\n• transcribe：语音识别（默认）\n• translate：翻译成英文",
+      "backend": "推理后端选择\n• transformers：标准后端（默认）\n• vllm：高性能后端（仅Qwen3-ASR模型适用）",
+      "enable_timestamps": "启用时间戳功能\n• 需要Qwen3-ForcedAligner模型\n• 为识别结果添加时间戳信息",
+      "max_new_tokens": "最大生成token数\n• 控制输出文本长度\n• 默认：256",
+      "batch_size": "批处理大小\n• 影响处理速度\n• 默认：32",
+      "flash_attention": "启用FlashAttention2优化\n• 需要安装flash-attn库\n• 提升推理性能"
+    }
+  },
+  "llama_cpp_clean_states": {
+    "title": "Llama-cpp 清理状态",
+    "inputs": {
+      "any": "任意输入",
+      "state_uid": "对话状态ID"
+    },
+    "widgets": {
+      "any": "任意输入",
+      "state_uid": "对话状态ID"
+    },
+    "outputs": {
+      "any": "任意输出"
+    },
+    "tooltips": {
+      "any": "任意类型的输入\n• 用于触发节点执行",
+      "state_uid": "要清理的对话状态ID\n• -1：清理所有状态\n• 指定ID：清理特定状态"
+    }
+  },
+  "forced_aligner_inference": {
+    "title": "强制对齐推理",
+    "inputs": {
+      "aligner_model": "对齐模型",
+      "audio": "音频",
+      "text": "文本",
+      "sample_rate": "采样率",
+      "output_format": "输出格式",
+      "language": "语言"
+    },
+    "widgets": {
+      "aligner_model": "对齐模型",
+      "audio": "音频",
+      "text": "文本",
+      "sample_rate": "采样率",
+      "output_format": "输出格式",
+      "language": "语言"
+    },
+    "outputs": {
+      "aligned_text": "对齐文本",
+      "timestamps": "时间戳",
+      "subtitle_text": "字幕文本"
+    },
+    "tooltips": {
+      "aligner_model": "加载的强制对齐模型\n• 通过强制对齐模型加载器节点加载",
+      "audio": "输入音频数据\n• 支持单通道音频\n• 推荐采样率：16000Hz",
+      "text": "要对齐的文本内容\n• 需要与音频内容匹配",
+      "sample_rate": "音频采样率（Hz）\n• 默认：16000",
+      "output_format": "输出格式\n• Text：对齐文本\n• SRT：SRT字幕\n• VTT：VTT字幕",
+      "language": "文本语言\n• zh：中文\n• en：英文",
+      "aligned_text": "对齐后的文本",
+      "timestamps": "细粒度时间戳\n• 包含单词级和音素级时间信息",
+      "subtitle_text": "字幕文本\n• 可直接保存为SRT/VTT文件"
+    }
+  },
+  "forced_aligner_loader": {
+    "title": "强制对齐模型加载器",
+    "inputs": {
+      "forced_aligner_model": "强制对齐模型",
+      "n_gpu_layers": "GPU模型层数",
+      "precision": "精度",
+      "batch_size": "批处理大小",
+      "flash_attention": "启用FlashAttention2"
+    },
+    "widgets": {
+      "forced_aligner_model": "强制对齐模型",
+      "n_gpu_layers": "GPU模型层数",
+      "precision": "精度",
+      "batch_size": "批处理大小",
+      "flash_attention": "启用FlashAttention2"
+    },
+    "outputs": {
+      "aligner_model": "对齐模型"
+    },
+    "tooltips": {
+      "forced_aligner_model": "选择强制对齐模型文件\n• Qwen3-ForcedAligner-0.6B：阿里通义千问强制对齐模型",
+      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载（推荐）\n• GPU模式有效，CPU模式自动忽略\n• 显存不足时可设为部分层数",
+      "precision": "模型精度选择\n• float16：半精度（推荐）\n• bfloat16：BF16精度\n• float32：单精度",
+      "batch_size": "批处理大小\n• 影响处理速度\n• 默认：32",
+      "flash_attention": "启用FlashAttention2优化\n• 需要安装flash-attn库\n• 提升推理性能",
+      "aligner_model": "加载的强制对齐模型对象"
+    }
+  },"llama_cpp_model_loader": {
+    "title": "Llama-cpp 模型加载器",
+    "inputs": {
+      "model": "模型文件",
+      "enable_mmproj": "启用多模态",
+      "mmproj": "视觉编码模型",
+      "enable_asr": "启用ASR",
+      "enable_tts": "启用TTS",
+      "device_mode": "运行模式",
+      "n_ctx": "上下文长度",
+      "n_gpu_layers": "GPU模型层数",
+      "vram_limit": "显存限制（GB）",
+      "image_min_tokens": "图片最小编码token数",
+      "image_max_tokens": "图片最大编码token数",
+      "attention_type": "注意力类型"
+    },
+    "widgets": {
+      "model": "模型文件",
+      "enable_mmproj": "启用多模态",
+      "mmproj": "视觉编码模型",
+      "enable_asr": "启用ASR",
+      "enable_tts": "启用TTS",
+      "device_mode": "运行模式",
+      "n_ctx": "上下文长度",
+      "n_gpu_layers": "GPU模型层数",
+      "vram_limit": "显存限制（GB）",
+      "image_min_tokens": "图片最小编码token数",
+      "image_max_tokens": "图片最大编码token数",
+      "attention_type": "注意力类型"
+    },
+    "outputs": {
+      "llama_model": "Llama模型"
+    },
+    "tooltips": {
+      "model": "选择要加载的LLM模型文件（GGUF格式）\n• 轻量级任务：Moondream2、MobileVLM\n• 中型任务：LLaVA-1.6、MiniCPM-V-4.5\n• 复杂任务：Qwen3-VL、GLM-4.6V",
+      "enable_mmproj": "启用多模态功能（需要选择mmproj模型）\n• 处理图片或需要对话格式时设为True\n• 纯文本生成时设为False",
+      "mmproj": "选择对应的视觉编码模型文件\n• 不同模型需要对应的mmproj文件\n• 确保版本匹配",
+      "enable_asr": "启用ASR语音识别功能\n• 需要配合ASR模型加载器使用\n• 支持音频反推、语音转文本",
+      "enable_tts": "启用TTS语音合成功能\n• 需要配合TTS模型加载器使用\n• 支持文本转语音",
+      "device_mode": "选择运行模式\n• GPU：使用显卡加速（推荐，8GB+显存）\n• CPU：纯CPU运行（兼容性好）\n\nGPU模式推理速度比CPU模式快5-10倍",
+      "n_ctx": "上下文长度，影响可处理的文本长度\n• 24GB+显存：16384\n• 16GB显存：8192\n• 12GB显存：6144\n• 8GB显存：4096\n• 4-6GB显存：2048",
+      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载（推荐）\n• GPU模式有效，CPU模式自动忽略\n• 显存不足时可设为部分层数",
+      "vram_limit": "显存限制（GB）\n• -1：无限制\n• GPU模式有效，CPU模式自动忽略\n• 建议设为实际显存大小减1",
+      "image_min_tokens": "图片最小编码token数\n• 保持默认0即可",
+      "image_max_tokens": "图片最大编码token数\n• 保持默认0即可",
+      "attention_type": "注意力类型\n• Auto：自动选择（推荐）\n• Standard：标准注意力\n• Flash：Flash Attention（NVIDIA GPU推荐）\n• XFormers：XFormers（实验性）"
+    }
+  },
+  "llama_cpp_parameters": {
+    "title": "Llama-cpp 参数设置",
+    "inputs": {
+      "max_tokens": "最大token数",
+      "top_k": "采样候选数",
+      "top_p": "核心采样阈值",
+      "min_p": "最小采样概率",
+      "typical_p": "典型采样阈值",
+      "temperature": "生成温度",
+      "repeat_penalty": "重复惩罚",
+      "frequency_penalty": "频率惩罚",
+      "presence_penalty": "存在惩罚",
+      "mirostat_mode": "Mirostat模式",
+      "mirostat_eta": "Mirostat学习率",
+      "mirostat_tau": "Mirostat目标困惑度",
+      "state_uid": "对话状态ID"
+    },
+    "widgets": {
+      "max_tokens": "最大token数",
+      "top_k": "采样候选数",
+      "top_p": "核心采样阈值",
+      "min_p": "最小采样概率",
+      "typical_p": "典型采样阈值",
+      "temperature": "生成温度",
+      "repeat_penalty": "重复惩罚",
+      "frequency_penalty": "频率惩罚",
+      "presence_penalty": "存在惩罚",
+      "mirostat_mode": "Mirostat模式",
+      "mirostat_eta": "Mirostat学习率",
+      "mirostat_tau": "Mirostat目标困惑度",
+      "state_uid": "对话状态ID"
+    },
+    "outputs": {
+      "parameters": "参数"
+    },
+    "tooltips": {
+      "max_tokens": "最大生成token数\n• 影响输出文本长度\n• 值越大输出越长",
+      "top_k": "采样候选数\n• 值越小生成越集中\n• 推荐值：40",
+      "top_p": "核心采样阈值（Nucleus Sampling）\n• 控制生成多样性\n• 推荐值：0.9-0.95",
+      "min_p": "最小采样概率\n• 避免完全忽略低概率词汇\n• 推荐值：0.05-0.1",
+      "typical_p": "典型采样阈值\n• 控制生成的典型性\n• 推荐值：1.0（禁用）",
+      "temperature": "生成温度\n• 值越高越随机、创意性越强\n• 值越低越确定、一致性越高\n• 推荐值：0.7-1.0",
+      "repeat_penalty": "重复惩罚\n• 避免生成重复内容\n• 推荐值：1.1-1.2",
+      "frequency_penalty": "频率惩罚\n• 减少高频词汇出现\n• 推荐值：0.0-0.5",
+      "presence_penalty": "存在惩罚\n• 鼓励生成新内容\n• 推荐值：0.0-0.5",
+      "mirostat_mode": "Mirostat采样模式\n• 0：关闭（默认）\n• 1：基础版\n• 2：版本2（推荐）\n\n自适应控制生成多样性",
+      "mirostat_eta": "Mirostat学习率\n• 控制适应性调整速度\n• 推荐值：0.1",
+      "mirostat_tau": "Mirostat目标困惑度\n• 控制生成多样性\n• 推荐值：5-7",
+      "state_uid": "对话状态ID\n• -1：使用节点唯一ID\n• 用于多轮对话管理"
+    }
+  },
+  "llama_cpp_sharded_model_loader": {
+    "title": "分段模型加载器",
+    "inputs": {
+      "model_name": "模型名称",
+      "quantization": "量化模式",
+      "enable_asr": "启用ASR",
+      "enable_tts": "启用TTS",
+      "n_ctx": "上下文长度",
+      "n_gpu_layers": "GPU模型层数",
+      "vram_limit": "显存限制（GB）",
+      "image_min_tokens": "图片最小编码token数",
+      "image_max_tokens": "图片最大编码token数",
+      "attention_type": "注意力类型"
+    },
+    "widgets": {
+      "model_name": "模型名称",
+      "quantization": "量化模式",
+      "enable_asr": "启用ASR",
+      "enable_tts": "启用TTS",
+      "n_ctx": "上下文长度",
+      "n_gpu_layers": "GPU模型层数",
+      "vram_limit": "显存限制（GB）",
+      "image_min_tokens": "图片最小编码token数",
+      "image_max_tokens": "图片最大编码token数",
+      "attention_type": "注意力类型"
+    },
+    "outputs": {
+      "llama_model": "Llama模型"
+    },
+    "tooltips": {
+      "model_name": "选择要加载的分段模型\n• Qwen2.5-Omni-3B（默认）\n• Qwen2.5-Omni-7B\n• Qwen3.5-2B（4.55GB）\n• Qwen3.5-4B（9.32GB）\n• Qwen3.5-9B（19.32GB）\n• 本地模型会自动扫描显示",
+      "quantization": "选择量化模式\n• None：不量化（精度最高）\n• 4-bit (VRAM-friendly)：4位量化（显存友好）\n• 8-bit (Balanced Precision)：8位量化（平衡精度）",
+      "enable_asr": "启用ASR语音识别功能\n• 需要配合ASR模型加载器使用\n• 支持音频反推、语音转文本",
+      "enable_tts": "启用TTS语音合成功能\n• 需要配合TTS模型加载器使用\n• 支持文本转语音",
+      "n_ctx": "上下文长度，影响可处理的文本长度\n• 24GB+显存：16384\n• 16GB显存：8192\n• 12GB显存：6144\n• 8GB显存：4096\n• 4-6GB显存：2048",
+      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载（推荐）\n• GPU模式有效，CPU模式自动忽略\n• 显存不足时可设为部分层数",
+      "vram_limit": "显存限制（GB）\n• -1：无限制\n• GPU模式有效，CPU模式自动忽略\n• 建议设为实际显存大小减1",
+      "image_min_tokens": "图片最小编码token数\n• 保持默认0即可",
+      "image_max_tokens": "图片最大编码token数\n• 保持默认0即可",
+      "attention_type": "注意力类型\n• Auto：自动选择（推荐）\n• Standard：标准注意力\n• Flash：Flash Attention（NVIDIA GPU推荐）\n• XFormers：XFormers（实验性）",
+      "llama_model": "加载的分段模型对象\n• 可直接连接到推理节点"
+    }
+  },
+  "llama_cpp_tts_loader": {
+    "title": "TTS模型加载器",
+    "inputs": {
+      "tts_model": "TTS模型",
+      "n_gpu_layers": "GPU模型层数",
+      "sample_rate": "采样率",
+      "model_type": "模型类型",
+      "voice": "音色",
+      "emotion": "情绪",
+      "language": "语言",
+      "speed": "语速",
+      "temperature": "生成温度",
+      "top_p": "核采样阈值",
+      "top_k": "Top-K采样",
+      "repetition_penalty": "重复惩罚",
+      "max_new_tokens": "最大生成token数",
+      "use_cache": "使用缓存",
+      "ref_audio_path": "参考音路径",
+      "pitch": "音高",
+      "volume": "音量",
+      "use_8bit_quant": "8bit量化",
+      "flash_attention": "启用FlashAttention2"
+    },
+    "widgets": {
+      "tts_model": "TTS模型",
+      "n_gpu_layers": "GPU模型层数",
+      "sample_rate": "采样率",
+      "model_type": "模型类型",
+      "voice": "音色",
+      "emotion": "情绪",
+      "language": "语言",
+      "speed": "语速",
+      "temperature": "生成温度",
+      "top_p": "核采样阈值",
+      "top_k": "Top-K采样",
+      "repetition_penalty": "重复惩罚",
+      "max_new_tokens": "最大生成token数",
+      "use_cache": "使用缓存",
+      "ref_audio_path": "参考音路径",
+      "pitch": "音高",
+      "volume": "音量",
+      "use_8bit_quant": "8bit量化",
+      "flash_attention": "启用FlashAttention2"
+    },
+    "outputs": {
+      "tts_model": "TTS模型"
+    },
+    "tooltips": {
+      "tts_model": "选择TTS模型文件\n• 主流：Qwen3-TTS、IndexTTS-2\n• 其他：Bark、VITS、XTTS、Coqui、Supertonic等\n• 格式：.gguf、.safetensors、.pt、.pth、.bin 或模型目录",
+      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载（推荐）\n• GPU模式有效，CPU模式自动忽略\n• 显存不足时可设为部分层数",
+      "sample_rate": "音频采样率（Hz）\n• 影响音质和文件大小\n• Qwen3-TTS/IndexTTS-2推荐：24000",
+      "model_type": "模型类型选择\n• 自动检测：自动识别模型类型（推荐）\n• 手动指定：Qwen3-TTS、IndexTTS-2、Bark、VITS、XTTS、Coqui、Supertonic等",
+      "voice": "选择音色类型\n• Vivian/Serena/Uncle_Fu/Dylan/Eric/Ryan/Aiden/Ono_Anna/Sohee\n• 支持多人对话模式（主流TTS模型）",
+      "emotion": "选择情绪风格\n• default：默认\n• happy：开心\n• sad：悲伤\n• angry：愤怒\n• surprised：惊讶\n• calm：平静\n• excited：兴奋\n• gentle：温柔\n• 增强语音表现力（主流TTS模型）",
+      "language": "选择合成语言\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• German：德语\n• French：法语\n• Russian：俄语\n• Portuguese：葡萄牙语\n• Spanish：西班牙语\n• Italian：意大利语\n• Qwen3-TTS支持10种语言",
+      "speed": "语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
+      "temperature": "生成温度\n• 值越高生成越随机\n• 推荐值：0.7",
+      "top_p": "核采样阈值（Top-P）\n• 控制生成多样性\n• 推荐值：0.9",
+      "top_k": "Top-K采样参数\n• 限制每步只从K个最高概率的token中选择\n• 推荐值：50",
+      "repetition_penalty": "重复惩罚\n• 值越高越避免重复\n• 推荐值：1.1",
+      "max_new_tokens": "最大生成token数\n• 影响输出音频长度\n• 推荐值：2048",
+      "use_cache": "是否使用KV缓存加速推理\n• True：启用缓存（推荐）\n• False：禁用缓存",
+      "ref_audio_path": "音色克隆参考音路径\n• wav格式，3~60秒最佳\n• 单声道48000Hz\n• 用于音色克隆",
+      "pitch": "音高偏移\n• 范围：-5.0到5.0\n• 调整语音音调",
+      "volume": "音量\n• 控制输出音量大小\n• 范围：0.1到2.0",
+      "use_8bit_quant": "使用8bit量化\n• 适配低显存显卡/入门级GPU\n• 降低显存占用但可能影响音质\n• 默认：False",
+      "flash_attention": "启用FlashAttention2优化\n• 需要安装flash-attn库\n• 提升推理性能\n• 适用于NVIDIA GPU"
+    }
+  },
+  "llama_cpp_unified_inference": {
+    "title": "Llama-cpp 统一推理",
+    "inputs": {
+      "llama_model": "Llama模型",
+      "preset_prompt": "预设模板",
+      "system_prompt": "系统提示词",
+      "text_input": "文本输入",
+      "inference_mode": "推理模式",
+      "prompt_language": "提示词语言",
+      "response_language": "响应语言",
+      "asr_language": "ASR语言",
+      "video_max_frames": "视频最大帧数",
+      "image_max_size": "图像最大尺寸",
+      "video_sampling": "视频抽帧模式",
+      "video_manual_indices": "视频手动帧索引",
+      "audio_output_mode": "音频输出模式",
+      "omni_speaker": "Omni音色",
+      "tts_language": "TTS语言",
+      "tts_speed": "语速",
+      "seed": "随机种子",
+      "force_offload": "强制卸载",
+      "save_states": "保存状态",
+      "parameters": "参数",
+      "images": "图像",
+      "video": "视频",
+      "audio": "音频",
+      "asr_model": "ASR模型",
+      "tts_model": "TTS模型",
+      "queue_handler": "队列处理器"
+    },
+    "widgets": {
+      "llama_model": "Llama模型",
+      "preset_prompt": "预设模板",
+      "system_prompt": "系统提示词",
+      "text_input": "文本输入",
+      "inference_mode": "推理模式",
+      "prompt_language": "提示词语言",
+      "response_language": "响应语言",
+      "asr_language": "ASR语言",
+      "video_max_frames": "视频最大帧数",
+      "image_max_size": "图像最大尺寸",
+      "video_sampling": "视频抽帧模式",
+      "video_manual_indices": "视频手动帧索引",
+      "audio_output_mode": "音频输出模式",
+      "omni_speaker": "Omni音色",
+      "tts_language": "TTS语言",
+      "tts_speed": "语速",
+      "seed": "随机种子",
+      "force_offload": "强制卸载",
+      "save_states": "保存状态",
+      "parameters": "参数",
+      "images": "图像",
+      "video": "视频",
+      "audio": "音频",
+      "asr_model": "ASR模型",
+      "tts_model": "TTS模型",
+      "queue_handler": "队列处理器"
+    },
+    "outputs": {
+      "output": "输出",
+      "output_list": "输出列表",
+      "state_uid": "状态ID",
+      "audio": "音频输出"
+    },
+    "tooltips": {
+      "llama_model": "选择加载的Llama模型",
+      "preset_prompt": "选择预设提示词模板\n• 包含文生图、图生视频、OCR等多种预设\n• 可快速生成特定格式的提示词",
+      "system_prompt": "系统提示词，定义AI助手的角色和行为\n• 可包含预设模板占位符#\n• 与预设模板配合使用时，可设置AI的角色扮演",
+      "text_input": "用户输入文本\n• 作为对话的用户消息内容\n• 支持多行文本输入\n• 可替换预设模板中的#占位符",
+      "inference_mode": "选择推理模式\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 视觉理解：处理图像内容并生成描述\n• [基础] 音频转文本：使用 ASR 或 Omni 模型将音频转换为文本\n• [基础] 文本转音频：生成文本后使用 TTS 模型转换为语音\n• [高级] 视频理解：从视频中提取帧并进行分析",
+      "prompt_language": "提示词语言\n• Chinese：使用中文提示词\n• English：使用英文提示词",
+      "response_language": "响应语言\n• Auto-detect：自动检测\n• Chinese：强制中文输出\n• English：强制英文输出",
+      "asr_language": "ASR语音识别语言\n• Auto-detect：自动检测\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• French：法语\n• German：德语\n• Spanish：西班牙语",
+      "video_max_frames": "视频处理的最大帧数\n• 控制视频抽帧数量\n• 影响处理时间和显存占用",
+      "image_max_size": "图像处理的最大尺寸\n• 控制图像缩放大小\n• 影响显存占用和处理速度",
+      "video_sampling": "视频抽帧模式\n• Auto uniform sampling：自动均匀采样\n• Manual frame indices：手动指定帧索引",
+      "video_manual_indices": "手动模式下的帧索引\n• 仅在video_sampling为手动时生效\n• 格式：逗号分隔的数字",
+      "audio_output_mode": "音频输出模式\n• TTS voice beautification output：先生成文本，再使用TTS模型转换为音频\n• Omni native audio output：使用Omni模型直接生成音频输出",
+      "seed": "随机种子\n• 影响生成结果的可重复性\n• 相同种子产生相同结果",
+      "force_offload": "推理完成后强制卸载模型\n• 释放显存\n• 适用于多模型切换场景",
+      "save_states": "保存对话状态\n• 支持多轮对话\n• 保持上下文连贯性",
+      "omni_speaker": "Omni模型音频输出音色（仅在Omni原生音频输出模式下生效）",
+      "tts_language": "TTS合成语言\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• German：德语\n• French：法语\n• Russian：俄语\n• Portuguese：葡萄牙语\n• Spanish：西班牙语\n• Italian：意大利语",
+      "tts_speed": "TTS语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
+      "parameters": "选择参数设置节点\n• 控制生成参数如温度、采样等",
+      "images": "输入图像\n• 支持单张或多张图像",
+      "video": "输入视频\n• 自动抽帧处理",
+      "asr_model": "ASR模型输入\n• 用于语音识别\n• 将音频转换为文本",
+      "tts_model": "TTS模型输入\n• 用于语音合成\n• 将文本转换为语音",
+      "queue_handler": "队列处理器\n• 管理批量任务",
+      "output": "生成的文本输出",
+      "output_list": "生成的文本输出列表\n• 批量处理时使用",
+      "state_uid": "对话状态ID\n• 用于多轮对话管理",
+      "audio": "生成的音频输出\n• 仅在音频输出模式下有效"
+    }
+  },
+  "llama_cpp_unload_model": {
+    "title": "Llama-cpp 卸载模型",
+    "inputs": {
+      "any": "任意输入"
+    },
+    "widgets": {
+      "any": "任意输入"
+    },
+    "outputs": {
+      "any": "任意输出"
+    },
+    "tooltips": {
+      "any": "任意类型的输入\n• 用于触发节点执行\n• 执行后卸载当前模型释放显存"
+    }
+  },
+  "multi_model_tts": {
+    "title": "多人对话TTS",
+    "inputs": {
+      "dialogue_text": "对话文本",
+      "tts_model_1": "TTS模型1",
+      "tts_model_2": "TTS模型2",
+      "tts_model_3": "TTS模型3",
+      "tts_model_4": "TTS模型4",
+      "role_config_1": "角色配置1",
+      "role_config_2": "角色配置2",
+      "role_config_3": "角色配置3",
+      "role_config_4": "角色配置4",
+      "pause_duration": "停顿时长",
+      "add_silence": "添加静音",
+      "force_offload": "强制卸载"
+    },
+    "widgets": {
+      "dialogue_text": "对话文本",
+      "tts_model_1": "TTS模型1",
+      "tts_model_2": "TTS模型2",
+      "tts_model_3": "TTS模型3",
+      "tts_model_4": "TTS模型4",
+      "role_config_1": "角色配置1",
+      "role_config_2": "角色配置2",
+      "role_config_3": "角色配置3",
+      "role_config_4": "角色配置4",
+      "pause_duration": "停顿时长",
+      "add_silence": "添加静音",
+      "force_offload": "强制卸载"
+    },
+    "outputs": {
+      "text": "文本输出",
+      "audio": "音频输出",
+      "dialogue_info": "对话信息"
+    },
+    "tooltips": {
+      "dialogue_text": "格式化的对话文本\n• 包含所有角色的对话内容",
+      "tts_model_1": "TTS模型1\n• 用于生成角色音频",
+      "tts_model_2": "TTS模型2\n• 用于生成角色音频",
+      "tts_model_3": "TTS模型3\n• 用于生成角色音频",
+      "tts_model_4": "TTS模型4\n• 用于生成角色音频",
+      "role_config_1": "角色配置1\n• 包含角色名称、音色、语速等参数",
+      "role_config_2": "角色配置2\n• 包含角色名称、音色、语速等参数",
+      "role_config_3": "角色配置3\n• 包含角色名称、音色、语速等参数",
+      "role_config_4": "角色配置4\n• 包含角色名称、音色、语速等参数",
+      "pause_duration": "说话人之间的停顿时间（秒）\n• 0.0-2.0",
+      "add_silence": "是否在说话人之间添加静音",
+      "force_offload": "推理完成后强制卸载模型\n• 释放显存\n• 适用于多模型切换场景",
+      "text": "生成的对话文本\n• 可连接到文本处理节点",
+      "audio": "生成的音频数据\n• AUDIO类型，可直接连接音频保存节点",
+      "dialogue_info": "对话详细信息\n• 包含分段数、总时长、角色配置等信息"
+    }
+  },
+
+  "multi_image_input": {
+    "title": "多图输入（故事创作）",
+    "inputs": {
+      "image1": "图像1",
+      "image2": "图像2",
+      "image3": "图像3",
+      "image4": "图像4",
+      "image5": "图像5",
+      "image6": "图像6",
+      "image7": "图像7",
+      "image8": "图像8",
+      "image9": "图像9",
+      "image10": "图像10",
+      "image11": "图像11",
+      "image12": "图像12",
+      "mode": "模式",
+      "story_type": "故事类型",
+      "story_length": "故事长度",
+      "language": "语言",
+      "max_size": "最大尺寸",
+      "custom_prompt": "自定义提示词",
+      "include_image_descriptions": "包含图片描述",
+      "story_theme": "故事主题",
+      "narrative_style": "叙事风格",
+      "content_focus": "内容重点",
+      "target_audience": "目标受众",
+      "video_model": "视频生成模型"
+    },
+    "widgets": {
+      "image1": "图像1",
+      "image2": "图像2",
+      "image3": "图像3",
+      "image4": "图像4",
+      "image5": "图像5",
+      "image6": "图像6",
+      "image7": "图像7",
+      "image8": "图像8",
+      "image9": "图像9",
+      "image10": "图像10",
+      "image11": "图像11",
+      "image12": "图像12",
+      "mode": "模式",
+      "story_type": "故事类型",
+      "story_length": "故事长度",
+      "language": "语言",
+      "max_size": "最大尺寸",
+      "custom_prompt": "自定义提示词",
+      "include_image_descriptions": "包含图片描述",
+      "story_theme": "故事主题",
+      "narrative_style": "叙事风格",
+      "content_focus": "内容重点",
+      "target_audience": "目标受众",
+      "video_model": "视频生成模型"
+    },
+    "outputs": {
+      "images": "图像",
+      "prompt": "提示词"
+    },
+    "tooltips": {
+      "image1": "第一张输入图像",
+      "image2": "第二张输入图像",
+      "image3": "第三张输入图像",
+      "image4": "第四张输入图像",
+      "image5": "第五张输入图像",
+      "image6": "第六张输入图像",
+      "image7": "第七张输入图像",
+      "image8": "第八张输入图像",
+      "image9": "第九张输入图像",
+      "image10": "第十张输入图像",
+      "image11": "第十一张输入图像",
+      "image12": "第十二张输入图像",
+      "mode": "选择工作模式\n• 图像模式：分析图像内容\n• 文本模式：根据选项生成提示词",
+      "story_type": "选择内容创作类型\n• 连贯故事/分镜描述/场景分析等",
+      "story_length": "选择内容长度\n• 简短（200字以内）\n• 中等（400字以内）\n• 详细（600字以内）\n• 完整（1000字以内）",
+      "language": "选择输出语言\n• 中文/英文",
+      "max_size": "图像最大尺寸（像素）\n• 控制图像缩放",
+      "custom_prompt": "自定义提示词\n• 用于指导内容创作",
+      "include_image_descriptions": "是否在故事前包含每张图像的描述",
+      "story_theme": "选择内容主题\n• 冒险故事/浪漫故事/悬疑故事等",
+      "narrative_style": "选择叙事风格\n• 第一人称/第三人称/全知视角等",
+      "content_focus": "内容重点\n• 平衡发展/强调情节/强调角色等",
+      "target_audience": "选择目标受众\n• 普通大众/青少年/儿童等",
+      "video_model": "选择视频生成模型类型\n• WAN2.2/LTX2/通用视频/自定义\n• 不同模型需要不同的提示词格式",
+      "images": "预处理后的图像\n• 可连接到推理节点",
+      "prompt": "生成的提示词\n• 可直接连接到推理节点的custom_prompt"
+    }
+  },
+  "RoleConfig": {
+    "title": "角色配置",
+    "inputs": {
+      "role_name": "角色名称",
+      "config_type": "配置类型",
+      "local_voice": "本地模型音色",
+      "local_emotion": "本地模型情绪",
+      "api_voice": "API模型音色",
+      "speed": "语速",
+      "pitch": "音高偏移",
+      "volume": "音量",
+      "api_config_name": "API配置名称",
+      "use_custom_api": "使用自定义API",
+      "api_provider": "API提供商",
+      "api_base": "API地址",
+      "api_key": "API密钥"
+    },
+    "widgets": {
+      "role_name": "角色名称",
+      "config_type": "配置类型",
+      "local_voice": "本地模型音色",
+      "local_emotion": "本地模型情绪",
+      "api_voice": "API模型音色",
+      "speed": "语速",
+      "pitch": "音高偏移",
+      "volume": "音量",
+      "api_config_name": "API配置名称",
+      "use_custom_api": "使用自定义API",
+      "api_provider": "API提供商",
+      "api_base": "API地址",
+      "api_key": "API密钥"
+    },
+    "outputs": {
+      "role_config": "角色配置"
+    },
+    "tooltips": {
+      "role_name": "角色名称\n• 用于识别不同角色",
+      "config_type": "配置类型\n• 本地模型：使用本地TTS模型\n• API模型：使用API TTS服务",
+      "local_voice": "本地模型音色\n• 选择角色的音色\n• Vivian/Serena/Uncle_Fu/Dylan",
+      "local_emotion": "本地模型情绪\n• 选择角色的情绪风格\n• default/happy/sad/angry/surprised/calm/excited/gentle",
+      "api_voice": "API模型音色\n• OpenAI TTS支持的音色",
+      "speed": "语速\n• 0.25-4.0",
+      "pitch": "音高偏移\n• -4.0到4.0",
+      "volume": "音量\n• 0.2到2.0",
+      "api_config_name": "API配置名称（多API模式使用）",
+      "use_custom_api": "是否使用自定义API配置",
+      "api_provider": "API提供商",
+      "api_base": "API地址",
+      "api_key": "API密钥",
+      "role_config": "角色配置数据"
+    }
+  },
+  "VideoLoader": {
+    "title": "视频加载器",
+    "inputs": {
+      "video": "视频文件",
+      "force_rate": "强制帧率",
+      "custom_width": "自定义宽度",
+      "custom_height": "自定义高度",
+      "frame_load_cap": "帧数读取上限",
+      "skip_first_frames": "跳过前几帧",
+      "select_every_nth": "间隔采样",
+      "format": "输出格式"
+    },
+    "widgets": {
+      "video": "视频文件",
+      "force_rate": "强制帧率",
+      "custom_width": "自定义宽度",
+      "custom_height": "自定义高度",
+      "frame_load_cap": "帧数读取上限",
+      "skip_first_frames": "跳过前几帧",
+      "select_every_nth": "间隔采样",
+      "format": "输出格式"
+    },
+    "outputs": {
+      "images": "图像序列",
+      "video": "视频",
+      "audio": "音频"
+    },
+    "tooltips": {
+      "force_rate": "强制帧率\n• 0=使用视频原始帧率",
+      "custom_width": "自定义宽度\n• 0=保持原始尺寸",
+      "custom_height": "自定义高度\n• 0=保持原始尺寸",
+      "frame_load_cap": "帧数读取上限\n• 0=无限制",
+      "skip_first_frames": "跳过前几帧\n• 从指定帧开始读取",
+      "select_every_nth": "间隔采样\n• 每N帧取1帧",
+      "format": "输出格式\n• 控制颜色通道顺序",
+      "images": "提取的图像序列",
+      "video": "处理后的视频对象",
+      "audio": "提取的音频"
+    }
+  },
+
+  "tts_align": {
+    "title": "TTS时间对齐",
+    "inputs": {
+      "tts_model": "TTS模型",
+      "timestamps": "时间戳",
+      "text": "文本",
+      "sample_rate": "采样率",
+      "speed": "语速",
+      "align_mode": "对齐模式",
+      "silence_padding": "段落间静音填充"
+    },
+    "widgets": {
+      "tts_model": "TTS模型",
+      "timestamps": "时间戳",
+      "text": "文本",
+      "sample_rate": "采样率",
+      "speed": "语速",
+      "align_mode": "对齐模式",
+      "silence_padding": "段落间静音填充"
+    },
+    "outputs": {
+      "aligned_audio": "对齐音频",
+      "alignment_info": "对齐信息"
+    },
+    "tooltips": {
+      "tts_model": "TTS模型对象\n• 从TTS加载器获取",
+      "timestamps": "时间戳数据\n• 从强制对齐处理节点获取",
+      "text": "要合成的文本内容",
+      "sample_rate": "音频采样率（Hz）\n• 默认：24000",
+      "speed": "语速倍数\n• 0.5：慢速\n• 1.0：正常\n• 2.0：快速",
+      "align_mode": "选择对齐模式\n• 精确时间对齐：严格按照时间戳生成音频\n• 自然流对齐：保持自然语音节奏",
+      "silence_padding": "段落间静音填充（秒）\n• 在每个片段之后添加静音\n• 默认：0.1",
+      "aligned_audio": "对齐后的音频",
+      "alignment_info": "对齐处理信息"
+    }
+  },
+  "options": {
+    "llama_cpp_unified_inference": {
+      "omni_speaker": {
+        "Chelsie - 女声": "Chelsie - 女声",
+        "Ethan - 男声": "Ethan - 男声"
+      },
+      "audio_output_mode": {
+        "TTS voice beautification output": "TTS音色美化输出",
+        "Omni native audio output": "Omni原生音频输出"
+      }
+    },
+    "llama_cpp_api_inference": {
+      "tts_voice": {
+        "default": "默认",
+        "female": "女声",
+        "male": "男声",
+        "loli": "萝莉音",
+        "shota": "正太音",
+        "mature_female": "御姐音",
+        "mature_male": "大叔音"
+      },
+      "tts_emotion": {
+        "default": "默认",
+        "happy": "开心",
+        "sad": "悲伤",
+        "angry": "愤怒",
+        "calm": "平静",
+        "excited": "兴奋",
+        "gentle": "温柔"
+      },
+      "preset_prompt": {
+        "Empty - Nothing": "空白-无内容",
+        "[Normal] Describe": "[正常] 描述",
+        "[Text to Image] ZIMAGE - Turbo": "[文生图] ZIMAGE - Turbo",
+        "[Text to Image] FLUX2 - Klein": "[文生图] FLUX2 - Klein",
+        "[Text to Image] Qwen - Image 2512": "[文生图] Qwen - Image 2512",
+        "[Image Edit] Qwen - Image Edit Combined": "[图像编辑] Qwen - 图像编辑组合",
+        "[Image Edit] Qwen - Image Layered": "[图像编辑] Qwen - 图像分层",
+        "[Text to Video] LTX-2": "[文生视频] LTX-2",
+        "[Text to Video] WAN - Text to Video": "[文生视频] WAN - 文本到视频",
+        "[Image to Video] WAN - Image to Video": "[图生视频] WAN - 图像到视频",
+        "[Image to Video] WAN - Image to Video Empty": "[图生视频] WAN - 图像到视频（空）",
+        "[Image to Video] WAN - FLF to Video": "[图生视频] WAN - FLF到视频",
+        "[Audio] Audio Subtitle Convert": "[音频] 音频字幕转换",
+        "[Audio] Video to Audio Subtitle": "[音频] 视频到音轨字幕",
+        "[Audio] Text to Audio": "[音频] 文本到音轨",
+        "[Prompt Style] Tags": "[提示词风格] 标签",
+        "[Prompt Style] Simple": "[提示词风格] 简单",
+        "[Prompt Style] Detailed": "[提示词风格] 详细",
+        "[Prompt Style] Comprehensive Expansion": "[提示词风格] 全面扩展",
+        "[Creative] Refine & Expand Prompt": "[创意] 优化与扩展提示词",
+        "[Creative] Detailed Analysis": "[创意] 详细分析",
+        "[Creative] Summarize Video": "[创意] 视频总结",
+        "[Creative] Short Story": "[创意] 短篇故事",
+        "[Video Analysis] Video - Reverse Prompt": "[视频分析] 视频 - 反向提示",
+        "[Video Analysis] Video - Detailed Scene Breakdown": "[视频分析] 视频 - 详细分镜拆解",
+        "[Video Analysis] Video - Subtitle Format": "[视频分析] 视频 - 字幕格式",
+        "[Vision] Bounding Box": "[视觉] 边界框",
+        "[OCR] Enhanced OCR": "[OCR] 增强OCR",
+        "[HighRes] Ultra HD Image Reverse": "[高分辨率] 超高清图像反向"
+      }
+    }
+  }
+}
