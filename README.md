@@ -457,6 +457,11 @@ The plugin includes various scene-based prompt templates, categorized by inferen
 - **Audio Analysis**: Analyze audio emotions, style, rhythm and other characteristics
 - **Video to Audio and Subtitle**: Extract audio from video and generate subtitles
 
+
+## 如有功能建议或使用疑惑，可以加群交流反馈  
+* QQ群: 202018000   进群验证码：猪的飞行梦
+
+
 ## Acknowledgments  
 - [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
 - [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng  
