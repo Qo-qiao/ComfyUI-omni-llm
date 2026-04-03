@@ -1,21 +1,230 @@
-diskcache
-scipy
-numpy
-pillow
+# ===========================================
+# ComfyUI-omni-llm 依赖配置文件
+# ===========================================
+# 安装说明：
+# 1. 基础安装：pip install -r requirements.txt
+# 2. 如果遇到版本冲突，请执行：
+#    pip install qwen-tts --no-deps --user
+# 3. 如果遇到 auto-gptq 版本解析问题，请手动安装：
+#    pip install auto-gptq --no-deps --user
+# 4. 如果遇到 webrtcvad 编译问题（缺少 Python.h），这是嵌入式 Python 环境限制，
+#    可以跳过安装，不影响核心功能
+# 5. Windows CUDA 12.8 需要取消对应 Python 版本的 llama-cpp-python 注释
+# ===========================================
+
+# ===========================================
+# 基础依赖
+# ===========================================
+opencv-python
+Pillow
+requests
+
+# ===========================================
+# 音频处理依赖
+# ===========================================
+soundfile
+numpy>=1.20.0
 gguf
 tqdm
+librosa>=0.10.0
+pydub
+resampy
+ffmpeg-python
+webrtcvad
+audioread
+soxr
+numba
+lazy_loader
+msgpack
+decorator
+scipy>=1.7.0
 
-# for Windows - CUDA 12.6
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp310-cp310-win_amd64.whl; python_version == "3.10" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp311-cp311-win_amd64.whl; python_version == "3.11" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp312-cp312-win_amd64.whl; python_version == "3.12" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp313-cp313-win_amd64.whl; python_version == "3.13" and platform_system == "Windows"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-win-20260219/llama_cpp_python-0.3.26+cu126.basic-cp314-cp314-win_amd64.whl; python_version == "3.14" and platform_system == "Windows"
+# ===========================================
+# 模型依赖
+# ===========================================
+transformers>=4.57.0
+modelscope>=1.20.0
+huggingface-hub>=0.20.0
+safetensors>=0.4.0
+peft>=0.8.0
+omegaconf>=2.3.0
+tokenizers>=0.15.0
+protobuf>=3.20.0
+# transformers marian分词器依赖
+sacremoses
 
-# for Linux - CUDA 12.6
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp310-cp310-linux_x86_64.whl; python_version == "3.10" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp311-cp311-linux_x86_64.whl; python_version == "3.11" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp312-cp312-linux_x86_64.whl; python_version == "3.12" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp313-cp313-linux_x86_64.whl; python_version == "3.13" and platform_system == "Linux"
-llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.26-cu126-Basic-linux-20260219/llama_cpp_python-0.3.26+cu126.basic-cp314-cp314-linux_x86_64.whl; python_version == "3.14" and platform_system == "Linux"
+# ===========================================
+# Qwen3-TTS 专用依赖
+# ===========================================
+qwen-tts
+einops>=0.7.0
+onnxruntime>=1.16.0
+onnxruntime-gpu; sys_platform != 'darwin'
+webdataset>=1.0.0
+pydantic>=2.0.0
 
+# ===========================================
+# Qwen3-ASR 专用依赖
+# ===========================================
+qwen-asr>=0.0.6
+
+# 可选：启用FlashAttention2优化以减少显存使用
+flash-attn>=2.6.0
+
+# ===========================================
+# OpenAI 兼容调用依赖
+# ===========================================
+openai>=1.0.0
+tiktoken
+
+# ===========================================
+# llms-py API 网关支持
+# ===========================================
+llms-py
+
+# ===========================================
+# 量化优化依赖
+# ===========================================
+bitsandbytes
+accelerate
+sentencepiece
+optimum
+auto-gptq; sys_platform != 'darwin'
+
+# ===========================================
+# 图像处理增强
+# ===========================================
+scikit-image
+albumentations
+
+# ===========================================
+# 多媒体处理
+# ===========================================
+imageio
+imageio-ffmpeg
+
+# ===========================================
+# 视频处理依赖
+# ===========================================
+torchvision
+av>=10.0.0
+decord
+
+# ===========================================
+# 音频编解码补充
+# ===========================================
+pyaudio
+
+# ===========================================
+# 网络和数据处理
+# ===========================================
+urllib3>=1.26.0
+certifi>=2022.0.0
+charset-normalizer
+idna
+
+# ===========================================
+# 配置文件处理
+# ===========================================
+pyyaml
+toml
+tomli
+json5
+
+# ===========================================
+# 进程管理
+# ===========================================
+psutil
+setproctitle
+
+# ===========================================
+# 音频处理补充
+# ===========================================
+kaldiio
+pytorch-wpe
+
+# ===========================================
+# 机器学习基础
+# ===========================================
+scikit-learn>=1.1.0
+pooch>=1.1.0
+threadpoolctl>=3.2.0
+joblib>=1.0.0
+typing_extensions>=4.1.1
+
+# ===========================================
+# UMAP 降维（Fun-ASR 需要）
+# ===========================================
+umap-learn>=0.5.0
+pynndescent>=0.5.0
+
+# ===========================================
+# 中文处理（Fun-ASR 需要）
+# ===========================================
+jieba>=0.42.0
+jaconv
+jamo
+
+# ===========================================
+# 阿里云相关（Fun-ASR 需要）
+# ===========================================
+oss2>=2.19.0
+aliyun-python-sdk-core>=2.13.12
+aliyun-python-sdk-kms>=2.4.1
+crcmod>=1.7
+pycryptodome>=3.4.7
+
+# ===========================================
+# TensorBoard 支持
+# ===========================================
+tensorboardX>=2.6.0
+
+# ===========================================
+# 编辑距离计算（Fun-ASR 需要）
+# ===========================================
+editdistance
+
+# ===========================================
+# 音频工具
+# ===========================================
+audio-separator
+noisereduce
+
+# ===========================================
+# llama-cpp-python (官方版本)
+# ===========================================
+# 官方llama-cpp-python，支持CUDA、ROCm等加速
+llama-cpp-python
+
+# ===========================================
+# Fun-ASR 依赖
+# ===========================================
+# 方式 1: 直接安装（推荐）
+funasr>=1.3.0
+
+# 方式 2: 从源码安装（如果需要最新版本）
+# git+https://github.com/FunAudioLLM/Fun-ASR.git
+
+
+# ===========================================
+# Whisper 依赖（可选）
+# ===========================================
+# openai-whisper  # 如果使用 OpenAI Whisper
+# faster-whisper  # 更快的 Whisper 实现
+
+# ===========================================
+# 其他可选依赖
+# ===========================================
+# torch、torchaudio、torchvision已在视频处理依赖组中包含
+
+# ===========================================
+# 安装后验证
+# ===========================================
+# 安装完成后，运行以下命令验证：
+# python -c "import llama_cpp; print('llama-cpp-python 版本:', llama_cpp.__version__)"
+# python -c "import funasr; print('funasr 版本:', funasr.__version__)"
+# python -c "import soundfile; print('soundfile 导入成功')"
+# python -c "import librosa; print('librosa 版本:', librosa.__version__)"
+# python -c "import qwen_asr; print('qwen-asr 导入成功')"
+# python -c "import qwen_tts; print('qwen-tts 导入成功')"
+# python -c "import transformers; print('transformers 版本:', transformers.__version__)"

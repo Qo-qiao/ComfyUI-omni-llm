@@ -1,5 +1,5 @@
 [project]
-name = "ComfyUI-llama-cpp-vlmforQo"
+name = "ComfyUI-omni-llm"
 description = "Run LLM/VLM models natively in ComfyUI based on llama.cpp"
 version = "1.2.5"
 license = {file = "LICENSE"} 
@@ -23,14 +23,14 @@ license = {file = "LICENSE"}
 dependencies = ["diskcache", "scipy", "numpy", "pillow", "gguf"]
 
 [project.urls]
-Repository = "https://github.com/lihaoyun6/ComfyUI-llama-cpp-vlmforQo"
+Repository = "https://github.com/lihaoyun6/ComfyUI-omni-llm"
 #  Used by Comfy Registry https://registry.comfy.org
-Documentation = "https://github.com/lihaoyun6/ComfyUI-llama-cpp-vlmforQo/wiki"
-"Bug Tracker" = "https://github.com/lihaoyun6/ComfyUI-llama-cpp-vlmforQo/issues"
+Documentation = "https://github.com/lihaoyun6/ComfyUI-omni-llm/wiki"
+"Bug Tracker" = "https://github.com/lihaoyun6/ComfyUI-omni-llm/issues"
 
 [tool.comfy]
 PublisherId = "lhy666"
-DisplayName = "ComfyUI-llama-cpp-vlmforQo"
+DisplayName = "ComfyUI-omni-llm"
 Icon = ""
 includes = [] 
 # "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility

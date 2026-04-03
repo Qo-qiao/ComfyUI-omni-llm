@@ -1,6 +1,4 @@
-# ComfyUI-llama-cpp-vlmforQo
-
-Update notice: Due to the addition of many new features in the new version, the calling of the new qwen3.5 model cannot be updated and added in a timely manner. Currently, the function addition has been completed, but the plug-in still needs a lot of time for debugging and improvement. I am seizing my free time after work to debug, striving to release and share it as soon as possible.
+# ComfyUI-omni-llm
 
 Run LLM/VLM models natively in ComfyUI based on llama.cpp, supporting multimodal inference, visual language understanding, and various AI tasks.
 
@@ -8,29 +6,30 @@ Run LLM/VLM models natively in ComfyUI based on llama.cpp, supporting multimodal
 
 ## Project Introduction
 
-ComfyUI-llama-cpp-vlmforQo is a comprehensive and performance-optimized ComfyUI plugin, deeply refactored and enhanced based on the ComfyUI-llama-cpp-vlm plugin, focusing on providing localized, efficient multimodal AI inference capabilities. Currently supporting over 40 VLM models and 200 LLM models, the plugin offers rich parameter adjustment options, allowing users to select different models and parameter configurations based on their needs to achieve optimal inference results.
+ComfyUI-omni-llm is a comprehensive ComfyUI plugin, deeply refactored and enhanced based on ComfyUI-llama-cpp-vlm, focusing on providing localized, efficient multimodal AI inference capabilities. The plugin has specially optimized support for Omni series full-modal models, ASR speech recognition, and TTS speech synthesis functions, supporting over 40 VLM models and 200 LLM models.
 
-Compared to similar plugins, this project has achieved significant breakthroughs in the following aspects:
-- **More comprehensive multimodal support**: Not only supports text and images, but also adds video input and analysis capabilities
-- **Smarter hardware adaptation**: Based on llama.cpp technology, implements intelligent parameter tuning from high-end to low-end devices
-- **Rich model ecosystem**: Supports multiple mainstream VLM/LLM models, including the latest professional AI models, with dynamic support functionality—when llama_cpp_python updates and supports new model versions, users can directly download and use them without modifying plugin code
-- **Optimized inference performance**: Reconstructs model loading and inference processes, significantly improving operational efficiency
-- **Professional prompt system**: Built-in rich preset templates covering full-scenario needs from basic description to professional model optimization
+### Core Advantages
+- **Full-stack multimodal**: Seamlessly integrates text, image, video, and audio processing capabilities
+- **Intelligent hardware adaptation**: Automatic parameter tuning, supporting full-range devices from high-end GPUs to low-end CPUs
+- **Rich model ecosystem**: Supports multiple mainstream VLM/LLM models, automatically adapting to new models
+- **Efficient inference performance**: Introduces parallel processing and caching mechanisms, significantly improving operational efficiency
+- **Professional prompt system**: Built-in rich scene-based preset templates
+- **Powerful audio capabilities**: Integrates ASR speech recognition and TTS speech synthesis functions
 
 > Note: Incompatible with ComfyUI-llama-cpp-vlm and branch plugins
 
 ## Core Features
 
-- **Multimodal Full Support**: Process text, image, and video inputs, enabling cross-modal understanding and generation
-- **Wide Model Compatibility**: Support for multiple mainstream VLM/LLM models, including the latest professional AI models
+- **Multimodal Full Support**: Process text, image, video, and audio inputs, enabling cross-modal understanding and generation
 - **Intelligent Hardware Adaptation**: Automatically adjust parameters based on VRAM size to maximize hardware performance
 - **Efficient Inference Engine**: Optimized model loading and inference workflow, significantly improving operational speed
-- **Professional Prompt System**: Built-in rich preset templates covering full-scenario needs from basic description to professional model optimization
-- **Flexible Parameter Control**: Detailed inference parameter settings to meet customized needs for different scenarios
-- **Video Processing Capability**: Added video input support, enabling video content analysis and reverse generation
+- **Professional Prompt Templates**: Built-in rich scene-based prompt templates covering full-scenario needs
+- **Flexible Parameter Control**: Detailed inference parameter settings, supporting fine-tuning for advanced users
+- **Video Processing**: Supports video input, content analysis, scene breakdown, and video reverse engineering
+- **Audio Processing**: Supports audio analysis, subtitle conversion, content understanding, and high-precision speech recognition
+- **TTS Speech Synthesis**: Supports multi-person dialogue synthesis, voice selection, and emotion control
 - **CPU/GPU Mode**: Freely switch between runtime modes to adapt to different hardware configurations
 - **Hardware Detection Optimization**: Automatically detect hardware performance and recommend optimal parameter configurations
-- **Multi-Image Input Node**: Supports dual-mode operation for image analysis and text-based prompt generation with rich customization options for content creation
 
 
 ## Chinese Translation
@@ -41,33 +40,104 @@ Place the zh-CN files into the corresponding folder of the translation plugin (C
 
 The supported model types are synchronized with llama_cpp_python version. Common mainstream models include:
 
-- Qwen2.5-VL
-- Qwen3-VL-Instruct
-- olmOCR-2-7B-1025
-- llava-1.6-mistral-7b
-- nanoLLaVA-1.5
-- MiniCPM-V-4.5
-- MiniCPM-Llama3-V 2.5
-- GLM-4.6V
-- llama-joycaption
-- Moondream2
-- gemma-3-12b
-- Youtu-VL-4B-Instruct
-- EraX-VL-7B-V1.5
-- MiMo-VL-7B-RL
-- DreamOmni2
-- Phi-3.5-vision-instruct
-- Llama-3.2-11B-Vision-Instruct
-- LLaMA-3.1-Vision
-- Yi-VL-6B
-- LightOnOCR-2-1B
+**Qwen Series**
+- **Qwen2.5-Omni-3B** (Lightweight Full-Modal Model)
+- **Qwen2.5-Omni-7B** (Complete Full-Modal Model)
+- **Qwen2.5-VL-7B** (Vision Language Model)
+- **Qwen3-VL-8B-Instruct** (Instruction-Optimized Vision Model)
+- **Qwen3-VL-8B-maid-i1** (Maid Version Vision Model)
+- **Qwen3.5-2B** (Ultra-lightweight Version)
+- **Qwen3.5-4B** (Lightweight Version)
+- **Qwen3.5-9B** (Next-generation Dialogue Model)
 
-> Note: The plugin already supports multiple model loading, specific support depends on llama_cpp_python version
+**MiniCPM Series**
+- **MiniCPM-V-4.5** (Vision Language Model)
+- **MiniCPM-Llama3-V 2.5** (Lightweight Vision Model)
+
+**LLaVA Series**
+- **llava-1.6-mistral-7b** (Classic Vision Language Model)
+- **nanoLLaVA-1.5** (Lightweight Vision Model)
+
+**Llama Series**
+- **Llama-3.2-11B-Vision-Instruct** (Meta Vision Instruction Model)
+- **LLaMA-3.1-Vision** (Meta Vision Model)
+- **llama-joycaption** (Reverse Engineering Special Model)
+
+**GLM Series**
+- **GLM-4.6V-Flash** (Zhipu Vision Language Model)
+
+**OCR Special**
+- **olmOCR-2-7B-1025** (Document OCR Model)
+- **LightOnOCR-2-1B** (Lightweight OCR Model)
+
+**Audio Series (ASR/TTS)**
+- **Qwen3-ASR-0.6B/1.7B** (Speech Recognition Model)
+- **Qwen3-ForcedAligner-0.6B** (Forced Alignment Model)
+- **Qwen3-TTS-12Hz-1.7B-CustomVoice** (Predefined Voice Synthesis)
+- **Qwen3-TTS-12Hz-1.7B-VoiceDesign** (Creative Voice Design)
+
+**Others**
+- **gemma-3-4b-it** (Google Vision Model)
+- **Youtu-VL-4B-Instruct** (Tencent Vision Model)
+- **EraX-VL-7B-V1.5** (Vision Language Model)
+- **MiMo-VL-7B-RL** (Reinforcement Learning Vision Model)
+- **Phi-3.5-vision-instruct** (Microsoft Vision Instruction Model)
+- **Moondream2** (Lightweight Vision Model)
+- **Yi-VL-6B** (Zero One Wanwu Vision Model)
+- **zen3-vl-i1** (Vision Language Model)
 
 
 
 ## Changelog
-#### 2026-02-23
+#### v2.0 (2026-04-03)
+
+This update achieves a comprehensive upgrade from audio processing to full-modal inference, introducing modular architecture design, ASR+TTS combined capabilities, API node support, and segmented model loading, realizing a true full-stack multimodal AI experience.
+
+**I. Modular Inference Architecture**
+- **Unified Inference Engine**: Reconstructed inference logic into a modular structure, supporting unified processing of VL/Omni/ASR/TTS models
+- **Intelligent Hardware Adaptation**: Improved NVIDIA/AMD/CPU three-terminal adaptation, automatically adjusting parameters based on VRAM size
+- **Error Recovery Mechanism**: Enhanced error handling and recovery capabilities to ensure inference continuity and stability
+
+**II. Image Inference Node Optimization Adjustment**
+- **Unified Inference Node**: Integrates text, image, and audio processing capabilities, supporting 6 inference modes (text generation, image understanding, audio-to-text, text-to-audio, full-modal integration, video understanding), enabling cross-modal understanding and generation
+- **API Model Node System**: Including API configuration management node, API configuration selector, API configuration manager, and API model switcher, supporting multiple API service providers such as OpenAI, Ollama, llms-py, llama-cpp-python, vllm-omni (Linux only), enabling remote deployment and distributed inference
+- **Segmented Model Loader**: New loading node added specifically for multi-segment models like Qwen2.5 Omni
+- **Parameter Configuration Node**: Added Flash Attention and KV Cache support for more efficient inference and improved inference speed
+
+**III. ASR+TTS Audio Processing System**
+- **ASR Model Loader**: Supports Qwen3-ASR speech recognition model, supporting 28+ languages and 20+ Chinese dialects, strong noise/music scene capabilities
+- **TTS Model Loader**: Supports Qwen3-TTS speech synthesis model, supporting 9 fixed high-quality voices and creative voice design
+- **Forced Alignment Model Loader**: Supports Qwen3-ForcedAligner model, achieving high-precision audio-text alignment and timestamp generation
+- **Forced Alignment Inference Node**: Processes audio-text alignment, generating precise timestamp information
+- **Multi-Model TTS Node**: Supports multi-role dialogue synthesis, allowing different voices to be assigned to different roles
+- **Role Configuration Node**: Manages dialogue role information and voice assignment
+- **TTS Alignment Node**: Optimizes audio alignment effect of TTS output
+
+**IV. Video Processing System**
+- **Video Loader Node**: Supports video file input, extracting video frame sequences for analysis
+- **Video Frame Sampling**: Supports automatic uniform sampling and manual specified frame index modes
+- **Video Understanding Mode**: Supports video content analysis, scene breakdown, video reverse, and subtitle generation
+- **Video to Audio and Subtitle**: Extracts audio from video and generates synchronized subtitles
+
+**V. Model Ecosystem Expansion**
+- **Omni Model Support**: Currently only supports Qwen2.5 Omni series models, achieving native full-modal processing capabilities
+
+**VI. Inference Performance Optimization**
+- **Parallel Image Processing**: Implemented parallel image processing, improving multi-image inference speed
+- **Image Cache Mechanism**: Added image cache mechanism to avoid repeated processing of the same image
+- **Memory Management Optimization**: Intelligent resource allocation, optimized memory usage monitoring, automatic cache cleaning to release resources
+- **Inference Mode Optimization**: Optimized text generation, visual understanding, audio processing, and multimodal integration modes
+
+**VII. New Audio Preset Templates**
+- **Audio Subtitle Conversion**: Converts audio content into standard format subtitles, including time codes and synchronized text
+- **Video Audio Subtitle Generation**: Generates complete subtitles with audio descriptions based on video content
+- **Text to Audio**: Converts text into natural speech, supporting multi-person dialogue synthesis and voice selection
+- **Audio Analysis**: Analyzes audio content, extracting key information and emotional characteristics
+
+**VIII. Multi-Image Input Node Interface Expansion**
+- Doubled the interfaces of the multi-image input node, supporting more image inputs to create richer and more coherent story content
+
+#### v1.4.0 (2026-02-23)
 - Added Multi-Image Input node with the following features:
   - Dual mode operation: Image mode analyzes multiple images and creates stories, Text mode generates prompts through option settings
   - Multi-image input support: Supports 1-6 image inputs with automatic preprocessing and encoding
@@ -87,7 +157,7 @@ The supported model types are synchronized with llama_cpp_python version. Common
 - Optimized workflow examples section, updated example images and file links based on actual workflows folder content
 - Improved documentation structure, enhanced user experience
 
-#### 2026-02-08
+#### v1.3.0 (2026-02-08)
 - Added multiple new preset prompt templates: Bilingual Prompt Generate, Ultra HD Image Reverse
 - Optimized model loading and inference workflow for improved efficiency
 - Enhanced Chinese localization support
@@ -101,11 +171,11 @@ The supported model types are synchronized with llama_cpp_python version. Common
 - Optimized model name inference logic to automatically generate model names based on ChatHandler naming conventions
 - Expanded model support list to ensure backward compatibility with all previously supported models
 - Implemented model list deduplication functionality to keep the interface clean and organized
-- Added support for multiple models: olmOCR-2-7B-1025, llava-1.6-mistral-7b, nanoLLaVA-1.5, MiniCPM-Llama3-V 2.5, Moondream2, gemma-3-12b, Youtu-VL-4B-Instruct, EraX-VL-7B-V1.5, MiMo-VL-7B-RL, DreamOmni2, Phi-3.5-vision-instruct, Llama-3.2-11B-Vision-Instruct, LLaMA-3.1-Vision, Yi-VL-6B, LightOnOCR-2-1B
+- Added support for multiple models: olmOCR-2-7B-1025, llava-1.6-mistral-7b, nanoLLaVA-1.5, MiniCPM-Llama3-V 2.5, Moondream2, gemma-3-4b-it, Youtu-VL-4B-Instruct, EraX-VL-7B-V1.5, MiMo-VL-7B-RL, Phi-3.5-vision-instruct, Llama-3.2-11B-Vision-Instruct, LLaMA-3.1-Vision, Yi-VL-6B, LightOnOCR-2-1B
 - Added dynamic support functionality, when llama_cpp_python updates and releases support for new model versions, users can directly download and use the models
 - Optimized and fixed known bugs
 
-#### 2026-01-29
+#### v1.2.0 (2026-01-29)
 - Restructured file directory, please delete old version files when installing, do not overwrite
 - Added comprehensive preset prompt templates for specialized AI models:
   - **ZIMAGE - Turbo**: Optimized for Z-Image-Turbo model with 8-step Turbo inference for rapid 1080P HD image generation
@@ -131,10 +201,10 @@ The supported model types are synchronized with llama_cpp_python version. Common
 - Provided bilingual preset templates (English and Chinese) for better compatibility with different language models (exclusive presets have word count limits to meet model generation needs while ensuring efficient results, if they cannot meet requirements, please input in the preset box or use external custom presets)
 - Added Chinese-English switching function for generated results
 
-#### 2026-01-24
+#### v1.1.0 (2026-01-24)
 - Restructured node file directory
 - Added parameter recommendation settings documentation for users to understand the impact of each parameter on generation results
-- Added support for MiniCPM-V-4.5, LFM2.5-VL-1.6B, GLM-4.6V models
+- Added support for MiniCPM-V-4.5, LFM2.5-VL-1.6B, GLM-4.6V, DreamOmni2 models
 - Added Chinese-English switching function for reverse models
 - Only support .gguf and .safetensors format model files
 - Added CPU/GPU runtime mode selection feature:
@@ -149,7 +219,7 @@ The supported model types are synchronized with llama_cpp_python version. Common
   - Optimized VRAM estimation logic, only executed in GPU mode
   - Improved model loading and inference efficiency
 
-#### 2026-01-17  
+#### v1.0.0 (2026-01-17)  
 - Added support for llama-joycaption reverse model, personal recommendation: Qwen3VL unrestricted model
 - Added mmproj model switch to support pure text generation
 - Added clean session node (releases resources occupied by current conversation, reduces cases of no results)
@@ -157,17 +227,21 @@ The supported model types are synchronized with llama_cpp_python version. Common
 - Added hardware optimization module to adapt to different performance hardware, improve inference speed, and ensure smooth usage on different hardware
 - Rewrote Prompt Style preset information
 
-## Model Downloads
+## Model Recommendations and Links (for reference only)
 
-Please see [model_series_introduction_and_links.md](./doc/model_series_introduction_and_links.md)
+Please see [模型推荐与链接](./doc/模型推荐与链接.md)
 
-## Node Parameter Settings and Recommended Configurations
+## Inference Node Parameter Explanation and Recommended Settings (for reference only)
 
-Please see [Parameter-Explanation-and-Recommended-Settings.md](./doc/Parameter-Explanation-and-Recommended-Settings.md)
+Please see [推理节点参数说明与推荐设置](./doc/推理节点参数说明与推荐设置.md)
 
-## Multi-Image Input Node Usage Guide
+## Multi-Image Input Node Usage Guide (for reference only)
 
-Please see [Multi_Image_Input_Usage_Guide.md](./doc/Multi_Image_Input_Usage_Guide.md)
+Please see [多图输入节点使用说明](./doc/多图输入节点使用说明.md)
+
+## Audio Node Parameter Explanation (for reference only)
+
+Please see [音频类节点参数说明](./doc/音频类节点参数说明.md)
 
 ## Installation Instructions
 
@@ -175,13 +249,42 @@ Please see [Multi_Image_Input_Usage_Guide.md](./doc/Multi_Image_Input_Usage_Guid
 
 1. **Clone or download the plugin**:
    - Place the plugin folder into `ComfyUI/custom_nodes/` directory
-   - The folder name should be `ComfyUI-llama-cpp-vlmforQo`
+   - The folder name should be `ComfyUI-omni-llm`
 
 2. **Install dependencies**:
    ```bash
    # Run in ComfyUI root directory
-   pip install -r custom_nodes/ComfyUI-llama-cpp-vlmforQo/requirements.txt
+   pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
    ```
+
+   **Installation Notes:**
+   - If you encounter version conflicts between `qwen-tts` and `transformers`, please execute:
+     ```bash
+     pip install qwen-tts --no-deps --user
+     ```
+   - If you encounter version parsing issues with `auto-gptq`, please execute:
+     ```bash
+     pip install auto-gptq --no-deps --user
+     ```
+   - If you encounter compilation issues with `webrtcvad` (missing Python.h), this is a limitation of the embedded Python environment and can be skipped without affecting core functionality
+
+3. **Install llama-cpp-python** (required):
+   - Needs to be downloaded and installed manually, please download from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)
+
+   **Wheel Selection Guide:**
+   - **Python version matching**: `cp312` in the file name indicates Python 3.12 version, select the file matching your Python version
+   - **CUDA version matching**: `cu128` in the file name indicates CUDA 12.8 version, select the file compatible with your CUDA version
+   - **Operating system matching**: `win_amd64` indicates Windows 64-bit system, ensure to select the file suitable for your operating system
+   - **Function version**: `basic` indicates basic version, `full` includes more functions (such as OpenCL, etc.)
+
+   **Installation command:**
+   - Use the following command to install: `pip install downloaded_filename.whl`
+   - Example: `pip install llama_cpp_python-0.3.32+cu128.basic-cp312-cp312-win_amd64.whl`
+
+   **Version selection recommendations:**
+   - **CUDA 12.8**: Select `cu128` version for best performance
+   - **CUDA 12.x**: Select `cu124` version for backward compatibility
+
 
 ### 2. Model Preparation
 
@@ -190,125 +293,73 @@ Please see [Multi_Image_Input_Usage_Guide.md](./doc/Multi_Image_Input_Usage_Guid
    - Place downloaded model files into this directory
 
 2. **Model file formats**:
-   - Supports `.gguf` and `.safetensors` formats
+   - LLM/VLM models support `.gguf` and `.safetensors` formats (multi-segment models are not supported yet)
    - Vision models require corresponding `mmproj` files
+   - ASR/TTS models require downloading full model files
 
-## Workflow Examples
+## Workflow Examples (Refer to examples, please modify parameters according to actual situation)
 
 ### Workflow Files
-- [Text or Image Mode Workflow](./workflows/llama-cpp-vlmforQo(text-image).json)
-- [Video Mode Workflow](./workflows/llama-cpp-vlmforQo(video).json)
+- [Audio Mode Workflow](./workflows/omni-llm(audio).json)
+- [Text or Image Mode Workflow](./workflows/omni-llm(text_or_image).json)
+- [Video Mode Workflow](./workflows/omni-llm(video).json)
 
 ### Workflow Example Images
 
 #### Text Generation
-![Text Generation Workflow Example](./workflows/Text-Generation.png)
+![Text Generation Workflow Example](./workflows/文本生成（Text_Generation）.png)
 
 #### Image Processing
-![Batch Image Processing Workflow Example](./workflows/Batch-lmage-Processing.png)
-
-![Image Reverse Engineering Workflow Example](./workflows/Image-reverse-engineering.png)
+![Image Reverse Engineering Workflow Example](./workflows/图像反推（Image_reverse_engineering）.png)
 
 #### Video Processing
-![Video Text Generation Workflow Example](./workflows/Video-Text-Generation.png)
-
-![Video Frame Mode Workflow Example](./workflows/Video-frame-mode.png)
-
-![Video Reverse Engineering Workflow Example](./workflows/Video-reverse-engineering.png)
+![Video Reverse Engineering Workflow Example](./workflows/视频反推（Video_reverse_engineering）.png)
 
 #### Multi-Image Video Text Generation
-![Multi-Image Video Text Generation Workflow Example](./workflows/Multi-lmage-Video-Text-Generation.png)
+![Multi-Image Video Text Generation Workflow Example](./workflows/分镜生成（Storyboard_generation）.png)
+
+#### Audio Processing
+![Text to Audio Workflow Example](./workflows/文本转音频（Text_to_Audio）.png)
+
+![Audio to Text Workflow Example](./workflows/音频转文本（Audio_to_text）.png)
+
+![Multi-person Dialogue Audio Generation Workflow Example](./workflows/多人对话音频生成（Multi-person_dialogue_audio_generation）.png)
 
 ## Usage Guide (Adjust according to your computer configuration)
 
 ### 1. Basic Usage Flow
 
 1. **Load Model**:
-   - Use the `Llama-cpp Model Loader` node
-   - Select model file and corresponding chat_handler
-   - Choose runtime mode (CPU or GPU)
-   - Enable mmproj to process image input
+   - **LLM/VLM Model**: Use the `llama_cpp_model_loader` node
+   - **ASR Speech Recognition Model**: Use the `llama_cpp_asr_loader` node (optional)
+   - **TTS Speech Synthesis Model**: Use the `llama_cpp_tts_loader` node (optional)
+   - **Forced Alignment Model**: Use the `llama_cpp_forced_aligner_loader` node (optional)
+   - Select runtime mode (CPU or GPU) based on hardware
+   - Visual models require selecting the corresponding visual encoding model
 
 2. **Configure Inference Parameters**:
-   - Use the `Llama-cpp Parameter Settings` node (optional)
-   - Adjust temperature, max_tokens and other parameters
+   - Use the `llama_cpp_parameters` node (optional)
+   - Adjust temperature, max_tokens, top_p and other parameters to optimize generation results
+   - Set appropriate context length based on hardware performance
 
 3. **Execute Inference**:
-   - Use the `Llama-cpp Image Inference` node
-   - Select input type (text, image, video)
-   - Choose appropriate prompt template
+   - Use the `llama_cpp_unified_inference` unified inference node
+   - Select inference mode: text generation, image understanding, audio-to-text, text-to-audio, video understanding, full-modal integration
+   - Select appropriate prompt template
+   - Connect input data (text, image, video, audio)
 
-4. **Manage Resources**:
-   - Use the `Llama-cpp Clean Session` node to release session resources
-   - Use the `Llama-cpp Unload Model` node to release model resources
+4. **Audio Processing Flow**:
+   - **Speech Recognition**: Connect `llama_cpp_asr_loader` node to `asr_model` input of inference node
+   - **Speech Synthesis**: Connect `llama_cpp_tts_loader` node to `tts_model` input of inference node
+   - **Timestamp Generation**: Connect `llama_cpp_forced_aligner_loader` node (requires enabling timestamp feature in ASR model)
 
-Note: For detailed parameter explanations, please see [Parameter-Explanation-and-Recommended-Settings.md](./doc/Parameter-Explanation-and-Recommended-Settings.md)
+5. **Manage Resources**:
+   - Use the `llama_cpp_clean_states` node to release session resources
+   - Use the `llama_cpp_unload_model` node to release model resources
 
-### 1.1 Multi-Image Input Node Usage
+Note: For detailed parameter explanations>=0.3.30, please see [推理节点参数说明与推荐设置](./doc/推理节点参数说明与推荐设置.md)
 
-The Multi-Image Input node supports dual-mode operation for content creation:
-
-#### Image Mode Usage
-1. **Prepare Images (1-6 images)**:
-   - Ensure image content is coherent and has storytelling potential
-   - Images can be continuous scenes or different scene fragments
-
-2. **Configure Multi-Image Input Node**:
-   - Select `mode` as "Image Mode"
-   - Connect image inputs to `image1` through `image6` ports (at least one connection required)
-   - Select `story_type` (recommend "Coherent Story" or "Storyboard Description")
-   - Select `story_length` (usually requires within 400 words)
-   - Select `language` (Chinese or English)
-   - Select `video_model` (WAN2.2/LTX2/General Video/Custom)
-   - Adjust other parameters (theme, narrative style, etc.)
-
-3. **Connect to Llama-cpp Image Inference Node**:
-   - Connect `prompt` output to `custom_prompt` input
-   - Connect `images` output to `images` input
-   - In Llama-cpp Image Inference node:
-     - `inference_mode` select "images"
-     - `preset_prompt` select "[Creative] Short Story"
-     - `output_language` select the same language as Multi-Image Input
-
-4. **Get Story Content**:
-   - Run the workflow
-   - Wait for model processing
-   - Get the generated story content
-
-5. **Use for Video Generation**:
-   - Based on the selected `video_model` type, copy the story content to the corresponding video generation model (WAN2.2, LTX2, etc.) prompt input
-   - Adjust video parameters based on story content
-   - Generate video
-
-#### Text Mode Usage
-1. **Configure Multi-Image Input Node**:
-   - Select `mode` as "Text Mode"
-   - No need to connect any images
-   - Select `story_type` (according to needs)
-   - Select `story_length` (according to content length needs)
-   - Select `language` (Chinese or English)
-   - Configure other parameters (theme, narrative style, content focus, target audience)
-   - Optional: Add `custom_prompt` for custom requirements
-
-2. **Connect to Llama-cpp Image Inference Node**:
-   - Connect `prompt` output to `custom_prompt` input
-   - No need to connect `images` output (text mode returns None)
-   - In Llama-cpp Image Inference node:
-     - `inference_mode` select "text"
-     - `preset_prompt` select "[Creative] Short Story" or other appropriate preset
-     - `output_language` select the same language as Multi-Image Input
-
-3. **Get Generated Content**:
-   - Run the workflow
-   - Wait for model processing
-   - Get the generated content
-
-4. **Use Generated Content**:
-   - Use for video generation (WAN2.2, LTX2, etc.)
-   - Use for other text generation applications
-   - Use for creative writing or content creation
-
-### 1.2 CPU/GPU Runtime Mode Selection
+### 2. CPU/GPU Runtime Mode Selection
 
 The plugin supports flexible CPU and GPU runtime mode selection, allowing users to freely choose based on hardware configuration and needs:
 
@@ -355,168 +406,56 @@ The plugin automatically selects appropriate runtime mode based on hardware perf
 - **Flexible switching**: You can switch runtime modes anytime based on task requirements
 - **Monitor performance**: When using GPU mode, monitor VRAM usage
 
-### 2. Recommended Workflows
-
-#### Multi-Image Input Workflow
-1. Load model (e.g., Qwen3-VL)
-2. Connect images (1-6 images) to Multi-Image Input node
-3. Configure Multi-Image Input node:
-   - Select mode (Image Mode or Text Mode)
-   - Choose story type, length, theme, narrative style, etc.
-   - Select video model type (WAN2.2, LTX2, General Video, Custom)
-4. Connect Multi-Image Input to Llama-cpp Image Inference node:
-   - Connect `prompt` output to `custom_prompt` input
-   - Connect `images` output to `images` input (for Image Mode)
-5. Execute inference to get story content
-6. Use generated story for video generation
-
-#### Prompt Generation Workflow
-1. Load model (e.g., Qwen3-VL)
-2. Disable "Auto Configuration" option
-3. Input prompt content
-4. Select "Prompt Style" series or dedicated model presets
-
-#### Image Description Workflow
-1. Load model (e.g., Moondream2)
-2. Connect image input
-3. Select "Normal - Describe" preset
-4. Execute inference to get description
-
-#### Video Analysis Workflow
-1. Load model (e.g., LLaVA-1.6)
-2. Connect video input
-3. Select "Creative - Summarize Video" preset
-4. Configure max_frames parameter
-5. Execute inference to get video summary
-
-## Common Questions
-
-It is recommended to run workflows in separate blocks for generation, avoiding combined workflows like prompt generation + image generation, which can lead to high resource usage.
-
-### 1. Model Loading Issues
-
-**Reasons**:
-- Model file doesn't exist or path is incorrect
-- llama-cpp-python version is too low
-- Missing corresponding mmproj file
-
-**Solutions**:
-- Check model file path
-- Update llama-cpp-python to the latest version
-- Ensure mmproj file matches the model
-
-### 2. Out of Memory (OOM) Issues
-
-**Reasons**:
-- Model is too large, exceeding VRAM capacity
-- Context length is set too large
-- Multiple large models running simultaneously
-
-**Solutions**:
-- Reduce `n_gpu_layers` value
-- Decrease `n_ctx` value
-- Use a smaller model
-- Try CPU mode if GPU memory is insufficient
-- Lower image `max_size` for VLM tasks
-
-### 3. Slow Inference Speed
-
-**Reasons**:
-- Model is too large
-- GPU layers setting is too low
-- Hardware performance limitations
-- Unrestricted system_prompts word count
-
-**Solutions**:
-- Use a smaller model
-- Increase `n_gpu_layers` value
-- Reduce `n_ctx` value
-- Close unnecessary applications
-- Add word count limit, such as within 300 words, fewer words means faster inference
-
-### 4. Poor Generation Quality
-
-**Reasons**:
-- Inappropriate model selection
-- Poor prompt quality
-- Unreasonable parameter settings
-
-**Solutions**:
-- Use a more suitable model for the task
-- Optimize prompts with more detailed instructions
-- Adjust temperature, top_p, and other parameters
-- Use appropriate prompt templates
-
-## Advanced Settings
-
-### 1. Hardware Detection Optimization
-
-The plugin automatically detects hardware performance and recommends optimal parameters:
-- **24GB+ VRAM**: High-performance mode, full GPU loading
-- **16GB VRAM**: Balanced mode, full GPU loading
-- **12GB VRAM**: Standard mode, full GPU loading
-- **8GB VRAM**: Lightweight mode, partial GPU loading
-- **4-6GB VRAM**: Compatible mode, using CPU
-
-### 2. Custom Parameters
-
-For advanced users, you can manually adjust the following key parameters:
-
-- **n_ctx**: Context length, affects the length of text that can be processed
-- **n_gpu_layers**: GPU loading layers, -1=load all
-- **temperature**: Generation temperature, controls randomness
-- **top_p/top_k**: Control the diversity and accuracy of generation
-
 ## Prompt Template Instructions
 
-The plugin includes various prompt templates for different scenarios:
+The plugin includes various scene-based prompt templates, categorized by inference mode as follows:
 
-### Basic Templates
-- **Empty - Nothing**: Empty template, fully customizable
-- **Normal - Describe**: Simply describe image content
+### [Basic] Text Generation (Text Generation)
+- **Empty Template**: Fully customizable, no preset prompts
+- **Standard Description**: Simple description of image content
+- **Tag Style**: Generate image tag lists, suitable for models like SDXL
+- **Concise Style**: Concise image description, enhancing clarity and expressiveness
+- **Detailed Style**: Detailed description of image elements and details
+- **Comprehensive Expansion**: Detailed prompt expansion, enhancing expressiveness
+- **Creative Optimization**: Optimize and expand prompts to enhance visual richness
+- **Lyric Generation**: Create emotional Chinese lyrics
 
-### Prompt Style Templates
-- **Prompt Style - Tags**: Generate image tag lists, suitable for models like SDXL, maximum output 50 unique tags
-- **Prompt Style - Simple**: Concise image description (within 300 words), enhancing clarity and expressiveness
-- **Prompt Style - Detailed**: Detailed image description (within 500 words), adding specific details for each element
-- **Prompt Style - Comprehensive Expansion**: Detailed prompt expansion (within 800 words), enhancing clarity and expressiveness
-- **Creative - Refine & Expand Prompt**: Optimize and expand prompts to make them more expressive and visually rich
+### [Basic] Image Understanding (Image Understanding)
+- **Detailed Analysis**: Detailed analysis of image content, breaking down subject, clothing, accessories, background, and composition
+- **Short Story**: Generate short stories based on images or videos
+- **Bounding Box Detection**: Generate object detection bounding boxes, output JSON format coordinate list
+- **Enhanced OCR**: Professional poster OCR text recognition, accurately extracting text content and style attributes
+- **ZIMAGE Acceleration**: Designed for Z-Image-Turbo model, creating efficient and high-quality image generation prompts
+- **FLUX2 Concise**: Designed for FLUX.2 Klein model, creating concise and expressive prompts
+- **Qwen Layered**: Designed for Qwen-Image-Layered model, creating detailed layered prompts
+- **Qwen Edit**: Comprehensive editing prompt enhancer for image editing tasks
+- **Qwen High Resolution**: Designed for Qwen Image 2512 model, creating high-quality image generation prompts
 
-### Creative Templates
-- **Creative - Detailed Analysis**: Detailed analysis of image content, breaking down subject, clothing, accessories, background, and composition
-- **Creative - Summarize Video**: Summarize key events and narrative points of video content
-- **Creative - Short Story**: Generate short stories based on images or videos
+### [Basic] Audio to Text (Audio to Text)
+- **Audio to Subtitle**: Convert audio content into subtitle text
+- **Multi-person Dialogue**: Identify and process multi-role dialogue in audio
+- **ASR Transcription**: Transcribe audio content into text
 
-### Vision Templates
-- **Vision - Bounding Box**: Generate object detection bounding boxes, output JSON format coordinate list
+### [Basic] Text to Audio (Text to Audio)
+- **Text to Audio**: Convert text content into speech
+- **TTS Synthesis**: Generate speech using TTS model
 
-### OCR Templates
-- **OCR - Enhanced**: Professional poster OCR text recognition, accurately extracting text content and style attributes, optimized for prompt reverse requirements
+### [Advanced] Video Understanding (Video Understanding)
+- **Video Summary**: Summarize key events and narrative points of video content
+- **Video Reverse**: Generate detailed video descriptions based on video content
+- **Short Story**: Generate short stories based on images or videos
+- **Scene Breakdown**: Detailed video scene breakdown, providing complete details for each scene in chronological order
+- **Subtitle Format**: Generate standard format video subtitles, including time codes and synchronized text
+- **LTX2 Video**: Designed for LTX-2 model, creating detailed and dynamic video generation prompts
+- **WAN Text to Video**: Cinematic director style, adding cinematic elements to original prompts
+- **WAN Image to Video**: Video description prompt rewriting expert, emphasizing dynamic content
+- **WAN Image to Video (Empty)**: Video description prompt writing expert, generating video descriptions from images with imagination
+- **WAN First and Last Frame Video**: Optimize and rewrite prompts based on video first and last frame images, emphasizing motion information and camera movement
 
-### Multilingual Templates
-- **[Multilingual] Bilingual Prompt Generate**: Professional bilingual prompt generation expert, specializing in creating high-quality Chinese-English bilingual prompts for cross-border creation and bilingual document scenarios, ensuring both languages convey the same visual information and creative intent
-
-### High Resolution Templates
-- **[HighRes] Ultra HD Image Reverse**: Professional ultra HD image prompt reverse expert, specializing in extracting detailed visual information from 4K/8K ultra HD images and generating accurate prompts, including all details such as subjects, scenes, materials, textures, lighting, colors, and composition
-
-### Video Templates
-- **Video - Reverse Prompt**: Video reverse prompt, generating detailed video description prompts based on video content
-- **Video - Detailed Scene Breakdown**: Detailed video scene breakdown, providing complete details for each scene in chronological order
-- **Video - Subtitle Format**: Generate standard format video subtitles, including time codes and synchronized text
-
-### Professional Model Templates
-- **ZIMAGE - Turbo**: Designed for Z-Image-Turbo model, creating efficient and high-quality image generation prompts, using 8-step Turbo inference for rapid 1080P HD image generation
-- **FLUX2 - Klein**: Designed for FLUX series (Flux.1 and FLUX.2 Klein) models, creating concise and expressive prompts
-- **LTX-2**: Designed for LTX-2 model, creating detailed and dynamic video generation prompts, supporting high-quality, audio-visual synchronized 4K video
-- **Qwen - Image Layered**: Designed for Qwen-Image-Layered model, creating detailed layered prompts for complex compositions
-- **Qwen - Image Edit Combined**: Comprehensive editing prompt enhancer for image editing tasks, supporting add, delete, replace and other operations
-- **Qwen - Image Dual**: Designed for Qwen Image 2512 model, creating high-quality image generation prompts
-
-### Cinematic Style Templates
-- **WAN - Text to Video**: Cinematic director style, adding cinematic elements (time, light source, light intensity, light angle, color tone, shooting angle, lens size, composition, etc.) to original prompts
-- **WAN - Image to Video**: Video description prompt rewriting expert, rewriting video descriptions based on images and input prompts, emphasizing dynamic content
-- **WAN - Image to Video Empty**: Video description prompt writing expert, generating video descriptions from images with imagination
-- **WAN - FLF to Video**: Prompt optimizer, optimizing and rewriting prompts based on video first and last frame images, emphasizing motion information and camera movement
+### [Advanced] Multimodal Integration (Multimodal Integration) - Omni Exclusive
+- **Short Story**: Generate short stories based on images or videos
+- **Audio Analysis**: Analyze audio emotions, style, rhythm and other characteristics
+- **Video to Audio and Subtitle**: Extract audio from video and generate subtitles
 
 ## Acknowledgments  
 - [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
