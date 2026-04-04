@@ -251,11 +251,11 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
    ```
 
    **安装注意事项：**
-   - 如果遇到 `qwen-tts` 和 `transformers` 版本冲突，请执行：
+   -  `qwen-tts` 和 `transformers` 版本冲突，请单独执行安装（必须）：
      ```bash
      pip install qwen-tts --no-deps --user
      ```
-   - 如果遇到 `auto-gptq` 版本解析问题，请执行：
+   -  `auto-gptq` 版本解析问题，请选择执行：
      ```bash
      pip install auto-gptq --no-deps --user
      ```
