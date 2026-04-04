@@ -16,7 +16,6 @@ ComfyUI-omni-llm is a comprehensive ComfyUI plugin, deeply refactored and enhanc
 - **Professional prompt system**: Built-in rich scene-based preset templates
 - **Powerful audio capabilities**: Integrates ASR speech recognition and TTS speech synthesis functions
 
-> Note: Incompatible with ComfyUI-llama-cpp-vlm and branch plugins
 
 ## Core Features
 
