@@ -89,7 +89,7 @@ bitsandbytes
 accelerate
 sentencepiece
 optimum
-auto-gptq; sys_platform != 'darwin'
+# auto-gptq; sys_platform != 'darwin'
 
 # ===========================================
 # 图像处理增强
