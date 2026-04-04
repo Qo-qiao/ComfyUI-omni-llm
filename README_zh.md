@@ -16,7 +16,6 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 - **专业提示词系统**：内置丰富的场景化预设模板
 - **强大音频能力**：集成ASR语音识别与TTS语音合成功能
 
-> 注：与ComfyUI-llama-cpp-vlm及分支插件不兼容（安装前请删除旧版插件，请勿覆盖或安装多个相同插件）
 
 ## 核心功能
 
