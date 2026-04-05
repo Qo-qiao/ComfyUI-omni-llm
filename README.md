@@ -251,21 +251,15 @@ Please see [Audio Node Parameters Guide](./doc/Audio_Node_Parameters_Guide.md)
    - The folder name should be `ComfyUI-omni-llm`
 
 2. **Install dependencies**:
-   ```bash
-   # Run in ComfyUI root directory
-   pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
-   ```
-
-   **Installation Notes:**
-   - If you encounter version conflicts between `qwen-tts` and `transformers`, please execute:
+   - First, install qwen-tts separately (to avoid version conflicts):
      ```bash
      pip install qwen-tts --no-deps --user
      ```
-   - If you encounter version parsing issues with `auto-gptq`, please execute:
+   - Then install other dependencies:
      ```bash
-     pip install auto-gptq --no-deps --user
+     # Run in ComfyUI root directory
+     pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
-   - If you encounter compilation issues with `webrtcvad` (missing Python.h), this is a limitation of the embedded Python environment and can be skipped without affecting core functionality
 
 3. **Install llama-cpp-python** (required):
    - Needs to be downloaded and installed manually, please download from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)

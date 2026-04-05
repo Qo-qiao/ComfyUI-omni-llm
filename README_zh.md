@@ -244,27 +244,18 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
    - 文件夹名称应为 `ComfyUI-omni-llm`
 
 2. **安装依赖**：
-   -  `qwen-tts` 和 `transformers` 版本冲突，请先单独执行安装（必须）：
+   - 首先单独安装 qwen-tts（避免版本冲突）：
      ```bash
      pip install qwen-tts --no-deps --user
      ```
-   
-   ```bash
-   
-   # 在ComfyUI根目录运行
-   pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
-  
-   ```
-
-3. **安装注意事项：**
-   -  `auto-gptq` 版本解析问题，请选择执行：
+   - 然后安装其他依赖：
      ```bash
-     pip install auto-gptq --no-deps --user
+     # 在ComfyUI根目录运行
+     pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
-   - 如果遇到 `webrtcvad` 编译问题（缺少 Python.h），这是嵌入式 Python 环境限制，可以跳过安装，不影响核心功能
 
-4. **安装 llama-cpp-python**（必须）：
-   - 需自行下载最新版本>=0.3.30手动安装，请从[llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)下载cu129环境下载cu128版本文件即可
+3. **安装 llama-cpp-python**（必须）：
+   - 需自行下载最新版本>=0.3.30手动安装，请从[llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)下载
 
    **轮子选择指南：**
    - **Python版本匹配**：文件名中的`cp312`表示Python 3.12版本，选择与你的Python版本匹配的文件
