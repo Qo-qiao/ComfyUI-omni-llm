@@ -523,8 +523,10 @@ class APIConfigManager:
 
             # 返回音频数据
             audio_bytes = response.content
+            waveform = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+            waveform = torch.from_numpy(waveform).float().unsqueeze(0).unsqueeze(0)  # [1, 1, samples]
             return {
-                "waveform": np.frombuffer(audio_bytes, dtype=np.int16),
+                "waveform": waveform,
                 "sample_rate": 24000
             }
 

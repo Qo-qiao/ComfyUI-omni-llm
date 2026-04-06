@@ -430,7 +430,8 @@ class llama_cpp_sharded_model_loader:
         
         # 根据模型名称自动推断对话格式处理器
         def get_auto_chat_handler(model_name):
-            from ..common import chat_handler_manager, detect_model_chat_handler
+            import common
+            from common import chat_handler_manager, detect_model_chat_handler
             
             # 首先尝试使用ChatHandlerManager的智能匹配
             handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
@@ -480,7 +481,8 @@ class llama_cpp_sharded_model_loader:
                   image_min_tokens=0, image_max_tokens=0, attention_type="Auto"):
         # 根据模型名称自动推断对话格式处理器
         def get_auto_chat_handler(model_name):
-            from ..common import chat_handler_manager, detect_model_chat_handler
+            import common
+            from common import chat_handler_manager, detect_model_chat_handler
             
             # 首先尝试使用ChatHandlerManager的智能匹配
             handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)

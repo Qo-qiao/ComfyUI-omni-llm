@@ -219,10 +219,12 @@ class VideoLoader:
             # 转换为 torch tensor，添加 batch 维度
             waveform = torch.from_numpy(audio_array).float()
             if len(waveform.shape) == 1:
-                waveform = waveform.unsqueeze(0)
-            elif len(waveform.shape) == 2 and waveform.shape[0] < waveform.shape[1]:
-                # 转置为 (channels, samples)
-                waveform = waveform.T
+                waveform = waveform.unsqueeze(0).unsqueeze(0)  # [samples] -> [1, 1, samples]
+            elif len(waveform.shape) == 2:
+                if waveform.shape[0] > waveform.shape[1]:
+                    # 转置为 (channels, samples)
+                    waveform = waveform.T
+                waveform = waveform.unsqueeze(0)  # [channels, samples] -> [1, channels, samples]
             
             return {
                 "sample_rate": sample_rate,

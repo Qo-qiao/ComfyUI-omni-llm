@@ -816,16 +816,27 @@ class llama_cpp_unified_inference:
                         sample_rate = audio_output.get("sample_rate")
 
                         if isinstance(waveform, np.ndarray):
-                            audio_output["waveform"] = torch.from_numpy(waveform)
+                            waveform = torch.from_numpy(waveform)
                             print(f"【TTS兼容】waveform由numpy.ndarray转换为torch.Tensor，shape={waveform.shape}")
                         elif isinstance(waveform, list):
-                            audio_output["waveform"] = torch.tensor(waveform)
+                            waveform = torch.tensor(waveform)
                             print(f"【TTS兼容】waveform由list转换为torch.Tensor，长度={len(waveform)}")
                         elif isinstance(waveform, torch.Tensor):
                             # 已经符合要求
                             pass
                         else:
                             print(f"【TTS兼容】警告：waveform类型不支持 ({type(waveform)})")
+                            waveform = None
+                        
+                        # 确保waveform是三维张量 [batch, channels, samples]
+                        if waveform is not None:
+                            if waveform.dim() == 1:
+                                waveform = waveform.unsqueeze(0).unsqueeze(0)  # [samples] -> [1, 1, samples]
+                                print(f"【TTS兼容】waveform已reshape为三维，shape={waveform.shape}")
+                            elif waveform.dim() == 2:
+                                waveform = waveform.unsqueeze(0)  # [channels, samples] -> [1, channels, samples]
+                                print(f"【TTS兼容】waveform已reshape为三维，shape={waveform.shape}")
+                            audio_output["waveform"] = waveform
 
                         # 默认sample_rate
                         if sample_rate is None:
@@ -1075,16 +1086,27 @@ class llama_cpp_unified_inference:
 
                 # 支持numpy->torch类型转换
                 if isinstance(waveform, np.ndarray):
-                    audio_output["waveform"] = torch.from_numpy(waveform)
+                    waveform = torch.from_numpy(waveform)
                     print(f"【TTS兼容】waveform由numpy.ndarray转换为torch.Tensor，shape={waveform.shape}")
                 elif isinstance(waveform, list):
-                    audio_output["waveform"] = torch.tensor(waveform)
+                    waveform = torch.tensor(waveform)
                     print(f"【TTS兼容】waveform由list转换为torch.Tensor，长度={len(waveform)}")
                 elif isinstance(waveform, torch.Tensor):
                     # 已经符合要求
                     pass
                 else:
                     print(f"【TTS兼容】警告：waveform类型不支持 ({type(waveform)})")
+                    waveform = None
+                
+                # 确保waveform是三维张量 [batch, channels, samples]
+                if waveform is not None:
+                    if waveform.dim() == 1:
+                        waveform = waveform.unsqueeze(0).unsqueeze(0)  # [samples] -> [1, 1, samples]
+                        print(f"【TTS兼容】waveform已reshape为三维，shape={waveform.shape}")
+                    elif waveform.dim() == 2:
+                        waveform = waveform.unsqueeze(0)  # [channels, samples] -> [1, channels, samples]
+                        print(f"【TTS兼容】waveform已reshape为三维，shape={waveform.shape}")
+                    audio_output["waveform"] = waveform
 
                 # 默认sample_rate
                 if sample_rate is None:

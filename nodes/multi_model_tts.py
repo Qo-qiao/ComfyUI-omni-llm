@@ -45,6 +45,7 @@ class multi_model_tts:
                 "pause_duration": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 2.0, "step": 0.1, "tooltip": "说话人之间的停顿时间（秒）"}),
                 "add_silence": ("BOOLEAN", {"default": True, "tooltip": "是否在说话人之间添加静音"}),
                 "force_offload": ("BOOLEAN", {"default": False, "tooltip": "强制卸载模型释放显存"}),
+                "output_format": (["wav", "flac", "mp3", "ogg"], {"default": "wav", "tooltip": "输出音频格式"}),
             }
         }
     
@@ -56,7 +57,7 @@ class multi_model_tts:
     def generate_multi_model_audio(self, dialogue_text, 
                                   tts_model_1=None, tts_model_2=None, tts_model_3=None, tts_model_4=None,
                                   role_config_1=None, role_config_2=None, role_config_3=None, role_config_4=None,
-                                  pause_duration=0.5, add_silence=True, force_offload=False):
+                                  pause_duration=0.5, add_silence=True, force_offload=False, output_format="wav"):
         """
         生成多模型多角色对话音频
         根据连接的模型和角色配置数量动态处理
@@ -267,12 +268,19 @@ class multi_model_tts:
             print(f"【多模型TTS】正在保存音频...")
             audio_path = self._save_audio(
                 final_audio,
-                audio_segments[0]["sample_rate"]
+                audio_segments[0]["sample_rate"],
+                output_format=output_format
             )
             
             # 创建AUDIO格式输出
+            waveform = torch.from_numpy(final_audio)
+            # 确保waveform是三维张量 [batch, channels, samples]
+            if waveform.dim() == 1:
+                waveform = waveform.unsqueeze(0).unsqueeze(0)  # [samples] -> [1, 1, samples]
+            elif waveform.dim() == 2:
+                waveform = waveform.unsqueeze(0)  # [channels, samples] -> [1, channels, samples]
             audio_output = {
-                "waveform": torch.from_numpy(final_audio),
+                "waveform": waveform,
                 "sample_rate": audio_segments[0]["sample_rate"]
             }
             
@@ -379,13 +387,14 @@ class multi_model_tts:
         
         return final_audio
     
-    def _save_audio(self, waveform, sample_rate):
+    def _save_audio(self, waveform, sample_rate, output_format="wav"):
         """
         保存音频文件
         
         Args:
             waveform: 音频波形
             sample_rate: 采样率
+            output_format: 输出音频格式 (wav, flac, mp3, ogg)
         
         Returns:
             音频文件路径
@@ -402,9 +411,9 @@ class multi_model_tts:
                 audio_output_dir = "."
                 os.makedirs(audio_output_dir, exist_ok=True)
             
-            # 生成输出文件名（自动生成）
+            # 生成输出文件名
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_filename = f"multi_model_dialogue_{timestamp}.wav"
+            output_filename = f"multi_model_dialogue_{timestamp}.{output_format}"
             audio_path = os.path.join(audio_output_dir, output_filename)
             
             # 保存音频文件
@@ -412,8 +421,8 @@ class multi_model_tts:
                 audio_path,
                 waveform,
                 sample_rate,
-                format='WAV',
-                subtype='PCM_16'
+                format=output_format.upper(),
+                subtype='PCM_16' if output_format == 'wav' else None
             )
             
             return audio_path
