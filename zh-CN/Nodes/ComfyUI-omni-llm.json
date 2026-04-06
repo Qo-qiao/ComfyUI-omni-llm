@@ -580,7 +580,8 @@
       "role_config_4": "角色配置4",
       "pause_duration": "停顿时长",
       "add_silence": "添加静音",
-      "force_offload": "强制卸载"
+      "force_offload": "强制卸载",
+      "output_format": "输出格式"
     },
     "widgets": {
       "dialogue_text": "对话文本",
@@ -594,7 +595,8 @@
       "role_config_4": "角色配置4",
       "pause_duration": "停顿时长",
       "add_silence": "添加静音",
-      "force_offload": "强制卸载"
+      "force_offload": "强制卸载",
+      "output_format": "输出格式"
     },
     "outputs": {
       "text": "文本输出",
@@ -614,6 +616,7 @@
       "pause_duration": "说话人之间的停顿时间（秒）\n• 0.0-2.0",
       "add_silence": "是否在说话人之间添加静音",
       "force_offload": "推理完成后强制卸载模型\n• 释放显存\n• 适用于多模型切换场景",
+      "output_format": "输出音频格式\n• wav：无压缩音频（质量最高）\n• flac：无损压缩（推荐）\n• mp3：有损压缩（文件最小）\n• ogg：开放格式（平衡）",
       "text": "生成的对话文本\n• 可连接到文本处理节点",
       "audio": "生成的音频数据\n• AUDIO类型，可直接连接音频保存节点",
       "dialogue_info": "对话详细信息\n• 包含分段数、总时长、角色配置等信息"
