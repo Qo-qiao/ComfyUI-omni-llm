@@ -238,6 +238,10 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 ## 安装说明
 
 ### 1. 基本安装
+测试环境：comfyui 0.18.2   pytorch版本: 2.8.0+cu128
+依赖兼容问题可使用此完整依赖文件 夸克链接：https://pan.quark.cn/s/ad099cefaa40?pwd=cx94
+依赖文件存放地址 E:\ComfyUI\python\Lib（确认自己的存放盘）
+
 
 1. **克隆或下载插件**：
    - 将插件文件夹放入 `ComfyUI/custom_nodes/` 目录
