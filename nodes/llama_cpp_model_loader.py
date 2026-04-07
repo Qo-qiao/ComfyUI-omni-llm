@@ -21,6 +21,10 @@ class llama_cpp_model_loader:
         # 动态导入chat_handlers，确保使用最新的列表
         from common import chat_handlers
 
+        # 检查并添加LLM文件夹路径
+        if "LLM" not in folder_paths.folder_names_and_paths:
+            folder_paths.add_model_folder_path("LLM", os.path.join(folder_paths.models_dir, "LLM"))
+
         all_llms = []
         for folder in folder_paths.get_folder_paths("LLM"):
             for root, dirs, files in os.walk(folder):

@@ -187,6 +187,10 @@ class llama_cpp_asr_loader:
     
     @classmethod
     def INPUT_TYPES(s):
+        # 检查并添加LLM文件夹路径
+        if "LLM" not in folder_paths.folder_names_and_paths:
+            folder_paths.add_model_folder_path("LLM", os.path.join(folder_paths.models_dir, "LLM"))
+
         # 获取所有LLM文件夹路径
         llm_folders = folder_paths.get_folder_paths("LLM")
         
