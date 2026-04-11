@@ -99,6 +99,18 @@ try:
 except:
     Gemma3ChatHandler = None
 
+# 尝试导入Gemma4ChatHandler
+try:
+    from llama_cpp.llama_chat_format import Gemma4ChatHandler
+except:
+    Gemma4ChatHandler = None
+
+# 尝试导入LFM2.5VLChatHandler
+try:
+    from llama_cpp.llama_chat_format import LFM25VLChatHandler
+except:
+    LFM25VLChatHandler = None
+
 # 尝试导入GraniteDoclingChatHandler
 try:
     from llama_cpp.llama_chat_format import GraniteDoclingChatHandler
@@ -833,8 +845,10 @@ class ChatHandlerManager:
             ('glm-4.6v', 'GLM46VChatHandler'),
             ('glm-4.1v', 'GLM41VChatHandler'),
             ('gemma-3', 'Gemma3ChatHandler'),
+            ('gemma-4', 'Gemma4ChatHandler'),
             ('granite-docling', 'GraniteDoclingChatHandler'),
             ('lfm-2-vl', 'LFM2VLChatHandler'),
+            ('lfm-2.5-vl', 'LFM25VLChatHandler'),
             ('paddleocr', 'PaddleOCRChatHandler'),
             ('obsidian', 'ObsidianChatHandler'),
             ('llava-1.6', 'Llava16ChatHandler'),
@@ -1080,6 +1094,7 @@ MODEL_FILE_CHAT_HANDLER_MAP = {
     'nanollava': 'nanoLLaVA',
     # 其他模型
     'gemma-3': 'Gemma-3',
+    'gemma-4': 'Gemma-4',
     'moondream2': 'Moondream2',
     'moondream-2': 'Moondream2',
     'llama-3.2-11b-vision': 'Llama-3.2-11B-Vision-Instruct',
@@ -1097,6 +1112,7 @@ MODEL_FILE_CHAT_HANDLER_MAP = {
     'paddleocr': 'PaddleOCR-VL-1.5',
     'granite-docling': 'Granite-DocLing',
     'lfm-2-vl': 'Lfm-2-VL',
+    'lfm-2.5-vl': 'Lfm-2.5-VL',
     'erax-vl': 'EraX-VL-7B-V1.5',
     'mimo-vl': 'MiMo-VL-7B-RL',
     'asid-captioner': 'ASID-Captioner-7B',
