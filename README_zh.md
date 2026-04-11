@@ -249,6 +249,7 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 2. **安装依赖**：
    - 首先安装插件依赖：
+     ```bash
      # 在ComfyUI根目录运行
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```

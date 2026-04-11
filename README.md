@@ -253,7 +253,7 @@ Please see [Audio Node Parameters Guide](./doc/Audio_Node_Parameters_Guide.md)
 2. **Install dependencies**:
    - First install plugin dependencies:
      ```bash
-     # Run in ComfyUI root directory
+     # 在ComfyUI根目录运行
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
    - qwen-tts, qwen-asr, and peft dependencies are installed via file replacement (not via pip):
