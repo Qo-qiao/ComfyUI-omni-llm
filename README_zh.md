@@ -248,15 +248,12 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
    - 文件夹名称应为 `ComfyUI-omni-llm`
 
 2. **安装依赖**：
-   - 首先单独安装 qwen-tts（避免版本冲突）：
-     ```bash
-     pip install qwen-tts --no-deps --user
-     ```
-   - 然后安装其他依赖：
-     ```bash
+   - 首先安装插件依赖：
      # 在ComfyUI根目录运行
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
+   - qwen-tts、qwen-asr、peft 三个依赖通过文件替换方式安装（不通过pip安装）：
+     将准备好的三个依赖包文件分别复制到 [site-packages](site-packages.zip) 目录覆盖原有文件（这三个依赖文件已支持transformers-5.5.3版本）
 
 3. **安装 llama-cpp-python**（必须）：
    - 需自行下载最新版本>=0.3.30手动安装，请从[llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)下载
