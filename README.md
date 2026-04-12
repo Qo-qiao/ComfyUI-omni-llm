@@ -251,13 +251,15 @@ Please see [Audio Node Parameters Guide](./doc/Audio_Node_Parameters_Guide.md)
    - The folder name should be `ComfyUI-omni-llm`
 
 2. **Install dependencies**:
-   - First install plugin dependencies:
+   - First, install qwen-tts separately (to avoid version conflicts):
      ```bash
-     # 在ComfyUI根目录运行
+     pip install qwen-tts --no-deps --user
+     ```
+   - Then install other dependencies:
+     ```bash
+     # Run in ComfyUI root directory
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
-   - qwen-tts, qwen-asr, and peft dependencies are installed via file replacement (not via pip):
-     Copy the three dependency package files to the dependency file location [site-packages](site-packages.zip) directory to overwrite the original files (these three dependencies support transformers-5.5.3 version)
 
 3. **Install llama-cpp-python** (required):
    - Needs to be downloaded and installed manually, please download from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)
