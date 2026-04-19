@@ -77,6 +77,7 @@
       "tts_language": "TTS语言",
       "tts_speed": "语速",
       "seed": "随机种子",
+      "output_format": "输出格式",
       "images": "图像",
       "video": "视频",
       "audio": "音频"
@@ -97,7 +98,8 @@
       "tts_emotion": "情感风格",
       "tts_language": "TTS语言",
       "tts_speed": "语速",
-      "seed": "随机种子"
+      "seed": "随机种子",
+      "output_format": "输出格式"
     },
     "outputs": {
       "text": "文本输出",
@@ -119,6 +121,7 @@
       "tts_emotion": "TTS情感风格\n• 开心/悲伤/愤怒/平静/兴奋/温柔/默认",
       "tts_speed": "TTS语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
       "seed": "随机种子\n• 影响生成结果的可重复性\n• 相同种子产生相同结果",
+      "output_format": "选择输出格式：\n• 文本：返回纯文本结果\n• JSON：返回包含详细信息的JSON格式",
       "images": "图像输入\n• 支持单张或多张图像",
       "video": "视频输入\n• 自动抽帧处理",
       "audio": "音频输入\n• 用于音频理解"
@@ -244,7 +247,8 @@
       "flash_attention": "启用FlashAttention2优化\n• 需要安装flash-attn库\n• 提升推理性能",
       "aligner_model": "加载的强制对齐模型对象"
     }
-  },"llama_cpp_model_loader": {
+  },
+  "llama_cpp_model_loader": {
     "title": "Llama-cpp 模型加载器",
     "inputs": {
       "model": "模型文件",
@@ -258,7 +262,9 @@
       "vram_limit": "显存限制（GB）",
       "image_min_tokens": "图片最小编码token数",
       "image_max_tokens": "图片最大编码token数",
-      "attention_type": "注意力类型"
+      "attention_type": "注意力类型",
+      "cache_prompt": "缓存提示词",
+      "turboquant_kv_cache": "TurboQuant KV缓存"
     },
     "widgets": {
       "model": "模型文件",
@@ -272,7 +278,9 @@
       "vram_limit": "显存限制（GB）",
       "image_min_tokens": "图片最小编码token数",
       "image_max_tokens": "图片最大编码token数",
-      "attention_type": "注意力类型"
+      "attention_type": "注意力类型",
+      "cache_prompt": "缓存提示词",
+      "turboquant_kv_cache": "TurboQuant KV缓存"
     },
     "outputs": {
       "llama_model": "Llama模型"
@@ -289,7 +297,9 @@
       "vram_limit": "显存限制（GB）\n• -1：无限制\n• GPU模式有效，CPU模式自动忽略\n• 建议设为实际显存大小减1",
       "image_min_tokens": "图片最小编码token数\n• 保持默认0即可",
       "image_max_tokens": "图片最大编码token数\n• 保持默认0即可",
-      "attention_type": "注意力类型\n• Auto：自动选择（推荐）\n• Standard：标准注意力\n• Flash：Flash Attention（NVIDIA GPU推荐）\n• XFormers：XFormers（实验性）"
+      "attention_type": "注意力类型\n• Auto：自动选择（推荐）\n• Standard：标准注意力\n• Flash：Flash Attention（NVIDIA GPU推荐）\n• XFormers：XFormers（实验性）",
+      "cache_prompt": "缓存提示词\n• 启用后会缓存提示词以提高性能\n• 适用于重复使用相同提示词的场景",
+      "turboquant_kv_cache": "TurboQuant KV缓存\n• 启用TurboQuant压缩以减少显存使用\n• 提升推理性能"
     }
   },
   "llama_cpp_parameters": {
@@ -348,6 +358,7 @@
     "inputs": {
       "model_name": "模型名称",
       "quantization": "量化模式",
+      "turboquant_kv_cache": "TurboQuant KV缓存",
       "enable_asr": "启用ASR",
       "enable_tts": "启用TTS",
       "n_ctx": "上下文长度",
@@ -360,6 +371,7 @@
     "widgets": {
       "model_name": "模型名称",
       "quantization": "量化模式",
+      "turboquant_kv_cache": "TurboQuant KV缓存",
       "enable_asr": "启用ASR",
       "enable_tts": "启用TTS",
       "n_ctx": "上下文长度",
@@ -375,6 +387,7 @@
     "tooltips": {
       "model_name": "选择要加载的分段模型\n• Qwen2.5-Omni-3B（默认）\n• Qwen2.5-Omni-7B\n• Qwen3.5-2B（4.55GB）\n• Qwen3.5-4B（9.32GB）\n• Qwen3.5-9B（19.32GB）\n• 本地模型会自动扫描显示",
       "quantization": "选择量化模式\n• None：不量化（精度最高）\n• 4-bit (VRAM-friendly)：4位量化（显存友好）\n• 8-bit (Balanced Precision)：8位量化（平衡精度）",
+      "turboquant_kv_cache": "TurboQuant KV缓存压缩\n• None：禁用压缩\n• f16 (无压缩)：16位浮点，无压缩\n• q8_0 (8-bit)：8位量化\n• q6_k (6-bit)：6位K-Quant\n• q5_k (5-bit)：5位K-Quant\n• q4_k (4-bit)：4位K-Quant（推荐平衡）\n• q4_0 (4-bit)/q4_1 (4-bit)：4位量化\n• q5_0 (5-bit)/q5_1 (5-bit)：5位量化\n• q2_k (2-bit)：2位K-Quant（高压缩）\n• q3_k (3-bit)：3位K-Quant\n• mxfp4 (4-bit)/nvfp4 (4-bit)：4位特殊格式\n• turbo1 (1-bit)：TurboQuant 1位（最高压缩）\n• turbo2 (2-bit)：TurboQuant 2位\n• turbo3 (3-bit)：TurboQuant 3位\n\n位数越低压缩率越高，显存占用越少",
       "enable_asr": "启用ASR语音识别功能\n• 需要配合ASR模型加载器使用\n• 支持音频反推、语音转文本",
       "enable_tts": "启用TTS语音合成功能\n• 需要配合TTS模型加载器使用\n• 支持文本转语音",
       "n_ctx": "上下文长度，影响可处理的文本长度\n• 24GB+显存：16384\n• 16GB显存：8192\n• 12GB显存：6144\n• 8GB显存：4096\n• 4-6GB显存：2048",
@@ -466,6 +479,8 @@
       "prompt_language": "提示词语言",
       "response_language": "响应语言",
       "asr_language": "ASR语言",
+      "output_format": "输出格式",
+      "batch_combination": "批量输出选项",
       "video_max_frames": "视频最大帧数",
       "image_max_size": "图像最大尺寸",
       "video_sampling": "视频抽帧模式",
@@ -494,6 +509,8 @@
       "prompt_language": "提示词语言",
       "response_language": "响应语言",
       "asr_language": "ASR语言",
+      "output_format": "输出格式",
+      "batch_combination": "批量输出选项",
       "video_max_frames": "视频最大帧数",
       "image_max_size": "图像最大尺寸",
       "video_sampling": "视频抽帧模式",
@@ -528,7 +545,9 @@
       "prompt_language": "提示词语言\n• Chinese：使用中文提示词\n• English：使用英文提示词",
       "response_language": "响应语言\n• Auto-detect：自动检测\n• Chinese：强制中文输出\n• English：强制英文输出",
       "asr_language": "ASR语音识别语言\n• Auto-detect：自动检测\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• French：法语\n• German：德语\n• Spanish：西班牙语",
+      "output_format": "输出格式控制：\n• JSON格式：输出JSON格式内容（遵循预设模板的output_format要求）\n• 文本格式：输出纯文本内容（使用input_template_text模板）",
       "video_max_frames": "视频处理的最大帧数\n• 控制视频抽帧数量\n• 影响处理时间和显存占用",
+      "batch_combination": "批量输出选项：\n• 逐个输出：每张图片单独输出结果\n• 合并输出：所有结果合并为一个输出",
       "image_max_size": "图像处理的最大尺寸\n• 控制图像缩放大小\n• 影响显存占用和处理速度",
       "video_sampling": "视频抽帧模式\n• Auto uniform sampling：自动均匀采样\n• Manual frame indices：手动指定帧索引",
       "video_manual_indices": "手动模式下的帧索引\n• 仅在video_sampling为手动时生效\n• 格式：逗号分隔的数字",
@@ -871,34 +890,30 @@
       },
       "preset_prompt": {
         "Empty - Nothing": "空白-无内容",
-        "[Normal] Describe": "[正常] 描述",
-        "[Text to Image] ZIMAGE - Turbo": "[文生图] ZIMAGE - Turbo",
-        "[Text to Image] FLUX2 - Klein": "[文生图] FLUX2 - Klein",
-        "[Text to Image] Qwen - Image 2512": "[文生图] Qwen - Image 2512",
-        "[Image Edit] Qwen - Image Edit Combined": "[图像编辑] Qwen - 图像编辑组合",
-        "[Image Edit] Qwen - Image Layered": "[图像编辑] Qwen - 图像分层",
+        "[Reverse] Tags": "[反推] 标签",
+        "[Reverse] Describe": "[反推] 描述",
+        "[Normal] Expand": "[常规] 提示词扩写",
+        "[Portrait] ZIMAGE - Turbo": "[人像强化] ZIMAGE - Turbo",
+        "[General] FLUX2 - Klein": "[通用细节强化] FLUX2 - Klein",
+        "[Poster] Qwen - Image 2512": "[海报强化] Qwen - Image 2512",
+        "[Image Edit] Qwen - Image Edit Combined": "[图层编辑] Qwen - 图像编辑",
+        "[Image Edit] Qwen - Image Layered": "[图层编辑] Qwen - 图像分层",
         "[Text to Video] LTX-2": "[文生视频] LTX-2",
-        "[Text to Video] WAN - Text to Video": "[文生视频] WAN - 文本到视频",
-        "[Image to Video] WAN - Image to Video": "[图生视频] WAN - 图像到视频",
-        "[Image to Video] WAN - Image to Video Empty": "[图生视频] WAN - 图像到视频（空）",
-        "[Image to Video] WAN - FLF to Video": "[图生视频] WAN - FLF到视频",
-        "[Audio] Audio Subtitle Convert": "[音频] 音频字幕转换",
-        "[Audio] Video to Audio Subtitle": "[音频] 视频到音轨字幕",
-        "[Audio] Text to Audio": "[音频] 文本到音轨",
-        "[Prompt Style] Tags": "[提示词风格] 标签",
-        "[Prompt Style] Simple": "[提示词风格] 简单",
-        "[Prompt Style] Detailed": "[提示词风格] 详细",
-        "[Prompt Style] Comprehensive Expansion": "[提示词风格] 全面扩展",
-        "[Creative] Refine & Expand Prompt": "[创意] 优化与扩展提示词",
-        "[Creative] Detailed Analysis": "[创意] 详细分析",
-        "[Creative] Summarize Video": "[创意] 视频总结",
-        "[Creative] Short Story": "[创意] 短篇故事",
-        "[Video Analysis] Video - Reverse Prompt": "[视频分析] 视频 - 反向提示",
-        "[Video Analysis] Video - Detailed Scene Breakdown": "[视频分析] 视频 - 详细分镜拆解",
+        "[Text to Video] WAN - Text to Video": "[文生视频] WAN - 文本生视频",
+        "[Image to Video] WAN - Image to Video": "[图生视频] WAN - 图像生视频",
+        "[Image to Video] WAN - Image to Video Empty": "[图生视频] WAN - 图像生视频（无提示此词）",
+        "[Image to Video] WAN - FLF to Video": "[图生视频] WAN - 首尾帧生视频",
+        "[Video Analysis] Video - Reverse Prompt": "[视频反推] 视频 - 反向提示",
+        "[Video Analysis] Video - Detailed Scene Breakdown": "[视频反推] 视频 - 详细分镜拆解",
         "[Video Analysis] Video - Subtitle Format": "[视频分析] 视频 - 字幕格式",
-        "[Vision] Bounding Box": "[视觉] 边界框",
+        "[Audio] Audio ↔ Subtitle Convert": "[音频] 音频↔字幕转换",
+        "[Audio] Video to Audio & Subtitle": "[音频] 视频到音频和字幕",
+        "[Audio] Audio Analysis": "[音频] 音频分析",
+        "[Audio] Multi-Person Dialogue": "[音频] 多人对话",
+        "[Music] Lyrics Creation": "[音乐] 歌词创作",
         "[OCR] Enhanced OCR": "[OCR] 增强OCR",
-        "[HighRes] Ultra HD Image Reverse": "[高分辨率] 超高清图像反向"
+        "[HighRes] Ultra HD Image Reverse": "[高分辨率] 超高清图像反向",
+        "[Vision] Bounding Box": "[视觉] 边界框"
       }
     }
   }
