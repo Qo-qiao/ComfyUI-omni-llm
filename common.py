@@ -20,6 +20,20 @@ import platform
 from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter
 
+# 导入加速模块
+try:
+    from engine.vram_layers import (
+        calculate_vram_layers,
+        calculate_safetensors_vram_layers,
+        get_layer_count,
+        estimate_vram_for_safetensors,
+    )
+except ImportError:
+    calculate_vram_layers = None
+    calculate_safetensors_vram_layers = None
+    get_layer_count = None
+    estimate_vram_for_safetensors = None
+
 # -------------------------- 自动导入依赖（缺失会提示） --------------------------
 try:
     import llama_cpp
@@ -170,14 +184,14 @@ def get_hardware_info():
                 hardware_info["is_high_perf"] = False
                 hardware_info["is_low_perf"] = False
                 hardware_info["perf_level"] = "mid"  # 12GB
-            elif gpu_vram >= 8 or any(flag.lower() in gpu_name_lower for flag in mid_low_perf_flags):
+            elif gpu_vram >= 4 or any(flag.lower() in gpu_name_lower for flag in mid_low_perf_flags):
                 hardware_info["is_high_perf"] = False
                 hardware_info["is_low_perf"] = False
-                hardware_info["perf_level"] = "mid_low"  # 8GB
+                hardware_info["perf_level"] = "mid_low"  # 4-8GB
             else:
                 hardware_info["is_high_perf"] = False
                 hardware_info["is_low_perf"] = True
-                hardware_info["perf_level"] = "low"  # <8GB
+                hardware_info["perf_level"] = "low"  # <4GB
             print(f"【硬件检测】显卡：{hardware_info['gpu_name']}，显存：{hardware_info['gpu_vram_total']}GB")
         except Exception as e:
             print(f"【提示】显卡信息检测失败，自动使用兼容模式：{e}")
@@ -225,14 +239,14 @@ def get_hardware_info():
                         hardware_info["is_high_perf"] = False
                         hardware_info["is_low_perf"] = False
                         hardware_info["perf_level"] = "mid"  # 12GB
-                    elif gpu_vram >= 8 or any(flag.lower() in gpu_name_lower for flag in amd_mid_low_perf_flags):
+                    elif gpu_vram >= 4 or any(flag.lower() in gpu_name_lower for flag in amd_mid_low_perf_flags):
                         hardware_info["is_high_perf"] = False
                         hardware_info["is_low_perf"] = False
-                        hardware_info["perf_level"] = "mid_low"  # 8GB
+                        hardware_info["perf_level"] = "mid_low"  # 4-8GB
                     else:
                         hardware_info["is_high_perf"] = False
                         hardware_info["is_low_perf"] = True
-                        hardware_info["perf_level"] = "low"  # <8GB
+                        hardware_info["perf_level"] = "low"  # <4GB
                     
                     print(f"【硬件检测】AMD显卡：{hardware_info['gpu_name']}，显存：{hardware_info['gpu_vram_total']}GB")
                 except AttributeError:
@@ -1446,7 +1460,7 @@ class LLAMA_CPP_STORAGE:
             return None
     
     @classmethod
-    def init_chat_handler(cls, handler_cls, mmproj_path, chat_handler_name, image_max_tokens, image_min_tokens, video_input=False):
+    def init_chat_handler(cls, handler_cls, mmproj_path, chat_handler_name, image_max_tokens, image_min_tokens, video_input=False, enable_thinking=False):
         """
         初始化ChatHandler - 智能参数检测和初始化
         
@@ -1457,6 +1471,7 @@ class LLAMA_CPP_STORAGE:
             image_max_tokens: 图片最大token数
             image_min_tokens: 图片最小token数
             video_input: 是否为视频输入
+            enable_thinking: 是否启用thinking模式
             
         Returns:
             初始化的ChatHandler实例或None
@@ -1515,23 +1530,25 @@ class LLAMA_CPP_STORAGE:
                 if issubclass(handler_cls, MTMDChatHandler):
                     # 检查是否是Qwen35ChatHandler
                     is_qwen35_handler = "Qwen35" in handler_cls.__name__
+                    # 检查是否是Qwen3VLChatHandler
+                    is_qwen3vl_handler = "Qwen3VL" in handler_cls.__name__
                     
-                    # 对于Qwen35ChatHandler，即使没有mmproj_path也尝试初始化
-                    if is_qwen35_handler:
-                        print(f"【ChatHandler初始化】Qwen35ChatHandler特殊处理，即使没有mmproj_path也尝试初始化")
+                    # 对于Qwen35ChatHandler和Qwen3VLChatHandler，即使没有mmproj_path也尝试初始化
+                    if is_qwen35_handler or is_qwen3vl_handler:
+                        print(f"【ChatHandler初始化】{handler_cls.__name__}特殊处理，即使没有mmproj_path也尝试初始化")
                         # 强制添加clip_model_path参数，使用空字符串作为默认值
                         init_params["clip_model_path"] = ""
-                        print(f"【ChatHandler初始化】为Qwen35ChatHandler添加clip_model_path=''参数")
-                        # 尝试捕获初始化异常，允许Qwen35ChatHandler在没有mmproj的情况下初始化
+                        print(f"【ChatHandler初始化】为{handler_cls.__name__}添加clip_model_path=''参数")
+                        # 尝试捕获初始化异常，允许在没有mmproj的情况下初始化
                         try:
                             chat_handler = handler_cls(**init_params)
                             print(f"【ChatHandler初始化】成功：{handler_cls.__name__}")
                             return chat_handler
                         except Exception as e:
-                            print(f"【ChatHandler初始化错误】Qwen35ChatHandler初始化失败：{e}")
+                            print(f"【ChatHandler初始化错误】{handler_cls.__name__}初始化失败：{e}")
                             # 不尝试其他备选，直接返回None，让模型以基础模式加载
                             # 这样可以避免后续的初始化尝试失败，同时保持TTS音频功能可用
-                            print(f"【ChatHandler初始化】Qwen35ChatHandler初始化失败，模型将以基础模式加载")
+                            print(f"【ChatHandler初始化】{handler_cls.__name__}初始化失败，模型将以基础模式加载")
                             print(f"【提示】虽然ChatHandler初始化失败，但TTS音频功能仍可使用")
                             return None
                     else:
@@ -1589,8 +1606,8 @@ class LLAMA_CPP_STORAGE:
                 init_params["image_min_tokens"] = image_min_tokens
                 print(f"【ChatHandler初始化】添加image_min_tokens={image_min_tokens}")
             
-            # 检测是否是思考模式（Thinking）
-            think_mode = "Thinking" in chat_handler_name
+            # 优先使用用户传入的enable_thinking参数，其次才基于chat_handler_name
+            think_mode = enable_thinking or ("Thinking" in chat_handler_name)
             
             # 根据模型类型添加特殊参数
             if chat_handler_name in ["Qwen3-VL", "Qwen3-VL-Thinking"]:
@@ -1628,8 +1645,8 @@ class LLAMA_CPP_STORAGE:
                 supported_params = list(params.keys())
                 # 只添加支持的参数
                 if "enable_thinking" in supported_params:
-                    init_params["enable_thinking"] = True
-                    print(f"【ChatHandler初始化】{chat_handler_name} 启用 thinking 模式")
+                    init_params["enable_thinking"] = think_mode
+                    print(f"【ChatHandler初始化】{chat_handler_name} 启用 thinking 模式: {think_mode}")
                 # 移除可能不支持的参数
                 if "image_max_tokens" in init_params and "image_max_tokens" not in supported_params:
                     init_params.pop("image_max_tokens")
@@ -1683,6 +1700,9 @@ class LLAMA_CPP_STORAGE:
                     minimal_params["clip_model_path"] = init_params["clip_model_path"]
                 elif "mmproj" in init_params:
                     minimal_params["mmproj"] = init_params["mmproj"]
+                # 添加enable_thinking参数（如果支持）
+                if "enable_thinking" in params:
+                    minimal_params["enable_thinking"] = think_mode
                 try:
                     chat_handler = handler_cls(**minimal_params)
                     print(f"【ChatHandler初始化】成功（最小参数）：{handler_name}")
@@ -1806,6 +1826,8 @@ class LLAMA_CPP_STORAGE:
             n_ubatch = 0
             n_threads = config.get("n_threads", 0)
             n_threads_batch = config.get("n_threads_batch", 0)
+            cache_prompt = config.get("cache_prompt", False)
+            enable_thinking = config.get("enable_thinking", False)
             
             # 自动计算高级参数（从UI中移除，改为后台自动调整）
             # Flash Attention：根据GPU类型自动决定
@@ -1947,7 +1969,7 @@ class LLAMA_CPP_STORAGE:
             
             # 获取并初始化ChatHandler
             handler_cls = cls.get_chat_handler_cls(chat_handler_name)
-            cls.chat_handler = cls.init_chat_handler(handler_cls, mmproj_path, chat_handler_name, image_max_tokens, image_min_tokens, video_input=False)
+            cls.chat_handler = cls.init_chat_handler(handler_cls, mmproj_path, chat_handler_name, image_max_tokens, image_min_tokens, video_input=False, enable_thinking=enable_thinking)
             
             # ChatHandler初始化失败时的处理
             if cls.chat_handler is None:
@@ -1975,25 +1997,58 @@ class LLAMA_CPP_STORAGE:
             # 检查是否是Qwen3.5模型
             is_qwen35 = "qwen35" in model.lower() or "qwen3.5" in model.lower()
             is_qwen3 = "qwen3" in model.lower()
-            
+
+            # 检测模型格式
+            model_ext = os.path.splitext(model_path)[1].lower() if model_path else ""
+            is_safetensors = model_ext == ".safetensors"
+            is_gguf = model_ext == ".gguf"
+
             if device_mode == "GPU" and (HARDWARE_INFO["has_cuda"] or HARDWARE_INFO["has_rocm"]) and n_gpu_layers > 0:
                 # 根据显存大小计算推荐的GPU层数
                 gpu_vram = HARDWARE_INFO["gpu_vram_total"]
                 gpu_vendor = HARDWARE_INFO["gpu_vendor"]
-                
+
                 # 估算模型在GPU中占用的显存（包括上下文）
                 estimated_vram_usage = 0
                 try:
                     model_file_size = os.path.getsize(model_path) / (1024 ** 3)  # GB
-                    # AMD ROCm的显存开销略高于NVIDIA CUDA
-                    vram_multiplier = 1.9 if gpu_vendor == "amd" else 1.8
-                    
-                    # Qwen3系列模型需要更高的显存倍数
-                    if is_qwen3:
-                        vram_multiplier *= 1.2
-                        print(f"【显存估算】Qwen3系列模型使用更高的显存倍数: {vram_multiplier}")
-                    
-                    estimated_vram_usage = model_file_size * vram_multiplier
+
+                    # 尝试使用加速模块进行精确计算
+                    if is_gguf and calculate_vram_layers is not None:
+                        # GGUF模型：使用加速模块的精确层数计算
+                        mmproj_size_gb = 0
+                        if enable_mmproj and mmproj != "None":
+                            mmproj_path = os.path.join(folder_paths.models_dir, 'LLM', mmproj)
+                            if os.path.exists(mmproj_path):
+                                mmproj_size_gb = os.path.getsize(mmproj_path) / (1024 ** 3)
+
+                        recommended_gpu_layers = calculate_vram_layers(
+                            model_path, gpu_vram, mmproj_size_gb
+                        )
+                        estimated_vram_usage = model_file_size * (1.9 if gpu_vendor == "amd" else 1.8)
+                        print(f"【加速VRAM计算】使用GGUF精确层数计算: 推荐GPU层数={recommended_gpu_layers}")
+
+                    elif is_safetensors and calculate_safetensors_vram_layers is not None:
+                        # safetensors模型：使用safetensors加速模块
+                        mmproj_size_gb = 0
+                        if enable_mmproj and mmproj != "None":
+                            mmproj_path = os.path.join(folder_paths.models_dir, 'LLM', mmproj)
+                            if os.path.exists(mmproj_path):
+                                mmproj_size_gb = os.path.getsize(mmproj_path) / (1024 ** 3)
+
+                        safetensors_info = estimate_vram_for_safetensors(
+                            model_path, gpu_vram, mmproj_size_gb
+                        )
+                        recommended_gpu_layers = safetensors_info.get("n_gpu_layers", n_gpu_layers)
+                        estimated_vram_usage = safetensors_info.get("estimated_vram_gb", model_file_size * 1.8)
+                        print(f"【加速VRAM计算】safetensors模型: tensor数={safetensors_info.get('tensor_count', 0)}, 估算层数={safetensors_info.get('estimated_layers', 32)}, 推荐GPU层数={recommended_gpu_layers}")
+                    else:
+                        # 回退到原有计算方式
+                        vram_multiplier = 1.9 if gpu_vendor == "amd" else 1.8
+                        if is_qwen3:
+                            vram_multiplier *= 1.2
+                            print(f"【显存估算】Qwen3系列模型使用更高的显存倍数: {vram_multiplier}")
+                        estimated_vram_usage = model_file_size * vram_multiplier
                     
                     if enable_mmproj and mmproj != "None":
                         mmproj_file_size = os.path.getsize(os.path.join(folder_paths.models_dir, 'LLM', mmproj)) / (1024 ** 3)
@@ -2080,7 +2135,7 @@ class LLAMA_CPP_STORAGE:
                 "n_gpu_layers": recommended_gpu_layers if device_mode == "GPU" else 0,
                 "n_ctx": n_ctx,
                 "n_batch": n_batch,
-                
+
                 "verbose": False,
                 "n_threads": n_threads,
                 "n_threads_batch": n_threads_batch,
@@ -2089,7 +2144,79 @@ class LLAMA_CPP_STORAGE:
                 "use_mmap": use_mmap,
                 "use_mlock": use_mlock,
                 "f16_kv": f16_kv,
+                "cache_prompt": cache_prompt,
             }
+
+            # TurboQuant KV Cache 加速（仅GGUF格式支持 llama.cpp 原生TurboQuant）
+            turboquant_kv_cache = config.get("turboquant_kv_cache", "None")
+            if turboquant_kv_cache and turboquant_kv_cache != "None":
+                model_ext_check = os.path.splitext(model_path)[1].lower() if model_path else ""
+                if model_ext_check == ".gguf":
+                    # GGUF格式：使用 llama.cpp 原生 TurboQuant
+                    try:
+                        # 使用 type_k 和 type_v 参数（新版本API）
+                        from llama_cpp._ggml import GGMLType
+                        
+                        turbo_type_map = {
+                            "f16 (无压缩)": GGMLType.GGML_TYPE_F16,
+                            "q8_0 (8-bit)": GGMLType.GGML_TYPE_Q8_0,
+                            "q6_k (6-bit)": GGMLType.GGML_TYPE_Q6_K,
+                            "q5_k (5-bit)": GGMLType.GGML_TYPE_Q5_K,
+                            "q5_0 (5-bit)": GGMLType.GGML_TYPE_Q5_0,
+                            "q5_1 (5-bit)": GGMLType.GGML_TYPE_Q5_1,
+                            "q4_k (4-bit)": GGMLType.GGML_TYPE_Q4_K,
+                            "q4_0 (4-bit)": GGMLType.GGML_TYPE_Q4_0,
+                            "q4_1 (4-bit)": GGMLType.GGML_TYPE_Q4_1,
+                            "q3_k (3-bit)": GGMLType.GGML_TYPE_Q3_K,
+                            "q2_k (2-bit)": GGMLType.GGML_TYPE_Q2_K,
+                            "mxfp4 (4-bit)": GGMLType.GGML_TYPE_MXFP4,
+                            "nvfp4 (4-bit)": GGMLType.GGML_TYPE_NVFP4,
+                            "turbo3 (3-bit)": GGMLType.GGML_TYPE_TQ3_0 if hasattr(GGMLType, 'GGML_TYPE_TQ3_0') else GGMLType.GGML_TYPE_TQ1_0,
+                            "turbo2 (2-bit)": GGMLType.GGML_TYPE_TQ2_0,
+                            "turbo1 (1-bit)": GGMLType.GGML_TYPE_TQ1_0,
+                        }
+                        kv_type = turbo_type_map.get(turboquant_kv_cache, GGMLType.GGML_TYPE_TQ1_0)
+
+                        # 检查 llama-cpp-python 是否支持 type_k 和 type_v 参数
+                        import inspect
+                        llama_sig = inspect.signature(llama_cpp.Llama.__init__)
+                        if 'type_k' in llama_sig.parameters and 'type_v' in llama_sig.parameters:
+                            llama_kwargs["type_k"] = kv_type
+                            llama_kwargs["type_v"] = kv_type
+                            print(f"【TurboQuant加速】GGUF模型启用 KV Cache 压缩: {turboquant_kv_cache} (type_k={kv_type}, type_v={kv_type})")
+                        elif 'cache_type_k' in llama_sig.parameters:
+                            # 回退到旧版本API
+                            old_type_map = {
+                                "f16 (无压缩)": "f16",
+                                "q8_0 (8-bit)": "q8_0",
+                                "q6_k (6-bit)": "q6_k",
+                                "q5_k (5-bit)": "q5_k",
+                                "q5_0 (5-bit)": "q5_0",
+                                "q5_1 (5-bit)": "q5_1",
+                                "q4_k (4-bit)": "q4_k",
+                                "q4_0 (4-bit)": "q4_0",
+                                "q4_1 (4-bit)": "q4_1",
+                                "q3_k (3-bit)": "q3_k",
+                                "q2_k (2-bit)": "q2_k",
+                                "mxfp4 (4-bit)": "mxfp4",
+                                "nvfp4 (4-bit)": "nvfp4",
+                                "turbo3 (3-bit)": "turbo3",
+                                "turbo2 (2-bit)": "turbo2",
+                                "turbo1 (1-bit)": "turbo1",
+                            }
+                            cache_type_k_value = old_type_map.get(turboquant_kv_cache, "turbo3")
+                            llama_kwargs["cache_type_k"] = cache_type_k_value
+                            print(f"【TurboQuant加速】GGUF模型启用 KV Cache 压缩: {cache_type_k_value} (旧API)")
+                        else:
+                            # 如果不支持这些参数，尝试在模型加载后使用 set_kv_cache_compression 方法
+                            print(f"【TurboQuant加速】当前llama-cpp-python版本不支持type_k/type_v参数，将在模型加载后尝试使用set_kv_cache_compression方法")
+                            # 保存 turboquant_kv_cache 配置，以便在模型加载后使用
+                            config["_turboquant_kv_cache"] = turboquant_kv_cache
+                    except Exception as e:
+                        print(f"【TurboQuant加速】启用失败: {e}")
+                else:
+                    # safetensors格式：使用 PyTorch 版本 TurboQuant（在模型加载后处理）
+                    print(f"【TurboQuant加速】safetensors格式模型将在推理时使用PyTorch版本TurboQuant")
             
             # 处理attention_type参数（GPU模式下）
             attention_type = config.get("attention_type", "Auto")
@@ -2243,6 +2370,22 @@ class LLAMA_CPP_STORAGE:
                 else:
                     print(f"【模型加载】🔍  MMProj：未启用")
                 print(f"【模型加载】📈  推理参数：n_batch={n_batch}, n_threads={n_threads}")
+                
+                # 尝试启用 TurboQuant KV Cache 压缩（新版本API）
+                if "_turboquant_kv_cache" in config:
+                    try:
+                        if hasattr(cls.llm, 'set_kv_cache_compression'):
+                            # 启用 TurboQuant KV Cache 压缩
+                            cls.llm.set_kv_cache_compression(True)
+                            print(f"【TurboQuant加速】已启用 KV Cache 压缩加速（使用set_kv_cache_compression方法）")
+                        elif hasattr(cls.llm, 'model') and hasattr(cls.llm.model, 'set_kv_cache_compression'):
+                            # 对于包装的模型，尝试通过 model 属性启用
+                            cls.llm.model.set_kv_cache_compression(True)
+                            print(f"【TurboQuant加速】已启用 KV Cache 压缩加速（使用model.set_kv_cache_compression方法）")
+                        else:
+                            print(f"【TurboQuant加速】当前模型不支持set_kv_cache_compression方法")
+                    except Exception as e:
+                        print(f"【TurboQuant加速】启用失败: {e}")
                 
                 # 禁用模型缓存
                 # MODEL_CACHE[cache_key] = cls.llm

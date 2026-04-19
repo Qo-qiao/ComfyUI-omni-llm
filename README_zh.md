@@ -22,6 +22,7 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 - **多模态全支持**：处理文本、图片、视频和音频输入，实现跨模态理解与生成
 - **智能硬件适配**：根据显存大小自动调整参数，实现硬件性能最大化
 - **高效推理引擎**：优化的模型加载和推理流程，提升运行速度
+- **TurboQuant加速**：集成多重加速模块，提高不同模型格式的推理速度，减少显存占用
 - **专业提示词模板**：内置多种场景化提示词模板，覆盖全场景需求
 - **灵活参数控制**：详细的推理参数设置，支持高级用户精细调优
 - **视频处理**：支持视频输入、内容分析、分镜拆解和视频反推
@@ -35,6 +36,38 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 
 ## 更新日志
+#### v3.0 （2026-04-19）
+
+本次更新支持了更广泛的显卡型号，并优化了推理速度，同时针对多图输入节点进行了全面优化。（自带节点可能无法清理显存占用，导致二次推理变慢，请使用其他清理节点）
+
+**一、优化加速模块**
+- 添加turboquant（gguf模型暂不支持）等多重加速模块，提高不同模型格式的推理速度
+- 新增KV Cache压缩功能，减少显存占用的同时提升推理速度
+
+**二、提示词格式优化**
+- **JSON格式输出**：多图输入节点提示词输出改为JSON格式，包含完整的任务类型、主题、叙事风格、内容重点、目标受众、故事长度、视频模型类型和具体内容字段
+- **结构化输出**：图像描述列表包含场景描述、主体识别、动作状态、情感基调等详细信息
+
+**三、参数传递优化**
+- **内容重点传递**：新增将内容重点（content_focus）参数传递到图像模式
+- **目标受众传递**：新增将目标受众（target_audience）参数传递到图像模式
+- **统一JSON结构**：图像模式和文本模式的JSON输出格式保持一致，都包含所有必要字段
+
+**四、预设模板调整优化**
+- **精简优化**：移除不实用的模板，保留高频使用且效果稳定的模板
+- **分类重构**：优化模板定位，重新整合为更清晰的分类体系
+- **人像模板增强**：新增人像专属模板，优化人像特征捕捉、表情刻画、姿态描述等功能
+- **海报模板增强**：强化海报模板的排版布局、字体样式、色彩搭配等设计元素支持
+
+**五、新增模型支持**
+- **Gemma4模型支持**：新增Google Gemma 4系列多模态模型支持（仅支持量化版本），Gemma 4非量化版本由于依赖限制，无法兼容，并且使用效果不理想，所以不新增支持
+- **LFM2.5-VL模型支持**：新增LFM 2.5 Vision系列模型支持（仅支持量化版本），扩展视觉理解能力
+
+**六、冲突依赖处理**
+- **冲突依赖处理**：冲突依赖项嵌入插件中，避免与用户其他插件冲突，确保插件稳定运行。
+
+注：多分段模型加载器只做了qwen2.5-omni模型的测试验证，其他支持模型请参考模型推荐与链接.md文件介绍（与transformers库支持的模型一致），如有问题请联系作者修复。
+
 #### v2.0 （2026-04-03）
 
 本次更新实现了从音频处理到全模态推理的全面升级，引入模块化架构设计、ASR+TTS组合能力、API节点支持以及多分段模型加载，实现真正的全栈多模态AI体验。
@@ -124,7 +157,7 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
   - **FLUX2 - Klein**：专为 FLUX.2 Klein 模型设计，创建简洁而富有表现力的提示词
   - **LTX-2**：专为 LTX-2 视频生成模型定制，支持动态视频提示词，可生成高质量、音画同步的4K视频
   - **Qwen - Image Layered**：为 Qwen-Image-Layered 模型创建，支持详细分层提示词，处理复杂构图和多个元素
-  - **Qwen - Image Edit Combined**：综合编辑提示增强器，用于图像编辑任务
+  - **Qwen - Image Edit Combined**：编辑提示增强器，用于图像编辑任务
   - **Qwen - Image Dual**：专为 Qwen Image 2512 模型设计，支持高分辨率生成能力
   - **Video - Reverse Prompt**：视频反推提示词生成器，基于视频内容创建详细的视频描述（600-1000字）
   - **WAN - T2V**：电影导演风格模板，添加电影元素（时间、光源、光线强度、光线角度、色调、拍摄角度、镜头大小、构图）
@@ -133,8 +166,7 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
   - **WAN - FLF2V**：提示词优化器，基于视频首尾帧图片优化提示词，强调运动信息和镜头运镜
 - 增强预设提示词分类，提升用户体验：
   - 基础模板：Empty - Nothing、Normal - Describe
-  - Prompt 风格模板：Tags、Simple、Detailed、Comprehensive Expansion、Refine & Expand Prompt
-  - 创意模板：Detailed Analysis、Summarize Video、Short Story
+  - Prompt 风格模板：Tags、Simple、Detailed
   - 视觉模板：Bounding Box
   - 专业模型模板：ZIMAGE - Turbo、FLUX2 - Klein、LTX-2、Qwen - Image Layered、Qwen - Image Edit Combined、Qwen - Image Dual
   - 视频模板：Video - Reverse Prompt
@@ -237,29 +269,28 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 ## 安装说明
 
+如果你不会安装依赖，建议使用安装[ComfyNexus启动器](https://github.com/Allen-xxa/ComfyNexus/releases/)。
+启动器提供更加直观的安装方式，方便查看安装依赖文件，解决依赖冲突问题
+
 ### 1. 基本安装
-测试环境：comfyui 0.18.2   pytorch版本: 2.8.0+cu128
-依赖兼容问题可使用此完整依赖文件 夸克链接：https://pan.quark.cn/s/ad099cefaa40?pwd=cx94
-依赖文件存放地址 E:\ComfyUI\python\Lib（确认自己的存放盘）
 
-
-1. **克隆或下载插件**：
-   - 将插件文件夹放入 `ComfyUI/custom_nodes/` 目录
-   - 文件夹名称应为 `ComfyUI-omni-llm`
-
-2. **安装依赖**：
-   - 首先单独安装 qwen-tts（避免版本冲突）：
-     ```bash
-     pip install qwen-tts --no-deps --user
+1. **解压插件site-packages文件夹内的依赖文件**：
+   - 将插件site-packages文件夹内的依赖文件解压到 `ComfyUI/custom_nodes/ComfyUI-omni-llm/site-packages` 目录下
+   - 目录参考格式如下：
      ```
-   - 然后安装其他依赖：
+     ComfyUI/custom_nodes/ComfyUI-omni-llm/site-packages/
+     ├── qwen-tts-0.0.1-py3-none-any.whl
+     ├── ... 其他依赖文件
+     ```
+2. **安装剩余依赖**：
+   - 安装：
      ```bash
      # 在ComfyUI根目录运行
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
 
 3. **安装 llama-cpp-python**（必须）：
-   - 需自行下载最新版本>=0.3.30手动安装，请从[llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)下载
+   - 需自行下载最新版本0.3.35手动安装，请从[llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)下载
 
    **轮子选择指南：**
    - **Python版本匹配**：文件名中的`cp312`表示Python 3.12版本，选择与你的Python版本匹配的文件
@@ -374,14 +405,11 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 - **适用场景**：
   - 无 GPU 或 GPU 显存不足
   - 需要使用 CPU 进行推理
-  - 低性能硬件（<8GB 显存）
+  - 低性能硬件（<4GB 显存）
 - **特点**：
   - 不依赖 GPU 显存
   - 自动忽略 GPU 相关参数
   - 推理速度较慢，但兼容性好
-- **参数设置**：
-  - CPU 模式下，n_gpu_layers 和 vram_limit 参数会被自动忽略
-  - 无需手动调整这些参数
 - **推荐配置**：
   - 适用于所有硬件配置
   - 适合小型模型和简单任务
@@ -404,47 +432,40 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 ### [基础] 文本生成 (Text Generation)
 - **空模板**：完全自定义，无预设提示词
-- **标准描述**：简单描述图片内容
 - **标签风格**：生成图片标签列表，适用于 SDXL 等模型
-- **简洁风格**：简洁的图片描述，增强清晰度和表现力
-- **详细风格**：详细描述图片元素和细节
-- **全面扩写**：详细扩写提示词，增强表现力
-- **创意优化**：优化并扩写提示词，提升视觉丰富性
-- **歌词生成**：创作富有情感的中文歌词
+- **标准描述**：简单描述图片内容
+- **提示词扩写**：详细扩写提示词，增强表现力
 
 ### [基础] 图像理解 (Image Understanding)
-- **详细分析**：详细分析图片内容，分解主体、服装、配饰、背景和构图
-- **短篇故事**：基于图片或视频生成短篇故事
-- **边界框检测**：生成物体检测的边界框，输出 JSON 格式的坐标列表
+- **ZIMAGE - Turbo**：专为 Z-Image-Turbo 模型设计，创建高效且高质量的图像生成提示
+- **FLUX2 - Klein**：专为 FLUX.2 Klein 模型设计，创建简洁而富有表现力的提示
+- **Qwen - Image 2512**：专为 Qwen Image 2512 模型设计，创建高质量的图像生成提示
+- **Qwen - Image Edit Combined**：综合编辑提示增强器，用于图像编辑任务
+- **Qwen - Image Layered**：专为 Qwen-Image-Layered 模型设计，创建详细的分层提示
 - **增强 OCR**：专业的海报 OCR 文字识别，精准提取文字内容和样式属性
-- **ZIMAGE 加速**：专为 Z-Image-Turbo 模型设计，创建高效且高质量的图像生成提示
-- **FLUX2 简洁**：专为 FLUX.2 Klein 模型设计，创建简洁而富有表现力的提示
-- **Qwen 分层**：专为 Qwen-Image-Layered 模型设计，创建详细的分层提示
-- **Qwen 编辑**：综合编辑提示增强器，用于图像编辑任务
-- **Qwen 高分辨率**：专为 Qwen Image 2512 模型设计，创建高质量的图像生成提示
+- **超高清图像反向**：生成超高清图像的详细描述
+- **边界框**：生成物体检测的边界框，输出 JSON 格式的坐标列表
 
 ### [基础] 音频转文本 (Audio to Text)
-- **音频转文本**：将音频内容转换为文本
+- **音频↔字幕转换**：在音频内容和字幕文本之间进行精准转换，确保两者内容同步匹配
+- **视频转音频与字幕**：从视频提取音频并生成同步字幕
+- **音频分析**：分析音频的情感、风格、节奏等特征
 - **多人对话**：识别和处理音频中的多角色对话
-- **ASR 转录**：将音频内容转录为文本
 
 ### [基础] 文本转音频 (Text to Audio)
-- **文本转音频**：将文本内容转换为语音
+- **歌词和音频合并**：创作富有情感、韵律优美的中文歌词
 
 ### [高级] 视频理解 (Video Understanding)
-- **视频总结**：总结视频内容的关键事件和叙事点
-- **视频反推**：根据视频内容生成详细的视频描述
-- **短篇故事**：基于图片或视频生成短篇故事
-- **分镜拆解**：视频分镜详细拆解，按时间顺序为每个分镜提供完整细节
-- **字幕格式**：生成标准格式的视频字幕，包含时间码和同步文本
-- **LTX2 视频**：专为 LTX-2 模型设计，创建详细而富有动态感的视频生成提示
-- **WAN 文生视频**：电影导演风格，为原始 prompt 添加电影元素
-- **WAN 图生视频**：根据图像和输入提示词改写视频描述，强调动态内容
-- **WAN 图生视频(空)**：根据图像发挥想象生成视频描述
-- **WAN 首尾帧视频**：根据视频首尾帧图片优化改写 Prompt，强调运动信息和镜头运镜
+- **LTX-2**：专为 LTX-2 模型设计，创建详细而富有动态感的视频生成提示
+- **WAN - Text to Video**：电影导演风格，为原始 prompt 添加电影元素
+- **WAN - Image to Video**：根据图像和输入提示词改写视频描述，强调动态内容
+- **WAN - Image to Video Empty**：根据图像发挥想象生成视频描述
+- **WAN - FLF to Video**：根据视频首尾帧图片优化改写 Prompt，强调运动信息和镜头运镜
+- **Video - Reverse Prompt**：根据视频内容生成详细的视频描述
+- **Video - Detailed Scene Breakdown**：视频分镜详细拆解，按时间顺序为每个分镜提供完整细节
+- **Video - Subtitle Format**：生成标准格式的视频字幕，包含时间码和同步文本
 
 ### [高级] 全模态整合 (Multimodal Integration) - Omni 专属
-- **短篇故事**：基于图片或视频生成短篇故事
 - **音频分析**：分析音频的情感、风格、节奏等特征
 - **视频转音频与字幕**：从视频提取音频并生成字幕
 
@@ -458,3 +479,5 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 * [ComfyUI-llama-cpp](https://github.com/kijai/ComfyUI-llama-cpp) @kijai
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) @comfyanonymous
 * [Whisper](https://github.com/openai/whisper) @openai
+* [turboquant-pytorch](https://github.com/tonbistudio/turboquant-pytorch) @tonbistudio
+* [llama-cpp-turboquant](https://github.com/TheTom/llama-cpp-turboquant) @TheTom

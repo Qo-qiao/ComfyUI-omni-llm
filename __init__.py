@@ -10,10 +10,17 @@ License: See LICENSE file for details
 import sys
 import os
 
+plugin_dir = os.path.dirname(os.path.abspath(__file__))
+
 # 添加项目根目录和nodes目录到路径
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-nodes_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nodes")
+sys.path.insert(0, plugin_dir)
+nodes_dir = os.path.join(plugin_dir, "nodes")
 sys.path.insert(0, nodes_dir)
+
+# 添加插件自带的site-packages目录到路径（优先使用插件自带的依赖，避免版本冲突）
+site_packages_dir = os.path.join(plugin_dir, "site-packages")
+if os.path.exists(site_packages_dir):
+    sys.path.insert(0, site_packages_dir)
 
 # 导入所有节点模块
 from llama_cpp_model_loader import llama_cpp_model_loader
@@ -91,4 +98,4 @@ WEB_EXTENSIONS = [
 ]
 
 # 版本信息
-VERSION = "2.0.0"
+VERSION = "3.0.0"

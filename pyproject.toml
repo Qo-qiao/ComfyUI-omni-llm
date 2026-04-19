@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI-omni-llm"
-description = "Run LLM/VLM models natively in ComfyUI based on llama.cpp"
-version = "1.2.5"
+description = "Full-modal AI inference plugin for ComfyUI - supports text, image, video, audio processing with LLM/VLM/ASR/TTS capabilities based on llama.cpp"
+version = "2.0"
 license = {file = "LICENSE"} 
  classifiers = [
 #     # For OS-independent nodes (works on all operating systems)
@@ -20,18 +20,18 @@ license = {file = "LICENSE"}
 #     "Environment :: GPU :: Apple Metal",    # Apple Metal support
 ]
 
-dependencies = ["diskcache", "scipy", "numpy", "pillow", "gguf"]
+dependencies = ["diskcache", "scipy", "numpy", "pillow", "gguf", "torch", "torchaudio", "soundfile", "transformers"]
 
 [project.urls]
-Repository = "https://github.com/lihaoyun6/ComfyUI-omni-llm"
+Repository = "https://github.com/Qo-qiao/ComfyUI-omni-llm"
 #  Used by Comfy Registry https://registry.comfy.org
-Documentation = "https://github.com/lihaoyun6/ComfyUI-omni-llm/wiki"
-"Bug Tracker" = "https://github.com/lihaoyun6/ComfyUI-omni-llm/issues"
+Documentation = "https://github.com/Qo-qiao/ComfyUI-omni-llm/wiki"
+"Bug Tracker" = "https://github.com/Qo-qiao/ComfyUI-omni-llm/issues"
 
 [tool.comfy]
-PublisherId = "lhy666"
+PublisherId = "Qo-qiao"
 DisplayName = "ComfyUI-omni-llm"
 Icon = ""
 includes = [] 
-# "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
+
 
