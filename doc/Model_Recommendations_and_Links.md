@@ -1,7 +1,44 @@
 # **llama-cpp-python 0.3.33 Compatible Models Download and Preset Recommendations**
 
+### Note: please download based on your needs and hardware environment. Different models are suitable for different scenarios such as ComfyUI prompt generation, image/video frame reverse inference, etc. Reverse inference requires matching mmproj visual models.
 
-### Note: Please download based on your needs and hardware environment. Different models are suitable for different scenarios such as ComfyUI prompt generation, image/video frame reverse inference, etc. Reverse inference requires matching mmproj visual models.
+## Document Structure
+
+This document is organized as follows:
+- **Quick Selection Guide**: Models recommended by hardware configuration and task type
+- **Quantization Level Selection**: Guidelines for choosing quantization levels
+- **Model Preparation**: Instructions for setting up model files
+- **ASR Series**: Speech recognition models
+- **TTS Series**: Text-to-speech models
+- **Omni Series**: All-in-one multimodal models
+- **VLM Series**: Visual language models
+- **Preset Template Recommended Models**: Models recommended for each preset template
+
+## Quick Selection Guide
+
+### By Hardware Configuration
+
+| Hardware Configuration | Recommended Models | VRAM Requirement | Best For |
+|----------------------|-------------------|------------------|----------|
+| High-end GPU (24GB+) | Qwen3-VL-8B, GLM-4.6V, LLaVA-1.6 | 24GB+ | Complex visual understanding, professional applications |
+| Mid-range GPU (16GB) | LLaVA-1.6, MiniCPM-V-4.5, Qwen2.5-VL | 12-16GB | General visual understanding, balanced tasks |
+| Mid-low GPU (12GB) | LLaVA-1.5, MiniCPM-V-2.6, Moondream2 | 8-12GB | Daily visual reasoning, OCR tasks |
+| Low-end GPU (8GB) | Moondream2, nanoLLaVA, MobileVLM | 6-8GB | Quick descriptions, low VRAM devices |
+| Very Low VRAM (4-6GB) | TinyLLaVA, MiniGPT-v2, LightOnOCR | 4-6GB | Basic tasks, edge device deployment |
+| CPU Only | nanoLLaVA, TinyLLaVA | N/A | Maximum compatibility, offline processing |
+
+### By Task Type
+
+| Task Type | Recommended Models | Quantization | Notes |
+|-----------|-------------------|--------------|-------|
+| General Image Description | Qwen3-VL-8B, LLaVA-1.6, MiniCPM-V-4.5 | Q4_K_M | Balanced quality and speed |
+| Fast Inference | Moondream2, nanoLLaVA | Q4_K_M | Prioritize speed |
+| High Precision OCR | olmOCR-2-7B-1025, Qwen3-VL-8B | Q5_K_M | Highest accuracy |
+| Video Analysis | Qwen2.5-Omni-7B, Phi-3.5-vision-instruct | Q4_K_M | Multi-frame processing |
+| Speech Recognition | Qwen3-ASR-0.6B, Qwen3-ASR-1.7B | Original | ASR specialized models |
+| Speech Synthesis | Qwen3-TTS-12Hz-1.7B | Original | TTS specialized models |
+| Prompt Generation | Qwen3-VL-8B, GLM-4.6V | Q4_K_M | Creative tasks |
+| Long Context | Qwen3.5-9B, MiniCPM-V-4.5 | Q4_K_M | 128K context support |
 
 
 
@@ -411,26 +448,6 @@
 **Optimized Expansion**: Optimize and expand prompts to make them more expressive and visually rich
 
 **Recommended Models**: Qwen3-VL-8B-Instruct, GLM-4.6V-Flash, MiMo-VL-7B-RL, Qwen3-VL-8B-maid-i1, Qwen3.5-4B
-
-
-
-### Creative Templates
-
-**Detailed Analysis**: Detailed analysis of image content, breaking down subject, clothing, accessories, background and composition
-
-**Recommended Models**: Llama-3.2-11B-Vision-Instruct, Qwen3-VL-8B-Instruct, GLM-4.6V-Flash, EraX-VL-7B-V1.5, Qwen2.5-Omni-7B, Qwen3-VL-8B-maid-i1, zen3-vl-i1
-
-
-
-**Video Summary**: Summarize key events and narrative points of video content
-
-**Recommended Models**: Qwen3-VL-8B-Instruct, Phi-3.5-vision-instruct, GLM-4.6V-Flash, MiMo-VL-7B-RL, Qwen2.5-Omni-7B, Qwen3.5-4B
-
-
-
-**Short Story**: Generate short stories based on images or videos
-
-**Recommended Models**: Qwen3-VL-8B-Instruct, GLM-4.6V-Flash, gemma-3-4b-it, Qwen2.5-Omni-7B, Qwen3.5-4B, Qwen3-VL-8B-maid-i1
 
 
 

@@ -173,7 +173,7 @@ The **Multi-Image Input (Story Creation)** node supports two working modes:
    - Connect `images` output to `images` input
    - In Llama-cpp Image Inference node:
      - `inference_mode` select "images"
-     - `preset_prompt` select "[Creative] Short Story"
+     - `preset_prompt` select "[Video Analysis] Video - Detailed Scene Breakdown"
      - `output_language` select the same language as Multi-Image Input
 
 4. **Get Story Content**:
@@ -204,7 +204,7 @@ The **Multi-Image Input (Story Creation)** node supports two working modes:
    - No need to connect `images` output (Text Mode returns None)
    - In Llama-cpp Image Inference node:
      - `inference_mode` select "text"
-     - `preset_prompt` select "[Creative] Short Story" or other appropriate preset
+     - `preset_prompt` select "[Video Analysis] Video - Detailed Scene Breakdown" or other appropriate preset
      - `output_language` select the same language as Multi-Image Input
 
 3. **Get Created Content**:
