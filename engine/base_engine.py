@@ -19,6 +19,12 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from common import scale_image, image2base64
 
+# 导入加速模块
+try:
+    from .hook_utils import filter_stderr
+except ImportError:
+    filter_stderr = None
+
 
 def convert_audio_to_wav_bytes(audio: Dict) -> Optional[bytes]:
     """将音频转换为WAV字节流 - 优化版本"""
@@ -183,28 +189,64 @@ def create_audio_data_uri(audio_bytes: bytes, format: str = "wav") -> Optional[s
 
 class BaseInferenceEngine:
     """基础推理引擎 - 封装通用推理逻辑"""
-    
+
     def __init__(self, model_info: Dict):
         self.model_info = model_info
         self.model_type = model_info.get("type", "vl")
         self.model_subtype = model_info.get("subtype", "default")
         self.supports_audio = model_info.get("supports_audio", False)
         self.supports_vision = model_info.get("supports_vision", True)
-        
-        # 添加图像处理缓存
-        self._image_cache = {}
-        self._cache_size_limit = 50
-        
-        # 添加音频处理缓存
-        self._audio_cache = {}
-        self._audio_cache_size_limit = 20
-        
-        # 添加内存管理
-        self._memory_threshold = 0.85  # 内存使用阈值（85%）
+
+        self._cache_manager = None
+
+        self._memory_threshold = 0.85
         self._enable_memory_monitoring = True
+
+    @property
+    def cache_manager(self):
+        """Get unified cache manager (TurboQuantManager)."""
+        if self._cache_manager is None:
+            from .turboquant_module import get_global_manager
+            self._cache_manager = get_global_manager()
+        return self._cache_manager
+
+    @property
+    def _image_cache(self):
+        """Image cache via unified manager."""
+        return self.cache_manager._image_cache
+
+    @property
+    def _audio_cache(self):
+        """Audio cache via unified manager."""
+        return self.cache_manager._audio_cache
         
+    def _detect_hardware(self):
+        """检测硬件资源"""
+        import torch
+        import os
+        
+        hardware_info = {
+            "has_cuda": torch.cuda.is_available(),
+            "cpu_cores": os.cpu_count() or 4,
+            "gpu_mem_gb": 0,
+            "gpu_name": ""
+        }
+        
+        if hardware_info["has_cuda"]:
+            try:
+                gpu_properties = torch.cuda.get_device_properties(0)
+                hardware_info["gpu_mem_gb"] = gpu_properties.total_memory / (1024 ** 3)
+                hardware_info["gpu_name"] = gpu_properties.name
+            except Exception:
+                pass
+        
+        return hardware_info
+    
     def get_generation_params(self, perf_level: str, video_input: bool = False, text_input: bool = False) -> Dict:
         """获取生成参数"""
+        # 检测硬件资源
+        hardware = self._detect_hardware()
+        
         # 根据模型类型设置基础参数
         if self.model_subtype in ["qwen35", "qwen25_omni"]:
             # Qwen系列模型的优化参数
@@ -213,9 +255,9 @@ class BaseInferenceEngine:
                 "typical_p": 1.0,
                 "repeat_penalty": 1.05,  # Qwen模型需要稍高的重复惩罚
                 "frequency_penalty": 0.0,
-                "mirostat_mode": 0,
+                "mirostat_mode": 2,  # 使用mirostat v2模式加快生成速度
                 "mirostat_eta": 0.1,
-                "mirostat_tau": 4.0,  # Qwen模型使用稍低的tau
+                "mirostat_tau": 2.5,  # 进一步降低tau值加快生成速度
             }
         elif self.model_subtype == "minicpm_o":
             # MiniCPM-O模型的优化参数
@@ -224,9 +266,9 @@ class BaseInferenceEngine:
                 "typical_p": 1.0,
                 "repeat_penalty": 1.02,
                 "frequency_penalty": 0.0,
-                "mirostat_mode": 0,
+                "mirostat_mode": 1,  # 使用mirostat模式加快生成速度
                 "mirostat_eta": 0.1,
-                "mirostat_tau": 4.5,
+                "mirostat_tau": 4.0,  # 降低tau值加快生成速度
             }
         else:
             # 默认参数
@@ -235,9 +277,9 @@ class BaseInferenceEngine:
                 "typical_p": 1.0,
                 "repeat_penalty": 1.0,
                 "frequency_penalty": 0.0,
-                "mirostat_mode": 0,
+                "mirostat_mode": 1,  # 默认使用mirostat模式加快生成速度
                 "mirostat_eta": 0.1,
-                "mirostat_tau": 5.0,
+                "mirostat_tau": 3.5,  # 降低tau值加快生成速度
             }
         
         # 根据硬件性能调整
@@ -267,8 +309,30 @@ class BaseInferenceEngine:
             base_params["temperature"] = max(base_params["temperature"] - 0.1, 0.5)  # 视频任务需要更稳定的输出
         elif text_input:
             base_params["temperature"] = min(base_params["temperature"] + 0.1, 1.0)
-            
-        print(f"【模型特定优化】为{self.model_subtype}模型使用优化参数")
+        
+        # 根据硬件资源调整批处理大小
+        if hardware["has_cuda"]:
+            # GPU模式下的批处理优化
+            if hardware["gpu_mem_gb"] >= 16:
+                base_params["n_batch"] = 2048
+                base_params["n_ubatch"] = 1024
+            elif hardware["gpu_mem_gb"] >= 8:
+                base_params["n_batch"] = 1536
+                base_params["n_ubatch"] = 768
+            else:
+                base_params["n_batch"] = 1024
+                base_params["n_ubatch"] = 512
+        else:
+            # CPU模式下的批处理优化
+            base_params["n_batch"] = 512
+            base_params["n_ubatch"] = 256
+        
+        # 根据CPU核心数调整线程数
+        base_params["n_threads"] = min(hardware["cpu_cores"], 8)
+        base_params["n_threads_batch"] = min(hardware["cpu_cores"], 4)
+        
+        print(f"【硬件优化】检测到硬件: {'GPU' if hardware['has_cuda'] else 'CPU'}, GPU内存: {hardware['gpu_mem_gb']:.1f}GB, CPU核心: {hardware['cpu_cores']}")
+        print(f"【模型特定优化】为{self.model_subtype}模型使用优化参数: n_batch={base_params.get('n_batch', 'N/A')}, n_threads={base_params.get('n_threads', 'N/A')}")
         return base_params
     
     def build_messages(self, system_prompt: str, user_content: Union[str, List], 
@@ -455,36 +519,33 @@ class BaseInferenceEngine:
         import hashlib
         
         try:
-            # 使用图像数据的哈希作为缓存键
-            img_bytes = image_tensor.cpu().numpy().tobytes()
-            img_hash = hashlib.md5(img_bytes).hexdigest()
-            cache_key = f"{img_hash}_{max_size}"
+            # 使用图像的形状和统计信息生成缓存键，减少计算时间
+            img_shape = tuple(image_tensor.shape)
+            img_min = image_tensor.min().item()
+            img_max = image_tensor.max().item()
+            img_mean = image_tensor.mean().item()
+            
+            # 生成哈希
+            hash_input = f"{img_shape}_{img_min:.2f}_{img_max:.2f}_{img_mean:.2f}_{max_size}"
+            img_hash = hashlib.md5(hash_input.encode('utf-8')).hexdigest()
+            cache_key = f"{img_hash}"
             
             return cache_key
         except Exception as e:
             print(f"【图像缓存错误】生成缓存键失败: {str(e)}")
-            return None
+            # 回退到简单的时间戳
+            import time
+            return f"fallback_{int(time.time() * 1000)}_{max_size}"
     
     def _cache_image_result(self, cache_key: str, result: Dict):
-        """
-        缓存图像处理结果
-        """
+        """Cache image processing result via unified manager."""
         if cache_key is None:
             return
-        
         try:
-            # 检查内存使用情况（图像处理任务）
             if self._enable_memory_monitoring and self._check_memory_usage(task_type="images"):
                 print("【内存管理】内存使用率过高，清理缓存")
-                self._clear_cache()
-            
-            # 如果缓存已满，删除最旧的条目
-            if len(self._image_cache) >= self._cache_size_limit:
-                oldest_key = next(iter(self._image_cache))
-                del self._image_cache[oldest_key]
-            
-            self._image_cache[cache_key] = result
-            
+                self.cache_manager.clear_all()
+            self.cache_manager.cache_image(cache_key, result)
         except Exception as e:
             print(f"【图像缓存错误】缓存结果失败: {str(e)}")
     
@@ -616,72 +677,28 @@ class BaseInferenceEngine:
             return None
     
     def _cache_audio_result(self, cache_key: str, result: Dict):
-        """
-        缓存音频处理结果 - 智能缓存管理
-        """
+        """Cache audio processing result via unified manager."""
         if cache_key is None:
             return
-        
         try:
-            # 检查内存使用情况（音频处理任务）
             if self._enable_memory_monitoring and self._check_memory_usage(task_type="audio"):
                 print("【内存管理】内存使用率过高，清理缓存")
-                self._clear_cache()
-            
-            # 动态调整缓存大小基于可用内存
-            import psutil
-            import os
-            
-            # 获取当前进程的内存使用情况
-            process = psutil.Process(os.getpid())
-            memory_info = process.memory_info()
-            memory_used = memory_info.rss / 1024 / 1024  # 转换为MB
-            
-            # 基于可用内存动态调整缓存大小
-            adjusted_cache_limit = self._audio_cache_size_limit
-            if memory_used > 8000:  # 如果内存使用超过8GB
-                adjusted_cache_limit = max(10, int(self._audio_cache_size_limit * 0.4))
-            elif memory_used > 4000:  # 如果内存使用超过4GB
-                adjusted_cache_limit = max(20, int(self._audio_cache_size_limit * 0.7))
-            
-            # 如果缓存已满，删除最旧的条目
-            if len(self._audio_cache) >= adjusted_cache_limit:
-                # 实现LRU缓存清理策略
-                # 注意：这里简化实现，实际应该记录访问时间
-                # 为了兼容性，我们仍然使用删除最早条目的策略
-                oldest_key = next(iter(self._audio_cache))
-                del self._audio_cache[oldest_key]
-                print(f"【音频缓存】清理缓存，当前缓存大小: {len(self._audio_cache)}, 调整后缓存限制: {adjusted_cache_limit}")
-            
-            # 缓存结果
-            self._audio_cache[cache_key] = result
-            print(f"【音频缓存】缓存结果，当前缓存大小: {len(self._audio_cache)}")
-            
+                self.cache_manager.clear_all()
+            self.cache_manager.cache_audio(cache_key, result)
         except Exception as e:
             print(f"【音频缓存错误】缓存结果失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
     
     def _clear_cache(self):
-        """
-        清理缓存
-        """
+        """Clear all caches via unified manager."""
         try:
-            # 清理图像缓存
-            image_cache_size = len(self._image_cache)
-            self._image_cache.clear()
-            print(f"【内存管理】已清理 {image_cache_size} 个图像缓存条目")
-            
-            # 清理音频缓存
-            audio_cache_size = len(self._audio_cache)
-            self._audio_cache.clear()
-            print(f"【内存管理】已清理 {audio_cache_size} 个音频缓存条目")
-            
-            # 清理GPU缓存
+            self.cache_manager.clear_all()
+            try:
+                from common import LLAMA_CPP_STORAGE
+                LLAMA_CPP_STORAGE.clean_state()
+            except Exception:
+                pass
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-                print("【内存管理】已清理GPU缓存")
-            
         except Exception as e:
             print(f"【内存管理错误】{str(e)}")
     
@@ -784,13 +801,37 @@ class BaseInferenceEngine:
     
     def create_chat_completion(self, llm, messages: List[Dict], params: Dict) -> Dict:
         """创建聊天完成请求"""
+        def _do_completion(completion_params):
+            return llm.create_chat_completion(**completion_params)
+
         try:
+            # 尝试启用 TurboQuant 加速
+            try:
+                # 检查 llm 是否支持 TurboQuant
+                if hasattr(llm, 'set_kv_cache_compression'):
+                    # 启用 TurboQuant KV Cache 压缩
+                    llm.set_kv_cache_compression(True)
+                    print("【TurboQuant】已启用 KV Cache 压缩加速")
+                elif hasattr(llm, 'model') and hasattr(llm.model, 'set_kv_cache_compression'):
+                    # 对于包装的模型，尝试通过 model 属性启用
+                    llm.model.set_kv_cache_compression(True)
+                    print("【TurboQuant】已启用 KV Cache 压缩加速")
+                else:
+                    # 对于GGUF格式模型，KV Cache压缩可能已通过构造函数参数启用
+                    # 检查是否为llama.cpp模型
+                    if hasattr(llm, 'model_path') and llm.model_path and llm.model_path.endswith('.gguf'):
+                        print("【TurboQuant】GGUF模型已通过构造函数参数启用 KV Cache 压缩")
+                    else:
+                        print("【TurboQuant】当前模型不支持 KV Cache 压缩")
+            except Exception as e:
+                print(f"【TurboQuant】启用失败: {str(e)}")
+
             # 为不同模型类型添加特定的优化策略
             if self.model_subtype in ["qwen35", "qwen25_omni"]:
                 # Qwen模型的特殊处理
                 # 确保使用正确的停止词
                 stop_words = params.get("stop", ["</s>", "<|im_end|>"])
-                
+
                 # 构建参数，确保seed参数正确传递
                 completion_params = {
                     "messages": messages,
@@ -804,18 +845,24 @@ class BaseInferenceEngine:
                     "stream": False,
                     "stop": stop_words
                 }
-                
+
                 # 添加seed参数，兼容llama-cpp-python 0.3.32
                 if "seed" in params:
                     completion_params["seed"] = params["seed"]
-                
+
                 print(f"【Qwen-Omni API】调用参数: max_tokens={completion_params['max_tokens']}, temperature={completion_params['temperature']}")
-                output = llm.create_chat_completion(**completion_params)
-                
+
+                # 使用 stderr 过滤器减少日志 IO 开销
+                if filter_stderr is not None:
+                    with filter_stderr():
+                        output = _do_completion(completion_params)
+                else:
+                    output = _do_completion(completion_params)
+
             elif self.model_subtype in ["minicpm_o", "minicpm_o_26", "minicpm_o_45"]:
                 # MiniCPM-O模型的特殊处理
                 stop_words = params.get("stop", ["</s>", "[END]", "<|end|>"])
-                
+
                 # 构建参数，确保seed参数正确传递
                 completion_params = {
                     "messages": messages,
@@ -829,7 +876,7 @@ class BaseInferenceEngine:
                     "stream": False,
                     "stop": stop_words
                 }
-                
+
                 # 添加seed参数，兼容llama-cpp-python 0.3.32
                 if "seed" in params:
                     completion_params["seed"] = params["seed"]
@@ -843,9 +890,14 @@ class BaseInferenceEngine:
                     print(f"【MiniCPM-O-4.5 API】优化参数: max_tokens={completion_params['max_tokens']}, temperature={completion_params['temperature']}")
                 else:
                     print(f"【MiniCPM-O API】调用参数: max_tokens={completion_params['max_tokens']}, temperature={completion_params['temperature']}")
-                
-                output = llm.create_chat_completion(**completion_params)
-                
+
+                # 使用 stderr 过滤器减少日志 IO 开销
+                if filter_stderr is not None:
+                    with filter_stderr():
+                        output = _do_completion(completion_params)
+                else:
+                    output = _do_completion(completion_params)
+
             else:
                 # 默认处理
                 # 构建参数，确保seed参数正确传递
@@ -861,13 +913,19 @@ class BaseInferenceEngine:
                     "stream": False,
                     "stop": params.get("stop", ["</s>"])
                 }
-                
+
                 # 添加seed参数，兼容llama-cpp-python 0.3.32
                 if "seed" in params:
                     completion_params["seed"] = params["seed"]
-                
+
                 print(f"【默认API】调用参数: max_tokens={completion_params['max_tokens']}, temperature={completion_params['temperature']}")
-                output = llm.create_chat_completion(**completion_params)
+
+                # 使用 stderr 过滤器减少日志 IO 开销
+                if filter_stderr is not None:
+                    with filter_stderr():
+                        output = _do_completion(completion_params)
+                else:
+                    output = _do_completion(completion_params)
             
             # 验证输出格式
             if output and 'choices' in output and len(output['choices']) > 0:

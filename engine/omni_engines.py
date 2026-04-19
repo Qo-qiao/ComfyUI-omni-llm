@@ -2,7 +2,7 @@
 """
 Omni系列推理引擎模块
 
-提供Omni系列模型（Qwen3.5, Qwen2.5-Omni, MiniCPM-O, DreamOmni2等）的推理引擎实现。
+提供Omni系列模型（ Qwen2.5-Omni, MiniCPM-O, DreamOmni2等）的推理引擎实现。
 支持音频和视觉多模态输入，包括文本生成、音频生成、图像理解等功能。
 
 Author: 亲卿于情 (@Qo-qiao)
@@ -19,7 +19,7 @@ from .base_engine import BaseInferenceEngine, scale_image, image2base64
 
 
 class QwenOmniInferenceEngine(BaseInferenceEngine):
-    """Qwen Omni系列推理引擎 (Qwen3.5, Qwen2.5-Omni)"""
+    """Qwen Omni系列推理引擎 (Qwen2.5-Omni)"""
     
     def __init__(self, model_info: Dict):
         super().__init__(model_info)
@@ -90,8 +90,13 @@ class QwenOmniInferenceEngine(BaseInferenceEngine):
             else:
                 messages[-1]["content"] += audio_instruction
             
+            # 优化参数：为音频生成调整参数
+            audio_params = params.copy()
+            audio_params["max_tokens"] = min(audio_params.get("max_tokens", 1024), 1536)  # 音频生成需要更多token
+            audio_params["temperature"] = max(audio_params.get("temperature", 0.7), 0.8)  # 音频生成需要更高的随机性
+            
             # 调用API
-            output = self.create_chat_completion(llm, messages, params)
+            output = self.create_chat_completion(llm, messages, audio_params)
             
             if output and 'choices' in output and len(output['choices']) > 0:
                 content = output['choices'][0]['message']['content']
