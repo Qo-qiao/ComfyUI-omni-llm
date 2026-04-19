@@ -15,6 +15,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common import HARDWARE_INFO, chat_handlers, folder_paths, LLAMA_CPP_STORAGE
 
+# 导入加速模块
+from engine.hook_utils import (
+    apply_acceleration_hooks,
+)
+
+# 应用加速钩子
+apply_acceleration_hooks(LLAMA_CPP_STORAGE)
+
 class llama_cpp_model_loader:
     @classmethod
     def INPUT_TYPES(s):
@@ -31,29 +39,24 @@ class llama_cpp_model_loader:
                 rel_path = os.path.relpath(root, folder)
                 for f in files:
                     ext = os.path.splitext(f)[1].lower()
-                    if ext in [".gguf", ".safetensors"]:
+                    if ext == ".gguf":
                         if rel_path == '.':
                             all_llms.append(f)
                         else:
                             all_llms.append(f"{rel_path.replace(os.sep, '/')}/{f}")
 
         # Omni模型关键词
-        omni_keywords = ["omni", "qwen3.5", "qwen35", "dreamomni", "dream-omni"]
+        omni_keywords = ["omni", "dreamomni", "dream-omni"]
         
-        # 筛选.gguf和.safetensors格式的主模型，排除mmproj和语音相关模型
+        # 筛选.gguf格式的主模型，排除mmproj和语音相关模型
         model_list = ["None"]
         model_set = set()  # 使用绝对路径作为去重依据
         
         for f in all_llms:
             ext = os.path.splitext(f)[1].lower()
-            if ext not in [".gguf", ".safetensors"]:
+            if ext != ".gguf":
                 continue
             if "mmproj" in f.lower():
-                continue
-            
-            # 排除多分段模型（由Qwen Omni模型加载器处理）
-            basename = os.path.basename(f)
-            if "-of-" in basename.lower() and ext == ".safetensors":
                 continue
             
             # 排除TTS/ASR等语音模型
@@ -72,30 +75,17 @@ class llama_cpp_model_loader:
                 model_set.add(file_abs_path)
                 model_list.append(f)
         
-        # 筛选.gguf和.safetensors格式的MMProj模型
+        # 筛选.gguf格式的MMProj模型
         # 支持mmproj和vision命名的视觉编码模型
         mmproj_list = ["None"]
-        sharded_mmproj = set()  # 记录已处理的多分段MMProj模型
         mmproj_set = set()  # 使用绝对路径作为去重依据
         
         for f in all_llms:
             ext = os.path.splitext(f)[1].lower()
-            if ext not in [".gguf", ".safetensors"]:
+            if ext != ".gguf":
                 continue
             
-            # 检查是否是多分段safetensors文件
-            is_sharded = "-of-" in f.lower() and ext == ".safetensors"
-            
             if "mmproj" in f.lower() or "vision" in f.lower():
-                if is_sharded:
-                    # 多分段MMProj，只保留第一个
-                    base_name = f.split("-of-")[0]
-                    if base_name in sharded_mmproj:
-                        continue
-                    sharded_mmproj.add(base_name)
-                    display_name = f"{base_name}-of-* (多分段)"
-                    mmproj_list.append(display_name)
-                else:
                     # 获取文件的绝对路径（去重依据）
                     file_abs_path = None
                     for folder in folder_paths.get_folder_paths("LLM"):
@@ -119,6 +109,9 @@ class llama_cpp_model_loader:
         # 默认使用 GPU 模式
         default_device_mode = "GPU"
         
+        # 默认注意力类型
+        default_attention_type = "Flash"  # 默认使用 Flash Attention 加速
+        
         if perf_level == "high":  # 24GB+
             default_n_gpu_layers = -1  # 全部加载
             default_vram_limit = 24  # 24GB
@@ -128,13 +121,14 @@ class llama_cpp_model_loader:
         elif perf_level == "mid":  # 12GB
             default_n_gpu_layers = -1  # 全部加载
             default_vram_limit = 12  # 12GB
-        elif perf_level == "mid_low":  # 8GB
-            default_n_gpu_layers = 30  # 部分加载
-            default_vram_limit = 8  # 8GB
-        else:  # <8GB
+        elif perf_level == "mid_low":  # 4-8GB
+            default_n_gpu_layers = 20  # 部分加载
+            default_vram_limit = 6  # 6GB
+        else:  # <4GB
             default_n_gpu_layers = 0  # 纯CPU
             default_vram_limit = -1  # 无限制
             default_device_mode = "CPU"  # 低性能硬件默认使用 CPU
+            default_attention_type = "Standard"  # CPU模式使用标准注意力
         
         return {
             "required": {
@@ -143,13 +137,16 @@ class llama_cpp_model_loader:
                 "mmproj": (mmproj_list, {"default": "None", "tooltip": "选择对应的视觉编码模型文件"}),
                 "enable_asr": ("BOOLEAN", {"default": False, "tooltip": "启用ASR语音识别功能（需配合ASR模型加载器使用）"}),
                 "enable_tts": ("BOOLEAN", {"default": False, "tooltip": "启用TTS语音合成功能（需配合TTS模型加载器使用）"}),
+
                 "device_mode": (["GPU", "CPU"], {"default": default_device_mode, "tooltip": "选择运行模式：GPU=使用显卡加速，CPU=纯CPU运行"}),
                 "n_ctx": ("INT", {"default": default_n_ctx, "min": 1024, "max": 327680, "step": 128, "tooltip": "上下文长度，影响可处理的文本长度"}),
                 "n_gpu_layers": ("INT", {"default": default_n_gpu_layers, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载（GPU模式有效）"}),
                 "vram_limit": ("INT", {"default": default_vram_limit, "min": -1, "max": 24, "step": 1, "tooltip": "显存限制（GB），-1=无限制（GPU模式有效）"}),
                 "image_min_tokens": ("INT", {"default": 0, "min": 0, "max": 4096, "step": 32, "tooltip": "图片最小编码token数"}),
                 "image_max_tokens": ("INT", {"default": 0, "min": 0, "max": 4096, "step": 32, "tooltip": "图片最大编码token数"}),
-                "attention_type": (["Auto", "Standard", "Flash", "XFormers"], {"default": "Auto", "tooltip": "注意力类型：Auto=自动选择，Standard=标准，Flash=Flash Attention（NVIDIA GPU推荐），XFormers=XFormers（实验性）"}),
+                "attention_type": (["Auto", "Standard", "Flash", "XFormers"], {"default": default_attention_type, "tooltip": "注意力类型：Auto=自动选择，Standard=标准，Flash=Flash Attention（NVIDIA GPU推荐），XFormers=XFormers（实验性）"}),
+                "cache_prompt": ("BOOLEAN", {"default": False, "tooltip": "启用Prompt缓存，相同前缀的请求可复用KV Cache，提升批量推理速度"}),
+                #"turboquant_kv_cache": (["None", "f16 (无压缩)", "q8_0 (8-bit)", "q6_k (6-bit)", "q5_k (5-bit)", "q5_0 (5-bit)", "q5_1 (5-bit)", "q4_k (4-bit)", "q4_0 (4-bit)", "q4_1 (4-bit)", "q3_k (3-bit)", "q2_k (2-bit)", "mxfp4 (4-bit)", "nvfp4 (4-bit)", "turbo3 (3-bit)", "turbo2 (2-bit)", "turbo1 (1-bit)"], {"default": "None", "tooltip": "TurboQuant KV Cache 压缩：None=禁用，f16=无压缩，其他=量化压缩（位数越低压缩率越高，显存占用越少）"}),
             }
         }
     
@@ -184,7 +181,7 @@ class llama_cpp_model_loader:
         return None
     
     @classmethod
-    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, enable_tts, device_mode, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto"):
+    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, enable_tts, device_mode, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False, turboquant_kv_cache="None"):
         if LLAMA_CPP_STORAGE.llm is None:
             return float("NaN") 
         
@@ -215,22 +212,24 @@ class llama_cpp_model_loader:
         custom_config = {
             "model": model,
             "model_path": resolved_path or "",
+            "chat_handler": chat_handler,
             "enable_mmproj": enable_mmproj,
             "mmproj": mmproj,
             "enable_asr": enable_asr,
             "enable_tts": enable_tts,
-            "chat_handler": chat_handler,
             "device_mode": device_mode,
             "n_ctx": n_ctx,
             "n_gpu_layers": n_gpu_layers,
             "vram_limit": vram_limit,
             "image_min_tokens": image_min_tokens,
             "image_max_tokens": image_max_tokens,
-            "attention_type": attention_type
+            "attention_type": attention_type,
+            "cache_prompt": cache_prompt,
+            "turboquant_kv_cache": turboquant_kv_cache,
         }
         return json.dumps(custom_config, sort_keys=True, ensure_ascii=False)
     
-    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, enable_tts, device_mode, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto"):
+    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, enable_tts, device_mode, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False, turboquant_kv_cache="None"):
         # 解析完整模型路径，避免同名冲突
         resolved_model_path = self._resolve_llm_model_path(model)
         if resolved_model_path:
@@ -284,18 +283,14 @@ class llama_cpp_model_loader:
         is_qwen3vl = "qwen3-vl" in model.lower() or "qwen3vl" in model.lower()
         
         # 检查是否是Omni模型
-        is_omni = any(keyword in model.lower() for keyword in ["omni", "qwen3.5", "qwen35", "dreamomni", "dream-omni"])
+        is_omni = any(keyword in model.lower() for keyword in ["omni", "dreamomni", "dream-omni"])
         
         # 检查具体的Omni模型类型
-        is_qwen35_omni = "qwen35" in model.lower() or "qwen3.5" in model.lower()
         is_qwen25_omni = "qwen2.5-omni" in model.lower() or "qwen25-omni" in model.lower()
         is_dreamomni = "dreamomni" in model.lower() or "dream-omni" in model.lower()
         
         # 显示Omni模型检测结果
-        if is_qwen35_omni:
-            print(f"【Omni模型检测】检测到Qwen3.5模型: {model}")
-            print(f"【Omni模型检测】Qwen3.5模型，支持音频和视觉多模态，建议使用Qwen35ChatHandler")
-        elif is_qwen25_omni:
+        if is_qwen25_omni:
             print(f"【Omni模型检测】检测到Qwen2.5-Omni模型: {model}")
             print(f"【Omni模型检测】Qwen2.5-Omni模型，支持音频和视觉多模态，建议使用Qwen2.5-VL ChatHandler")
         elif is_dreamomni:
@@ -352,7 +347,7 @@ class llama_cpp_model_loader:
             if is_qwen35:
                 print(f"【GPU模式优化】Qwen3.5模型启用特殊GPU参数配置")
                 # 确保使用正确的ChatHandler
-                print(f"【提示】Qwen3.5模型将使用Qwen35ChatHandler，启用thinking模式")
+                print(f"【提示】Qwen3.5模型将使用Qwen35ChatHandler")
             
             # Qwen3系列模型（包括Qwen3-VL和Qwen3.5）需要至少1024个image tokens
             if image_min_tokens < 1024:
@@ -406,19 +401,30 @@ class llama_cpp_model_loader:
         
         # 自动选择对话格式处理器，多模态功能由用户控制
         chat_handler = get_auto_chat_handler(model)
+        
         mmproj_status = "已启用" if enable_mmproj else "已禁用"
         asr_status = "已启用" if enable_asr else "已禁用"
         tts_status = "已启用" if enable_tts else "已禁用"
         print(f"【自动配置】根据模型 {model} 选择对话格式处理器: {chat_handler}，多模态功能{mmproj_status}，ASR功能{asr_status}，TTS功能{tts_status}")
-        
+
+        # 检测模型格式，用于 TurboQuant KV Cache 加速方案选择
+        model_ext = os.path.splitext(model)[1].lower() if model else ""
+        is_gguf_model = model_ext == ".gguf"
+
+        # TurboQuant KV Cache 加速方案提示
+        if turboquant_kv_cache != "None":
+            if is_gguf_model:
+                print(f"【TurboQuant加速】GGUF格式模型将使用 llama.cpp 原生 TurboQuant KV Cache: {turboquant_kv_cache}")
+
         custom_config = {
             "model": model, "enable_mmproj": enable_mmproj, "mmproj": mmproj,
             "enable_asr": enable_asr, "enable_tts": enable_tts,
-            "chat_handler": chat_handler, "device_mode": device_mode, "n_ctx": n_ctx, 
-            "n_gpu_layers": n_gpu_layers, "vram_limit": vram_limit, 
+            "chat_handler": chat_handler, "device_mode": device_mode, "n_ctx": n_ctx,
+            "n_gpu_layers": n_gpu_layers, "vram_limit": vram_limit,
             "image_min_tokens": image_min_tokens, "image_max_tokens": image_max_tokens,
-            "n_batch": n_batch, "n_ubatch": n_ubatch, "n_threads": n_threads, 
-            "n_threads_batch": n_threads_batch, "attention_type": attention_type
+            "n_batch": n_batch, "n_ubatch": n_ubatch, "n_threads": n_threads,
+            "n_threads_batch": n_threads_batch, "attention_type": attention_type,
+            "cache_prompt": cache_prompt, "turboquant_kv_cache": turboquant_kv_cache
         }
         if not LLAMA_CPP_STORAGE.llm or LLAMA_CPP_STORAGE.current_config != custom_config:
             LLAMA_CPP_STORAGE.load_model(custom_config)

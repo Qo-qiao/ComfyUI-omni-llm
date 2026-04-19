@@ -26,10 +26,9 @@ try:
         ZIMAGE_TURBO_ZH, FLUX2_KLEIN_ZH, LTX2_ZH,
         VIDEO_TO_PROMPT_ZH, VIDEO_DETAILED_SCENE_BREAKDOWN_ZH, VIDEO_SUBTITLE_FORMAT_ZH,
         OCR_ENHANCED_ZH, ULTRA_HD_IMAGE_REVERSE_ZH, NORMAL_DESCRIBE_ZH,
-        PROMPT_STYLE_TAGS_ZH, PROMPT_STYLE_SIMPLE_ZH, PROMPT_STYLE_DETAILED_ZH, PROMPT_STYLE_COMPREHENSIVE_ZH,
-        CREATIVE_DETAILED_ANALYSIS_ZH, CREATIVE_SUMMARIZE_VIDEO_ZH, CREATIVE_SHORT_STORY_ZH, CREATIVE_REFINE_EXPAND_PROMPT_ZH,
+        NORMAL_DESCRIBE_TAGS_ZH, PROMPT_EXPANDER_ZH,
         VISION_BOUNDING_BOX_ZH, AUDIO_SUBTITLE_CONVERT_ZH, VIDEO_TO_AUDIO_SUBTITLE_ZH,
-        TEXT_TO_AUDIO_ZH, AUDIO_ANALYSIS_ZH, MULTI_SPEAKER_DIALOGUE_ZH, AUDIO_TO_TEXT_ZH, LYRICS_AND_AUDIO_MERGE_ZH,
+        AUDIO_ANALYSIS_ZH, MULTI_SPEAKER_DIALOGUE_ZH, LYRICS_CREATION_ZH,
     )
 
     from support.prompt_enhancer_preset_en import (
@@ -38,10 +37,9 @@ try:
         QWEN_IMAGE_2512_EN, ZIMAGE_TURBO_EN,
         VIDEO_TO_PROMPT_EN, VIDEO_DETAILED_SCENE_BREAKDOWN_EN, VIDEO_SUBTITLE_FORMAT_EN,
         ULTRA_HD_IMAGE_REVERSE_EN, NORMAL_DESCRIBE_EN,
-        PROMPT_STYLE_TAGS_EN, PROMPT_STYLE_SIMPLE_EN, PROMPT_STYLE_DETAILED_EN, PROMPT_STYLE_COMPREHENSIVE_EN,
-        CREATIVE_DETAILED_ANALYSIS_EN, CREATIVE_SUMMARIZE_VIDEO_EN, CREATIVE_SHORT_STORY_EN, CREATIVE_REFINE_EXPAND_PROMPT_EN,
+        NORMAL_DESCRIBE_TAGS_EN, PROMPT_EXPANDER_EN,
         VISION_BOUNDING_BOX_EN, AUDIO_SUBTITLE_CONVERT_EN, VIDEO_TO_AUDIO_SUBTITLE_EN,
-        TEXT_TO_AUDIO_EN, AUDIO_ANALYSIS_EN, MULTI_SPEAKER_DIALOGUE_EN, AUDIO_TO_TEXT_EN, LYRICS_AND_AUDIO_MERGE_EN,
+        AUDIO_ANALYSIS_EN, MULTI_SPEAKER_DIALOGUE_EN, LYRICS_CREATION_EN,
     )
 except ImportError:
     # 提示词缺失时的兜底
@@ -64,19 +62,14 @@ except ImportError:
     PROMPT_STYLE_TAGS_ZH = PROMPT_STYLE_TAGS_EN = ""
     PROMPT_STYLE_SIMPLE_ZH = PROMPT_STYLE_SIMPLE_EN = ""
     PROMPT_STYLE_DETAILED_ZH = PROMPT_STYLE_DETAILED_EN = ""
-    PROMPT_STYLE_COMPREHENSIVE_ZH = PROMPT_STYLE_COMPREHENSIVE_EN = ""
-    CREATIVE_DETAILED_ANALYSIS_ZH = CREATIVE_DETAILED_ANALYSIS_EN = ""
-    CREATIVE_SUMMARIZE_VIDEO_ZH = CREATIVE_SUMMARIZE_VIDEO_EN = ""
-    CREATIVE_SHORT_STORY_ZH = CREATIVE_SHORT_STORY_EN = ""
-    CREATIVE_REFINE_EXPAND_PROMPT_ZH = CREATIVE_REFINE_EXPAND_PROMPT_EN = ""
     VISION_BOUNDING_BOX_ZH = VISION_BOUNDING_BOX_EN = ""
     AUDIO_SUBTITLE_CONVERT_ZH = AUDIO_SUBTITLE_CONVERT_EN = ""
     VIDEO_TO_AUDIO_SUBTITLE_ZH = VIDEO_TO_AUDIO_SUBTITLE_EN = ""
-    TEXT_TO_AUDIO_ZH = TEXT_TO_AUDIO_EN = ""
     AUDIO_ANALYSIS_ZH = AUDIO_ANALYSIS_EN = ""
     MULTI_SPEAKER_DIALOGUE_ZH = MULTI_SPEAKER_DIALOGUE_EN = ""
-    AUDIO_TO_TEXT_ZH = AUDIO_TO_TEXT_EN = ""
-    LYRICS_AND_AUDIO_MERGE_ZH = LYRICS_AND_AUDIO_MERGE_EN = ""
+    LYRICS_CREATION_ZH = LYRICS_CREATION_EN = ""
+    NORMAL_DESCRIBE_TAGS_ZH = NORMAL_DESCRIBE_TAGS_EN = ""
+    PROMPT_EXPANDER_ZH = PROMPT_EXPANDER_EN = ""
 
 
 class VideoProcessor:
@@ -256,11 +249,13 @@ class llama_cpp_api_inference:
     # 添加基础预设
     preset_prompts["Empty - Nothing"] = ""
 
-    # 添加分类预设提示词
-    preset_prompts["[Normal] Describe"] = "NORMAL_DESCRIBE"
-    preset_prompts["[Text to Image] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
-    preset_prompts["[Text to Image] FLUX2 - Klein"] = "FLUX2_KLEIN"
-    preset_prompts["[Text to Image] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
+    # 添加分类预设提示词（顺序与 prompt_enhancer_preset_zh.py / prompt_enhancer_preset_en.py 保持一致）
+    preset_prompts["[Reverse] Tags"] = "NORMAL_DESCRIBE_TAGS"
+    preset_prompts["[Reverse] Describe"] = "NORMAL_DESCRIBE"
+    preset_prompts["[Normal] Expand"] = "PROMPT_EXPANDER"
+    preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
+    preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
+    preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
     preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
     preset_prompts["[Image Edit] Qwen - Image Layered"] = "QWEN_IMAGE_LAYERED"
     preset_prompts["[Text to Video] LTX-2"] = "LTX2"
@@ -268,27 +263,17 @@ class llama_cpp_api_inference:
     preset_prompts["[Image to Video] WAN - Image to Video"] = "WAN_I2V"
     preset_prompts["[Image to Video] WAN - Image to Video Empty"] = "WAN_I2V_EMPTY"
     preset_prompts["[Image to Video] WAN - FLF to Video"] = "WAN_FLF2V"
-    preset_prompts["[Prompt Style] Tags"] = "PROMPT_STYLE_TAGS"
-    preset_prompts["[Prompt Style] Simple"] = "PROMPT_STYLE_SIMPLE"
-    preset_prompts["[Prompt Style] Detailed"] = "PROMPT_STYLE_DETAILED"
-    preset_prompts["[Prompt Style] Comprehensive Expansion"] = "PROMPT_STYLE_COMPREHENSIVE"
-    preset_prompts["[Creative] Refine & Expand Prompt"] = "CREATIVE_REFINE_EXPAND_PROMPT"
-    preset_prompts["[Creative] Detailed Analysis"] = "CREATIVE_DETAILED_ANALYSIS"
-    preset_prompts["[Creative] Summarize Video"] = "CREATIVE_SUMMARIZE_VIDEO"
-    preset_prompts["[Creative] Short Story"] = "CREATIVE_SHORT_STORY"
     preset_prompts["[Video Analysis] Video - Reverse Prompt"] = "VIDEO_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Detailed Scene Breakdown"] = "VIDEO_DETAILED_SCENE_BREAKDOWN"
     preset_prompts["[Video Analysis] Video - Subtitle Format"] = "VIDEO_SUBTITLE_FORMAT"
-    preset_prompts["[Vision] Bounding Box"] = "VISION_BOUNDING_BOX"
-    preset_prompts["[OCR] Enhanced OCR"] = "OCR_ENHANCED"
-    preset_prompts["[HighRes] Ultra HD Image Reverse"] = "ULTRA_HD_IMAGE_REVERSE"
     preset_prompts["[Audio] Audio ↔ Subtitle Convert"] = "AUDIO_SUBTITLE_CONVERT"
     preset_prompts["[Audio] Video to Audio & Subtitle"] = "VIDEO_TO_AUDIO_SUBTITLE"
-    preset_prompts["[Audio] Text to Audio"] = "TEXT_TO_AUDIO"
     preset_prompts["[Audio] Audio Analysis"] = "AUDIO_ANALYSIS"
     preset_prompts["[Audio] Multi-Person Dialogue"] = "MULTI_SPEAKER_DIALOGUE"
-    preset_prompts["[Audio] Audio to Text"] = "AUDIO_TO_TEXT"
-    preset_prompts["[Music] Lyrics & Audio Merge"] = "LYRICS_AND_AUDIO_MERGE"
+    preset_prompts["[Music] Lyrics Creation"] = "LYRICS_CREATION"
+    preset_prompts["[OCR] Enhanced OCR"] = "OCR_ENHANCED"
+    preset_prompts["[HighRes] Ultra HD Image Reverse"] = "ULTRA_HD_IMAGE_REVERSE"
+    preset_prompts["[Vision] Bounding Box"] = "VISION_BOUNDING_BOX"
 
     preset_tags = list(preset_prompts.keys())
 
@@ -296,7 +281,9 @@ class llama_cpp_api_inference:
         """根据语言获取预设提示词文本"""
         if language == "中文":
             preset_map = {
+                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_ZH,
                 "NORMAL_DESCRIBE": NORMAL_DESCRIBE_ZH,
+                "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
                 "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
@@ -310,28 +297,20 @@ class llama_cpp_api_inference:
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
                 "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_ZH,
-                "OCR_ENHANCED": OCR_ENHANCED_ZH,
-                "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_ZH,
-                "PROMPT_STYLE_TAGS": PROMPT_STYLE_TAGS_ZH,
-                "PROMPT_STYLE_SIMPLE": PROMPT_STYLE_SIMPLE_ZH,
-                "PROMPT_STYLE_DETAILED": PROMPT_STYLE_DETAILED_ZH,
-                "PROMPT_STYLE_COMPREHENSIVE": PROMPT_STYLE_COMPREHENSIVE_ZH,
-                "CREATIVE_DETAILED_ANALYSIS": CREATIVE_DETAILED_ANALYSIS_ZH,
-                "CREATIVE_SUMMARIZE_VIDEO": CREATIVE_SUMMARIZE_VIDEO_ZH,
-                "CREATIVE_SHORT_STORY": CREATIVE_SHORT_STORY_ZH,
-                "CREATIVE_REFINE_EXPAND_PROMPT": CREATIVE_REFINE_EXPAND_PROMPT_ZH,
-                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_ZH,
                 "AUDIO_SUBTITLE_CONVERT": AUDIO_SUBTITLE_CONVERT_ZH,
                 "VIDEO_TO_AUDIO_SUBTITLE": VIDEO_TO_AUDIO_SUBTITLE_ZH,
-                "TEXT_TO_AUDIO": TEXT_TO_AUDIO_ZH,
                 "AUDIO_ANALYSIS": AUDIO_ANALYSIS_ZH,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_ZH,
-                "AUDIO_TO_TEXT": AUDIO_TO_TEXT_ZH,
-                "LYRICS_AND_AUDIO_MERGE": LYRICS_AND_AUDIO_MERGE_ZH,
+                "LYRICS_CREATION": LYRICS_CREATION_ZH,
+                "OCR_ENHANCED": OCR_ENHANCED_ZH,
+                "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_ZH,
+                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_ZH,
             }
         else:
             preset_map = {
+                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_EN,
                 "NORMAL_DESCRIBE": NORMAL_DESCRIBE_EN,
+                "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
                 "FLUX2_KLEIN": FLUX2_KLEIN_EN,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
@@ -345,23 +324,14 @@ class llama_cpp_api_inference:
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
                 "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_EN,
-                "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_EN,
-                "PROMPT_STYLE_TAGS": PROMPT_STYLE_TAGS_EN,
-                "PROMPT_STYLE_SIMPLE": PROMPT_STYLE_SIMPLE_EN,
-                "PROMPT_STYLE_DETAILED": PROMPT_STYLE_DETAILED_EN,
-                "PROMPT_STYLE_COMPREHENSIVE": PROMPT_STYLE_COMPREHENSIVE_EN,
-                "CREATIVE_DETAILED_ANALYSIS": CREATIVE_DETAILED_ANALYSIS_EN,
-                "CREATIVE_SUMMARIZE_VIDEO": CREATIVE_SUMMARIZE_VIDEO_EN,
-                "CREATIVE_SHORT_STORY": CREATIVE_SHORT_STORY_EN,
-                "CREATIVE_REFINE_EXPAND_PROMPT": CREATIVE_REFINE_EXPAND_PROMPT_EN,
-                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
                 "AUDIO_SUBTITLE_CONVERT": AUDIO_SUBTITLE_CONVERT_EN,
                 "VIDEO_TO_AUDIO_SUBTITLE": VIDEO_TO_AUDIO_SUBTITLE_EN,
-                "TEXT_TO_AUDIO": TEXT_TO_AUDIO_EN,
                 "AUDIO_ANALYSIS": AUDIO_ANALYSIS_EN,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_EN,
-                "AUDIO_TO_TEXT": AUDIO_TO_TEXT_EN,
-                "LYRICS_AND_AUDIO_MERGE": LYRICS_AND_AUDIO_MERGE_EN,
+                "LYRICS_CREATION": LYRICS_CREATION_EN,
+                "OCR_ENHANCED": OCR_ENHANCED_EN,
+                "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_EN,
+                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
             }
         return preset_map.get(preset_key, preset_key)
 
@@ -386,7 +356,7 @@ class llama_cpp_api_inference:
                     }),
 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1] if len(s.preset_tags) > 1 else s.preset_tags[0], "tooltip": "选择预设提示词模板"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1] if len(s.preset_tags) > 1 else s.preset_tags[0], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Normal] Tags：反推标签格式的描述\n• [Normal] Describe：反推详细描述文本\n• [Normal] Expand：扩展和丰富提示词\n• [Portrait] ZIMAGE - Turbo：人像生成优化\n• [General] FLUX2 - Klein：通用图像生成\n• [Poster] Qwen - Image 2512：海报风格图像\n• [Image Edit] Qwen - Image Edit Combined：图像编辑模板\n• [Image Edit] Qwen - Image Layered：分层图像编辑\n• [Text to Video] LTX-2：文本到视频生成\n• [Text to Video] WAN - Text to Video：WAN模型文本生视频\n• [Image to Video] WAN - Image to Video：图生视频\n• [Image to Video] WAN - Image to Video Empty：图像生视频（无提示词）\n• [Image to Video] WAN - FLF to Video：首尾帧生视频\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频场景详细分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式\n• [Audio] Audio ↔ Subtitle Convert：音频与字幕互转\n• [Audio] Video to Audio & Subtitle：视频转音频和字幕\n• [Audio] Audio Analysis：音频内容分析\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics & Audio Merge：歌词与音频合并\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "You are an excellent multimodal assistant.", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
 
@@ -438,6 +408,9 @@ class llama_cpp_api_inference:
 
                 # ========== 生成参数 ==========
                 "seed": ("INT", {"default": 101, "min": 0, "max": 0xffffffffffffffff, "step": 1, "tooltip": "随机种子，用于复现结果"}),
+                
+                # ========== 输出格式 ==========
+                "output_format": (["文本", "JSON"], {"default": "文本", "tooltip": "选择输出格式：\n• 文本：返回纯文本结果\n• JSON：返回包含详细信息的JSON格式"}),
             },
             "optional": {
                 "images": ("IMAGE", {"tooltip": "图像输入（用于图像理解模式）"}),
@@ -454,28 +427,40 @@ class llama_cpp_api_inference:
 
     def inference(self, api_config, inference_mode, preset_prompt, system_prompt, text_input,
                   prompt_language, response_language, video_max_frames, video_sampling, video_manual_indices,
-                  image_max_size, tts_voice, tts_emotion, tts_speed, seed,
+                  image_max_size, tts_voice, tts_emotion, tts_speed, seed, output_format,
                   images=None, video=None, audio=None):
         try:
             # 配置验证
             if not api_config or not isinstance(api_config, dict):
-                return ("错误：API配置无效", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API配置无效"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API配置无效", None)
 
             api_provider = api_config.get("api_provider", "OpenAI")
             api_base = api_config.get("api_base", "").strip()
             api_key = api_config.get("api_key", "").strip()
 
             if not api_base:
-                return ("错误：API基础URL未配置", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API基础URL未配置"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API基础URL未配置", None)
 
             # 对于需要API密钥的提供商进行验证
             if api_provider in ["OpenAI", "Anthropic", "Moonshot AI", "Qwen", "llms-py", "Kimi", "GLM", "MiniMax"] and not api_key:
-                return ("错误：API密钥未配置", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API密钥未配置"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API密钥未配置", None)
 
             # 检查视频处理库
             if "视频理解" in inference_mode and video is not None:
                 if not self.video_processor.is_available():
-                    return ("错误：视频处理需要opencv-python。请运行：pip install opencv-python", None)
+                    if output_format == "JSON":
+                        return (json.dumps({"error": "视频处理需要opencv-python。请运行：pip install opencv-python"}, ensure_ascii=False), None)
+                    else:
+                        return ("错误：视频处理需要opencv-python。请运行：pip install opencv-python", None)
 
             # 确定输入语言
             if prompt_language == "中文":
@@ -699,7 +684,10 @@ class llama_cpp_api_inference:
             )
 
             if not result:
-                return ("错误：API调用失败，请检查日志了解详情", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API调用失败，请检查日志了解详情"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API调用失败，请检查日志了解详情", None)
 
             # 解析响应结果
             generated_text = ""
@@ -709,15 +697,24 @@ class llama_cpp_api_inference:
                 generated_text = result['choices'][0]['message']['content']
             else:
                 print("【API响应】未知的响应格式")
-                return ("错误：API返回格式错误", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API返回格式错误"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API返回格式错误", None)
 
             # 验证生成结果
             if not generated_text or not isinstance(generated_text, str):
-                return ("错误：API返回结果无效", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API返回结果无效"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API返回结果无效", None)
 
             generated_text = generated_text.strip()
             if not generated_text:
-                return ("错误：API返回空结果", None)
+                if output_format == "JSON":
+                    return (json.dumps({"error": "API返回空结果"}, ensure_ascii=False), None)
+                else:
+                    return ("错误：API返回空结果", None)
 
             print(f"【API响应】生成了 {len(generated_text)} 字符的文本")
 
@@ -755,22 +752,46 @@ class llama_cpp_api_inference:
                 except Exception as e:
                     print(f"【TTS错误】语音合成失败: {str(e)}")
 
-            return (generated_text, audio_output)
+            # 处理输出格式
+            if output_format == "JSON":
+                json_output = {
+                    "text": generated_text,
+                    "audio_generated": audio_output is not None,
+                    "inference_mode": inference_mode,
+                    "prompt_language": prompt_language,
+                    "response_language": response_language,
+                    "model": api_config.get("model_id", "default"),
+                    "provider": api_config.get("api_provider", "OpenAI"),
+                    "token_count": len(generated_text),
+                    "timestamp": "2026-04-17"
+                }
+                return (json.dumps(json_output, ensure_ascii=False, indent=2), audio_output)
+            else:
+                return (generated_text, audio_output)
 
         except requests.exceptions.Timeout as e:
             error_msg = f"错误：API请求超时：{str(e)}"
             print(f"【超时错误】{error_msg}")
-            return (error_msg, None)
+            if output_format == "JSON":
+                return (json.dumps({"error": error_msg}, ensure_ascii=False), None)
+            else:
+                return (error_msg, None)
         except requests.exceptions.RequestException as e:
             error_msg = f"错误：API请求失败：{str(e)}"
             print(f"【网络错误】{error_msg}")
-            return (error_msg, None)
+            if output_format == "JSON":
+                return (json.dumps({"error": error_msg}, ensure_ascii=False), None)
+            else:
+                return (error_msg, None)
         except Exception as e:
             error_msg = f"错误：API调用失败：{str(e)}"
             print(f"【错误】{error_msg}")
             import traceback
             traceback.print_exc()
-            return (error_msg, None)
+            if output_format == "JSON":
+                return (json.dumps({"error": error_msg}, ensure_ascii=False), None)
+            else:
+                return (error_msg, None)
 
 
 NODE_CLASS_MAPPINGS = {

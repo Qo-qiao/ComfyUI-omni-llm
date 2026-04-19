@@ -295,7 +295,7 @@ class llama_cpp_asr_loader:
         
         # 根据硬件性能推荐默认参数
         perf_level = HARDWARE_INFO.get("perf_level", "low")
-        
+
         if perf_level == "high":  # 24GB+
             default_n_gpu_layers = -1
         elif perf_level == "mid_high":  # 16GB
@@ -303,9 +303,9 @@ class llama_cpp_asr_loader:
         elif perf_level == "mid":  # 12GB
             default_n_gpu_layers = -1
         elif perf_level == "mid_low":  # 8GB
-            default_n_gpu_layers = 20
+            default_n_gpu_layers = -1
         else:  # <8GB
-            default_n_gpu_layers = 0
+            default_n_gpu_layers = 20
         
         # Qwen3-ASR支持的52种语言和方言
         qwen3_languages = [
@@ -322,10 +322,7 @@ class llama_cpp_asr_loader:
                 "task": (["transcribe", "translate"], {"default": "transcribe", "tooltip": "任务类型：transcribe=转录，translate=翻译成英文"}),
             },
             "optional": {
-                "backend": (["transformers", "vllm"], {"default": "transformers", "tooltip": "推理后端选择（仅Qwen3-ASR模型适用）"}),
                 "enable_timestamps": ("BOOLEAN", {"default": False, "tooltip": "启用时间戳功能（需要Qwen3-ForcedAligner）"}),
-                "max_new_tokens": ("INT", {"default": 256, "min": 64, "max": 4096, "step": 64, "tooltip": "最大生成token数"}),
-                "batch_size": ("INT", {"default": 32, "min": 1, "max": 128, "step": 1, "tooltip": "批处理大小"}),
                 "flash_attention": ("BOOLEAN", {"default": False, "tooltip": "启用FlashAttention2优化（需要安装flash-attn）"}),
             }
         }
@@ -388,7 +385,7 @@ class llama_cpp_asr_loader:
         self.current_config = None
     
     @classmethod
-    def IS_CHANGED(s, asr_model, n_gpu_layers, language, task, backend="transformers", enable_timestamps=False, max_new_tokens=256, batch_size=32, flash_attention=False):
+    def IS_CHANGED(s, asr_model, n_gpu_layers, language, task, enable_timestamps=False, flash_attention=False):
         resolved_path = s._resolve_asr_model_path(asr_model)
         config = {
             "asr_model": asr_model,
@@ -396,15 +393,12 @@ class llama_cpp_asr_loader:
             "n_gpu_layers": n_gpu_layers,
             "language": language,
             "task": task,
-            "backend": backend,
             "enable_timestamps": enable_timestamps,
-            "max_new_tokens": max_new_tokens,
-            "batch_size": batch_size,
             "flash_attention": flash_attention
         }
         return json.dumps(config, sort_keys=True, ensure_ascii=False)
     
-    def load_asr_model(self, asr_model, n_gpu_layers, language, task, backend="transformers", enable_timestamps=False, max_new_tokens=256, batch_size=32, flash_attention=False):
+    def load_asr_model(self, asr_model, n_gpu_layers, language, task, enable_timestamps=False, flash_attention=False):
         """
         加载ASR模型
         """
@@ -418,7 +412,7 @@ class llama_cpp_asr_loader:
 
         try:
             print(f"【ASR加载器】正在加载ASR模型: {asr_model} (解析路径: {resolved_model_path})")
-            print(f"【ASR加载器】配置: 后端={backend}, 时间戳={enable_timestamps}, max_new_tokens={max_new_tokens}, batch_size={batch_size}")
+            print(f"【ASR加载器】配置: 时间戳={enable_timestamps}")
             
             # 构建配置
             config = {
@@ -427,10 +421,7 @@ class llama_cpp_asr_loader:
                 "n_gpu_layers": n_gpu_layers,
                 "language": language,
                 "task": task,
-                "backend": backend,
                 "enable_timestamps": enable_timestamps,
-                "max_new_tokens": max_new_tokens,
-                "batch_size": batch_size,
                 "flash_attention": flash_attention
             }
             
@@ -650,7 +641,6 @@ class ASRModelWrapper:
                 print(f"【Qwen3-ASR模型】正在加载模型: {self.model_path}")
                 
                 # 获取配置参数
-                backend = self.config.get("backend", "transformers")
                 dtype = torch.bfloat16 if self.device == "cuda" else torch.float32
                 enable_timestamps = self.config.get("enable_timestamps", False)
                 
@@ -660,52 +650,42 @@ class ASRModelWrapper:
                     model_path_for_loading = os.path.dirname(self.model_path)
                     print(f"【Qwen3-ASR模型】检测到文件路径，使用目录路径: {model_path_for_loading}")
                 
-                if backend == "vllm":
-                    # 使用vLLM后端（高性能）
-                    print(f"【Qwen3-ASR模型】使用vLLM后端")
-                    model = Qwen3ASRModel.LLM(
-                        model=model_path_for_loading,
-                        gpu_memory_utilization=0.7,
-                        max_inference_batch_size=self.config.get("batch_size", 32),
-                        max_new_tokens=self.config.get("max_new_tokens", 256)
+                # 使用transformers后端
+                model_kwargs = {
+                    "dtype": dtype,
+                    "device_map": "cuda:0" if self.device == "cuda" else "cpu",
+                    "max_inference_batch_size": 32,  # 固定值
+                    "max_new_tokens": 256  # 固定值
+                }
+                
+                # 如果启用FlashAttention2优化
+                if self.config.get("flash_attention", False):
+                    try:
+                        import flash_attn
+                        model_kwargs["attn_implementation"] = "flash_attention_2"
+                        print(f"【Qwen3-ASR模型】启用FlashAttention2优化")
+                    except ImportError:
+                        print(f"【Qwen3-ASR模型】FlashAttention2未安装，使用默认Attention实现")
+                
+                # 如果启用时间戳，添加ForcedAligner
+                if enable_timestamps:
+                    model_kwargs["forced_aligner"] = "Qwen/Qwen3-ForcedAligner-0.6B"
+                    aligner_kwargs = dict(
+                        dtype=dtype,
+                        device_map="cuda:0" if self.device == "cuda" else "cpu"
                     )
-                else:
-                    # 使用transformers后端
-                    model_kwargs = {
-                        "dtype": dtype,
-                        "device_map": "cuda:0" if self.device == "cuda" else "cpu",
-                        "max_inference_batch_size": self.config.get("batch_size", 32),
-                        "max_new_tokens": self.config.get("max_new_tokens", 256)
-                    }
                     
-                    # 如果启用FlashAttention2优化
+                    # ForcedAligner也支持FlashAttention2优化
                     if self.config.get("flash_attention", False):
                         try:
                             import flash_attn
-                            model_kwargs["attn_implementation"] = "flash_attention_2"
-                            print(f"【Qwen3-ASR模型】启用FlashAttention2优化")
+                            aligner_kwargs["attn_implementation"] = "flash_attention_2"
                         except ImportError:
-                            print(f"【Qwen3-ASR模型】FlashAttention2未安装，使用默认Attention实现")
+                            pass
                     
-                    # 如果启用时间戳，添加ForcedAligner
-                    if enable_timestamps:
-                        model_kwargs["forced_aligner"] = "Qwen/Qwen3-ForcedAligner-0.6B"
-                        aligner_kwargs = dict(
-                            dtype=dtype,
-                            device_map="cuda:0" if self.device == "cuda" else "cpu"
-                        )
-                        
-                        # ForcedAligner也支持FlashAttention2优化
-                        if self.config.get("flash_attention", False):
-                            try:
-                                import flash_attn
-                                aligner_kwargs["attn_implementation"] = "flash_attention_2"
-                            except ImportError:
-                                pass
-                        
-                        model_kwargs["forced_aligner_kwargs"] = aligner_kwargs
-                    
-                    model = Qwen3ASRModel.from_pretrained(model_path_for_loading, **model_kwargs)
+                    model_kwargs["forced_aligner_kwargs"] = aligner_kwargs
+                
+                model = Qwen3ASRModel.from_pretrained(model_path_for_loading, **model_kwargs)
                 
                 self.model = model
                 print(f"【Qwen3-ASR模型】已加载到 {self.device}")
@@ -873,11 +853,20 @@ class ASRModelWrapper:
         Returns:
             dict: 包含识别结果的字典 {"text": "识别文本", "language": "检测语言", "segments": []}
         """
+        import time
+        import psutil
+        
         if audio_input is None:
             return {"text": "", "language": "", "segments": []}
         
         language = language if language is not None else self.config.get("language", "auto")
         task = self.config.get("task", "transcribe")
+        
+        # 开始性能监控
+        start_time = time.time()
+        start_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+        if torch.cuda.is_available():
+            start_gpu_memory = torch.cuda.memory_allocated() / 1024 / 1024  # MB
         
         try:
             # 生成缓存键
@@ -885,7 +874,6 @@ class ASRModelWrapper:
             
             # 检查缓存
             if cache_key in self._audio_cache:
-                print(f"【ASR缓存】使用缓存结果")
                 return self._audio_cache[cache_key]
             
             # 根据模型类型调用不同的识别方法
@@ -906,6 +894,22 @@ class ASRModelWrapper:
             
             # 缓存结果
             self._cache_result(cache_key, result)
+            
+            # 结束性能监控
+            end_time = time.time()
+            end_memory = psutil.Process().memory_info().rss / 1024 / 1024  # MB
+            inference_time = end_time - start_time
+            memory_used = end_memory - start_memory
+            
+            # 在结果中添加性能信息
+            result["performance"] = {
+                "inference_time": inference_time,
+                "memory_used": memory_used
+            }
+            if torch.cuda.is_available():
+                end_gpu_memory = torch.cuda.memory_allocated() / 1024 / 1024  # MB
+                gpu_memory_used = end_gpu_memory - start_gpu_memory
+                result["performance"]["gpu_memory_used"] = gpu_memory_used
             
             return result
                 
@@ -949,7 +953,6 @@ class ASRModelWrapper:
                 del self._audio_cache[oldest_key]
             
             self._audio_cache[cache_key] = result
-            print(f"【ASR缓存】已缓存结果，当前缓存数量: {len(self._audio_cache)}")
             
         except Exception as e:
             print(f"【ASR缓存错误】缓存结果失败: {str(e)}")

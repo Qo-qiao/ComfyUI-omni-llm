@@ -19,6 +19,10 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common import HARDWARE_INFO, LLAMA_CPP_STORAGE
+from engine.airllm_turboquant_integration import (
+    integrate_turboquant_to_transformers,
+    AirLLMTurboQuantConfig,
+)
 
 
 # 模型注册表 - 存储所有支持的模型版本信息
@@ -379,6 +383,7 @@ class llama_cpp_sharded_model_loader:
             "required": {
                 "model_name": (available_models, {"default": default_model}),
                 "quantization": (["None", "4-bit (VRAM-friendly)", "8-bit (Balanced Precision)"], {"default": "None"}),
+                "turboquant_kv_cache": (["None", "f16 (无压缩)", "q8_0 (8-bit)", "q6_k (6-bit)", "q5_k (5-bit)", "q5_0 (5-bit)", "q5_1 (5-bit)", "q4_k (4-bit)", "q4_0 (4-bit)", "q4_1 (4-bit)", "q3_k (3-bit)", "q2_k (2-bit)", "mxfp4 (4-bit)", "nvfp4 (4-bit)", "turbo3 (3-bit)", "turbo2 (2-bit)", "turbo1 (1-bit)"], {"default": "None", "tooltip": "TurboQuant KV Cache 压缩：None=禁用，f16=无压缩，其他=量化压缩（位数越低压缩率越高，显存占用越少）"}),
                 "enable_asr": ("BOOLEAN", {"default": False, "tooltip": "启用ASR语音识别功能（需配合ASR模型加载器使用）"}),
                 "enable_tts": ("BOOLEAN", {"default": False, "tooltip": "启用TTS语音合成功能（需配合TTS模型加载器使用）"}),
                 "n_ctx": ("INT", {"default": default_n_ctx, "min": 1024, "max": 327680, "step": 128, "tooltip": "上下文长度，影响可处理的文本长度"}),
@@ -426,7 +431,7 @@ class llama_cpp_sharded_model_loader:
     CATEGORY = "llama-cpp-vlm"
 
     @classmethod
-    def IS_CHANGED(s, model_name, quantization, enable_asr=False, enable_tts=False, 
+    def IS_CHANGED(s, model_name, quantization, turboquant_kv_cache="None", enable_asr=False, enable_tts=False, 
                   n_ctx=8192, n_gpu_layers=-1, vram_limit=-1, 
                   image_min_tokens=0, image_max_tokens=0, attention_type="Auto"):
         if LLAMA_CPP_STORAGE.llm is None:
@@ -458,6 +463,7 @@ class llama_cpp_sharded_model_loader:
         custom_config = {
             "model": model_name,
             "quantization": quantization,
+            "turboquant_kv_cache": turboquant_kv_cache,
             "enable_asr": enable_asr,
             "enable_tts": enable_tts,
             "chat_handler": chat_handler,
@@ -480,7 +486,7 @@ class llama_cpp_sharded_model_loader:
         self.current_device_mode = None
         self.model_path = None
     
-    def load_model(self, model_name, quantization, enable_asr=False, enable_tts=False, 
+    def load_model(self, model_name, quantization, turboquant_kv_cache="None", enable_asr=False, enable_tts=False, 
                   n_ctx=8192, n_gpu_layers=-1, vram_limit=-1, 
                   image_min_tokens=0, image_max_tokens=0, attention_type="Auto"):
         # 根据模型名称自动推断对话格式处理器
@@ -717,7 +723,49 @@ class llama_cpp_sharded_model_loader:
             offload_state_dict=True,
             **model_kwargs
         ).eval()
+
+        num_heads = getattr(self.model.config, "num_attention_heads", 32)
+        head_dim = getattr(self.model.config, "hidden_size", 4096) // num_heads
         
+        turboquant_kv_cache_to_bits = {
+            "f16 (无压缩)": 16,
+            "q8_0 (8-bit)": 8,
+            "q6_k (6-bit)": 6,
+            "q5_k (5-bit)": 5,
+            "q5_0 (5-bit)": 5,
+            "q5_1 (5-bit)": 5,
+            "q4_k (4-bit)": 4,
+            "q4_0 (4-bit)": 4,
+            "q4_1 (4-bit)": 4,
+            "q3_k (3-bit)": 3,
+            "q2_k (2-bit)": 2,
+            "mxfp4 (4-bit)": 4,
+            "nvfp4 (4-bit)": 4,
+            "turbo3 (3-bit)": 3,
+            "turbo2 (2-bit)": 2,
+            "turbo1 (1-bit)": 1,
+        }
+        
+        kv_compression_bits = turboquant_kv_cache_to_bits.get(turboquant_kv_cache, None)
+        
+        if turboquant_kv_cache != "None" and kv_compression_bits is not None:
+            turboquant_config = AirLLMTurboQuantConfig(
+                enabled=True,
+                kv_compression_bits=kv_compression_bits,
+                kv_seed=42,
+                enable_asymmetric_attention=True,
+                compress_kv=True,
+                device="cuda" if torch.cuda.is_available() else "cpu",
+            )
+            print(f"【TurboQuant】正在集成 KV Cache 压缩 (bits={turboquant_config.kv_compression_bits}, heads={num_heads}, head_dim={head_dim})")
+            self.model = integrate_turboquant_to_transformers(self.model, turboquant_config)
+            print(f"【TurboQuant】TurboQuant 集成完成，启用非对称注意力加速")
+        else:
+            if turboquant_kv_cache == "None":
+                print(f"【TurboQuant】KV Cache 压缩已禁用，使用标准 KV Cache")
+            else:
+                print(f"【TurboQuant】未知的 KV Cache 压缩选项: {turboquant_kv_cache}，使用标准 KV Cache")
+
         # 编译优化（PyTorch 2.2+）
         if torch.__version__ >= "2.2":
             self.model = torch.compile(self.model, mode="reduce-overhead")
@@ -752,6 +800,7 @@ class llama_cpp_sharded_model_loader:
             "model": model_name,
             "model_path": model_path,
             "quantization": quantization,
+            "turboquant_kv_cache": turboquant_kv_cache,
             "enable_asr": enable_asr,
             "enable_tts": enable_tts,
             "chat_handler": chat_handler,

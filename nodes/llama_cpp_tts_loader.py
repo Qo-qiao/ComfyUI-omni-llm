@@ -307,12 +307,10 @@ class llama_cpp_tts_loader:
 
         perf_level = HARDWARE_INFO.get("perf_level", "low")
 
-        if perf_level in ["high", "mid_high", "mid"]:
+        if perf_level in ["high", "mid_high", "mid", "mid_low"]:
             default_n_gpu_layers = -1
-        elif perf_level == "mid_low":
-            default_n_gpu_layers = 20
         else:
-            default_n_gpu_layers = 0
+            default_n_gpu_layers = 20
 
         return {
             "required": {

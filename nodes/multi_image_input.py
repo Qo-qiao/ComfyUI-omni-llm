@@ -229,7 +229,9 @@ class MultiImageInput:
             include_image_descriptions,
             story_theme,
             narrative_style,
-            video_model
+            video_model,
+            content_focus,
+            target_audience
         )
         
         print(f"【Image Mode】Completed, generated prompt length: {len(multi_image_prompt)} characters")
@@ -387,9 +389,18 @@ class MultiImageInput:
         # 添加输出格式
         prompt_parts.append(f"")
         prompt_parts.append(f"【输出格式】")
-        prompt_parts.append(f"1. 直接输出创作的内容，不添加任何额外说明或标记。")
-        prompt_parts.append(f"2. 确保内容逻辑清晰，语言流畅。")
-        prompt_parts.append(f"3. 使用生动、具体的描述性语言，营造画面感。")
+        prompt_parts.append(f"1. 直接输出JSON格式内容，不添加任何额外说明或标记。")
+        prompt_parts.append(f"2. JSON必须包含以下字段：")
+        prompt_parts.append(f"   - task_type: 内容创作类型")
+        prompt_parts.append(f"   - theme: 内容主题")
+        prompt_parts.append(f"   - narrative_style: 叙事风格")
+        prompt_parts.append(f"   - content_focus: 内容重点")
+        prompt_parts.append(f"   - target_audience: 目标受众")
+        prompt_parts.append(f"   - story_length: 故事长度")
+        prompt_parts.append(f"   - video_model: 视频模型类型")
+        prompt_parts.append(f"   - content: 创作的具体内容")
+        prompt_parts.append(f"   - image_descriptions: 图像描述列表（图像模式时）")
+        prompt_parts.append(f"3. 确保JSON格式正确，可被json.loads()解析。")
         prompt_parts.append(f"4. {model_specific_instruction}")
         
         return "\n".join(prompt_parts)
@@ -494,60 +505,78 @@ class MultiImageInput:
         # Add output format
         prompt_parts.append(f"")
         prompt_parts.append(f"【Output Format】")
-        prompt_parts.append(f"1. Output the created content directly, without adding any additional explanations or markers.")
-        prompt_parts.append(f"2. Ensure the content is logically clear and the language is fluent.")
-        prompt_parts.append(f"3. Use vivid, specific descriptive language to create a strong sense of imagery.")
+        prompt_parts.append(f"1. Output JSON format content directly, without adding any additional explanations or markers.")
+        prompt_parts.append(f"2. JSON must contain the following fields:")
+        prompt_parts.append(f"   - task_type: Content creation type")
+        prompt_parts.append(f"   - theme: Content theme")
+        prompt_parts.append(f"   - narrative_style: Narrative style")
+        prompt_parts.append(f"   - content_focus: Content focus")
+        prompt_parts.append(f"   - target_audience: Target audience")
+        prompt_parts.append(f"   - story_length: Story length")
+        prompt_parts.append(f"   - video_model: Video model type")
+        prompt_parts.append(f"   - content: The specific content created")
+        prompt_parts.append(f"   - image_descriptions: List of image descriptions (for image mode)")
+        prompt_parts.append(f"3. Ensure the JSON format is correct and can be parsed by json.loads().")
         prompt_parts.append(f"4. {model_specific_instruction}")
         
         return "\n".join(prompt_parts)
-      
-    def _build_multi_image_prompt(self, image_count, story_type, story_length, 
+    
+    def _build_multi_image_prompt(self, image_count, story_type, story_length,
                                language, custom_prompt, include_image_descriptions,
-                               story_theme, narrative_style, video_model):
+                               story_theme, narrative_style, video_model,
+                               content_focus, target_audience):
         """
         构建多图分析提示词
         """
-        
+
         # 语言设置
         if language == "中文":
             return self._build_chinese_prompt(
                 image_count, story_type, story_length, custom_prompt,
-                include_image_descriptions, story_theme, narrative_style, video_model
+                include_image_descriptions, story_theme, narrative_style, video_model,
+                content_focus, target_audience
             )
         else:
             return self._build_english_prompt(
                 image_count, story_type, story_length, custom_prompt,
-                include_image_descriptions, story_theme, narrative_style, video_model
+                include_image_descriptions, story_theme, narrative_style, video_model,
+                content_focus, target_audience
             )
     
     def _build_chinese_prompt(self, image_count, story_type, story_length,
                             custom_prompt, include_image_descriptions,
-                            story_theme, narrative_style, video_model):
+                            story_theme, narrative_style, video_model,
+                            content_focus, target_audience):
         """
         构建中文提示词
         """
-        
+
         # 视频模型特定的提示词格式
         model_specific_instruction = self._get_video_model_instruction(video_model, language="中文")
-        
+
         # 故事长度映射
         length_map = {
-            "Short (200 words or less)": "400字以内",
+            "Short (200 words or less)": "200字以内",
             "Medium (400 words or less)": "400字以内",
             "Detailed (600 words or less)": "600字以内",
             "Complete (1000 words or less)": "1000字以内"
         }
         target_length = length_map.get(story_length, "400字以内")
-        
+
         type_map = {
             "Coherent Story": "创作一个连贯完整的故事",
             "Storyboard Description": "按照时间顺序描述每个场景",
             "Scene Analysis": "深入分析每个场景的细节",
             "Character Development": "描述角色的成长和变化",
-            "Emotional Progression": "展现情感的变化和发展"
+            "Emotional Progression": "展现情感的变化和发展",
+            "Creative Writing": "进行创意写作，展现独特的想法和创意",
+            "Script Creation": "创作一个完整的剧本，包含对话和场景描述",
+            "Advertising Copy": "创作吸引人的广告文案",
+            "Product Introduction": "撰写详细的产品介绍",
+            "Educational Content": "创作教育性内容，易于理解和学习"
         }
         type_instruction = type_map.get(story_type, "创作一个连贯完整的故事")
-        
+
         theme_map = {
             "No Specific Theme": "",
             "Adventure Story": "冒险主题，充满挑战和探索",
@@ -557,10 +586,13 @@ class MultiImageInput:
             "Fantasy Story": "奇幻主题，包含魔法和超自然元素",
             "Daily Life": "日常生活主题，展现平凡中的美好",
             "Historical Story": "历史主题，展现过去的文化和时代",
-            "Future Technology": "未来科技主题，展现先进科技和人类发展"
+            "Future Technology": "未来科技主题，展现先进科技和人类发展",
+            "Business Marketing": "商业营销主题，突出产品或服务优势",
+            "Educational Popularization": "教育科普主题，传播知识和信息",
+            "Entertainment Comedy": "娱乐搞笑主题，带来欢乐和轻松"
         }
         theme_instruction = theme_map.get(story_theme, "")
-        
+
         style_map = {
             "First Person": "使用第一人称视角（我）",
             "Third Person": "使用第三人称视角（他/她）",
@@ -568,26 +600,51 @@ class MultiImageInput:
             "Multi-Perspective Switching": "在不同角色之间切换视角"
         }
         style_instruction = style_map.get(narrative_style, "使用第三人称视角（他/她）")
-        
+
+        focus_map = {
+            "Balanced Development": "平衡发展情节、角色、情感等各个方面",
+            "Emphasize Plot": "重点突出情节的发展和转折",
+            "Emphasize Characters": "重点刻画角色的性格和成长",
+            "Emphasize Emotions": "重点展现情感的变化和表达",
+            "Emphasize Visuals": "重点描述视觉元素和场景细节",
+            "Emphasize Dialogue": "重点通过对话推动故事发展"
+        }
+        focus_instruction = focus_map.get(content_focus, "平衡发展情节、角色、情感等各个方面")
+
+        audience_map = {
+            "General Public": "适合普通大众阅读和理解",
+            "Teenagers": "适合青少年阅读，内容积极向上",
+            "Children": "适合儿童阅读，语言简单易懂",
+            "Professionals": "适合专业人士阅读，内容专业深入",
+            "Specific Groups": "适合特定群体阅读，针对性强"
+        }
+        audience_instruction = audience_map.get(target_audience, "适合普通大众阅读和理解")
+
         # 构建提示词
         prompt_parts = []
-        
+
         # 添加主要任务
         prompt_parts.append(f"你是一位专业的视频故事创作专家，擅长根据多张图片创作连贯的故事内容。")
         prompt_parts.append(f"")
         prompt_parts.append(f"【任务要求】")
         prompt_parts.append(f"1. 仔细分析提供的 {image_count} 张图像，理解每张图像的内容、场景、角色和情感。")
         prompt_parts.append(f"2. {type_instruction}，确保故事逻辑连贯、情节发展自然。")
-        
+
         # 添加长度要求
         prompt_parts.append(f"3. 故事长度控制在 {target_length}，确保内容充实但不冗长。")
-        
+
         # 添加叙事风格
         prompt_parts.append(f"4. {style_instruction}，保持叙事风格一致。")
-        
+
+        # 添加内容重点
+        prompt_parts.append(f"5. {focus_instruction}。")
+
+        # 添加目标受众
+        prompt_parts.append(f"6. {audience_instruction}。")
+
         # 添加主题（如果有）
         if theme_instruction:
-            prompt_parts.append(f"5. 故事采用{theme_instruction}的风格。")
+            prompt_parts.append(f"7. 故事采用{theme_instruction}的风格。")
         
         # 添加图片描述要求
         if include_image_descriptions:
@@ -608,22 +665,30 @@ class MultiImageInput:
         # 添加输出格式
         prompt_parts.append(f"")
         prompt_parts.append(f"【输出格式】")
-        prompt_parts.append(f"1. 首先按顺序分析每张图像（图像1、图像2、图像3...）。")
-        prompt_parts.append(f"2. 然后创作一个连贯的故事，将所有图像的元素有机地融合在一起。")
-        prompt_parts.append(f"3. 故事要有明确的起承转合，情节发展自然。")
-        prompt_parts.append(f"4. 使用生动、具体的描述性语言，营造画面感。")
-        prompt_parts.append(f"5. {model_specific_instruction}")
-        prompt_parts.append(f"6. 直接输出故事内容，不添加任何额外说明或标记。")
-        
+        prompt_parts.append(f"1. 直接输出JSON格式内容，不添加任何额外说明或标记。")
+        prompt_parts.append(f"2. JSON必须包含以下字段：")
+        prompt_parts.append(f"   - task_type: 内容创作类型")
+        prompt_parts.append(f"   - theme: 内容主题")
+        prompt_parts.append(f"   - narrative_style: 叙事风格")
+        prompt_parts.append(f"   - content_focus: 内容重点")
+        prompt_parts.append(f"   - target_audience: 目标受众")
+        prompt_parts.append(f"   - story_length: 故事长度")
+        prompt_parts.append(f"   - video_model: 视频模型类型")
+        prompt_parts.append(f"   - content: 创作的具体内容")
+        prompt_parts.append(f"   - image_descriptions: 图像描述列表，每项包含scene_description、subject_identification、action_state、emotional_tone")
+        prompt_parts.append(f"3. 确保JSON格式正确，可被json.loads()解析。")
+        prompt_parts.append(f"4. {model_specific_instruction}")
+
         return "\n".join(prompt_parts)
-    
+
     def _build_english_prompt(self, image_count, story_type, story_length,
                             custom_prompt, include_image_descriptions,
-                            story_theme, narrative_style, video_model):
+                            story_theme, narrative_style, video_model,
+                            content_focus, target_audience):
         """
         构建英文提示词
         """
-        
+
         # 视频模型特定的提示词格式
         model_specific_instruction = self._get_video_model_instruction(video_model, language="English")
         # Story length mapping
@@ -634,16 +699,21 @@ class MultiImageInput:
             "Complete (1000 words or less)": "1000 words or less"
         }
         target_length = length_map.get(story_length, "400 words or less")
-        
+
         type_map = {
             "Coherent Story": "Create a coherent and complete story",
             "Storyboard Description": "Describe each scene in chronological order",
             "Scene Analysis": "Analyze the details of each scene in depth",
             "Character Development": "Describe the growth and changes of characters",
-            "Emotional Progression": "Show the progression and development of emotions"
+            "Emotional Progression": "Show the progression and development of emotions",
+            "Creative Writing": "Engage in creative writing, showcasing unique ideas and creativity",
+            "Script Creation": "Create a complete script with dialogue and scene descriptions",
+            "Advertising Copy": "Create engaging advertising copy",
+            "Product Introduction": "Write detailed product introductions",
+            "Educational Content": "Create educational content that is easy to understand and learn"
         }
         type_instruction = type_map.get(story_type, "Create a coherent and complete story")
-        
+
         theme_map = {
             "No Specific Theme": "",
             "Adventure Story": "Adventure theme, full of challenges and exploration",
@@ -653,10 +723,13 @@ class MultiImageInput:
             "Fantasy Story": "Fantasy theme, including magic and supernatural elements",
             "Daily Life": "Daily life theme, showing beauty in the ordinary",
             "Historical Story": "Historical theme, showing past culture and era",
-            "Future Technology": "Future technology theme, showing advanced tech and human development"
+            "Future Technology": "Future technology theme, showing advanced tech and human development",
+            "Business Marketing": "Business marketing theme, highlighting product or service advantages",
+            "Educational Popularization": "Educational popularization theme, spreading knowledge and information",
+            "Entertainment Comedy": "Entertainment and comedy theme, bringing joy and relaxation"
         }
         theme_instruction = theme_map.get(story_theme, "")
-        
+
         style_map = {
             "First Person": "Use first-person perspective (I)",
             "Third Person": "Use third-person perspective (he/she)",
@@ -664,26 +737,51 @@ class MultiImageInput:
             "Multi-Perspective Switching": "Switch perspectives between different characters"
         }
         style_instruction = style_map.get(narrative_style, "Use third-person perspective (he/she)")
-        
+
+        focus_map = {
+            "Balanced Development": "Balance development of plot, characters, emotions, and other aspects",
+            "Emphasize Plot": "Focus on highlighting plot development and twists",
+            "Emphasize Characters": "Focus on characterizing personalities and growth",
+            "Emphasize Emotions": "Focus on showcasing emotional changes and expressions",
+            "Emphasize Visuals": "Focus on describing visual elements and scene details",
+            "Emphasize Dialogue": "Focus on advancing story through dialogue"
+        }
+        focus_instruction = focus_map.get(content_focus, "Balance development of plot, characters, emotions, and other aspects")
+
+        audience_map = {
+            "General Public": "Suitable for general public to read and understand",
+            "Teenagers": "Suitable for teenagers to read, content is positive and uplifting",
+            "Children": "Suitable for children to read, language is simple and easy to understand",
+            "Professionals": "Suitable for professionals to read, content is professional and in-depth",
+            "Specific Groups": "Suitable for specific groups to read, highly targeted"
+        }
+        audience_instruction = audience_map.get(target_audience, "Suitable for general public to read and understand")
+
         # Build prompt
         prompt_parts = []
-        
+
         # Add main task
         prompt_parts.append(f"You are a professional video story creation expert, skilled at creating coherent story content based on multiple images.")
         prompt_parts.append(f"")
         prompt_parts.append(f"【Task Requirements】")
         prompt_parts.append(f"1. Carefully analyze the provided {image_count} images, understanding the content, scenes, characters, and emotions in each image.")
         prompt_parts.append(f"2. {type_instruction}, ensuring the story is logically coherent and the plot develops naturally.")
-        
+
         # Add length requirement
         prompt_parts.append(f"3. Keep the story length within {target_length}, ensuring the content is substantial but not redundant.")
-        
+
         # Add narrative style
         prompt_parts.append(f"4. {style_instruction}, maintaining consistent narrative style.")
-        
+
+        # Add content focus
+        prompt_parts.append(f"5. {focus_instruction}.")
+
+        # Add target audience
+        prompt_parts.append(f"6. {audience_instruction}.")
+
         # Add theme (if any)
         if theme_instruction:
-            prompt_parts.append(f"5. The story should adopt a {theme_instruction} style.")
+            prompt_parts.append(f"7. The story should adopt a {theme_instruction} style.")
         
         # Add image description requirements
         if include_image_descriptions:
@@ -704,12 +802,19 @@ class MultiImageInput:
         # Add output format
         prompt_parts.append(f"")
         prompt_parts.append(f"【Output Format】")
-        prompt_parts.append(f"1. First analyze each image in order (Image 1, Image 2, Image 3...).")
-        prompt_parts.append(f"2. Then create a coherent story that organically integrates all elements from the images.")
-        prompt_parts.append(f"3. The story should have a clear beginning, middle, and end, with natural plot development.")
-        prompt_parts.append(f"4. Use vivid, specific descriptive language to create a strong sense of imagery.")
-        prompt_parts.append(f"5. {model_specific_instruction}")
-        prompt_parts.append(f"6. Output the story content directly, without adding any additional explanations or markers.")
+        prompt_parts.append(f"1. Output JSON format content directly, without adding any additional explanations or markers.")
+        prompt_parts.append(f"2. JSON must contain the following fields:")
+        prompt_parts.append(f"   - task_type: Content creation type")
+        prompt_parts.append(f"   - theme: Content theme")
+        prompt_parts.append(f"   - narrative_style: Narrative style")
+        prompt_parts.append(f"   - content_focus: Content focus")
+        prompt_parts.append(f"   - target_audience: Target audience")
+        prompt_parts.append(f"   - story_length: Story length")
+        prompt_parts.append(f"   - video_model: Video model type")
+        prompt_parts.append(f"   - content: The specific content created")
+        prompt_parts.append(f"   - image_descriptions: List of image descriptions, each containing scene_description, subject_identification, action_state, emotional_tone")
+        prompt_parts.append(f"3. Ensure the JSON format is correct and can be parsed by json.loads().")
+        prompt_parts.append(f"4. {model_specific_instruction}")
         
         return "\n".join(prompt_parts)
     
