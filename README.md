@@ -294,7 +294,15 @@ The launcher provides a more intuitive installation method, making it easy to vi
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
 
-3. **Install llama-cpp-python** (required):
+3. **Install transformers dependency** (optional):
+   - If you need to install transformers dependency in the plugin's site-packages directory, you can use the following command:
+     ```bash
+     # Run in ComfyUI root directory
+     pip install transformers==4.57.6 --target=custom_nodes/ComfyUI-omni-llm/site-packages
+     ```
+   - This will install transformers 4.57.6 version and its dependencies into the plugin's site-packages directory, avoiding conflicts with other system dependencies
+
+4. **Install llama-cpp-python** (required):
    - Need to manually download and install the latest version 0.3.35, please download from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)
 
    **Wheel Selection Guide:**

@@ -289,7 +289,15 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
      pip install -r custom_nodes/ComfyUI-omni-llm/requirements.txt
      ```
 
-3. **安装 llama-cpp-python**（必须）：
+3. **安装 transformers 依赖**（可选）：
+   - 如果你需要在插件的site-packages目录下安装transformers依赖，可以使用以下命令：
+     ```bash
+     # 在ComfyUI根目录运行
+     pip install transformers==4.57.6 --target=custom_nodes/ComfyUI-omni-llm/site-packages
+     ```
+   - 这将把transformers 4.57.6版本及其依赖安装到插件的site-packages目录中，避免与系统其他依赖冲突
+
+4. **安装 llama-cpp-python**（必须）：
    - 需自行下载最新版本0.3.35手动安装，请从[llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)下载
 
    **轮子选择指南：**
