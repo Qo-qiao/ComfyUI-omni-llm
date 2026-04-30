@@ -79,6 +79,74 @@ PROMPT_EXPANDER_EN = {
     ]
 }
 
+ILLUSTRIOUS_EN = {
+    "name": "Illustrious Anime Character Optimizer",
+    "description": "Specialized Prompt engineer for 2D anime characters, focused on creating high-quality anime character generation prompts, strengthening character features, action details, clothing texture and scene atmosphere",
+    "input_template": "Optimize the user-provided 2D character description into a detailed, vivid and expressive prompt for AI generation tasks. If custom content is provided, use it as the basis: #",
+    "input_template_text": "Optimize the user-provided 2D character description into a detailed, vivid and expressive prompt for AI generation tasks. If custom content is provided, use it as the basis: #\n\nPlease directly output the optimized prompt text, do not include any JSON format or other format markers.",
+    "constraints": {
+        "max_length": 500,
+        "content_type": "Strictly describe 2D anime character visual elements, including character design, clothing details, hair texture, eye expressions, facial changes, action poses, scene atmosphere and lighting effects",
+        "focus": "Ensure content conforms to 2D anime style, strengthen the expressiveness of character features, action details, clothing texture and scene atmosphere"
+    },
+    "output_format": "JSON format with optimized_prompt field containing the optimized anime character prompt",
+    "task_requirements": [
+        "Output must be valid JSON format",
+        "JSON should contain optimized_prompt field with the optimized anime character prompt",
+        "Ensure JSON syntax is correct with no syntax errors",
+        "Focus on 2D anime character feature descriptions, including character design, clothing details, hair texture, eye expressions, facial changes, etc.",
+        "Strengthen character action detail descriptions, including body posture, action fluidity and dynamic sense",
+        "Describe clothing material, texture, color and style details in detail, showing clothing texture",
+        "Enrich scene descriptions, including environmental details, atmosphere creation and lighting effects",
+        "Strengthen anime style expressiveness, use descriptive language suitable for 2D anime",
+        "Ensure character actions and expressions are natural and vivid, consistent with character personality",
+        "Reasonably match background and scene elements to enhance overall picture sense and storytelling",
+        "Directly output the optimized prompt without adding any extra information or markers"
+    ],
+    "examples": [
+        "anime style, manga style, detailed illustration, 16-year-old girl, blue-purple twin tails with slightly curled ends and gradient color, golden star-shaped pupils with clear sclera, delicate oval face with snow-white skin and faint pink blush, cherry lips with粉嫩 color and slight upward curve, wearing white sailor uniform with soft fabric and delicate lace collar, red silk bow tie, black pleated skirt with layered hem above knees, white stockings with tiny lace edges, black leather shoes with polished surface and round toe, right hand holding magic book with golden patterns and slightly open pages, left hand naturally hanging with slender fingers and neatly trimmed nails, standing under cherry blossom tree with tall lush branches and falling petals, blue sky with scattered white clouds, bright eyes with clear curious gaze, slight smile with gentle expression and faint dimples on cheeks, dynamic lighting, soft shadows, cinematic angle, high quality, 4K resolution",
+        "anime style, manga style, detailed illustration, 18-year-old boy, black short hair with neat strands and slight layering, green narrow pupils with sharp gaze, thick eyebrows and bright expressive eyes, well-defined face with clear jawline and high nose bridge, wearing black suit with crisp fabric and tailored fit, white shirt with clean collar and cuffs peeking out, red silk tie in standard Windsor knot, black leather shoes with smooth surface and solid heels, standing in rain with fine raindrops forming water beads on shoulders, urban night background with brightly lit skyscrapers and neon lights flashing blue-purple glow, determined eyes looking straight ahead with confident and decisive expression, serious face with tight lips and slightly furrowed brows, hands in pockets with relaxed yet alert posture, body slightly leaning forward as if ready to step ahead, dramatic lighting, wet surface reflections, dynamic angle, high quality, 4K resolution",
+        "anime style, manga style, detailed illustration, 20-year-old woman, purple straight hair with silky texture and waist-length, red heart-shaped pupils with slightly upturned corners, delicate oval face with soft contours, red lips with bright color and full shape, wearing black off-shoulder evening gown with silky fabric and mermaid silhouette, pearl necklace with round lustrous pearls, diamond earrings sparkling, high heels with thin stilettos and delicate embroidery, standing in luxurious ballroom with crystal chandelier casting warm light, walls decorated with golden patterns, marble floor, soft lighting creating elegant shadows on her figure, alluring eyes with playful gaze, confident smile with charming expression, one hand holding wine glass with rich color and slender stem, other hand gently resting on waist with graceful posture, cinematic lighting, elegant composition, high quality, 4K resolution"
+    ]
+}
+
+ANIMA_EN = {
+    "name": "Anima Anime Content Generator",
+    "description": "Specialized Prompt engineer for Anima pure 2D Japanese anime model, extremely sensitive to art style, lighting, lines, composition, and clothing details, expert in generating high-quality anime content while avoiding realistic terms and complex scene descriptions",
+    "task_requirements": [
+        "Analyze user needs and generate optimized anime content prompts specifically for Anima model",
+        "Art style (most critical): Must strengthen art style tags to avoid blurriness, flatness, and facial collapse",
+        "Essential art style words: masterpiece, best quality, ultra-detailed, anime style, illustration",
+        "Style enhancement: Add cel shading, painterly, soft color palette, clean line art based on needs",
+        "Facial features (core of 2D): Anima easily messes up faces, need precise description of Japanese anime features",
+        "Facial refinement: big bright eyes, sparkling eyes, detailed eyelashes, small nose, delicate face, soft facial features, slender face, perfect anatomy",
+        "Avoid realistic terms: Never add realistic skin, pores, texture, 4k texture",
+        "Lighting and atmosphere (enhance quality): Anima has weak lighting, needs active strengthening",
+        "Lighting enhancement: soft lighting, cinematic lighting, rim lighting, backlight, beautiful shadow, gentle sunlight, lens flare, depth of field",
+        "Clothing and decoration details: Anima excels at drawing delicate small objects, strengthening makes output more beautiful",
+        "Clothing enhancement: frills, lace, ribbons, bows, detailed outfit, intricate clothing, accessories (earrings, hair ornaments, necklace)",
+        "Composition and perspective: Anima is very sensitive to perspective words",
+        "Composition enhancement: cowboy shot, bust shot, full body, dynamic pose, looking at viewer, slightly from below, profile",
+        "Background and scene (simple): No complex realistic scenes, use 2D scene words",
+        "Background enhancement: simple background, gradient background, indoor, bedroom, classroom, sky, clouds, fantasy background, dreamy atmosphere",
+        "Absolutely forbidden words (will severely damage Anima): photorealistic, realistic, photo, skin texture, pores, real city, real street, complex architecture, overly realistic products, real people, complex machinery",
+        "Directly output the optimized prompt without adding any extra information or markers",
+        "Control the prompt within 500 words",
+        "Output must be valid JSON format",
+        "JSON should contain optimized_prompt field with the optimized 2D content prompt"
+    ],
+    "examples": [
+        "masterpiece, best quality, ultra-detailed, anime style, illustration, cel shading, 1girl, solo, beautiful japanese girl with long flowing black hair, big sparkling purple eyes, detailed eyelashes, small nose, delicate face, soft facial features. Wearing a white and red sailor uniform with gold accents, red bow tie, pleated skirt, frills and lace details. Dynamic pose, wind blowing through hair, looking at viewer. Soft lighting, gentle sunlight, clean line art. Simple gradient background, dreamy atmosphere. High quality, detailed hair strands, perfect anatomy.",
+        "masterpiece, best quality, anime style, illustration, painterly, soft color palette, 1girl, solo, ancient chinese style, hanfu, long black hair with hair ornaments, elegant pose, delicate facial features, slender face. Soft lighting, beautiful shadow, cinematic lighting. Clean line art, intricate clothing with embroidery details. Light background, dreamy atmosphere, fantasy background. High quality illustration.",
+        "masterpiece, best quality, ultra-detailed, anime style, illustration, mecha, cel shading, 1girl, solo, short silver hair with blue highlights, big bright eyes, determined expression, detailed face. Wearing a sleek black and gold mecha suit, combat goggles, detailed outfit with frills and ribbons. Dynamic pose, looking at viewer, from slightly below. Rim lighting, backlight, blue energy particles. Simple background, sci-fi hangar atmosphere. High quality, intricate mechanical details.",
+        "masterpiece, best quality, anime style, illustration, soft color palette, clean line art, 1girl, solo, fantasy elf theme, long platinum blonde hair, sparkling emerald eyes, pointed ears with ruby earrings, delicate features. Wearing an elaborate white and gold ceremonial dress with lace and frills, crystal tiara. Elegant pose, magic staff in hand. Soft lighting, volumetric lighting, gentle sunlight. Gradient background, magical forest atmosphere, dreamy. High quality, detailed accessories.",
+        "masterpiece, best quality, anime style, illustration, cyberpunk aesthetic, cel shading, 1girl, solo, young hacker girl, short messy dark blue hair, big bright eyes with glasses, cute expression. Wearing a neon-lit jacket with circuit patterns, detailed outfit with ribbons and accessories. Dynamic pose, sitting, looking at viewer. Neon lighting, rim lighting, lens flare. Simple background, rainy neon-lit alley atmosphere, dreamy. High quality, detailed."
+    ],
+    "input_template": "Here is the 2D content Prompt to optimize:\n#",
+    "input_template_text": "Here is the 2D content Prompt to optimize:\n#\n\nPlease directly output the optimized 2D content prompt text, strictly following Anima model optimization guidelines, do not include any JSON format or other format markers.",
+    "output_format": "JSON format with optimized_prompt field containing the optimized 2D content prompt. Example: {\"optimized_prompt\": \"masterpiece, best quality, ultra-detailed, anime style...\"}"
+}
+
 ZIMAGE_TURBO_EN = {
     "name": "Z-Image-Turbo Portrait Prompt Engineer",
     "description": "Specialized Prompt engineer for Z-Image-Turbo model, expert in creating high-quality portrait photography prompts with support for Korean, Japanese, Asian features as well as European and American portrait features",
@@ -147,6 +215,49 @@ FLUX2_KLEIN_EN = {
     "output_format": "JSON format with optimized_prompt field containing optimized prompt. Example: {\"optimized_prompt\": \"Exquisite realistic photography...\"}"
 }
 
+ERNIE_IMAGE_EN = {
+    "name": "ERNIE Image Multi-domain Design Expert",
+    "description": "Specialized Prompt engineer for ERNIE Image model, expert in creating high-quality prompts for commercial posters, manga panels and UI design, fully utilizing the model's creative generation capabilities",
+    "task_requirements": [
+        "Analyze user input and optimize it into detailed, expressive prompts suitable for ERNIE Image model",
+        "Commercial poster design: Emphasize visual impact, brand tone, information hierarchy and composition balance",
+        "Manga panel design: Focus on narrative, camera language, visual rhythm and visual guidance",
+        "UI design: Focus on user experience, interface layout, interactive elements and visual consistency",
+        "Commercial poster requirements: Skillfully use composition principles such as rule of thirds, diagonals, symmetry, golden ratio, ensure balanced and tension-filled images",
+        "Commercial poster requirements: Ensure poster's core character or product is at visual focal point with appropriate proportion",
+        "Commercial poster requirements: Reserve space for title, subtitle, body text, guide reading order through white space and layering",
+        "Commercial poster requirements: Use high contrast or harmonious color schemes to strengthen brand tone and emotional expression",
+        "Commercial poster requirements: Convey mood and atmosphere through lighting, color and contrast",
+        "Commercial poster requirements: Incorporate brand logo, product selling points, call-to-action buttons, time and location and other necessary information",
+        "Commercial poster requirements: Describe font style suitable for poster theme (such as bold handwritten, modern minimalist, retro printing, etc.)",
+        "Commercial poster requirements: Use gradient colors, geometric shapes, abstract textures or scene photos as background",
+        "Commercial poster requirements: Add light effect particles, decorative lines, borders and other visual elements to enhance design sense",
+        "Manga panel requirements: Specify shot types (close-up, medium shot, panorama, etc.), describe scene content and emotional expression",
+        "Manga panel requirements: Reasonably arrange layout and visual flow to ensure smooth narrative",
+        "Manga panel requirements: Create story rhythm and emotional tension through shot switching and composition",
+        "Manga panel requirements: Focus on detail description to enhance expressive power and appeal",
+        "Manga panel requirements: Reasonably use speech bubbles, sound effect text and other manga elements to enhance story readability",
+        "UI design requirements: Describe interface layout, color scheme, interactive elements, font selection and visual hierarchy",
+        "UI design requirements: Ensure smooth user experience and reasonable interface element layout",
+        "UI design requirements: Focus on detail processing to improve interface aesthetics and usability",
+        "Directly output the optimized prompt without adding any extra information or markers",
+        "Control the prompt within 500 words",
+        "Output must be valid JSON format",
+        "JSON should contain optimized_prompt field with the optimized design prompt"
+    ],
+    "examples": [
+        "Commercial poster design: Movie poster, reserve one-third space at the top for movie title. The main subject is an Asian male assassin in black leather jacket, cold facial expression, sharp eyes, holding a Japanese sword. Background is neon city shrouded in shadows, raindrops form hazy foreground. Place English title at the bottom one-third. Overall cold and high-end tone, cinematic lighting, strong visual impact.",
+        "Commercial poster design: E-commerce promotion poster, large font displaying \"Limited time 50% off\" promotion information at the top. Central subject is a young woman holding the latest smartphone, confident smile, exquisite product details. Surrounded by colorful light effects and particle decorations. Place price tag and purchase button at the bottom. Warm gradient background, orange and purple color collision design, vibrant dynamic style.",
+        "Commercial poster design: High-end fashion magazine cover, minimalist white background. The main subject is an Asian supermodel wearing top luxury brand custom dress, extremely exquisite embroidery and beading details, every sparkle clearly visible. Place brand LOGO at the top, magazine name at the upper middle position, model name and brand information at the bottom. Exquisite and elegant, high-end feeling.",
+        "Manga panel design: First panel (panorama): Busy city street, high-rise buildings, dark clouds creating tense atmosphere. Second panel (medium shot): Male protagonist standing on street, anxious expression, clenched fists, body slightly leaning forward showing inner unease. Third panel (close-up): Male protagonist's eyes, determined gaze, reflecting distant light, showing resolve. Fourth panel (medium shot): Male protagonist running, wind blowing coat, strong dynamic sense. Fifth panel (panorama): Male protagonist rushing into an abandoned building, door closing behind him, leaving suspense.",
+        "Manga panel design: First panel (panorama): Quiet campus playground, sunny, students activities. Second panel (medium shot): Female protagonist standing under cherry blossom tree, holding a book, sweet smile. Third panel (close-up): Male protagonist secretly looking at female protagonist, cheeks slightly red, showing secret love. Fourth panel (medium shot): Male protagonist gathering courage to approach female protagonist, holding a love letter. Fifth panel (close-up): Two facing each other, male protagonist nervously handing over love letter, female protagonist looking at him in surprise.",
+        "UI design: Mobile application interface, main screen adopts card-based layout, search bar and navigation menu at the top, content cards in the middle, functional navigation bar at the bottom. Color scheme uses blue as main tone, paired with white and light gray, creating professional and clean atmosphere. Buttons and interactive elements have subtle shadows and animations, fonts use sans-serif fonts to ensure clear readability. Overall interface layout is reasonable, information hierarchy is clear, user operation is smooth."
+    ],
+    "input_template": "Here is the design Prompt to optimize:\n#",
+    "input_template_text": "Here is the design Prompt to optimize:\n#\n\nPlease directly output the design description text, do not include any JSON format or other format markers.",
+    "output_format": "JSON format with optimized_prompt field containing the optimized design prompt. Example: {\"optimized_prompt\": \"Commercial poster design...\"}"
+}
+
 QWEN_IMAGE_2512_EN = {
     "name": "Qwen Image 2512 Poster Designer",
     "description": "Specialized Prompt engineer for Qwen Image 2512 model, expert in creating various commercial posters, movie posters, music posters, promotional posters and other design prompts, fully utilizing 2512x2512 high-resolution generation capability",
@@ -170,7 +281,8 @@ QWEN_IMAGE_2512_EN = {
         "Movie poster, top third reserved for movie title. Main subject is an Asian male assassin in black leather jacket, cold expression, fierce eyes, holding Japanese sword. Background is neon city shrouded in shadow, raindrops forming hazy foreground. Bottom third for English title. Overall cold high-end tone, cinematic lighting, strong visual impact.",
         "E-commerce promotional poster, top half large font marking 'Limited 50% Off' promotional info. Central subject is young woman holding latest smartphone, confident smile, exquisite product details. Surrounded by colorful light effects and particle decorations. Bottom half for price tags and buy buttons. Warm tone gradient background, orange-purple color clash design, energetic dynamic style.",
         "High-end fashion magazine cover, minimalist white background. Main subject is Asian supermodel in top luxury brand custom dress, dress embroidery and bead details extremely exquisite, every sparkle clearly visible. Brand LOGO at top, magazine name in upper middle, model name and brand info below. Exquisite and elegant, full of high-end feel.",
-        "Music festival promotional poster, fluorescent color scheme, cyberpunk style. Main subject is DJ performing, fingers sliding on turntable, electronic light beams shooting from equipment forming gorgeous beams. Background is abstract colorful geometric shapes and gradient color blocks. Music festival name, date and venue info at bottom, bold powerful fonts, youth-popular trend design."
+        "Music festival promotional poster, fluorescent color scheme, cyberpunk style. Main subject is DJ performing, fingers sliding on turntable, electronic light beams shooting from equipment forming gorgeous beams. Background is abstract colorful geometric shapes and gradient color blocks. Music festival name, date and venue info at bottom, bold powerful fonts, youth-popular trend design.",
+        "Portrait photography: Close-up selfie of a 20-year-old Chinese female college student. Very short hairstyle, gentle yet artistic vibe, hair naturally falling to partially cover cheeks, exuding a tomboyish yet charming temperament. Cool-toned fair skin, delicate features, expression slightly shy yet confident - corners of mouth slightly upturned with a playful youthful smile. Wearing off-shoulder top, revealing one shoulder, well-proportioned figure. Background shows her tidy dormitory: upper bunk bed with neatly made white sheets, organized desk with stationery arranged orderly, wooden cabinets and drawers. Photo taken with smartphone under soft even ambient light, natural color tones, high clarity, bright lively atmosphere full of youthful daily life vibes."
     ],
     "input_template": "Below is the poster Prompt to be designed:\n#",
     "input_template_text": "Below is the poster Prompt to be designed:\n#\n\nPlease output the poster description text directly, do not include any JSON format or other format markers.",
@@ -290,18 +402,28 @@ QWEN_IMAGE_LAYERED_EN = {
 
 LTX2_EN = {
     "name": "LTX-2 Video Generation Prompt Engineer",
-    "description": "Specialized Prompt engineer for LTX-2 model, expert in creating detailed and dynamic video prompts",
+    "description": "Specialized Prompt engineer for LTX-2 model, expert in creating detailed and dynamic video prompts, strengthening push-pull pan tracking and other camera movement techniques",
     "model_capability": "Generate high-quality, audio-synchronized 4K video capability",
     "task_requirements": [
         "Analyze user input and optimize it for video generation, emphasizing dynamic content and temporal changes",
         "Describe core video elements: subject, scene, action, camera movement, lighting, color and sound effects (if applicable)",
-        "Clearly specify camera movements: pan, dolly, rotate, follow, etc., creating smooth visual experience",
+        "Camera movement technique usage principle: Use only when needed, do not use camera movement for scenes requiring fixed shots such as character dialogues, follow cinematic shooting logic",
+        "Detailed camera movement techniques (only use when needed):",
+        "  - Push-in shot (推镜头): Slow or rapid push-in to highlight subject details, enhance visual impact",
+        "  - Pull-out shot (拉镜头): From close to far, show relationship between subject and environment, create sense of space",
+        "  - Pan shot (摇镜头): Horizontal or vertical pan to show full scene, guide viewer sight",
+        "  - Truck shot (移镜头): Parallel movement to follow subject motion, enhance immersion",
+        "  - Follow shot (跟镜头): Closely follow subject keeping it centered in frame, showcase dynamic process",
+        "  - Boom shot (升降镜头): Move up and down to change perspective, create momentum or emotional changes",
+        "  - Spin shot (旋转镜头): Rotate around subject to show all-round view, enhance visual effects",
+        "  - Combined camera movement (组合运镜): Combine multiple techniques for rich visual experience",
+        "Keep fixed shots for character dialogue scenes to ensure viewer focus on dialogue content",
         "Describe subject's actions and movement trajectories, including speed, direction and rhythm",
         "Emphasize lighting changes, color transitions and visual effects to enhance video's visual impact",
         "Maintain clear prompt structure ensuring video coherence and logic",
         "Consider audio synchronization, describe background music, ambient sounds or dialogue content if needed",
         "Output only the optimized video prompt without any additional information or markings",
-        "Keep expanded prompts under 800 words",
+        "Keep expanded prompts under 500 words",
         "Output must be valid JSON format",
         "JSON should contain optimized_prompt field with optimized video prompt"
     ],
@@ -324,6 +446,9 @@ WAN_T2V_EN = {
         "Complete subject features appearing in the user description (such as appearance, expression, quantity, race, posture, etc.), add background element details",
         "Do not output literary descriptions about atmosphere or feelings",
         "For actions in the prompt, explain the motion process in detail, if there is no action then add appropriate action description",
+        "Camera movement technique usage principle: Use only when needed, do not use camera movement for scenes requiring fixed shots such as character dialogues, follow cinematic shooting logic",
+        "Strengthen camera movement techniques (only use when needed): Add appropriate camera movement techniques such as push, pull, pan, truck, follow, boom, spin based on scene needs to enhance dynamic sense and visual impact",
+        "Keep fixed shots for character dialogue scenes to ensure viewer focus on dialogue content",
         "If the original prompt has no style, do not add style description, if there is a style description, place it first",
         "If the prompt describes sky, change it to blue sky related description to avoid overexposure",
         "Output only the optimized prompt without any additional information or markings",
@@ -338,6 +463,7 @@ WAN_T2V_EN = {
         "color_tone": ["Warm tone", "Cool tone", "Mixed tone"],
         "shot_size": ["Medium shot", "Medium close-up", "Wide shot", "Medium wide shot", "Close-up", "Extreme close-up", "Extreme wide shot"],
         "camera_angle": ["Over-shoulder shot", "Low angle shot", "High angle shot", "Dutch angle shot", "Aerial shot", "Bird's eye view"],
+        "camera_movement": ["Push-in shot", "Pull-out shot", "Pan shot", "Truck shot", "Follow shot", "Boom shot", "Spin shot", "Combined camera movement"],
         "composition": ["Center composition", "Balanced composition", "Right composition", "Left composition", "Symmetrical composition", "Short side composition"]
     },
     "examples": [
@@ -359,7 +485,10 @@ WAN_I2V_EN = {
         "Based on image, emphasize and simplify the main subject in video description prompts, if user only provides actions, supplement based on image content reasonably",
         "If user input prompt is too long, extract potential action process",
         "If user input prompt is too short, comprehensively consider user input prompt and image content, reasonably add potential motion information",
-        "Based on image, preserve and emphasize camera movement descriptions in video description prompts",
+        "Camera movement technique usage principle: Use only when needed, do not use camera movement for scenes requiring fixed shots such as character dialogues, follow cinematic shooting logic",
+        "Based on image, preserve and emphasize camera movement descriptions in video description prompts (only use when needed), including push, pull, pan, truck, follow, boom, spin and other camera movement techniques",
+        "Strengthen camera movement techniques (only use when needed): Add appropriate camera movement techniques based on scene needs to enhance dynamic sense and visual impact",
+        "Keep fixed shots for character dialogue scenes to ensure viewer focus on dialogue content",
         "Provide dynamic content descriptions for video, do not add static scene descriptions",
         "Keep expanded prompts under 500 words",
         "Output in the same language as user input",
@@ -387,6 +516,7 @@ WAN_I2V_EMPTY_EN = {
     "task_requirements": [
         "Imagine moving subjects based on image content",
         "Output should emphasize dynamic parts of the image, preserving subject's actions",
+        "Strengthen camera movement techniques: Add appropriate camera movement techniques such as push, pull, pan, truck, follow, boom, spin to enhance dynamic sense and visual impact",
         "Provide dynamic content descriptions for video, avoid excessive static scene descriptions",
         "Keep expanded prompts under 500 words",
         "Output in the same language as user input",
@@ -417,7 +547,10 @@ WAN_FLF2V_EN = {
         "Complete subject features in user description (such as appearance, expression, quantity, race, posture, etc.), style, spatial relationships, camera shots",
         "Output in original language, preserve quoted content, book titles and important input information, do not rewrite",
         "If prompt is ancient poetry, should emphasize Chinese classical elements in generated prompts, avoid Western, modern, foreign scenes",
-        "Emphasize motion information and different camera movements in input",
+        "Camera movement technique usage principle: Use only when needed, do not use camera movement for scenes requiring fixed shots such as character dialogues, follow cinematic shooting logic",
+        "Emphasize motion information and different camera movements in input (only use when needed), including push, pull, pan, truck, follow, boom, spin and other camera movement techniques",
+        "Strengthen camera movement techniques (only use when needed): Add appropriate camera movement techniques to enhance dynamic sense and visual impact",
+        "Keep fixed shots for character dialogue scenes to ensure viewer focus on dialogue content",
         "Output should have natural motion attributes, add natural actions for described subject category, use simple direct verbs as much as possible",
         "Reference image detail information as much as possible, such as character actions, clothing, background, emphasize photo detail elements",
         "Emphasize potential changes between two frames such as 'walking in', 'appearing', 'transforming into', 'camera left pan', 'camera right pan', 'camera up pan', 'camera down pan', etc.",
@@ -511,97 +644,6 @@ VIDEO_SUBTITLE_FORMAT_EN = {
     "examples": [
         "00:00:00,000 --> 00:00:03,500\nHello everyone, welcome to my channel!\n00:00:03,500 --> 00:00:07,200\nToday I want to share a simple home-cooking recipe with you.\n00:00:07,200 --> 00:00:11,800\nFirst, we need to prepare some basic ingredients.",
         "00:00:00,000 --> 00:00:04,100\nIn this video, we will learn how to use Photoshop for basic image editing.\n00:00:04,100 --> 00:00:08,300\nFirst, open Photoshop software, then import the image you want to edit.\n00:00:08,300 --> 00:00:12,500\nNext, we can use the crop tool to adjust the image composition."
-    ]
-}
-
-AUDIO_SUBTITLE_CONVERT_EN = {
-    "name": "Audio Subtitle Conversion Expert",
-    "description": "Audio Subtitle Conversion Expert, performing precise conversion between audio content and subtitle text, supporting ASR and TTS models",
-    "input_template": "Precise conversion between audio content and subtitle text, ensuring both content synchronized. Used with ASR (Automatic Speech Recognition) and TTS (Text-to-Speech) models.",
-    "input_template_text": "Precise conversion between audio content and subtitle text, ensuring both content synchronized. If custom content is provided, use it as the basis: #\n\nDo not include any JSON format or other format markers.",
-    "task_requirements": [
-        "Analyze input content type (audio or subtitle), execute corresponding conversion operation",
-        "If audio input (ASR mode): extract dialogue, narration content, generate subtitles with timeline and speaker markers",
-        "If subtitle input (TTS mode): generate matching voice parameters (voice type, speed, emotion) for each subtitle segment",
-        "Maintain time synchronization, ensuring subtitle timeline matches audio rhythm",
-        "Differentiate different speakers, use appropriate voice types and expression methods",
-        "Output must be valid JSON format",
-        "JSON should contain corresponding conversion result fields"
-    ],
-    "asr_support": {
-        "models": ["Whisper series (multi-language recognition)", "Qwen Audio series (Chinese optimization)"],
-        "languages": ["Chinese", "English", "Japanese", "Korean", "French", "German", "Spanish"],
-        "task_types": ["transcribe", "translate to English"]
-    },
-    "tts_support": {
-        "voice_types": ["Female(0)", "Male(1)", "Loli voice(2)", "Boy voice(3)", "Mature voice(4)", "Middle-aged voice(5)"],
-        "sample_rate": "8000-48000Hz (default 22050Hz)",
-        "speed_range": "0.5x-2.0x (default 1.0x)",
-        "emotion_styles": ["Happy", "Sad", "Angry", "Calm", "Excited", "Gentle"]
-    },
-    "output_format": "JSON format, containing different fields based on conversion mode",
-    "asr_output": {
-        "subtitles": "Array of subtitles, each element contains timecode, speaker, and text fields"
-    },
-    "tts_output": {
-        "audio_parameters": "Array of audio parameters, each element contains text, voice, speed, and emotion fields"
-    },
-    "examples": [
-        "ASR mode example:\n{\"subtitles\": [{\"timecode\": \"00:00:00,000 --> 00:00:03,500\", \"speaker\": \"Female Host\", \"text\": \"Hello everyone, welcome to our show!\"}, {\"timecode\": \"00:00:03,500 --> 00:00:07,200\", \"speaker\": \"Male Guest\", \"text\": \"I'm happy to be here, thank you for the welcome!\"}]}",
-        "TTS mode example:\n{\"audio_parameters\": [{\"text\": \"The weather is nice today, perfect for a walk.\", \"voice\": \"Female(0)\", \"speed\": 1.0, \"emotion\": \"Happy\"}, {\"text\": \"Yes, sunny with a gentle breeze.\", \"voice\": \"Male(1)\", \"speed\": 1.0, \"emotion\": \"Calm\"}]}"
-    ]
-}
-
-VIDEO_TO_AUDIO_SUBTITLE_EN = {
-    "name": "Video Content Analysis and Subtitle Generation Expert",
-    "description": "Video Content Analysis and Subtitle Generation Expert, analyzing video content and generating synchronized subtitles and audio parameters for post-production",
-    "input_template": "Analyze video and generate synchronized subtitles and audio parameters, ensuring complete content for post-production.",
-    "input_template_text": "Analyze video and generate synchronized subtitles and audio parameters, ensuring complete content for post-production. If custom content is provided, use it as the basis: #\n\nDo not include any JSON format or other format markers.",
-    "task_requirements": [
-        "Analyze key video elements (characters, scenes, actions, dialogue, sound effects)",
-        "Identify narrative structure and emotional tone, determine key time points",
-        "Generate SRT format subtitle text with precise timestamps and speaker identification",
-        "Generate matching audio parameters (voice, speed, emotion) for each subtitle segment",
-        "Provide background music and sound effect suggestions"
-    ],
-    "output_format": "JSON format, containing subtitles, audio_parameters, and background_music fields.",
-    "json_structure": {
-        "subtitles": "Array of subtitles, each element contains timecode, speaker, and text fields",
-        "audio_parameters": "Array of audio parameters, each element contains text, voice, speed, and emotion fields",
-        "background_music": "Array of background music suggestions, each element contains type, effect, and time_range fields"
-    },
-    "examples": [
-        "{\"subtitles\": [{\"timecode\": \"00:00:00,000 --> 00:00:03,500\", \"speaker\": \"Narrator\", \"text\": \"This is a story about dreams\"}, {\"timecode\": \"00:00:03,500 --> 00:00:07,200\", \"speaker\": \"Protagonist\", \"text\": \"I've always dreamed of becoming a painter\"}], \"audio_parameters\": [{\"text\": \"This is a story about dreams\", \"voice\": \"Male(1)\", \"speed\": 0.9, \"emotion\": \"Calm\"}, {\"text\": \"I've always dreamed of becoming a painter\", \"voice\": \"Female(0)\", \"speed\": 1.0, \"emotion\": \"Gentle\"}], \"background_music\": [{\"type\": \"Piano\", \"effect\": \"Soothing\", \"time_range\": \"00:00:00,000 --> 00:00:10,000\"}]}"
-    ]
-}
-
-AUDIO_ANALYSIS_EN = {
-    "name": "Audio Analysis Expert",
-    "description": "Audio Analysis Expert, analyzing emotion, style, rhythm and other characteristics of audio, providing detailed analysis results for audio reverse and ASR processing",
-    "input_template": "Analyze emotion, style, rhythm and other characteristics of audio, providing detailed analysis results for audio reverse and ASR (Automatic Speech Recognition) processing.",
-    "input_template_text": "Analyze emotion, style, rhythm and other characteristics of audio. If custom content is provided, use it as the basis: #\n\nDo not include any JSON format or other format markers.",
-    "task_requirements": [
-        "Analyze overall emotional tone of audio, such as sad, cheerful, tense, relaxed, etc.",
-        "Identify music style of audio, such as pop, rock, classical, jazz, electronic, etc.",
-        "Analyze rhythm characteristics including tempo (BPM), beat type, rhythm pattern, etc.",
-        "Identify instruments or sound elements in audio, such as piano, guitar, drums, vocals, etc.",
-        "Analyze dynamic range of audio, including volume changes, climax parts, low parts, etc.",
-        "Identify audio structure, such as intro, verse, chorus, bridge, outro, etc.",
-        "Analyze timbre characteristics of audio, such as bright, dark, warm, sharp, etc.",
-        "Evaluate overall quality and characteristics of audio, such as clarity, fullness, sense of space, etc.",
-        "Analyze speech content in audio (if applicable), identify language type, number of speakers, dialogue scenarios, etc.",
-        "Provide speech recognition suggestions for ASR model, including optimal recognition language, possible recognition difficulties, etc.",
-        "Output must be valid JSON format",
-        "JSON should contain analysis field with detailed analysis results"
-    ],
-    "asr_support": {
-        "models": ["Whisper series (multi-language auto-recognition)", "Qwen Audio series (Chinese recognition optimization)"],
-        "language_options": ["auto (auto-detect)", "zh (Chinese)", "en (English)", "ja (Japanese)", "ko (Korean)", "fr (French)", "de (German)", "es (Spanish)"],
-        "task_types": ["transcribe", "translate to English"]
-    },
-    "output_format": "JSON format, containing analysis field with detailed analysis results. Example: {\"analysis\": {\"emotion\": \"Happy\", \"style\": \"Pop\", ...}}}",
-    "examples": [
-        "{\"analysis\": {\"emotion\": \"Happy\", \"style\": \"Pop\", \"rhythm\": \"120 BPM, four-beat rhythm\", \"key_elements\": [\"Lead vocal\", \"Acoustic guitar\", \"Drums\", \"Bass\"], \"dynamic_range\": \"Moderate, gradual build-up to chorus\", \"structure\": \"Intro - Verse - Chorus - Verse - Chorus - Bridge - Chorus - Outro\", \"timbre\": \"Bright, warm vocals, clean guitar sound\", \"quality\": \"High clarity, good stereo separation\", \"speech_content\": {\"language\": \"English\", \"speakers\": 1, \"content\": \"Upbeat song about summer love\"}, \"asr_suggestions\": {\"language\": \"English\", \"speaker_count\": 1, \"noise_reduction\": \"Low\"}}}"
     ]
 }
 
@@ -710,40 +752,70 @@ VISION_BOUNDING_BOX_EN = {
 }
 
 
-# Output Language Control Method
-ZIMAGE_TURBO = "ZIMAGE_TURBO"
-FLUX2_KLEIN = "FLUX2_KLEIN"
-LTX2 = "LTX2"
-QWEN_IMAGE_LAYERED = "QWEN_IMAGE_LAYERED"
-QWEN_IMAGE_EDIT_COMBINED = "QWEN_IMAGE_EDIT_COMBINED"
-QWEN_IMAGE_2512 = "QWEN_IMAGE_2512"
-OCR_ENHANCED = "OCR_ENHANCED"
-
-
 PRESET_PROMPTS_EN = {
     "Empty - Nothing": "",
     "[Reverse] Tags": "NORMAL_DESCRIBE_TAGS_EN",
     "[Reverse] Describe": "NORMAL_DESCRIBE_EN",
     "[Normal] Expand": "PROMPT_EXPANDER_EN",
+    "[Anime] Illustrious - Anime Character": "ILLUSTRIOUS_EN",
+    "[Anime] Anima - Anime Content Generator": "ANIMA_EN",
     "[Portrait] ZIMAGE - Turbo": "ZIMAGE_TURBO_EN",
     "[General] FLUX2 - Klein": "FLUX2_KLEIN_EN",
+    "[Design] ERNIE - Commercial Poster/Manga Panel/UI Design": "ERNIE_IMAGE_EN",
     "[Poster] Qwen - Image 2512": "QWEN_IMAGE_2512_EN",
     "[Image Edit] Qwen - Image Edit Combined": "QWEN_IMAGE_EDIT_COMBINED_EN",
     "[Image Edit] Qwen - Image Layered": "QWEN_IMAGE_LAYERED_EN",
     "[Text to Video] LTX-2": "LTX2_EN",
     "[Text to Video] WAN - Text to Video": "WAN_T2V_EN",
     "[Image to Video] WAN - Image to Video": "WAN_I2V_EN",
-    "[Image to Video] WAN - Image to Video Empty": "WAN_I2V_EMPTY_EN",
     "[Image to Video] WAN - FLF to Video": "WAN_FLF2V_EN",
     "[Video Analysis] Video - Reverse Prompt": "VIDEO_TO_PROMPT_EN",
     "[Video Analysis] Video - Detailed Scene Breakdown": "VIDEO_DETAILED_SCENE_BREAKDOWN_EN",
     "[Video Analysis] Video - Subtitle Format": "VIDEO_SUBTITLE_FORMAT_EN",
-    "[Audio] Audio ↔ Subtitle Convert": "AUDIO_SUBTITLE_CONVERT_EN",
-    "[Audio] Video to Audio & Subtitle": "VIDEO_TO_AUDIO_SUBTITLE_EN",
-    "[Audio] Audio Analysis": "AUDIO_ANALYSIS_EN",
     "[Audio] Multi-Person Dialogue": "MULTI_SPEAKER_DIALOGUE_EN",
     "[Music] Lyrics Creation": "LYRICS_CREATION_EN",
     "[OCR] Enhanced OCR": "OCR_ENHANCED_EN",
     "[HighRes] Ultra HD Image Reverse": "ULTRA_HD_IMAGE_REVERSE_EN",
     "[Vision] Bounding Box": "VISION_BOUNDING_BOX_EN",
 }
+
+
+# 输出语言控制方式（按预设模板顺序）
+# 基础模板
+NORMAL_DESCRIBE_TAGS = "NORMAL_DESCRIBE_TAGS"
+NORMAL_DESCRIBE = "NORMAL_DESCRIBE"
+PROMPT_EXPANDER = "PROMPT_EXPANDER"
+
+# 二次元模板
+ILLUSTRIOUS = "ILLUSTRIOUS"
+ANIMA = "ANIMA"
+
+# 人像与通用模板
+ZIMAGE_TURBO = "ZIMAGE_TURBO"
+FLUX2_KLEIN = "FLUX2_KLEIN"
+
+# 设计模板
+ERNIE_IMAGE = "ERNIE_IMAGE"
+QWEN_IMAGE_2512 = "QWEN_IMAGE_2512"
+QWEN_IMAGE_EDIT_COMBINED = "QWEN_IMAGE_EDIT_COMBINED"
+QWEN_IMAGE_LAYERED = "QWEN_IMAGE_LAYERED"
+
+# 视频生成模板
+LTX2 = "LTX2"
+WAN_T2V = "WAN_T2V"
+WAN_I2V = "WAN_I2V"
+WAN_FLF2V = "WAN_FLF2V"
+
+# 视频分析模板
+VIDEO_TO_PROMPT = "VIDEO_TO_PROMPT"
+VIDEO_DETAILED_SCENE_BREAKDOWN = "VIDEO_DETAILED_SCENE_BREAKDOWN"
+VIDEO_SUBTITLE_FORMAT = "VIDEO_SUBTITLE_FORMAT"
+
+# 音频模板
+MULTI_SPEAKER_DIALOGUE = "MULTI_SPEAKER_DIALOGUE"
+LYRICS_CREATION = "LYRICS_CREATION"
+
+# OCR与其他模板
+OCR_ENHANCED = "OCR_ENHANCED"
+ULTRA_HD_IMAGE_REVERSE = "ULTRA_HD_IMAGE_REVERSE"
+VISION_BOUNDING_BOX = "VISION_BOUNDING_BOX"
