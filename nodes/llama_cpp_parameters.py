@@ -2,6 +2,8 @@
 """
 ComfyUI-omni-llm Parameters Node
 
+参数配置节点，用于设置LLM模型的生成参数，如温度、采样策略等
+
 Author: 亲卿于情 (@Qo-qiao)
 GitHub: https://github.com/Qo-qiao
 License: See LICENSE file for details

@@ -16,7 +16,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common import (
-    HARDWARE_INFO, any_type, image2base64, scale_image
+    HARDWARE_INFO, image2base64, scale_image
 )
 
 class MultiImageInput:

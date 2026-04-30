@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Video Loader Node
+ComfyUI-omni-llm Video Loader Node
 
-视频加载节点 - 用于加载视频文件并输出图像序列、视频和音频
+视频加载节点，用于加载视频文件并输出图像序列、视频和音频
 
 Author: 亲卿于情 (@Qo-qiao)
 GitHub: https://github.com/Qo-qiao

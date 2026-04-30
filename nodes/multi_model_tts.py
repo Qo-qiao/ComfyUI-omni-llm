@@ -2,19 +2,21 @@
 """
 ComfyUI-omni-llm 多模型音频合成节点
 
+多模型音频合成节点，支持多种TTS模型的音频生成
+可根据角色配置和对话内容生成情感丰富的语音
+
 Author: 亲卿于情 (@Qo-qiao)
 GitHub: https://github.com/Qo-qiao
 License: See LICENSE file for details
 """
 import os
-import json
 import torch
 import numpy as np
 import sys
 import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from common import folder_paths
-from core.dialogue_parser import DialogueParser
+from common import DialogueParser
 
 
 class multi_model_tts:
@@ -27,7 +29,7 @@ class multi_model_tts:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "dialogue_text": ("STRING", {"multiline": True, "default": "[角色1] 你好，今天天气怎么样？\n[角色2] 今天天气很好，阳光明媚。", "tooltip": "多人对话文本"}),
+                "dialogue_text": ("STRING", {"multiline": True, "default": "角色1: 你好，今天天气怎么样？\n角色2: 今天天气很好，阳光明媚。", "tooltip": "多人对话文本（使用格式：角色名: 文本 或 角色名(情感): 文本）"}),
             },
             "optional": {
                 # 支持动态添加模型（最多4个）
@@ -35,13 +37,7 @@ class multi_model_tts:
                 "tts_model_2": ("TTSMODEL", {"tooltip": "TTS模型2"}),
                 "tts_model_3": ("TTSMODEL", {"tooltip": "TTS模型3"}),
                 "tts_model_4": ("TTSMODEL", {"tooltip": "TTS模型4"}),
-                
-                # 支持动态添加角色配置（最多4个）
-                "role_config_1": ("ROLE_CONFIG", {"tooltip": "角色配置1"}),
-                "role_config_2": ("ROLE_CONFIG", {"tooltip": "角色配置2"}),
-                "role_config_3": ("ROLE_CONFIG", {"tooltip": "角色配置3"}),
-                "role_config_4": ("ROLE_CONFIG", {"tooltip": "角色配置4"}),
-                
+
                 "pause_duration": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 2.0, "step": 0.1, "tooltip": "说话人之间的停顿时间（秒）"}),
                 "add_silence": ("BOOLEAN", {"default": True, "tooltip": "是否在说话人之间添加静音"}),
                 "force_offload": ("BOOLEAN", {"default": False, "tooltip": "强制卸载模型释放显存"}),
@@ -54,48 +50,64 @@ class multi_model_tts:
     FUNCTION = "generate_multi_model_audio"
     CATEGORY = "llama-cpp-vlm"
     
-    def generate_multi_model_audio(self, dialogue_text, 
+    def generate_multi_model_audio(self, dialogue_text,
                                   tts_model_1=None, tts_model_2=None, tts_model_3=None, tts_model_4=None,
-                                  role_config_1=None, role_config_2=None, role_config_3=None, role_config_4=None,
                                   pause_duration=0.5, add_silence=True, force_offload=False, output_format="wav"):
         """
         生成多模型多角色对话音频
         根据连接的模型和角色配置数量动态处理
         """
+        # VOICE_MAP: 与 llama_cpp_tts_loader 保持一致
+        VOICE_MAP = {
+            "Vivian": 0,
+            "Serena": 1,
+            "Uncle_Fu": 2,
+            "Dylan": 3,
+            "Eric": 4,
+            "Ryan": 5,
+            "Aiden": 6,
+            "Ono_Anna": 7,
+            "Sohee": 8,
+        }
+
+        # 预定义的默认音色列表（轮流分配）
+        default_voices = ["Vivian", "Uncle_Fu", "Serena", "Dylan"]
+
         # 构建角色配置
         role_configs = {}
-        
-        # 收集所有模型和角色配置
+
+        # 收集所有模型
         models = [tts_model_1, tts_model_2, tts_model_3, tts_model_4]
-        role_configs_list = [role_config_1, role_config_2, role_config_3, role_config_4]
-        
-        # 处理每个模型和角色配置对
-        for i, (role_config, tts_model) in enumerate(zip(role_configs_list, models)):
-            # 如果模型或角色配置存在，就处理
-            if role_config or tts_model:
-                if role_config:
-                    # 从角色配置中提取参数
-                    role_name = role_config.get("role_name", f"角色{i+1}")
-                    role_configs[role_name] = {
-                        "model": tts_model,
-                        "speaker": role_config.get("voice", "女声1"),
-                        "emotion": role_config.get("emotion", "默认"),
-                        "speed": role_config.get("speed", 1.0),
-                        "pitch": role_config.get("pitch", 0.0),
-                        "volume": role_config.get("volume", 1.0)
-                    }
-                elif tts_model:
-                    # 兼容旧版本：如果没有角色配置但有模型，使用默认配置
-                    role_name = f"角色{i+1}"
-                    speaker_options = ["女声1", "男声1", "女声2", "男声2"]
-                    role_configs[role_name] = {
-                        "model": tts_model,
-                        "speaker": speaker_options[i],
-                        "emotion": "默认",
-                        "speed": 1.0,
-                        "pitch": 0.0,
-                        "volume": 1.0
-                    }
+
+        # 从TTS模型的config中读取角色配置
+        for i, tts_model in enumerate(models):
+            if tts_model:
+                role_name = f"角色{i+1}"
+
+                # 从TTS模型配置中获取音色信息
+                model_config = getattr(tts_model, 'config', {})
+                speaker_id = model_config.get('speaker_id', 0)
+
+                # 将speaker_id映射回音色名称
+                voice_id_to_name = {v: k for k, v in VOICE_MAP.items()}
+                voice_name = voice_id_to_name.get(speaker_id, default_voices[i % len(default_voices)])
+
+                # 读取其他配置
+                emotion = model_config.get('emotion', 'default')
+                speed = model_config.get('speed', 1.0)
+                pitch = model_config.get('pitch', 0.0)
+                volume = model_config.get('volume', 1.0)
+
+                role_configs[role_name] = {
+                    "model": tts_model,
+                    "voice": voice_name,
+                    "speaker_id": speaker_id,
+                    "emotion": emotion,
+                    "speed": speed,
+                    "pitch": pitch,
+                    "volume": volume
+                }
+                print(f"【多模型TTS】从模型读取配置: {role_name} -> {voice_name}(id={speaker_id}), 情感={emotion}, 速度={speed}")
         
         # 过滤掉没有模型的角色
         valid_roles = {name: config for name, config in role_configs.items() if config["model"] is not None}
@@ -169,65 +181,73 @@ class multi_model_tts:
             dialogue_info = DialogueParser.format_dialogue_info(dialogue)
             print(f"【多模型TTS】解析结果：\n{dialogue_info}")
             
-            # 为每个说话人生成音频
+            # 为每个说话人生成音频（顺序处理，TTS模型不支持并发）
+            print(f"【多模型TTS】顺序生成音频（共{len(dialogue)}段）...")
+
             audio_segments = []
             total_duration = 0.0
-            
+
             for i, segment in enumerate(dialogue):
                 speaker = segment["speaker"]
-                emotion = segment["emotion"]
+                segment_emotion = segment["emotion"]
                 text = segment["text"]
-                
+
                 # 获取角色配置
                 role_config = valid_roles[speaker]
                 tts_model = role_config["model"]
-                # 提取纯音色名称（去掉描述部分）
-                speaker_name = role_config["speaker"]
-                pure_voice = speaker_name.split(' - ')[0] if ' - ' in speaker_name else speaker_name
-                # 使用与llama_cpp_tts_loader相同的VOICE_MAP
-                VOICE_MAP = {
-                    "Vivian": 0,
-                    "Serena": 1,
-                    "Uncle_Fu": 2,
-                    "Dylan": 3,
-                    "Eric": 4,
-                    "Ryan": 5,
-                    "Aiden": 6,
-                    "Ono_Anna": 7,
-                    "Sohee": 8,
-                }
-                speaker_id = VOICE_MAP.get(pure_voice, 0)
+
+                # 从TTS模型配置中获取参数
+                voice_name = role_config["voice"]
+                speaker_id = role_config["speaker_id"]
+
+                # 合并配置
+                emotion = segment_emotion if segment_emotion != "默认" else role_config["emotion"]
                 speed = role_config["speed"]
                 pitch = role_config["pitch"]
                 volume = role_config["volume"]
-                
-                print(f"【多模型TTS】生成第{i+1}段音频: [{speaker}]({emotion}) 使用模型: {tts_model.model_type}")
-                
+
+                print(f"【多模型TTS】开始生成第{i+1}段音频: [{speaker}]({emotion}) 音色={voice_name}(id={speaker_id})")
+
                 # 调用TTS模型生成音频
-                audio_result = tts_model.synthesize(
-                    text=text,
-                    speaker_id=speaker_id,
-                    speed=speed,
-                    emotion=emotion,
-                    pitch=pitch,
-                    volume=volume
-                )
-                
-                if audio_result is None:
-                    print(f"【多模型TTS】第{i+1}段音频生成失败")
+                try:
+                    audio_result = tts_model.synthesize(
+                        text=text,
+                        speaker_id=speaker_id,
+                        speed=speed,
+                        emotion=emotion,
+                        pitch=pitch,
+                        volume=volume
+                    )
+                except Exception as e:
+                    print(f"【多模型TTS】第{i+1}段音频生成失败: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
                     continue
-                
+
+                if audio_result is None:
+                    print(f"【多模型TTS】第{i+1}段音频生成失败（返回None）")
+                    continue
+
                 waveform = audio_result.get("waveform")
                 sample_rate = audio_result.get("sample_rate", 24000)
-                
+
                 if waveform is None:
                     print(f"【多模型TTS】第{i+1}段音频波形为空")
                     continue
-                
+
+                # 处理waveform格式
+                if isinstance(waveform, torch.Tensor):
+                    waveform = waveform.cpu().numpy() if waveform.is_cuda else waveform.numpy()
+
+                # 确保是一维数组
+                if waveform.ndim > 1:
+                    waveform = waveform.flatten()
+                    if waveform.ndim > 1:
+                        waveform = waveform.mean(axis=0)
+
                 # 计算音频时长
                 segment_duration = len(waveform) / sample_rate
-                total_duration += segment_duration
-                
+
                 audio_segments.append({
                     "waveform": waveform,
                     "sample_rate": sample_rate,
@@ -235,11 +255,14 @@ class multi_model_tts:
                     "speaker": speaker,
                     "emotion": emotion,
                     "text": text,
+                    "voice": voice_name,
+                    "speaker_id": speaker_id,
                     "model_type": tts_model.model_type
                 })
-                
-                print(f"【多模型TTS】第{i+1}段完成: 时长={segment_duration:.2f}秒, 模型={tts_model.model_type}")
-            
+                total_duration += segment_duration
+
+                print(f"【多模型TTS】第{i+1}段完成: 时长={segment_duration:.2f}秒")
+
             if not audio_segments:
                 print("【多模型TTS】没有生成任何音频片段")
                 empty_audio = {
@@ -295,6 +318,8 @@ class multi_model_tts:
                         "emotion": seg["emotion"],
                         "text": seg["text"],
                         "duration": seg["duration"],
+                        "voice": seg.get("voice", "Unknown"),
+                        "speaker_id": seg.get("speaker_id", 0),
                         "model_type": seg["model_type"]
                     }
                     for seg in audio_segments
@@ -303,7 +328,7 @@ class multi_model_tts:
                 "add_silence": add_silence,
                 "role_configs": {
                     role: {
-                        "speaker": config["speaker"],
+                        "voice": config["voice"],
                         "emotion": config["emotion"],
                         "speed": config["speed"],
                         "pitch": config["pitch"],

@@ -241,7 +241,7 @@ class forced_aligner_loader:
             "optional": {
                 "precision": (["float16", "bfloat16", "float32"], {"default": "float16", "tooltip": "模型精度选择"}),
                 "batch_size": ("INT", {"default": 32, "min": 1, "max": 128, "step": 1, "tooltip": "批处理大小"}),
-                "flash_attention": ("BOOLEAN", {"default": False, "tooltip": "启用FlashAttention2优化（需要安装flash-attn）"}),
+                "flash_attention": ("BOOLEAN", {"default": False, "tooltip": "启用FlashAttention优化（自动选择FA3/FA2，需安装flash-attn）"}),
             }
         }
     
@@ -402,8 +402,24 @@ class forced_aligner_loader:
                 except ImportError:
                     from qwen_asr import Qwen3ForcedAligner as aligner_cls
 
-                # 准备模型参数（简化，只传递必要参数）
+                # 准备模型参数
                 model_kwargs = {}
+                
+                # 如果启用FlashAttention优化
+                if flash_attention:
+                    try:
+                        # 优先检测 Flash Attention 3
+                        try:
+                            import flash_attn_3
+                            model_kwargs["attn_implementation"] = "flash_attention_3"
+                            print(f"【Qwen3-ForcedAligner】启用FlashAttention3优化")
+                        except ImportError:
+                            # 回退到 Flash Attention 2
+                            import flash_attn
+                            model_kwargs["attn_implementation"] = "flash_attention_2"
+                            print(f"【Qwen3-ForcedAligner】启用FlashAttention2优化")
+                    except ImportError:
+                        print(f"【Qwen3-ForcedAligner】FlashAttention未安装，使用默认Attention实现")
                 
                 print(f"【Qwen3-ForcedAligner】正在加载模型...")
                 print(f"【Qwen3-ForcedAligner】模型路径: {model_path}")

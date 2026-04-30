@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-ComfyUI-omni-llm Image Inference Node
+ComfyUI-omni-llm Unified Inference Node
+
+统一推理节点，支持VL模型的多模态推理
+支持文本生成、图像理解、音频处理和视频分析等多种模式
 
 Author: 亲卿于情 (@Qo-qiao)
 GitHub: https://github.com/Qo-qiao
@@ -27,19 +30,12 @@ from functools import partial
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common import (
-    HARDWARE_INFO, any_type, image2base64, scale_image,
-    mm
+    HARDWARE_INFO, image2base64, scale_image,
+    mm, BaseInferenceEngine, InferenceEngineFactory,
+    convert_audio_to_wav_bytes, create_audio_data_uri,
+    filter_stderr
 )
-from engine import (
-    ModelTypeDetector,
-    BaseInferenceEngine,
-    GLM4VInferenceEngine,
-    QwenOmniInferenceEngine,
-    InferenceEngineFactory,
-    convert_audio_to_wav_bytes,
-    create_audio_data_uri
-)
-from engine.hook_utils import filter_stderr
+
 
 class ErrorHandler:
     """错误处理类"""
@@ -203,19 +199,18 @@ from support.prompt_enhancer_preset_zh import (
     LTX2_ZH,
     WAN_T2V_ZH,
     WAN_I2V_ZH,
-    WAN_I2V_EMPTY_ZH,
     WAN_FLF2V_ZH,
     VIDEO_TO_PROMPT_ZH,
     VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
     VIDEO_SUBTITLE_FORMAT_ZH,
-    AUDIO_SUBTITLE_CONVERT_ZH,
-    VIDEO_TO_AUDIO_SUBTITLE_ZH,
-    AUDIO_ANALYSIS_ZH,
     MULTI_SPEAKER_DIALOGUE_ZH,
     LYRICS_CREATION_ZH,
     OCR_ENHANCED_ZH,
     ULTRA_HD_IMAGE_REVERSE_ZH,
     VISION_BOUNDING_BOX_ZH,
+    ILLUSTRIOUS_ZH,
+    ANIMA_ZH,
+    ERNIE_IMAGE_ZH,
 )
 
 from support.prompt_enhancer_preset_en import (
@@ -230,20 +225,143 @@ from support.prompt_enhancer_preset_en import (
     LTX2_EN,
     WAN_T2V_EN,
     WAN_I2V_EN,
-    WAN_I2V_EMPTY_EN,
     WAN_FLF2V_EN,
     VIDEO_TO_PROMPT_EN,
     VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
     VIDEO_SUBTITLE_FORMAT_EN,
-    AUDIO_SUBTITLE_CONVERT_EN,
-    VIDEO_TO_AUDIO_SUBTITLE_EN,
-    AUDIO_ANALYSIS_EN,
     MULTI_SPEAKER_DIALOGUE_EN,
     LYRICS_CREATION_EN,
     OCR_ENHANCED_EN,
     ULTRA_HD_IMAGE_REVERSE_EN,
     VISION_BOUNDING_BOX_EN,
+    ILLUSTRIOUS_EN,
+    ANIMA_EN,
+    ERNIE_IMAGE_EN,
 )
+
+
+class VideoProcessor:
+    """视频处理器 - 处理视频输入、视频帧提取和视频理解功能"""
+
+    def __init__(self):
+        """初始化视频处理器"""
+        self.use_torchcodec = False
+        self.torchcodec = None
+        self._try_import_torchcodec()
+
+    def _try_import_torchcodec(self):
+        """尝试导入torchcodec作为备选视频处理库"""
+        try:
+            import torchcodec
+            self.torchcodec = torchcodec
+            self.use_torchcodec = True
+            print("【视频处理】使用torchcodec进行视频处理")
+        except ImportError:
+            self.use_torchcodec = False
+            print("【视频处理】torchcodec不可用，使用默认处理方式")
+
+    def _check_video_input(self, video) -> bool:
+        """检查视频输入是否有效"""
+        if video is None:
+            return False
+        if hasattr(video, 'numel'):
+            return video.numel() > 0
+        return False
+
+    def get_video_optimization_params(self, base_params: Dict) -> Dict:
+        """获取视频处理优化参数"""
+        optimized_params = base_params.copy()
+        optimized_params["max_new_tokens"] = min(optimized_params.get("max_new_tokens", 1024), 768)
+        optimized_params["temperature"] = max(optimized_params.get("temperature", 0.7) - 0.05, 0.6)
+        optimized_params["top_p"] = max(optimized_params.get("top_p", 0.95) - 0.05, 0.9)
+        print(f"【视频优化】视频处理模式，调整max_new_tokens={optimized_params['max_new_tokens']}, temperature={optimized_params['temperature']}, top_p={optimized_params['top_p']}")
+        return optimized_params
+
+    def get_video_perf_level(self) -> str:
+        """获取视频处理的性能级别"""
+        return "fast"
+
+    def process_video_input(self, video, max_frames: int = 16, sampling_method: str = "自动均匀采样", manual_indices: str = "") -> Optional[Dict]:
+        """处理视频输入，返回处理后的视频数据"""
+        if not self._check_video_input(video):
+            return None
+
+        try:
+            frames = self._extract_frames(video, max_frames, sampling_method, manual_indices)
+            if frames:
+                frames = self._resize_frames(frames, max_size=384)
+            video_output = {
+                "frames": frames,
+                "frame_count": len(frames),
+                "max_frames": max_frames
+            }
+            print(f"视频处理成功，提取了 {len(frames)} 帧")
+            return video_output
+        except Exception as e:
+            print(f"处理视频输入时出错: {e}")
+            return None
+
+    def _extract_frames(self, video, max_frames: int, sampling_method: str, manual_indices: str) -> List:
+        """提取视频帧"""
+        frames = []
+        max_frames = min(max_frames, 15)
+
+        if hasattr(video, 'shape') and video.ndim == 4:
+            total_frames = video.shape[0]
+            if sampling_method == "自动均匀采样":
+                step = max(1, total_frames // max_frames)
+                indices = list(range(0, total_frames, step))[:max_frames]
+            else:
+                try:
+                    indices = [int(i) for i in manual_indices.split(',') if i.strip()]
+                    indices = [i for i in indices if 0 <= i < total_frames][:max_frames]
+                except Exception:
+                    step = max(1, total_frames // max_frames)
+                    indices = list(range(0, total_frames, step))[:max_frames]
+
+            if video.is_cuda:
+                for idx in indices:
+                    frame = video[idx].detach().cpu()
+                    frames.append(frame)
+            else:
+                for idx in indices:
+                    frames.append(video[idx])
+
+        if not frames and hasattr(video, 'shape') and video.ndim == 4 and video.shape[0] > 0:
+            frames.append(video[0])
+
+        return frames
+
+    def _resize_frames(self, frames: List, max_size: int = 384) -> List:
+        """调整帧大小以减少计算量"""
+        resized = []
+        for frame in frames:
+            if hasattr(frame, 'shape'):
+                if frame.shape[0] > max_size or frame.shape[1] > max_size:
+                    scale = max_size / max(frame.shape[0], frame.shape[1])
+                    new_h, new_w = int(frame.shape[0] * scale), int(frame.shape[1] * scale)
+                    frame = self._resize_tensor(frame, new_h, new_w)
+            resized.append(frame)
+        return resized
+
+    def _resize_tensor(self, tensor, new_h: int, new_w: int):
+        """调整张量大小"""
+        if tensor.dim() == 3:
+            tensor = tensor.permute(2, 0, 1).unsqueeze(0)
+            resized = torch.nn.functional.interpolate(tensor, size=(new_h, new_w), mode='bilinear', align_corners=False)
+            return resized.squeeze(0).permute(1, 2, 0)
+        return tensor
+
+    def prepare_video_for_inference(self, video_data: Dict) -> Optional[Dict]:
+        """准备视频数据用于推理"""
+        if not video_data or "frames" not in video_data:
+            return None
+
+        try:
+            return video_data
+        except Exception as e:
+            print(f"准备视频数据时出错: {e}")
+            return None
 
 
 class llama_cpp_unified_inference:
@@ -349,10 +467,13 @@ class llama_cpp_unified_inference:
         
         # 清理 GPU 内存
         try:
+            import gc
             import torch
             if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-                print("【内存管理】清理了 GPU 缓存")
+                torch.cuda.synchronize()  # 确保所有GPU操作完成
+                torch.cuda.empty_cache()  # 清空GPU缓存
+                gc.collect()  # 强制垃圾回收
+                print("【内存管理】清理了 GPU 缓存并执行垃圾回收")
         except Exception as e:
             print(f"【内存管理】清理 GPU 缓存失败: {e}")
     
@@ -366,17 +487,7 @@ class llama_cpp_unified_inference:
         "default": 0, "female": 0, "male": 1, "loli": 2,
         "shota": 3, "mature_female": 4, "mature_male": 5,
         "young_female": 6, "young_male": 7, "elderly_female": 8,
-        "elderly_male": 9, "dialect_female": 10,
-        # Qwen3-TTS CustomVoice 音色映射
-        "Vivian": 0,
-        "Serena": 1,
-        "Uncle_Fu": 2,
-        "Dylan": 3,
-        "Eric": 4,
-        "Ryan": 5,
-        "Aiden": 6,
-        "Ono_Anna": 7,
-        "Sohee": 8
+        "elderly_male": 9, "dialect_female": 10
     }
     
     # 初始化预设提示词字典
@@ -389,22 +500,21 @@ class llama_cpp_unified_inference:
     preset_prompts["[Reverse] Tags"] = "NORMAL_DESCRIBE_TAGS"
     preset_prompts["[Reverse] Describe"] = "NORMAL_DESCRIBE"
     preset_prompts["[Normal] Expand"] = "PROMPT_EXPANDER"
+    preset_prompts["[Anime] Illustrious"] = "ILLUSTRIOUS"
+    preset_prompts["[Anime] Anima"] = "ANIMA"
     preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
     preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
+    preset_prompts["[Design] ERNIE - Image"] = "ERNIE_IMAGE"
     preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
     preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
     preset_prompts["[Image Edit] Qwen - Image Layered"] = "QWEN_IMAGE_LAYERED"
     preset_prompts["[Text to Video] LTX-2"] = "LTX2"
     preset_prompts["[Text to Video] WAN - Text to Video"] = "WAN_T2V"
     preset_prompts["[Image to Video] WAN - Image to Video"] = "WAN_I2V"
-    preset_prompts["[Image to Video] WAN - Image to Video Empty"] = "WAN_I2V_EMPTY"
     preset_prompts["[Image to Video] WAN - FLF to Video"] = "WAN_FLF2V"
     preset_prompts["[Video Analysis] Video - Reverse Prompt"] = "VIDEO_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Detailed Scene Breakdown"] = "VIDEO_DETAILED_SCENE_BREAKDOWN"
     preset_prompts["[Video Analysis] Video - Subtitle Format"] = "VIDEO_SUBTITLE_FORMAT"
-    preset_prompts["[Audio] Audio ↔ Subtitle Convert"] = "AUDIO_SUBTITLE_CONVERT"
-    preset_prompts["[Audio] Video to Audio & Subtitle"] = "VIDEO_TO_AUDIO_SUBTITLE"
-    preset_prompts["[Audio] Audio Analysis"] = "AUDIO_ANALYSIS"
     preset_prompts["[Audio] Multi-Person Dialogue"] = "MULTI_SPEAKER_DIALOGUE"
     preset_prompts["[Music] Lyrics Creation"] = "LYRICS_CREATION"
     preset_prompts["[OCR] Enhanced OCR"] = "OCR_ENHANCED"
@@ -418,7 +528,7 @@ class llama_cpp_unified_inference:
         return {
             "required": {
                 # ========== 模型配置 ==========
-                "llama_model": ("LLAMACPPMODEL", {"tooltip": "加载的VL/Omni模型，用于图像理解和文本生成"}),
+                "llama_model": ("LLAMACPPMODEL", {"tooltip": "加载的VL模型，用于图像理解和文本生成"}),
                 
                 # ========== 推理模式 ==========
                 "inference_mode": ([
@@ -427,21 +537,20 @@ class llama_cpp_unified_inference:
                         "[基础] 批量图像理解 (Batch Image Understanding)",
                         "[基础] 音频转文本 (Audio to Text)",
                         "[基础] 文本转音频 (Text to Audio)",
-                        "[高级] 全模态整合 (Multimodal Integration)",
                         "[高级] 视频理解 (Video Understanding)"
                     ], {
                         "default": "[基础] 文本生成 (Text Generation)",
-                        "tooltip": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [基础] 文本转音频：生成文本后使用TTS模型转换为语音\n• [高级] 全模态整合：同时处理图像、音频和文本（Omni模型专用）\n• [高级] 视频理解：从视频中提取帧并进行分析"
+                        "tooltip": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [基础] 文本转音频：生成文本后使用TTS模型转换为语音\n• [高级] 视频理解：从视频中提取帧并进行分析"
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Normal] Tags：反推标签格式的描述\n• [Normal] Describe：反推详细描述文本\n• [Normal] Expand：扩展和丰富提示词\n• [Portrait] ZIMAGE - Turbo：人像生成优化\n• [General] FLUX2 - Klein：通用图像生成\n• [Poster] Qwen - Image 2512：海报风格图像\n• [Image Edit] Qwen - Image Edit Combined：图像编辑模板\n• [Image Edit] Qwen - Image Layered：分层图像编辑\n• [Text to Video] LTX-2：文本到视频生成\n• [Text to Video] WAN - Text to Video：WAN模型文本生视频\n• [Image to Video] WAN - Image to Video：图像生视频\n• [Image to Video] WAN - Image to Video Empty：图像生视频（无提示词）\n• [Image to Video] WAN - FLF to Video：首尾帧到视频\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜详细拆解\n• [Video Analysis] Video - Subtitle Format：视频字幕格式\n• [Audio] Audio ↔ Subtitle Convert：音频与字幕互转\n• [Audio] Video to Audio & Subtitle：视频转音频和字幕\n• [Audio] Audio Analysis：音频内容分析\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics & Audio Merge：歌词与音频合并\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的多模态助手。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
                 # ========== 语言设置 ==========
                 "prompt_language": (["中文", "English"], {"default": "中文", "tooltip": "预设提示词的语言"}),
-                "response_language": (["自动检测", "中文", "English"], {"default": "自动检测", "tooltip": "AI回复的语言"}),
+                "response_language": (["中文", "English"], {"default": "中文", "tooltip": "AI回复的语言"}),
                 
                 # ========== 输出格式设置 ==========
                 "output_format": (["JSON格式", "文本格式"], {
@@ -468,22 +577,7 @@ class llama_cpp_unified_inference:
                     "default": "逐个输出",
                     "tooltip": "批量模式的结果处理方式：\n• 逐个输出：每张图片单独输出结果\n• 合并输出：所有结果合并为一个输出"
                 }),
-                "audio_output_mode": ([
-                        "TTS音色美化输出",
-                        "Omni原生音频输出"
-                    ], {
-                        "default": "TTS音色美化输出", 
-                        "tooltip": "音频输出模式：\n• TTS音色美化输出：先生成文本，再使用TTS模型转换为音频\n• Omni原生音频输出：使用Omni模型直接生成音频输出"
-                    }),
-                "omni_speaker": ([
-                        "Chelsie - 女声",
-                        "Ethan - 男声"
-                    ], {
-                        "default": "Chelsie - 女声", 
-                        "tooltip": "Omni模型音频输出音色（仅在Omni原生音频输出模式下生效）"
-                    }),
-                "tts_speed": ("FLOAT", {"default": 1.0, "min": 0.5, "max": 2.0, "step": 0.05, 
-                                        "display": "slider"}),
+
                 
                 # ========== 生成参数 ==========
                 "seed": ("INT", {"default": 101, "min": 0, "max": 0xffffffffffffffff, "step": 1, "tooltip": "随机种子，用于复现结果"}),
@@ -497,7 +591,7 @@ class llama_cpp_unified_inference:
                 "audio": ("AUDIO", {"tooltip": "音频输入（用于ASR识别）"}),
                 "tts_model": ("TTSMODEL", {"tooltip": "TTS模型输入（用于语音合成）"}),
                 "asr_model": ("ASRMODEL", {"tooltip": "ASR模型输入（用于语音识别）"}),
-                "queue_handler": (any_type, {"tooltip": "队列处理器"}),
+                "queue_handler": ("*", {"tooltip": "队列处理器"}),
             },
         }
     
@@ -510,6 +604,7 @@ class llama_cpp_unified_inference:
     def __init__(self):
         self.engine = None
         self.model_info = None
+        self.video_processor = VideoProcessor()
     
     def detect_model_type(self, llama_model) -> Dict:
         """检测模型类型"""
@@ -534,43 +629,20 @@ class llama_cpp_unified_inference:
             self._model_type_cache[cache_key] = model_info
             return model_info
         
-        # 检测是否是分段模型
-        is_sharded_model = self._is_sharded_model(llama_model)
-        
-        # 如果是分段模型，使用特殊的模型信息
-        if is_sharded_model:
-            model_info = {
-                "key": "sharded_omni",
-                "type": "omni",
-                "subtype": "sharded",
-                "supports_audio": True,
-                "supports_vision": True,
-                "file_formats": [".safetensors"]
-            }
-        else:
-            # 检测模型类型
-            model_info = ModelTypeDetector.detect_model_type(model_path, model_config)
-            
-            # 现在支持 VL 模型和 Omni 模型
-            if model_info.get("type") not in ["vl", "omni"]:
-                raise ValueError(f"此节点仅支持VL模型和Omni模型。当前模型类型: {model_info.get('type')}")
+        # 简单的模型信息 - 默认为VL模型
+        model_info = {
+            "key": "default",
+            "type": "vl",
+            "subtype": "default",
+            "supports_audio": False,
+            "supports_vision": True,
+            "file_formats": [".gguf"]
+        }
         
         # 缓存结果
         self._model_type_cache[cache_key] = model_info
         
         return model_info
-    
-    def _is_sharded_model(self, llama_model) -> bool:
-        """检测是否是分段模型"""
-        # 检查模型对象是否有transformers相关的属性
-        has_transformers_model = hasattr(llama_model, 'model') and hasattr(llama_model.model, 'generate')
-        has_processor = hasattr(llama_model, 'processor')
-        
-        # 检查模型名称是否包含特定标记
-        model_name = getattr(llama_model, 'current_model_name', '')
-        is_sharded_name = any(keyword in model_name.lower() for keyword in ['qwen', 'minicpm', 'sharded'])
-        
-        return has_transformers_model and has_processor and is_sharded_name
     
     def get_preset_text_by_language(self, preset_key, language, output_format="JSON格式"):
         """根据语言和输出格式获取预设提示词文本"""
@@ -579,22 +651,21 @@ class llama_cpp_unified_inference:
                 "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_ZH,
                 "NORMAL_DESCRIBE": NORMAL_DESCRIBE_ZH,
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
+                "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
+                "ANIMA": ANIMA_ZH,
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
                 "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
+                "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
                 "QWEN_IMAGE_LAYERED": QWEN_IMAGE_LAYERED_ZH,
                 "LTX2": LTX2_ZH,
                 "WAN_T2V": WAN_T2V_ZH,
                 "WAN_I2V": WAN_I2V_ZH,
-                "WAN_I2V_EMPTY": WAN_I2V_EMPTY_ZH,
                 "WAN_FLF2V": WAN_FLF2V_ZH,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
                 "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_ZH,
-                "AUDIO_SUBTITLE_CONVERT": AUDIO_SUBTITLE_CONVERT_ZH,
-                "VIDEO_TO_AUDIO_SUBTITLE": VIDEO_TO_AUDIO_SUBTITLE_ZH,
-                "AUDIO_ANALYSIS": AUDIO_ANALYSIS_ZH,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_ZH,
                 "LYRICS_CREATION": LYRICS_CREATION_ZH,
                 "OCR_ENHANCED": OCR_ENHANCED_ZH,
@@ -606,22 +677,21 @@ class llama_cpp_unified_inference:
                 "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_EN,
                 "NORMAL_DESCRIBE": NORMAL_DESCRIBE_EN,
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
+                "ILLUSTRIOUS": ILLUSTRIOUS_EN,
+                "ANIMA": ANIMA_EN,
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
                 "FLUX2_KLEIN": FLUX2_KLEIN_EN,
+                "ERNIE_IMAGE": ERNIE_IMAGE_EN,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
                 "QWEN_IMAGE_LAYERED": QWEN_IMAGE_LAYERED_EN,
                 "LTX2": LTX2_EN,
                 "WAN_T2V": WAN_T2V_EN,
                 "WAN_I2V": WAN_I2V_EN,
-                "WAN_I2V_EMPTY": WAN_I2V_EMPTY_EN,
                 "WAN_FLF2V": WAN_FLF2V_EN,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
                 "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_EN,
-                "AUDIO_SUBTITLE_CONVERT": AUDIO_SUBTITLE_CONVERT_EN,
-                "VIDEO_TO_AUDIO_SUBTITLE": VIDEO_TO_AUDIO_SUBTITLE_EN,
-                "AUDIO_ANALYSIS": AUDIO_ANALYSIS_EN,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_EN,
                 "LYRICS_CREATION": LYRICS_CREATION_EN,
                 "OCR_ENHANCED": OCR_ENHANCED_EN,
@@ -638,537 +708,11 @@ class llama_cpp_unified_inference:
         
         return preset.get("input_template", preset_key)
     
-    def _analyze_audio_features(self, audio):
-        """分析音频特征"""
-        try:
-            # 这里可以添加音频分析逻辑
-            return {
-                "voice_type": "默认",
-                "emotion": "默认"
-            }
-        except Exception as e:
-            print(f"音频分析失败: {str(e)}")
-            return None
-    
-    def _generate_fallback_audio(self, text, voice_type, speed):
-        """生成备用音频"""
-        try:
-            # 如果文本为空，则无法生成有效语音
-            if not text:
-                return None
 
-            # 生成1秒静音波形作为安全回退，避免 downstream 保存音频时报错
-            sample_rate = 24000
-            duration_sec = 1.0
-            length = int(sample_rate * duration_sec)
-            waveform = torch.zeros(length, dtype=torch.float32)
-
-            print(f"【TTS兼容】备用静音音频已生成（{duration_sec}s，sample_rate={sample_rate}）")
-            return {"waveform": waveform, "sample_rate": sample_rate}
-        except Exception as e:
-            print(f"备用音频生成失败: {str(e)}")
-            return None
-    
-    def _process_sharded_model(self, llama_model, final_prompt, text_input, mode, 
-                            enable_tts, enable_asr, asr_text, audio_output_mode,
-                            omni_speaker_type, tts_speed, 
-                            has_images, has_audio, has_video, images, audio, tts_model, 
-                            parameters, unique_id, seed, force_offload, output_format="文本格式"):
-        """处理分段模型的推理请求"""
-        try:
-            print("【分段模型】使用分段模型推理方式")
-            
-            # 获取模型和处理器
-            model = llama_model.model
-            processor = llama_model.processor
-            tokenizer = llama_model.tokenizer
-            
-            # 检查是否使用纯提示词模式（与GGUF格式模型行为一致）
-            use_pure_prompt = output_format == "文本格式"
-            
-            if use_pure_prompt:
-                print("【纯提示词模式】使用纯提示词输入，与GGUF格式模型行为一致")
-                # 直接使用final_prompt作为输入，不添加系统提示词和对话结构
-                input_text = final_prompt
-                # 准备处理器参数
-                processor_args = {
-                    "text": input_text,
-                    "return_tensors": "pt",
-                    "padding": True
-                }
-                
-                # 添加图像
-                pil_images = []
-                if has_images and images is not None:
-                    try:
-                        if len(images.shape) == 3:
-                            images = images.unsqueeze(0)
-                        
-                        # 无论CPU还是GPU模式，都限制图像大小以避免内存问题
-                        target_size = 512  # 适当的图像大小，平衡质量和性能
-                        
-                        for i in range(images.shape[0]):
-                            try:
-                                if hasattr(images[i], 'cpu'):
-                                    img = images[i].cpu().numpy()
-                                else:
-                                    img = images[i]
-                                
-                                # 确保图像数据范围正确
-                                if img.max() <= 1.0:
-                                    img_np = (img * 255).astype(np.uint8)
-                                else:
-                                    img_np = img.astype(np.uint8)
-                                
-                                pil_img = Image.fromarray(img_np)
-                                
-                                # 调整图像大小
-                                if target_size and (pil_img.size[0] > target_size or pil_img.size[1] > target_size):
-                                    pil_img = pil_img.resize((target_size, target_size), Image.Resampling.LANCZOS)
-                                    if i == 0:
-                                        print(f"【图像优化】图像已调整大小至 {target_size}x{target_size}")
-                                
-                                pil_images.append(pil_img)
-                            except Exception as e:
-                                print(f"【图像处理错误】处理第{i}张图像时出错: {str(e)}")
-                                continue
-                        
-                        if pil_images:
-                            processor_args["images"] = pil_images
-                            print(f"【图像优化】成功处理 {len(pil_images)} 张图像")
-                        else:
-                            print("【图像优化】没有成功处理任何图像")
-                    except Exception as e:
-                        print(f"【图像处理错误】{str(e)}")
-                        import traceback
-                        traceback.print_exc()
-                
-                # 添加音频
-                audio_path = None
-                if has_audio and audio is not None:
-                    try:
-                        # 创建临时文件并保存音频
-                        with tempfile.NamedTemporaryFile(suffix=".flac", delete=False) as f:
-                            audio_path = f.name
-                            if isinstance(audio, dict):
-                                waveform = audio["waveform"].squeeze(0).cpu().numpy()
-                                sample_rate = audio["sample_rate"]
-                            else:
-                                waveform = audio.squeeze(0).cpu().numpy()
-                                sample_rate = 16000
-                            sf.write(audio_path, waveform.T, sample_rate)
-                        if audio_path:
-                            processor_args["audio"] = audio_path
-                    except Exception as e:
-                        print(f"保存音频到临时文件时出错: {e}")
-                        audio_path = None
-            else:
-                # 传统对话模式
-                print("【对话模式】使用完整对话结构")
-                # 构建对话
-                SYSTEM_PROMPT = "You are Qwen, a virtual human developed by the Qwen Team, Alibaba Group, capable of perceiving auditory and visual inputs, as well as generating text and speech."
-                
-                conversation = [
-                    {"role": "system", "content": [{"type": "text", "text": SYSTEM_PROMPT}]},
-                    {"role": "user", "content": []}
-                ]
-                
-                # 添加文本
-                if final_prompt:
-                    conversation[-1]["content"].append({"type": "text", "text": final_prompt})
-                
-                # 添加图像
-                pil_images = []
-                if has_images and images is not None:
-                    try:
-                        if len(images.shape) == 3:
-                            images = images.unsqueeze(0)
-                        
-                        # 无论CPU还是GPU模式，都限制图像大小以避免内存问题
-                        target_size = 512  # 适当的图像大小，平衡质量和性能
-                        
-                        for i in range(images.shape[0]):
-                            try:
-                                if hasattr(images[i], 'cpu'):
-                                    img = images[i].cpu().numpy()
-                                else:
-                                    img = images[i]
-                                
-                                # 确保图像数据范围正确
-                                if img.max() <= 1.0:
-                                    img_np = (img * 255).astype(np.uint8)
-                                else:
-                                    img_np = img.astype(np.uint8)
-                                
-                                pil_img = Image.fromarray(img_np)
-                                
-                                # 调整图像大小
-                                if target_size and (pil_img.size[0] > target_size or pil_img.size[1] > target_size):
-                                    pil_img = pil_img.resize((target_size, target_size), Image.Resampling.LANCZOS)
-                                    if i == 0:
-                                        print(f"【图像优化】图像已调整大小至 {target_size}x{target_size}")
-                                
-                                pil_images.append(pil_img)
-                                conversation[-1]["content"].append({"type": "image", "image": pil_img})
-                            except Exception as e:
-                                print(f"【图像处理错误】处理第{i}张图像时出错: {str(e)}")
-                                continue
-                        
-                        if pil_images:
-                            print(f"【图像优化】成功处理 {len(pil_images)} 张图像")
-                        else:
-                            print("【图像优化】没有成功处理任何图像")
-                    except Exception as e:
-                        print(f"【图像处理错误】{str(e)}")
-                        import traceback
-                        traceback.print_exc()
-                
-                # 添加音频
-                audio_path = None
-                if has_audio and audio is not None:
-                    try:
-                        # 创建临时文件并保存音频
-                        with tempfile.NamedTemporaryFile(suffix=".flac", delete=False) as f:
-                            audio_path = f.name
-                            if isinstance(audio, dict):
-                                waveform = audio["waveform"].squeeze(0).cpu().numpy()
-                                sample_rate = audio["sample_rate"]
-                            else:
-                                waveform = audio.squeeze(0).cpu().numpy()
-                                sample_rate = 16000
-                            sf.write(audio_path, waveform.T, sample_rate)
-                        conversation[-1]["content"].append({"type": "audio", "audio": audio_path})
-                    except Exception as e:
-                        print(f"保存音频到临时文件时出错: {e}")
-                        audio_path = None
-                
-                # 应用聊天模板
-                input_text = processor.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
-                
-                # 准备处理器参数
-                processor_args = {
-                    "text": input_text,
-                    "return_tensors": "pt",
-                    "padding": True
-                }
-                
-                # 添加图像和音频
-                if pil_images:
-                    processor_args["images"] = pil_images
-                if audio_path:
-                    processor_args["audio"] = audio_path
-            
-            # 参考ComfyUI-Qwen-Omni-main的处理方式：使用正确的多模态处理
-            # 构建对话结构（即使在纯提示词模式下也使用对话结构）
-            SYSTEM_PROMPT = "You are Qwen, a virtual human developed by the Qwen Team, Alibaba Group, capable of perceiving auditory and visual inputs, as well as generating text and speech."
-            
-            conversation = [
-                {"role": "system", "content": [{"type": "text", "text": SYSTEM_PROMPT}]},
-                {"role": "user", "content": []}
-            ]
-            
-            # 添加文本
-            if final_prompt:
-                conversation[-1]["content"].append({"type": "text", "text": final_prompt})
-            
-            # 添加图像
-            pil_images = []
-            if has_images and images is not None:
-                try:
-                    if len(images.shape) == 3:
-                        images = images.unsqueeze(0)
-                    
-                    # 无论CPU还是GPU模式，都限制图像大小以避免内存问题
-                    target_size = 512  # 适当的图像大小，平衡质量和性能
-                    
-                    for i in range(images.shape[0]):
-                        try:
-                            if hasattr(images[i], 'cpu'):
-                                img = images[i].cpu().numpy()
-                            else:
-                                img = images[i]
-                            
-                            # 确保图像数据范围正确
-                            if img.max() <= 1.0:
-                                img_np = (img * 255).astype(np.uint8)
-                            else:
-                                img_np = img.astype(np.uint8)
-                            
-                            pil_img = Image.fromarray(img_np)
-                            
-                            # 调整图像大小
-                            if target_size and (pil_img.size[0] > target_size or pil_img.size[1] > target_size):
-                                pil_img = pil_img.resize((target_size, target_size), Image.Resampling.LANCZOS)
-                                if i == 0:
-                                    print(f"【图像优化】图像已调整大小至 {target_size}x{target_size}")
-                            
-                            pil_images.append(pil_img)
-                            conversation[-1]["content"].append({"type": "image", "image": pil_img})
-                        except Exception as e:
-                            print(f"【图像处理错误】处理第{i}张图像时出错: {str(e)}")
-                            continue
-                    
-                    if pil_images:
-                        print(f"【图像优化】成功处理 {len(pil_images)} 张图像")
-                    else:
-                        print("【图像优化】没有成功处理任何图像")
-                except Exception as e:
-                    print(f"【图像处理错误】{str(e)}")
-                    import traceback
-                    traceback.print_exc()
-            
-            # 添加音频
-            audio_path = None
-            if has_audio and audio is not None:
-                try:
-                    # 创建临时文件并保存音频
-                    with tempfile.NamedTemporaryFile(suffix=".flac", delete=False) as f:
-                        audio_path = f.name
-                        if isinstance(audio, dict):
-                            waveform = audio["waveform"].squeeze(0).cpu().numpy()
-                            sample_rate = audio["sample_rate"]
-                        else:
-                            waveform = audio.squeeze(0).cpu().numpy()
-                            sample_rate = 16000
-                        sf.write(audio_path, waveform.T, sample_rate)
-                    conversation[-1]["content"].append({"type": "audio", "audio": audio_path})
-                except Exception as e:
-                    print(f"保存音频到临时文件时出错: {e}")
-                    audio_path = None
-            
-            # 应用聊天模板
-            input_text = processor.apply_chat_template(conversation, tokenize=False, add_generation_prompt=True)
-            
-            # 准备处理器参数
-            processor_args = {
-                "text": input_text,
-                "return_tensors": "pt",
-                "padding": True
-            }
-            
-            # 添加图像和音频
-            if pil_images:
-                processor_args["images"] = pil_images
-            if audio_path:
-                processor_args["audio"] = audio_path
-            
-            # 将输入移至设备
-            inputs = processor(**processor_args).to(model.device)
-            
-            # 清理临时文件
-            if audio_path:
-                try:
-                    os.remove(audio_path)
-                except Exception as e:
-                    print(f"删除临时音频文件时出错: {e}")
-            
-            # 生成配置
-            generate_config = {
-                "max_new_tokens": 1024,  # 增加生成长度，获得更详细的内容
-                "temperature": 0.8,  # 提高温度，增加输出多样性
-                "do_sample": True,
-                "use_cache": True,
-                "return_audio": audio_output_mode != "TTS音色美化输出",
-                "top_p": 0.95,  # 调整top_p，获得更丰富的输出
-                "repetition_penalty": 1.0,
-                "eos_token_id": tokenizer.eos_token_id,
-                "pad_token_id": tokenizer.pad_token_id,
-            }
-            
-            # CPU模式特殊优化：平衡质量和速度
-            if model.device.type == 'cpu':
-                generate_config["max_new_tokens"] = 512  # 适当增加生成长度
-                generate_config["temperature"] = 0.6  # 保持一定的多样性
-                generate_config["do_sample"] = True  # 启用采样以获得更自然的输出
-                generate_config["top_p"] = 0.9  # 保持一定的随机性
-                print(f"【CPU模式优化】已调整生成参数: max_new_tokens={generate_config['max_new_tokens']}, temperature={generate_config['temperature']}, do_sample={generate_config['do_sample']}")
-            
-            # 视频处理特殊优化：调整参数以平衡质量和内存占用
-            if has_video:
-                # 针对视频反推等模式的优化
-                generate_config["max_new_tokens"] = min(generate_config["max_new_tokens"], 768)  # 适当增加生成长度
-                # 保持一定的温度以获得丰富的输出
-                generate_config["temperature"] = max(generate_config["temperature"] - 0.05, 0.6)  # 保持较高的温度
-                # 调整top_p以获得更丰富的输出
-                generate_config["top_p"] = max(generate_config["top_p"] - 0.05, 0.9)  # 保持较高的top_p
-                print(f"【视频优化】视频处理模式，调整max_new_tokens={generate_config['max_new_tokens']}, temperature={generate_config['temperature']}, top_p={generate_config['top_p']}")
-            
-            # 图像处理特殊优化：调整参数以减少推理时间
-            elif has_images:
-                # 针对图片反推等模式的优化
-                generate_config["max_new_tokens"] = min(generate_config["max_new_tokens"], 512)  # 减少生成长度，加快推理速度
-                # 降低温度以获得更稳定的输出
-                generate_config["temperature"] = max(generate_config["temperature"] - 0.1, 0.5)  # 降低温度
-                # 调整top_p以获得更准确的输出
-                generate_config["top_p"] = max(generate_config["top_p"] - 0.05, 0.85)  # 降低top_p
-                print(f"【图像优化】图像处理模式，调整max_new_tokens={generate_config['max_new_tokens']}, temperature={generate_config['temperature']}, top_p={generate_config['top_p']}")
-            
-            # 设置音频输出参数
-            if generate_config["return_audio"]:
-                # 根据omni_speaker参数设置speaker
-                if "Chelsie" in omni_speaker_type:
-                    generate_config["speaker"] = "Chelsie"
-                elif "Ethan" in omni_speaker_type:
-                    generate_config["speaker"] = "Ethan"
-                else:
-                    generate_config["speaker"] = "Chelsie"
-            
-            # 执行推理
-            audio_output = None
-            generated_text = ""
-            
-            try:
-                # 动态获取设备类型，避免硬编码导致的设备不匹配错误
-                device_type = 'cuda' if model.device.type == 'cuda' else 'cpu'
-                
-                # 内存优化：清理缓存
-                if device_type == 'cuda':
-                    torch.cuda.empty_cache()
-                    print("【内存优化】已清理GPU缓存")
-                
-                # 记录推理开始时间
-                start_time = time.time()
-                
-                # 根据模式调整生成参数以平衡质量和内存使用
-                if has_video:
-                    # 视频处理模式：使用较大的生成长度
-                    generate_config["max_new_tokens"] = min(generate_config["max_new_tokens"], 768)
-                    print(f"【视频内存优化】已调整max_new_tokens为: {generate_config['max_new_tokens']}")
-                elif has_images:
-                    # 图像处理模式：使用适中的生成长度
-                    generate_config["max_new_tokens"] = min(generate_config["max_new_tokens"], 384)  # 进一步减少生成长度，加快推理速度
-                    print(f"【图像内存优化】已调整max_new_tokens为: {generate_config['max_new_tokens']}")
-                else:
-                    # 文本模式：使用较小的生成长度以节省内存
-                    generate_config["max_new_tokens"] = min(generate_config["max_new_tokens"], 512)
-                    print(f"【内存优化】已调整max_new_tokens为: {generate_config['max_new_tokens']}")
-                
-                with torch.amp.autocast(device_type=device_type, dtype=torch.float16):
-                    outputs = model.generate(**inputs, **generate_config)
-                
-                # 记录推理结束时间
-                end_time = time.time()
-                inference_time = end_time - start_time
-                print(f"【分段模型推理】推理完成，耗时: {inference_time:.2f} 秒")
-                
-                # 处理输出
-                if generate_config["return_audio"]:
-                    text_tokens = outputs[0] if outputs[0].dim() == 2 else outputs[0].unsqueeze(0)
-                    audio_tensor = outputs[1]
-                else:
-                    text_tokens = outputs if outputs.dim() == 2 else outputs.unsqueeze(0)
-                    audio_tensor = torch.zeros(0, 0, device=model.device)
-                
-                # 截取新生成的token
-                input_length = inputs["input_ids"].shape[1]
-                text_tokens = text_tokens[:, input_length:]
-                
-                # 解码文本
-                generated_text = tokenizer.decode(
-                    text_tokens[0],
-                    skip_special_tokens=True,
-                    clean_up_tokenization_spaces=True
-                )
-                
-                print(f"【分段模型推理】生成文本长度: {len(generated_text)}")
-                
-                # 处理音频输出
-                if generate_config["return_audio"] and audio_tensor is not None:
-                    # 参考ComfyUI-Qwen-Omni-main的处理方式：处理不同维度的音频张量
-                    if audio_tensor.dim() == 1:
-                        print(f"【分段模型】音频张量是1D，添加维度")
-                        audio_tensor = audio_tensor.unsqueeze(0)
-                    elif audio_tensor.dim() == 3:
-                        print(f"【分段模型】音频张量是3D，平均处理")
-                        audio_tensor = audio_tensor.mean(dim=1)
-                    
-                    assert audio_tensor.dim() == 2, f"Audio waveform must be 2D, got {audio_tensor.dim()}D"
-                    
-                    audio_output = {
-                        "waveform": audio_tensor,
-                        "sample_rate": 24000
-                    }
-                    
-                    # 保存为WAV格式
-                    buffer = io.BytesIO()
-                    torchaudio.save(buffer, audio_output["waveform"].cpu(), 24000, format="wav")
-                    buffer.seek(0)
-                    waveform, sample_rate = torchaudio.load(buffer)
-                    audio_output = {
-                        "waveform": waveform.unsqueeze(0),
-                        "sample_rate": sample_rate
-                    }
-                    print(f"【分段模型】音频生成成功，shape={audio_output['waveform'].shape}")
-                
-                # 内存优化：清理缓存
-                if device_type == 'cuda':
-                    torch.cuda.empty_cache()
-                    print("【内存优化】推理完成后已清理GPU缓存")
-            
-            except RuntimeError as e:
-                if "Allocation on device" in str(e) or "out of memory" in str(e).lower():
-                    print(f"【分段模型推理错误】内存分配失败: {str(e)}")
-                    print("【内存优化】尝试减少生成参数并重新推理...")
-                    
-                    # 内存优化：清理缓存
-                    if device_type == 'cuda':
-                        torch.cuda.empty_cache()
-                    
-                    # 进一步降低生成参数
-                    generate_config["max_new_tokens"] = 128
-                    generate_config["do_sample"] = False
-                    generate_config["temperature"] = 0.3
-                    print(f"【内存优化】已调整参数: max_new_tokens={generate_config['max_new_tokens']}, do_sample={generate_config['do_sample']}, temperature={generate_config['temperature']}")
-                    
-                    try:
-                        with torch.amp.autocast(device_type=device_type, dtype=torch.float16):
-                            outputs = model.generate(**inputs, **generate_config)
-                        
-                        # 处理输出
-                        if generate_config["return_audio"]:
-                            text_tokens = outputs[0] if outputs[0].dim() == 2 else outputs[0].unsqueeze(0)
-                        else:
-                            text_tokens = outputs if outputs.dim() == 2 else outputs.unsqueeze(0)
-                        
-                        # 截取新生成的token
-                        input_length = inputs["input_ids"].shape[1]
-                        text_tokens = text_tokens[:, input_length:]
-                        
-                        # 解码文本
-                        generated_text = tokenizer.decode(
-                            text_tokens[0],
-                            skip_special_tokens=True,
-                            clean_up_tokenization_spaces=True
-                        )
-                        
-                        print(f"【分段模型推理】内存优化后推理成功，生成文本长度: {len(generated_text)}")
-                    except Exception as e2:
-                        print(f"【分段模型推理错误】内存优化后仍然失败: {str(e2)}")
-                        generated_text = f"推理失败: 内存不足，请尝试减少输入图像大小或降低生成参数"
-                else:
-                    print(f"【分段模型推理错误】{str(e)}")
-                    generated_text = f"推理失败: {str(e)}"
-            except Exception as e:
-                print(f"【分段模型推理错误】{str(e)}")
-                generated_text = f"推理失败: {str(e)}"
-        
-        except Exception as e:
-            print(f"【分段模型处理错误】{str(e)}")
-            return f"处理失败: {str(e)}", None
-        
-        finally:
-            # 清理临时文件
-            if 'audio_path' in locals() and audio_path:
-                try:
-                    os.remove(audio_path)
-                except Exception as e:
-                    print(f"删除临时音频文件时出错: {e}")
-        
-        return generated_text, audio_output
     
     def _process_batch_inference(self, llama_model, images, system_prompt, final_prompt,
                                   image_max_size, batch_combination, gen_params,
-                                  audio_output_mode, engine, model_info, mode):
+                                  engine, model_info, mode):
         """
         批量推理模式 - 优化多图推理性能
         一次性处理多张图片，减少推理调用次数
@@ -1182,52 +726,87 @@ class llama_cpp_unified_inference:
             num_images = images.shape[0]
             print(f"【批量推理】开始处理 {num_images} 张图片")
             
+            # 记录总开始时间
+            total_start_time = time.time()
+            
             # 预处理：批量编码所有图片
             print(f"【批量推理】预处理图片编码...")
             image_contents = []
+            
+            # 批量转换为numpy数组，减少循环中的CPU-GPU数据传输
+            if hasattr(images, 'cpu'):
+                imgs_np = images.cpu().numpy()
+            else:
+                imgs_np = images
+            
+            # 批量处理图片
             for i in range(num_images):
                 mm.throw_exception_if_processing_interrupted()
                 
-                if hasattr(images[i], 'cpu'):
-                    img = images[i].cpu().numpy()
-                else:
-                    img = images[i]
+                img = imgs_np[i]
                 img_np = scale_image(img, image_max_size)
                 img_base64 = image2base64(img_np)
                 image_contents.append({
                     "type": "image_url",
                     "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}
                 })
-                print(f"【批量推理】编码图片 {i+1}/{num_images}")
+                if (i + 1) % 5 == 0 or i + 1 == num_images:
+                    print(f"【批量推理】编码图片 {i+1}/{num_images}")
             
             # 批量推理
             print(f"【批量推理】开始批量推理...")
             
             if batch_combination == "逐个输出":
-                # 逐个输出模式：每张图片单独推理
-                for i in range(num_images):
-                    mm.throw_exception_if_processing_interrupted()
-                    print(f"【批量推理】推理图片 {i+1}/{num_images}")
+                # 优化：使用批处理减少推理调用次数
+                # 对于数量较多的图片，分批次处理
+                batch_size = 4  # 每批处理4张图片
+                for batch_start in range(0, num_images, batch_size):
+                    batch_end = min(batch_start + batch_size, num_images)
+                    batch_images = image_contents[batch_start:batch_end]
                     
-                    messages = []
-                    if system_prompt and system_prompt.strip():
-                        messages.append({"role": "system", "content": system_prompt})
+                    print(f"【批量推理】处理批次 {batch_start//batch_size + 1}/{(num_images + batch_size - 1)//batch_size}")
                     
-                    content = [{"type": "text", "text": final_prompt}]
-                    content.append(image_contents[i])
+                    # 记录批次开始时间
+                    batch_start_time = time.time()
                     
-                    messages.append({"role": "user", "content": content})
+                    # 批量构建消息
+                    batch_messages = []
+                    for i, img_content in enumerate(batch_images):
+                        messages = []
+                        if system_prompt and system_prompt.strip():
+                            messages.append({"role": "system", "content": system_prompt})
+                        
+                        content = [{"type": "text", "text": final_prompt}]
+                        content.append(img_content)
+                        
+                        messages.append({"role": "user", "content": content})
+                        batch_messages.append(messages)
                     
-                    output = engine.create_chat_completion(llama_model.llm, messages, gen_params)
-                    if output and 'choices' in output:
-                        text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
-                        batch_results.append(text)
-                        print(f"【批量推理】图片 {i+1} 完成: {text[:50]}...")
-                    else:
-                        batch_results.append("")
-                        print(f"【批量推理】图片 {i+1} 失败")
+                    # 批量执行推理
+                    for i, messages in enumerate(batch_messages):
+                        img_idx = batch_start + i
+                        mm.throw_exception_if_processing_interrupted()
+                        print(f"【批量推理】推理图片 {img_idx+1}/{num_images}")
+                        
+                        output = engine.create_chat_completion(llama_model.llm, messages, gen_params)
+                        
+                        if output and 'choices' in output:
+                            text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
+                            batch_results.append(text)
+                            print(f"【批量推理】图片 {img_idx+1} 完成: {text[:50]}...")
+                        else:
+                            batch_results.append("")
+                            print(f"【批量推理】图片 {img_idx+1} 失败")
+                    
+                    # 记录批次结束时间
+                    batch_end_time = time.time()
+                    batch_time = batch_end_time - batch_start_time
+                    print(f"【批量推理】批次完成，耗时: {batch_time:.2f} 秒")
             else:
                 # 合并输出模式：所有图片一次性处理
+                # 记录推理开始时间
+                start_time = time.time()
+                
                 messages = []
                 if system_prompt and system_prompt.strip():
                     messages.append({"role": "system", "content": system_prompt})
@@ -1238,6 +817,11 @@ class llama_cpp_unified_inference:
                 messages.append({"role": "user", "content": content})
                 
                 output = engine.create_chat_completion(llama_model.llm, messages, gen_params)
+                
+                # 记录推理结束时间
+                end_time = time.time()
+                inference_time = end_time - start_time
+                
                 if output and 'choices' in output:
                     combined_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
                     # 尝试分割结果（假设模型按顺序返回结果）
@@ -1249,32 +833,32 @@ class llama_cpp_unified_inference:
                         # 如果无法分割，将整个结果作为第一个输出
                         batch_results = [combined_text]
                     
-                    print(f"【批量推理】合并模式完成: {combined_text[:50]}...")
+                    print(f"【批量推理】合并模式完成: {combined_text[:50]}... (耗时: {inference_time:.2f} 秒)")
                 else:
                     batch_results = [""]
-                    print(f"【批量推理】合并模式失败")
+                    print(f"【批量推理】合并模式失败 (耗时: {inference_time:.2f} 秒)")
+            
+            # 记录总结束时间
+            total_end_time = time.time()
+            total_inference_time = total_end_time - total_start_time
+            print(f"【批量推理】全部完成，总耗时: {total_inference_time:.2f} 秒")
             
             return batch_results
             
         except Exception as e:
-            print(f"【批量推理错误】{str(e)}")
+            # 记录错误时的时间
+            end_time = time.time()
+            inference_time = end_time - total_start_time if 'total_start_time' in locals() else 0
+            print(f"【批量推理错误】{str(e)} (耗时: {inference_time:.2f} 秒)")
             import traceback
             traceback.print_exc()
             return []
     
-    def _check_audio_input(self, audio):
-        """检查音频输入"""
-        if audio is None:
-            return False
-        if isinstance(audio, dict):
-            return "waveform" in audio or "text" in audio
-        elif hasattr(audio, 'numel'):
-            return audio.numel() > 0
-        return False
+
     
 
     
-    def _run_inference(self, llama_model, messages, gen_params, audio_output_mode, omni_speaker_type):
+    def _run_inference(self, llama_model, messages, gen_params):
         """执行推理的内部方法，用于异步处理"""
         generated_text = ""
         audio_output = None
@@ -1284,8 +868,7 @@ class llama_cpp_unified_inference:
         cache_content = {
             "model_path": model_path,
             "messages": messages,
-            "gen_params": {k: v for k, v in gen_params.items() if k != "seed"},  # 排除seed
-            "audio_output_mode": audio_output_mode
+            "gen_params": {k: v for k, v in gen_params.items() if k != "seed"}  # 排除seed
         }
         import json
         cache_key = hash(json.dumps(cache_content, sort_keys=True, default=str))
@@ -1301,39 +884,18 @@ class llama_cpp_unified_inference:
         
         while retry_count < max_retries and not success:
             try:
-                # 根据音频输出模式决定使用哪种方式
-                if audio_output_mode == "Omni原生音频输出":
-                    # 使用Omni模型原生音频输出
-                    if self.model_info["type"] == "omni" and isinstance(self.engine, QwenOmniInferenceEngine):
-                        generated_text, omni_audio = self.engine.generate_with_audio_output(
-                            llama_model.llm, messages, gen_params, omni_speaker_type, None
-                        )
-                        if omni_audio:
-                            audio_output = omni_audio
-                            print(f"【Omni推理】使用原生音频输出")
-                        else:
-                            # 如果Omni模型未生成音频，回退到标准文本推理
-                            output = self.engine.create_chat_completion(llama_model.llm, messages, gen_params)
-                            if output and 'choices' in output:
-                                generated_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
-                                # 过滤掉Thinking Process内容
-
-                            print(f"【提示】Omni无音频输出，回退至文本生成")
-                    else:
-                        # 非Omni模型或不支持原生音频输出，使用标准推理
-                        output = self.engine.create_chat_completion(llama_model.llm, messages, gen_params)
-                        if output and 'choices' in output:
-                            generated_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
-                            # 过滤掉Thinking Process内容
-                            if "Thinking Process:" in generated_text:
-                                generated_text = generated_text.split("Thinking Process:")[0].strip()
-                        print(f"【提示】当前模型不支持Omni原生音频输出，已回退到文本输出")
-                else:
-                    # 标准文本推理（所有模型类型）
-                    output = self.engine.create_chat_completion(llama_model.llm, messages, gen_params)
-                    if output and 'choices' in output:
-                        generated_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
-
+                # 记录推理开始时间
+                start_time = time.time()
+                
+                # 标准文本推理（所有模型类型）
+                output = self.engine.create_chat_completion(llama_model.llm, messages, gen_params)
+                if output and 'choices' in output:
+                    generated_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
+                
+                # 记录推理结束时间
+                end_time = time.time()
+                inference_time = end_time - start_time
+                print(f"【推理】推理完成，耗时: {inference_time:.2f} 秒")
 
                 if generated_text and generated_text.strip():
                     success = True
@@ -1348,6 +910,11 @@ class llama_cpp_unified_inference:
                         print(f"【调试】原始内容长度: {len(raw_content)}")
 
             except Exception as e:
+                # 记录推理结束时间（即使出错）
+                end_time = time.time()
+                inference_time = end_time - start_time
+                print(f"【推理】推理失败，耗时: {inference_time:.2f} 秒")
+                
                 retry_count += 1
                 error_msg = str(e)
                 
@@ -1387,8 +954,7 @@ class llama_cpp_unified_inference:
     def process(self, llama_model, inference_mode, preset_prompt, system_prompt, text_input,
                 prompt_language, response_language, output_format, video_max_frames,
                 video_sampling, video_manual_indices, image_max_size, batch_combination,
-                audio_output_mode,
-                omni_speaker, tts_speed, seed, force_offload,
+                seed, force_offload,
                 parameters=None, images=None, video=None, audio=None,
                 tts_model=None, asr_model=None, queue_handler=None, unique_id=None):
         """处理推理请求"""
@@ -1403,25 +969,27 @@ class llama_cpp_unified_inference:
                 "[基础] 批量图像理解 (Batch Image Understanding)": "batch_images",
                 "[基础] 音频转文本 (Audio to Text)": "audio",
                 "[基础] 文本转音频 (Text to Audio)": "text_to_audio",
-                "[高级] 全模态整合 (Multimodal Integration)": "multimodal",
                 "[高级] 视频理解 (Video Understanding)": "video"
             }
             mode = mode_map.get(inference_mode, "text")
             
-            # 处理Omni音频参数
-            omni_speaker_type = omni_speaker.split(" - ")[0].strip()
-            
             # 检查输入
             has_images = images is not None and (hasattr(images, 'numel') and images.numel() > 0)
-            has_video = video is not None and (hasattr(video, 'numel') and video.numel() > 0)
-            has_audio = self._check_audio_input(audio)
+            has_video = self.video_processor._check_video_input(video)
+            has_audio = False
             
             # 处理自定义提示词
             custom_prompt = text_input
             
             # 检查是否启用ASR和TTS
             enable_asr = mode in ["audio", "text_to_audio"] or preset_prompt in ["[Audio] Audio to Text"]
-            enable_tts = mode in ["text_to_audio"] or preset_prompt in ["[Audio] Text to Audio"]
+            # 启用TTS的条件：text_to_audio模式，或者使用了TTS模型，或者连接了TTS节点
+            enable_tts = mode in ["text_to_audio"] or preset_prompt in ["[Audio] Text to Audio"] or (tts_model is not None)
+            
+            # 设置默认值
+            audio_output_mode = "TTS音色美化输出" if enable_tts else "关闭音频输出"
+            tts_speed = 1.0
+            speaker_type = "default"
             
             # 检查是否有ASR和TTS模型
             has_asr_model = asr_model is not None
@@ -1443,11 +1011,21 @@ class llama_cpp_unified_inference:
                 final_prompt = custom_prompt.strip() if custom_prompt.strip() else system_prompt.strip()
             else:
                 final_prompt = preset_text
+                # 替换占位符
                 if custom_prompt.strip():
                     if "下面是要优化的 Prompt：" in preset_text or "Below is the Prompt to optimize:" in preset_text:
                         final_prompt = preset_text + custom_prompt.strip()
                     else:
-                        final_prompt = preset_text.replace("#", custom_prompt.strip()).replace("@", "video" if has_video else "image")
+                        final_prompt = final_prompt.replace("#", custom_prompt.strip()).replace("@", "video" if has_video else "image")
+                        # 清理条件语句
+                        final_prompt = final_prompt.replace("如果提供了自定义内容，请以此为基础：", "")
+                else:
+                    # 没有自定义内容时，移除 # 占位符并替换 @ 占位符
+                    final_prompt = final_prompt.replace("#", "").replace("@", "video" if has_video else "image")
+                    # 清理条件语句和多余的空白
+                    final_prompt = final_prompt.replace("如果提供了自定义内容，请以此为基础：", "")
+                    final_prompt = final_prompt.replace("和提供的自定义内容", "")
+                    final_prompt = final_prompt.replace("  ", " ").strip()
             
             # 添加语言指示
             if output_language == "中文":
@@ -1473,13 +1051,6 @@ class llama_cpp_unified_inference:
                         print("【ASR提示】未找到可用的ASR模型，跳过语音识别")
                 except Exception as e:
                     print(f"【ASR错误】语音识别失败: {str(e)}")
-            
-            # 分析音频特征（用于TTS音色匹配）
-            audio_features = None
-            if audio is not None and enable_tts:
-                audio_features = self._analyze_audio_features(audio)
-                if audio_features:
-                    print(f"【音频分析】音色: {audio_features['voice_type']}, 情感: {audio_features['emotion']}")
             
             # 将ASR结果合并到提示词中
             if asr_text:
@@ -1516,19 +1087,21 @@ class llama_cpp_unified_inference:
                         if tts_model is not None and hasattr(tts_model, 'synthesize'):
                             try:
                                 # TTS模型的音色和情感由TTS节点控制
+                                # 从TTS模型配置中获取speaker_id
+                                speaker_id = getattr(tts_model, 'config', {}).get('speaker_id', 0)
+                                print(f"【TTS】使用配置中的speaker_id: {speaker_id}")
                                 audio_output = tts_model.synthesize(
                                     text=generated_text,
-                                    speed=tts_speed
+                                    speed=tts_speed,
+                                    speaker_id=speaker_id
                                 )
                                 print(f"【TTS】使用TTS模型合成成功")
                             except Exception as e:
                                 print(f"【TTS】TTS模型合成失败: {str(e)}")
                                 audio_output = None
-                        # 如果TTS模型失败或未提供，使用备选方案
+                        # 如果TTS模型失败或未提供，audio_output保持为None
                         if audio_output is None:
-                            audio_output = self._generate_fallback_audio(generated_text, omni_speaker_type, tts_speed)
-                            if audio_output:
-                                print(f"【TTS】使用备选方案生成音频")
+                            print(f"【TTS】TTS模型未提供或合成失败")
                     # 兼容输出，确保传统Comfy音频保存器可以接受
                     if audio_output is None:
                         # 如果没有音频输出，使用1秒静音波形作为安全回退
@@ -1581,187 +1154,177 @@ class llama_cpp_unified_inference:
                     generated_text = asr_text
                     print(f"【TTS模式】使用ASR识别文本进行音频合成: {generated_text[:60]}...")
             
-            # 检查是否是分段模型
-            is_sharded_model = self._is_sharded_model(llama_model)
+            # 创建推理引擎（使用缓存）
+            engine_key = f"{self.model_info['key']}_{self.model_info['type']}_{self.model_info['subtype']}"
+            if engine_key not in self._model_cache:
+                self._model_cache[engine_key] = InferenceEngineFactory.create_engine(self.model_info)
+                print(f"【模型缓存】创建并缓存推理引擎: {engine_key}")
+            self.engine = self._model_cache[engine_key]
             
-            # 如果是分段模型，使用分段模型的推理方式
-            if is_sharded_model:
-                generated_text, audio_output = self._process_sharded_model(
-                    llama_model, final_prompt, text_input, mode, 
-                    enable_tts, enable_asr, asr_text, audio_output_mode,
-                    omni_speaker_type, tts_speed, 
-                    has_images, has_audio, has_video, images, audio, tts_model, 
-                    parameters, unique_id, seed, force_offload, output_format
-                )
+            # 确定性能级别
+            perf_level = "balanced"
+            if has_video:
+                perf_level = self.video_processor.get_video_perf_level()
+            elif has_images and image_max_size > 512:
+                perf_level = "quality"
+            
+            # 获取生成参数
+            video_input = has_video
+            text_input = bool(custom_prompt.strip())
+            cache_key = f"{perf_level}_{video_input}_{text_input}_{self.model_info['subtype']}"
+            
+            if cache_key in self._perf_params_cache:
+                gen_params = self._perf_params_cache[cache_key].copy()
             else:
-                # 创建推理引擎（使用缓存）
-                engine_key = f"{self.model_info['key']}_{self.model_info['type']}_{self.model_info['subtype']}"
-                if engine_key not in self._model_cache:
-                    self._model_cache[engine_key] = InferenceEngineFactory.create_engine(self.model_info)
-                    print(f"【模型缓存】创建并缓存推理引擎: {engine_key}")
-                self.engine = self._model_cache[engine_key]
+                gen_params = self.engine.get_generation_params(perf_level, video_input, text_input)
+                # 视频处理特殊优化：调整参数以减少内存占用
+                if video_input:
+                    # 降低批处理大小以避免内存不足
+                    gen_params["max_tokens"] = min(gen_params["max_tokens"], 1024)
+                    # 降低temperature以获得更稳定的输出
+                    gen_params["temperature"] = max(gen_params["temperature"] - 0.1, 0.5)
+                    print(f"【视频优化】视频处理模式，调整max_tokens={gen_params['max_tokens']}, temperature={gen_params['temperature']}")
+                # Qwen3.5模型特殊内存优化
+                try:
+                    from common import LLAMA_CPP_STORAGE
+                    if LLAMA_CPP_STORAGE.current_config:
+                        chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                        if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                            # 降低批处理大小以减少内存使用
+                            gen_params["n_batch"] = min(gen_params.get("n_batch", 512), 256)
+                            # 减少最大token数
+                            gen_params["max_tokens"] = min(gen_params.get("max_tokens", 1024), 768)
+                            # 降低top_p以减少内存使用
+                            gen_params["top_p"] = max(gen_params.get("top_p", 0.9), 0.8)
+                            print(f"【Qwen3.5优化】调整内存参数: n_batch={gen_params['n_batch']}, max_tokens={gen_params['max_tokens']}, top_p={gen_params['top_p']}")
+                except Exception as e:
+                    print(f"【Qwen3.5优化】内存参数调整时出错（忽略）: {e}")
+                self._perf_params_cache[cache_key] = gen_params.copy()
+            
+            # 应用用户自定义参数
+            if parameters:
+                gen_params.update({k: v for k, v in parameters.items() if k != "state_uid"})
+            
+            gen_params["seed"] = seed
+            
+
+                    
+            # 统一处理所有模型
+            content = []
+            if final_prompt:
+                content.append({"type": "text", "text": final_prompt})
+            
+            if images is not None and mode in ["images", "video"]:
+                if len(images.shape) == 3:
+                    images = images.unsqueeze(0)
                 
-                # 确定性能级别
-                perf_level = "balanced"
-                if has_video:
-                    perf_level = "fast"
-                elif has_images and image_max_size > 512:
-                    perf_level = "quality"
+                # Qwen3.5模型特殊图像大小优化
+                qwen35_image_size = image_max_size
+                try:
+                    from common import LLAMA_CPP_STORAGE
+                    if LLAMA_CPP_STORAGE.current_config:
+                        chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                        if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                            # 保持合理图像大小以匹配image_max_tokens（1024）
+                            # 512大小可以保证足够的图像质量同时控制内存使用
+                            qwen35_image_size = min(image_max_size, 512)
+                            if qwen35_image_size < 256:
+                                qwen35_image_size = 256
+                            print(f"【Qwen3.5优化】调整图像大小为: {qwen35_image_size}")
+                except Exception as e:
+                    print(f"【Qwen3.5优化】图像大小调整时出错（忽略）: {e}")
                 
-                # 获取生成参数
-                video_input = has_video
-                text_input = bool(custom_prompt.strip())
-                cache_key = f"{perf_level}_{video_input}_{text_input}_{self.model_info['subtype']}"
-                
-                if cache_key in self._perf_params_cache:
-                    gen_params = self._perf_params_cache[cache_key].copy()
-                else:
-                    gen_params = self.engine.get_generation_params(perf_level, video_input, text_input)
-                    # 视频处理特殊优化：调整参数以减少内存占用
-                    if video_input:
-                        # 降低批处理大小以避免内存不足
-                        gen_params["max_tokens"] = min(gen_params["max_tokens"], 1024)
-                        # 降低temperature以获得更稳定的输出
-                        gen_params["temperature"] = max(gen_params["temperature"] - 0.1, 0.5)
-                        print(f"【视频优化】视频处理模式，调整max_tokens={gen_params['max_tokens']}, temperature={gen_params['temperature']}")
-                    self._perf_params_cache[cache_key] = gen_params.copy()
-                
-                # 应用用户自定义参数
-                if parameters:
-                    gen_params.update({k: v for k, v in parameters.items() if k != "state_uid"})
-                
-                gen_params["seed"] = seed
-                
-                if self.model_info["type"] == "omni":
-                    # Omni 模型处理
-                    if isinstance(self.engine, QwenOmniInferenceEngine):
-                        # 处理音频输入：区分 ASR 输出（字典）和原始音频（tensor）
-                        audio_input = None
-                        if has_audio and audio is not None:
-                            if isinstance(audio, dict):
-                                # ASR 输出：检查是否包含波形数据
-                                if "waveform" in audio:
-                                    # 包含波形数据，可以用于多模态理解
-                                    audio_input = audio
-                                else:
-                                    # 只有文本数据，不传递给多模态输入
-                                    audio_input = None
-                                    print("【Omni 音频】ASR 输出仅包含文本，已跳过音频多模态输入")
-                            elif hasattr(audio, 'numel'):
-                                # 原始音频 tensor，需要包装成字典
-                                audio_input = {"waveform": audio, "sample_rate": 16000}
-                        
-                        # 文本生成模式下优化：跳过图像处理
-                        if mode == "text":
-                            messages = self.engine.build_messages(
-                                system_prompt=system_prompt,
-                                user_content=final_prompt
-                            )
-                            print("【Qwen3.5 优化】文本生成模式下使用简化消息格式")
-                        else:
-                            messages = self.engine.build_omni_messages(
-                                system_prompt=system_prompt,
-                                text=final_prompt,
-                                images=images if has_images else None,
-                                audio=audio_input,
-                                max_size=image_max_size
-                            )
+                for i in range(images.shape[0]):
+                    # 处理PyTorch张量或numpy数组
+                    if hasattr(images[i], 'cpu'):
+                        img = images[i].cpu().numpy()
                     else:
-                        # 回退到标准处理
-                        content = []
-                        if final_prompt:
-                            content.append({"type": "text", "text": final_prompt})
-                        messages = self.engine.build_messages(system_prompt, content)
-                elif self.model_info["subtype"] == "glm4v":
-                    # GLM-4V系列 (仅视觉)
-                    if isinstance(self.engine, GLM4VInferenceEngine):
-                        messages = self.engine.build_vision_messages(
-                            system_prompt, final_prompt, images, image_max_size
-                        )
-                else:
-                    # 默认VL模型
-                    content = []
-                    if final_prompt:
-                        content.append({"type": "text", "text": final_prompt})
+                        img = images[i]
+                    img_np = scale_image(img, qwen35_image_size)
+                    img_base64 = image2base64(img_np)
+                    content.append({
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}
+                    })
+                    # 清理内存
+                    del img, img_np, img_base64
+                    import gc
+                    gc.collect()
+            messages = self.engine.build_messages(system_prompt, content)
+            
+            print(f"【推理】使用模型: {self.model_info['key']}, 消息数: {len(messages)}")
+            
+            # ========== 批量推理模式 ==========
+            if mode == "batch_images" and has_images and images is not None and len(images.shape) >= 3:
+                num_images = images.shape[0] if len(images.shape) == 4 else 1
+                if num_images > 1:
+                    print(f"【批量推理】启用批量模式，图片数量: {num_images}，组合方式: {batch_combination}")
                     
-                    if images is not None and mode in ["images", "video"]:
-                        if len(images.shape) == 3:
-                            images = images.unsqueeze(0)
-                        
-                        for i in range(images.shape[0]):
-                            # 处理PyTorch张量或numpy数组
-                            if hasattr(images[i], 'cpu'):
-                                img = images[i].cpu().numpy()
-                            else:
-                                img = images[i]
-                            img_np = scale_image(img, image_max_size)
-                            img_base64 = image2base64(img_np)
-                            content.append({
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}
-                            })
+                    batch_results = self._process_batch_inference(
+                        llama_model=llama_model,
+                        images=images,
+                        system_prompt=system_prompt,
+                        final_prompt=final_prompt,
+                        image_max_size=image_max_size,
+                        batch_combination=batch_combination,
+                        gen_params=gen_params,
+                        engine=self.engine,
+                        model_info=self.model_info,
+                        mode=mode
+                    )
                     
-                    messages = self.engine.build_messages(system_prompt, content)
-                
-                print(f"【推理】使用模型: {self.model_info['key']}, 消息数: {len(messages)}")
-                
-                # ========== 批量推理模式 ==========
-                if mode == "batch_images" and has_images and images is not None and len(images.shape) >= 3:
-                    num_images = images.shape[0] if len(images.shape) == 4 else 1
-                    if num_images > 1:
-                        print(f"【批量推理】启用批量模式，图片数量: {num_images}，组合方式: {batch_combination}")
+                    if batch_results:
+                        if batch_combination == "合并输出":
+                            generated_text = " | ".join(batch_results)
+                            output_list = batch_results
+                        else:
+                            generated_text = batch_results[0] if batch_results else ""
+                            output_list = batch_results
                         
-                        batch_results = self._process_batch_inference(
-                            llama_model=llama_model,
-                            images=images,
-                            system_prompt=system_prompt,
-                            final_prompt=final_prompt,
-                            image_max_size=image_max_size,
-                            batch_combination=batch_combination,
-                            gen_params=gen_params,
-                            audio_output_mode=audio_output_mode,
-                            engine=self.engine,
-                            model_info=self.model_info,
-                            mode=mode
-                        )
+                        print(f"【批量推理】完成，生成 {len(batch_results)} 个结果")
                         
-                        if batch_results:
-                            if batch_combination == "合并输出":
-                                generated_text = " | ".join(batch_results)
-                                output_list = batch_results
-                            else:
-                                generated_text = batch_results[0] if batch_results else ""
-                                output_list = batch_results
-                            
-                            print(f"【批量推理】完成，生成 {len(batch_results)} 个结果")
-                            
-                            # 跳转到TTS处理部分
-                            if audio_output_mode == "TTS音色美化输出" and enable_tts and audio_output is None and generated_text:
-                                pass  # 继续到TTS处理
-                            else:
-                                # 直接返回结果
-                                _uid = parameters.get("state_uid", None) if parameters else None
-                                uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-                                return (generated_text, output_list, int(uid), None)
-                
-                # 执行推理（异步）
-                import asyncio
-                from concurrent.futures import ThreadPoolExecutor
-                audio_output = None
-                if not generated_text:
-                    # 使用线程池执行推理
-                    with ThreadPoolExecutor(max_workers=1) as executor:
-                        future = executor.submit(self._run_inference,
-                            llama_model=llama_model,
-                            messages=messages,
-                            gen_params=gen_params,
-                            audio_output_mode=audio_output_mode,
-                            omni_speaker_type=omni_speaker_type
-                        )
-                        generated_text, audio_output = future.result()
+                        # 跳转到TTS处理部分
+                        if audio_output_mode == "TTS音色美化输出" and enable_tts and audio_output is None and generated_text:
+                            pass  # 继续到TTS处理
+                        else:
+                            # Qwen3.5 模型特殊内存清理（防止多余内容）
+                            try:
+                                from common import LLAMA_CPP_STORAGE
+                                if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
+                                    chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                                        if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
+                                            LLAMA_CPP_STORAGE.llm.n_tokens = 0
+                                        if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
+                                            LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
+                                        if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
+                                            if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
+                                                LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
+                                        print("【Qwen3.5优化】已清理模型内存，防止多余内容")
+                            except Exception as e:
+                                print(f"【Qwen3.5优化】内存清理时出错（忽略）: {e}")
+
+                            # 直接返回结果
+                            _uid = parameters.get("state_uid", None) if parameters else None
+                            uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
+                            return (generated_text, output_list, int(uid), None)
+            
+            # 执行推理（异步）
+            import asyncio
+            from concurrent.futures import ThreadPoolExecutor
+            audio_output = None
+            if not generated_text:
+                # 使用线程池执行推理
+                with ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(self._run_inference,
+                        llama_model=llama_model,
+                        messages=messages,
+                        gen_params=gen_params
+                    )
+                    generated_text, audio_output = future.result()
             
             # 处理TTS语音合成（独立TTS模型）- 仅在TTS音色美化输出模式下启用
-            if audio_output_mode == "TTS音色美化输出" and enable_tts and audio_output is None and generated_text:
+            if enable_tts and audio_output is None and generated_text:
                 print(f"【TTS】开始语音合成...")
                 
                 # 尝试使用TTS模型
@@ -1794,11 +1357,9 @@ class llama_cpp_unified_inference:
                         print(f"【TTS】TTS模型合成失败: {str(e)}")
                         audio_output = None
                 
-                # 如果TTS模型失败或未提供，使用备选方案
+                # 如果TTS模型失败或未提供，audio_output保持为None
                 if audio_output is None:
-                    audio_output = self._generate_fallback_audio(generated_text, omni_speaker_type, tts_speed)
-                    if audio_output:
-                        print(f"【TTS】使用备选方案生成音频")
+                    print(f"【TTS】TTS模型未提供或合成失败")
             
             # 兼容输出，确保传统Comfy音频保存器可以接受
             if audio_output is None:
@@ -1838,6 +1399,23 @@ class llama_cpp_unified_inference:
                 if sample_rate is None:
                     audio_output["sample_rate"] = 24000
                     print("【TTS兼容】sample_rate缺失，已默认设为24000")
+
+            # Qwen3.5 模型特殊内存清理（防止多余内容）
+            try:
+                from common import LLAMA_CPP_STORAGE
+                if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
+                    chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                        if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
+                            LLAMA_CPP_STORAGE.llm.n_tokens = 0
+                        if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
+                            LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
+                        if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
+                            if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
+                                LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
+                        print("【Qwen3.5优化】已清理模型内存，防止多余内容")
+            except Exception as e:
+                print(f"【Qwen3.5优化】内存清理时出错（忽略）: {e}")
 
             # 强制卸载
             if force_offload:
@@ -1991,17 +1569,7 @@ class llama_cpp_unified_inference:
                     "max_tokens": 512
                 }
             },
-            "multimodal_integration": {
-                "model_type": "omni",
-                "recommended_models": ["Qwen3.5", "Qwen2.5-Omni", "MiniCPM-O-4.5"],
-                "params": {
-                    "temperature": 0.7,
-                    "top_p": 0.9,
-                    "max_tokens": 1024,
-                    "image_min_tokens": 1024,
-                    "image_max_tokens": 1024
-                }
-            },
+
             "video_understanding": {
                 "model_type": "vision",
                 "recommended_models": ["Qwen3-VL", "LLaVA-1.6"],

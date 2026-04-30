@@ -323,7 +323,7 @@ class llama_cpp_asr_loader:
             },
             "optional": {
                 "enable_timestamps": ("BOOLEAN", {"default": False, "tooltip": "启用时间戳功能（需要Qwen3-ForcedAligner）"}),
-                "flash_attention": ("BOOLEAN", {"default": False, "tooltip": "启用FlashAttention2优化（需要安装flash-attn）"}),
+                "flash_attention": ("BOOLEAN", {"default": False, "tooltip": "启用FlashAttention优化（自动选择FA3/FA2，需安装flash-attn）"}),
             }
         }
     
@@ -658,14 +658,21 @@ class ASRModelWrapper:
                     "max_new_tokens": 256  # 固定值
                 }
                 
-                # 如果启用FlashAttention2优化
+                # 如果启用FlashAttention优化
                 if self.config.get("flash_attention", False):
                     try:
-                        import flash_attn
-                        model_kwargs["attn_implementation"] = "flash_attention_2"
-                        print(f"【Qwen3-ASR模型】启用FlashAttention2优化")
+                        # 优先检测 Flash Attention 3
+                        try:
+                            import flash_attn_3
+                            model_kwargs["attn_implementation"] = "flash_attention_3"
+                            print(f"【Qwen3-ASR模型】启用FlashAttention3优化")
+                        except ImportError:
+                            # 回退到 Flash Attention 2
+                            import flash_attn
+                            model_kwargs["attn_implementation"] = "flash_attention_2"
+                            print(f"【Qwen3-ASR模型】启用FlashAttention2优化")
                     except ImportError:
-                        print(f"【Qwen3-ASR模型】FlashAttention2未安装，使用默认Attention实现")
+                        print(f"【Qwen3-ASR模型】FlashAttention未安装，使用默认Attention实现")
                 
                 # 如果启用时间戳，添加ForcedAligner
                 if enable_timestamps:
@@ -1408,16 +1415,31 @@ class ASRModelWrapper:
             if self.model is not None:
                 if isinstance(self.model, dict):
                     for key, value in self.model.items():
-                        if hasattr(value, 'cpu'):
-                            value.cpu()
+                        if hasattr(value, 'to'):
+                            value = value.to('cpu')
                     del self.model
                 else:
+                    # 将模型移动到CPU以确保GPU内存释放
+                    try:
+                        if hasattr(self.model, 'to'):
+                            self.model = self.model.to('cpu')
+                    except Exception as e:
+                        print(f"【ASR包装器】将模型移至CPU失败: {e}")
+                    
                     del self.model
                 self.model = None
                 
+                # 强制垃圾回收
+                import gc
+                gc.collect()
+                
+                # 同步GPU操作并清空缓存
                 if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize()  # 确保所有GPU操作完成
+                    torch.cuda.empty_cache()  # 清空GPU缓存
                     print("【ASR包装器】已清理GPU缓存")
+                else:
+                    print("【ASR包装器】CUDA不可用，仅清理CPU内存")
             
             print("【ASR包装器】ASR模型已卸载")
             
