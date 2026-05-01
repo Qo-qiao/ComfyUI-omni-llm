@@ -3,89 +3,39 @@
 # ===========================================
 # 安装说明：
 # 1. 基础安装：pip install -r requirements.txt
-# 2. 如果遇到版本冲突，请执行：
-#    pip install qwen-tts --no-deps --user
-# 3. 如果遇到 auto-gptq 版本解析问题，请手动安装：
-#    pip install auto-gptq --no-deps --user
-# 4. 如果遇到 webrtcvad 编译问题（缺少 Python.h），这是嵌入式 Python 环境限制，
-#    可以跳过安装，不影响核心功能
-# 5. Windows CUDA 12.8 需要取消对应 Python 版本的 llama-cpp-python 注释
+# 2. 如果遇到 llama-cpp-python 问题，请手动安装适合您系统的版本
+# 3. site-packages 目录中已包含部分依赖，无需重复安装
 # ===========================================
 
 # ===========================================
-# 基础依赖（必须安装）
+# 核心基础依赖（必须安装）
 # ===========================================
 torch
 torchaudio
 Pillow
 requests
+numpy
 scipy>=1.7.0
 
 # ===========================================
-# 音频处理依赖
+# 音频处理核心依赖
 # ===========================================
 soundfile
-gguf
-librosa>=0.10.0
-pydub
-resampy
-ffmpeg-python
 
 # ===========================================
-# 图像处理增强
+# 可选依赖（功能增强，按需安装）
 # ===========================================
-opencv-python
+# 如果需要使用 Supertonic TTS，安装：
+# onnxruntime>=1.16.0
+# onnxruntime-gpu; sys_platform != 'darwin'
 
-# ===========================================
-# Qwen3-TTS 专用依赖
-# ===========================================
-einops>=0.7.0
-onnxruntime>=1.16.0
-onnxruntime-gpu; sys_platform != 'darwin'
-pydantic>=2.0.0
-tqdm
-
-# ===========================================
-# Qwen3-ASR 专用依赖
-# ===========================================
-nagisa==0.2.11
-soynlp==0.0.493
-qwen-omni-utils
-jieba>=0.42.0
-editdistance
-
-# ===========================================
-# 模型依赖
-# ===========================================
-modelscope>=1.20.0
-huggingface-hub>=0.20.0
-safetensors>=0.4.0
-tokenizers>=0.15.0
-protobuf>=3.20.0
-
-# ===========================================
-# 多媒体处理
-# ===========================================
-torchvision
-imageio
-imageio-ffmpeg
-
-# ===========================================
-# 配置文件处理
-# ===========================================
-pyyaml
-
-# ===========================================
-# Fun-ASR 依赖
-# ===========================================
-funasr>=1.3.0
+# 如果需要使用 ASR 功能，安装：
+# librosa>=0.10.0
 
 # ===========================================
 # 安装后验证
 # ===========================================
 # 安装完成后，运行以下命令验证：
 # python -c "import llama_cpp; print('llama-cpp-python 版本:', llama_cpp.__version__)"
-# python -c "import funasr; print('funasr 版本:', funasr.__version__)"
-# python -c "import soundfile; print('soundfile 导入成功')"
-# python -c "import librosa; print('librosa 版本:', librosa.__version__)"
-# python -c "import transformers; print('transformers 版本:', transformers.__version__)"
+# python -c "import numpy; print('numpy 导入成功')"
+# python -c "import torch; print('torch 导入成功')"
