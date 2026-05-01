@@ -22,6 +22,11 @@ ComfyUI-omni-llm is a comprehensive ComfyUI plugin, deeply refactored and enhanc
 
 Place the zh-CN files into the corresponding folder of translation plugins (ComfyUI-Chinese-Translation/AIGODLIKE-ComfyUI-Translation/ComfyUI-DD-Translation) to overwrite. It is recommended to install the [ComfyUI-Chinese-Translation](https://github.com/a63976659/ComfyUI-Chinese-Translation) plugin for more comprehensive Chinese localization and faster translation updates.
 
+## Recommended Companion Plugins
+
+Welcome to try my new plugin, the prompt storage plugin [ComfyUI-prompt-storage](https://github.com/Qo-qiao/ComfyUI-prompt-storage), which allows you to store important prompts for easy future use.
+
+
 
 ## Installation Instructions
 
