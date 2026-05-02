@@ -1583,8 +1583,62 @@ class LLAMA_CPP_STORAGE:
     def clean(cls, all=False):
         try:
             if cls.llm is not None:
-                cls.llm.close()
-                print(f"【资源释放】成功关闭LLM模型")
+                print(f"【资源释放】开始彻底清理LLM模型...")
+                llm = cls.llm
+                
+                # 1. 清理模型内部缓存
+                try:
+                    if hasattr(llm, '_ctx') and hasattr(llm._ctx, 'memory_clear'):
+                        llm._ctx.memory_clear(True)
+                        print(f"【资源释放】已调用ctx.memory_clear(True)")
+                except Exception as e:
+                    print(f"【资源释放】清理ctx内存失败: {e}")
+                
+                # 2. 清理混合缓存管理器
+                try:
+                    if hasattr(llm, '_hybrid_cache_mgr') and llm._hybrid_cache_mgr is not None:
+                        llm._hybrid_cache_mgr.clear()
+                        print(f"【资源释放】已清理_hybrid_cache_mgr")
+                except Exception as e:
+                    print(f"【资源释放】清理_hybrid_cache_mgr失败: {e}")
+                
+                # 3. 尝试多种卸载方法
+                unload_methods = [
+                    ('close', lambda x: x.close()),
+                    ('free', lambda x: x.free()),
+                    ('unload', lambda x: x.unload())
+                ]
+                success = False
+                for method_name, method_func in unload_methods:
+                    if hasattr(llm, method_name):
+                        try:
+                            method_func(llm)
+                            print(f"【资源释放】已调用{method_name}()")
+                            success = True
+                            break
+                        except Exception as e:
+                            print(f"【资源释放】调用{method_name}()失败: {e}")
+                
+                if not success:
+                    print(f"【资源释放】未找到合适的卸载方法，尝试直接清理内部属性...")
+                
+                # 4. 清理模型的n_tokens
+                if hasattr(llm, 'n_tokens'):
+                    try:
+                        llm.n_tokens = 0
+                        print(f"【资源释放】已清空n_tokens")
+                    except Exception as e:
+                        pass
+                
+                # 5. 清理内部的ctx（如果有的话）
+                try:
+                    if hasattr(llm, '_ctx') and hasattr(llm._ctx, 'model'):
+                        llm._ctx.model = None
+                        print(f"【资源释放】已清空模型引用")
+                except Exception as e:
+                    pass
+                
+                print(f"【资源释放】成功清理LLM模型")
         except Exception as e:
             print(f"【提示】关闭LLM模型失败（忽略，继续释放资源）：{e}")
         
