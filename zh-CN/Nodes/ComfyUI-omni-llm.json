@@ -25,108 +25,6 @@
       "image_list": "绘制了边界框的图像列表\n• 可视化检测结果"
     }
   },
-  "llama_cpp_api_model_config": {
-    "title": "API配置管理器",
-    "inputs": {
-      "model_name": "模型名称",
-      "api_provider": "API提供商",
-      "api_base": "API地址",
-      "api_key": "API密钥",
-      "max_tokens": "最大token数",
-      "temperature": "生成温度"
-    },
-    "widgets": {
-      "model_name": "模型名称",
-      "api_provider": "API提供商",
-      "api_base": "API地址",
-      "api_key": "API密钥",
-      "max_tokens": "最大token数",
-      "temperature": "生成温度"
-    },
-    "outputs": {
-      "api_config": "API配置",
-      "preview": "预览"
-    },
-    "tooltips": {
-      "model_name": "API模型名称\n• 自定义模型时使用",
-      "api_provider": "选择API服务商\n• 会自动切换对应的模型列表",
-      "api_base": "API基础URL\n• 如：https://api.openai.com/v1",
-      "api_key": "API密钥\n• 用于身份验证\n• 请妥善保管",
-      "max_tokens": "最大生成token数\n• 控制输出长度",
-      "temperature": "温度参数\n• 0.0-2.0\n• 值越高越随机",
-      "api_config": "API配置",
-      "preview": "配置预览信息"
-    }
-  },
-  "llama_cpp_api_inference": {
-    "title": "API多媒体推理",
-    "inputs": {
-      "api_config": "API配置",
-      "inference_mode": "推理模式",
-      "preset_prompt": "预设模板",
-      "system_prompt": "系统提示词",
-      "text_input": "用户输入",
-      "prompt_language": "提示词语言",
-      "response_language": "响应语言",
-      "video_max_frames": "视频最大帧数",
-      "video_sampling": "视频抽帧模式",
-      "video_manual_indices": "视频手动帧索引",
-      "image_max_size": "图像最大尺寸",
-      "tts_voice": "TTS音色",
-      "tts_emotion": "情感风格",
-      "tts_language": "TTS语言",
-      "tts_speed": "语速",
-      "seed": "随机种子",
-      "output_format": "输出格式",
-      "images": "图像",
-      "video": "视频",
-      "audio": "音频"
-    },
-    "widgets": {
-      "api_config": "API配置",
-      "inference_mode": "推理模式",
-      "preset_prompt": "预设模板",
-      "system_prompt": "系统提示词",
-      "text_input": "用户输入",
-      "prompt_language": "提示词语言",
-      "response_language": "响应语言",
-      "video_max_frames": "视频最大帧数",
-      "video_sampling": "视频抽帧模式",
-      "video_manual_indices": "视频手动帧索引",
-      "image_max_size": "图像最大尺寸",
-      "tts_voice": "TTS音色",
-      "tts_emotion": "情感风格",
-      "tts_language": "TTS语言",
-      "tts_speed": "语速",
-      "seed": "随机种子",
-      "output_format": "输出格式"
-    },
-    "outputs": {
-      "text": "文本输出",
-      "audio": "音频输出"
-    },
-    "tooltips": {
-      "api_config": "API配置\n• 从API模型配置节点获取",
-      "inference_mode": "选择推理模式\n• [VL] 图像理解：处理单张或多张图片\n• [VL] 视频理解：从视频中提取帧进行分析\n• [VL] 单图逐个处理：逐张处理图片序列\n• [LLM] 纯文本对话：仅文本交互",
-      "preset_prompt": "选择预设提示词模板",
-      "system_prompt": "系统提示词，定义AI助手的角色和行为\n• 可包含预设模板占位符#\n• 与预设模板配合使用时，可设置AI的角色扮演",
-      "text_input": "用户输入文本\n• 作为对话的用户消息内容\n• 支持多行文本输入\n• 可替换预设模板中的#占位符",
-      "prompt_language": "提示词语言\n• 中文：使用中文提示词\n• English：使用英文提示词",
-      "response_language": "响应语言\n• 自动检测：自动检测语言\n• 中文：强制中文输出\n• English：强制英文输出",
-      "video_max_frames": "视频处理的最大帧数\n• 控制视频抽帧数量\n• 影响处理时间和API调用成本",
-      "video_sampling": "视频抽帧模式\n• 自动均匀采样：均匀抽取帧\n• 手动指定帧索引：按指定索引抽帧",
-      "video_manual_indices": "手动模式下的帧索引\n• 仅在video_sampling为手动时生效\n• 格式：逗号分隔的数字或范围（如：0,10,20 或 0-10）",
-      "image_max_size": "图像处理的最大尺寸\n• 控制图像缩放大小\n• 影响API调用成本和速度",
-      "tts_voice": "TTS音色选择\n• 👩 女声 (nova)\n• 👨 男声 (onyx)\n• 🧒 萝莉音 (shimmer)\n• 👦 正太音 (echo)\n• 💃 御姐音 (fable)\n• 👴 大叔音 (alloy)",
-      "tts_emotion": "TTS情感风格\n• 开心/悲伤/愤怒/平静/兴奋/温柔/默认",
-      "tts_speed": "TTS语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
-      "seed": "随机种子\n• 影响生成结果的可重复性\n• 相同种子产生相同结果",
-      "output_format": "选择输出格式：\n• 文本：返回纯文本结果\n• JSON：返回包含详细信息的JSON格式",
-      "images": "图像输入\n• 支持单张或多张图像",
-      "video": "视频输入\n• 自动抽帧处理",
-      "audio": "音频输入\n• 用于音频理解"
-    }
-  },
 
   "llama_cpp_asr_loader": {
     "title": "Llama-cpp ASR模型加载器",
@@ -437,7 +335,7 @@
       "force_offload": "强制卸载",
       "save_states": "保存状态",
       "parameters": "参数",
-      "images": "图像",
+      "images": "images",
       "video": "视频",
       "audio": "音频",
       "asr_model": "ASR模型",
@@ -463,7 +361,7 @@
       "force_offload": "强制卸载",
       "save_states": "保存状态",
       "parameters": "参数",
-      "images": "图像",
+      "images": "images",
       "video": "视频",
       "audio": "音频",
       "asr_model": "ASR模型",
@@ -498,7 +396,7 @@
       "tts_language": "TTS合成语言\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• German：德语\n• French：法语\n• Russian：俄语\n• Portuguese：葡萄牙语\n• Spanish：西班牙语\n• Italian：意大利语",
       "tts_speed": "TTS语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
       "parameters": "选择参数设置节点\n• 控制生成参数如温度、采样等",
-      "images": "输入图像\n• 支持单张或多张图像",
+      "images": "images\n• 支持单张或多张图像",
       "video": "输入视频\n• 自动抽帧处理",
       "asr_model": "ASR模型输入\n• 用于语音识别\n• 将音频转换为文本",
       "tts_model": "TTS模型输入\n• 用于语音合成\n• 将文本转换为语音",
@@ -624,7 +522,7 @@
       "video_model": "视频生成模型"
     },
     "outputs": {
-      "images": "图像",
+      "images": "images",
       "prompt": "提示词"
     },
     "tooltips": {
@@ -652,7 +550,7 @@
       "content_focus": "内容重点\n• 平衡发展/强调情节/强调角色等",
       "target_audience": "选择目标受众\n• 普通大众/青少年/儿童等",
       "video_model": "选择视频生成模型类型\n• WAN2.2/LTX2/通用视频/自定义\n• 不同模型需要不同的提示词格式",
-      "images": "预处理后的图像\n• 可连接到推理节点",
+      "images": "images\n• 可连接到推理节点",
       "prompt": "生成的提示词\n• 可直接连接到推理节点的custom_prompt"
     }
   },
@@ -679,7 +577,7 @@
       "format": "输出格式"
     },
     "outputs": {
-      "images": "图像序列",
+      "images": "images",
       "video": "视频",
       "audio": "音频"
     },
@@ -691,7 +589,7 @@
       "skip_first_frames": "跳过前几帧\n• 从指定帧开始读取",
       "select_every_nth": "间隔采样\n• 每N帧取1帧",
       "format": "输出格式\n• 控制颜色通道顺序",
-      "images": "提取的图像序列",
+      "images": "images",
       "video": "处理后的视频对象",
       "audio": "提取的音频"
     }
