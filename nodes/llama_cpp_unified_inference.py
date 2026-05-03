@@ -256,7 +256,7 @@ class VideoProcessor:
             self.torchcodec = torchcodec
             self.use_torchcodec = True
             print("【视频处理】使用torchcodec进行视频处理")
-        except ImportError:
+        except (ImportError, RuntimeError):
             self.use_torchcodec = False
             print("【视频处理】torchcodec不可用，使用默认处理方式")
 
@@ -544,7 +544,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：设计类图像描述\n• [Poster] Qwen - Image 2512：海报风格强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Image Edit] Qwen - Image Layered：图像分层编辑\n• [Text to Video] LTX-2：文本转视频提示词\n• [Text to Video] WAN - Text to Video：WAN文本转视频\n• [Image to Video] WAN - Image to Video：WAN图像转视频\n• [Image to Video] WAN - FLF to Video：WAN FLF转视频\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频详细场景分解\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的多模态助手。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
