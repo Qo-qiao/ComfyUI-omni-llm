@@ -100,8 +100,6 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 #### 视频处理
 ![视频反推工作流示例](./workflows/视频反推（Video_reverse_engineering）.png) 
 
-#### 多图像视频文本生成
-![分镜生成工作流示例](./workflows/分镜生成（Storyboard_generation）.png)
 
 #### 音频处理
 ![文本转音频工作流示例](./workflows/文本转音频（Text_to_Audio）.png)

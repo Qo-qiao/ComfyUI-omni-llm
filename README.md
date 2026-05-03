@@ -98,8 +98,6 @@ If you are not familiar with installing dependencies, it is recommended to use t
 #### Video Processing
 ![Video Reverse Engineering Workflow Example](./workflows/视频反推（Video_reverse_engineering）.png)
 
-#### Multi-Image Video Text Generation
-![Storyboard Generation Workflow Example](./workflows/分镜生成（Storyboard_generation）.png)
 
 #### Audio Processing
 ![Text to Audio Workflow Example](./workflows/文本转音频（Text_to_Audio）.png)
