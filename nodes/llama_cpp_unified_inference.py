@@ -200,6 +200,7 @@ from support.prompt_enhancer_preset_zh import (
     WAN_T2V_ZH,
     WAN_I2V_ZH,
     WAN_FLF2V_ZH,
+    VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH,
     VIDEO_TO_PROMPT_ZH,
     VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
     VIDEO_SUBTITLE_FORMAT_ZH,
@@ -226,6 +227,7 @@ from support.prompt_enhancer_preset_en import (
     WAN_T2V_EN,
     WAN_I2V_EN,
     WAN_FLF2V_EN,
+    VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN,
     VIDEO_TO_PROMPT_EN,
     VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
     VIDEO_SUBTITLE_FORMAT_EN,
@@ -264,17 +266,39 @@ class VideoProcessor:
         """检查视频输入是否有效"""
         if video is None:
             return False
+        
+        # 检查是否为 tensor（直接的图像序列）
         if hasattr(video, 'numel'):
             return video.numel() > 0
+        
+        # 检查是否为 VideoOutput 对象（包含 frames 属性）
+        if hasattr(video, 'frames'):
+            frames = video.frames
+            if hasattr(frames, 'numel'):
+                return frames.numel() > 0
+        
+        # 检查是否为字典格式
+        if isinstance(video, dict) and 'frames' in video:
+            frames = video['frames']
+            if hasattr(frames, 'numel'):
+                return frames.numel() > 0
+        
         return False
 
     def get_video_optimization_params(self, base_params: Dict) -> Dict:
         """获取视频处理优化参数"""
         optimized_params = base_params.copy()
+        
+        # 视频处理需要更多显存，降低参数以避免内存不足
         optimized_params["max_new_tokens"] = min(optimized_params.get("max_new_tokens", 1024), 768)
         optimized_params["temperature"] = max(optimized_params.get("temperature", 0.7) - 0.05, 0.6)
         optimized_params["top_p"] = max(optimized_params.get("top_p", 0.95) - 0.05, 0.9)
-        print(f"【视频优化】视频处理模式，调整max_new_tokens={optimized_params['max_new_tokens']}, temperature={optimized_params['temperature']}, top_p={optimized_params['top_p']}")
+        
+        # 关键优化：降低n_batch以节省显存（视频处理需要更多显存）
+        current_n_batch = optimized_params.get("n_batch", 512)
+        optimized_params["n_batch"] = max(64, current_n_batch // 4)  # 降低到原来的1/4
+        
+        print(f"【视频优化】视频处理模式，调整max_new_tokens={optimized_params['max_new_tokens']}, temperature={optimized_params['temperature']}, top_p={optimized_params['top_p']}, n_batch={optimized_params['n_batch']}")
         return optimized_params
 
     def get_video_perf_level(self) -> str:
@@ -306,8 +330,19 @@ class VideoProcessor:
         frames = []
         max_frames = min(max_frames, 15)
 
-        if hasattr(video, 'shape') and video.ndim == 4:
-            total_frames = video.shape[0]
+        # 获取实际的视频帧数据（处理 VideoOutput 对象或直接 tensor）
+        video_frames = video
+        
+        # 如果是 VideoOutput 对象，获取其 frames 属性
+        if hasattr(video, 'frames'):
+            video_frames = video.frames
+        
+        # 如果是字典格式，获取 frames 字段
+        if isinstance(video, dict) and 'frames' in video:
+            video_frames = video['frames']
+
+        if hasattr(video_frames, 'shape') and video_frames.ndim == 4:
+            total_frames = video_frames.shape[0]
             if sampling_method == "自动均匀采样":
                 step = max(1, total_frames // max_frames)
                 indices = list(range(0, total_frames, step))[:max_frames]
@@ -319,21 +354,21 @@ class VideoProcessor:
                     step = max(1, total_frames // max_frames)
                     indices = list(range(0, total_frames, step))[:max_frames]
 
-            if video.is_cuda:
+            if video_frames.is_cuda:
                 for idx in indices:
-                    frame = video[idx].detach().cpu()
+                    frame = video_frames[idx].detach().cpu()
                     frames.append(frame)
             else:
                 for idx in indices:
-                    frames.append(video[idx])
+                    frames.append(video_frames[idx])
 
-        if not frames and hasattr(video, 'shape') and video.ndim == 4 and video.shape[0] > 0:
-            frames.append(video[0])
+        if not frames and hasattr(video_frames, 'shape') and video_frames.ndim == 4 and video_frames.shape[0] > 0:
+            frames.append(video_frames[0])
 
         return frames
 
-    def _resize_frames(self, frames: List, max_size: int = 384) -> List:
-        """调整帧大小以减少计算量"""
+    def _resize_frames(self, frames: List, max_size: int = 256) -> List:
+        """调整帧大小以减少计算量和显存使用"""
         resized = []
         for frame in frames:
             if hasattr(frame, 'shape'):
@@ -512,6 +547,7 @@ class llama_cpp_unified_inference:
     preset_prompts["[Text to Video] WAN - Text to Video"] = "WAN_T2V"
     preset_prompts["[Image to Video] WAN - Image to Video"] = "WAN_I2V"
     preset_prompts["[Image to Video] WAN - FLF to Video"] = "WAN_FLF2V"
+    preset_prompts["[Video Analysis] Video - Frame Sequence Analysis"] = "VIDEO_FRAME_SEQUENCE_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Reverse Prompt"] = "VIDEO_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Detailed Scene Breakdown"] = "VIDEO_DETAILED_SCENE_BREAKDOWN"
     preset_prompts["[Video Analysis] Video - Subtitle Format"] = "VIDEO_SUBTITLE_FORMAT"
@@ -544,7 +580,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：设计类图像描述\n• [Poster] Qwen - Image 2512：海报风格强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Image Edit] Qwen - Image Layered：图像分层编辑\n• [Text to Video] LTX-2：文本转视频提示词\n• [Text to Video] WAN - Text to Video：WAN文本转视频\n• [Image to Video] WAN - Image to Video：WAN图像转视频\n• [Image to Video] WAN - FLF to Video：WAN FLF转视频\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频详细场景分解\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Image Edit] Qwen - Image Layered：图像分层编辑\n• [Text to Video] LTX-2：文本生视频提示词\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的多模态助手。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
@@ -663,6 +699,7 @@ class llama_cpp_unified_inference:
                 "WAN_T2V": WAN_T2V_ZH,
                 "WAN_I2V": WAN_I2V_ZH,
                 "WAN_FLF2V": WAN_FLF2V_ZH,
+                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
                 "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_ZH,
@@ -689,6 +726,7 @@ class llama_cpp_unified_inference:
                 "WAN_T2V": WAN_T2V_EN,
                 "WAN_I2V": WAN_I2V_EN,
                 "WAN_FLF2V": WAN_FLF2V_EN,
+                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
                 "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_EN,
@@ -1207,14 +1245,64 @@ class llama_cpp_unified_inference:
             
             gen_params["seed"] = seed
             
-
+            # ========== 视频处理逻辑 ==========
+            video_frames = []
+            if has_video and mode == "video":
+                print(f"【视频处理】开始处理视频，帧数限制: {video_max_frames}, 采样方式: {video_sampling}")
+                video_data = self.video_processor.process_video_input(
+                    video=video,
+                    max_frames=video_max_frames,
+                    sampling_method=video_sampling,
+                    manual_indices=video_manual_indices
+                )
+                
+                if video_data and "frames" in video_data:
+                    video_frames = video_data["frames"]
+                    print(f"【视频处理】成功提取 {len(video_frames)} 帧用于推理")
+                else:
+                    print(f"【视频处理】视频提取失败或无可用帧")
                     
             # 统一处理所有模型
             content = []
             if final_prompt:
                 content.append({"type": "text", "text": final_prompt})
             
-            if images is not None and mode in ["images", "video"]:
+            # 先添加视频帧
+            if len(video_frames) > 0:
+                # Qwen3.5模型特殊图像大小优化
+                qwen35_image_size = image_max_size
+                try:
+                    from common import LLAMA_CPP_STORAGE
+                    if LLAMA_CPP_STORAGE.current_config:
+                        chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                        if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                            # 保持合理图像大小以匹配image_max_tokens（1024）
+                            qwen35_image_size = min(image_max_size, 512)
+                            if qwen35_image_size < 256:
+                                qwen35_image_size = 256
+                            print(f"【Qwen3.5优化】调整视频帧大小为: {qwen35_image_size}")
+                except Exception as e:
+                    print(f"【Qwen3.5优化】视频帧大小调整时出错（忽略）: {e}")
+                
+                for i, frame in enumerate(video_frames):
+                    # 处理PyTorch张量或numpy数组
+                    if hasattr(frame, 'cpu'):
+                        img = frame.cpu().numpy()
+                    else:
+                        img = frame
+                    img_np = scale_image(img, qwen35_image_size)
+                    img_base64 = image2base64(img_np)
+                    content.append({
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}
+                    })
+                    # 清理内存
+                    del img, img_np, img_base64
+                    import gc
+                    gc.collect()
+            
+            # 再添加图像
+            if images is not None and mode in ["images"]:
                 if len(images.shape) == 3:
                     images = images.unsqueeze(0)
                 

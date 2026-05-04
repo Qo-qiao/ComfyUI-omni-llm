@@ -11,6 +11,7 @@ License: See LICENSE file for details
 import numpy as np
 import sys
 import os
+import torch
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -223,11 +224,51 @@ class MultiImageInput:
         print(f"【Image Mode】Completed, generated prompt length: {len(multi_image_prompt)} characters")
         
         # 将图像列表合并为单个tensor（如果有多张图像）
-        if len(preprocessed_images) == 1:
-            combined_images = preprocessed_images[0]
+        # 转换为PyTorch张量，格式为 [batch, height, width, channels]，范围 [0, 1]
+        tensor_list = []
+        target_height, target_width = 0, 0
+        
+        # 首先找到所有图像中的最大尺寸
+        for img_np in preprocessed_images:
+            h, w = img_np.shape[:2]
+            target_height = max(target_height, h)
+            target_width = max(target_width, w)
+        
+        # 如果只有一张图，使用原图尺寸；否则使用用户指定的max_size作为目标尺寸
+        if len(preprocessed_images) > 1:
+            target_height = target_width = max_size
+        
+        # 转换并调整所有图像到相同尺寸
+        for img_np in preprocessed_images:
+            # 添加batch维度并转换为float32，范围 [0, 1]
+            img_tensor = torch.from_numpy(img_np).float() / 255.0
+            # 确保形状为 [height, width, channels]
+            if img_tensor.dim() == 2:
+                img_tensor = img_tensor.unsqueeze(-1)  # 添加通道维度
+            if img_tensor.shape[-1] == 1:
+                img_tensor = img_tensor.repeat(1, 1, 3)  # 转换为RGB
+            
+            # 调整到目标尺寸
+            h, w = img_tensor.shape[:2]
+            if h != target_height or w != target_width:
+                # 需要调整尺寸
+                img_tensor = img_tensor.permute(2, 0, 1).unsqueeze(0)  # [1, C, H, W]
+                img_tensor = torch.nn.functional.interpolate(
+                    img_tensor, 
+                    size=(target_height, target_width), 
+                    mode='bilinear', 
+                    align_corners=False
+                )
+                img_tensor = img_tensor.squeeze(0).permute(1, 2, 0)  # [H, W, C]
+            
+            img_tensor = img_tensor.unsqueeze(0)  # 添加batch维度
+            tensor_list.append(img_tensor)
+        
+        if len(tensor_list) == 1:
+            combined_images = tensor_list[0]
         else:
             # 将多张图像堆叠在一起
-            combined_images = np.concatenate(preprocessed_images, axis=0)
+            combined_images = torch.cat(tensor_list, dim=0)
         
         return (combined_images, multi_image_prompt)
     
@@ -254,8 +295,9 @@ class MultiImageInput:
         
         print(f"【Text Mode】Completed, generated prompt length: {len(text_prompt)} characters")
         
-        # 文本模式不返回图像
-        return (None, text_prompt)
+        # 文本模式返回空的图像张量
+        empty_images = torch.zeros((0, 64, 64, 3), dtype=torch.float32)
+        return (empty_images, text_prompt)
     
     def _build_text_prompt(self, story_type, story_length, language, custom_prompt,
                          story_theme, narrative_style, content_focus, target_audience, video_model):
