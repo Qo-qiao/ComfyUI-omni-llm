@@ -115,6 +115,14 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
+#### v3.1.1 (2026-05-04)
+
+**I. Template Optimization**
+- **Template Content Adjustment**: Add frame sequence analysis template, optimize video reverse prompt template, enhance facial expression and detail descriptions for all templates involving characters
+
+**II. Code Maintenance**
+- **Bug Fixes**: Fix known issues found in multi-image transmission and video processing
+
 #### v3.1 (2026-04-30)
 
 **I. Streamlining and Optimization**
@@ -249,4 +257,3 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
 * [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) @comfyanonymous
-* [Whisper](https://github.com/openai/whisper) @openai

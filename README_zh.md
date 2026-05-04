@@ -119,9 +119,18 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 ## 如有功能建议或使用疑惑，可以加群交流反馈  
 * QQ群: 202018000   进群验证码：猪的飞行梦
 
-
+由于个人硬件资源有限，部分节点功能测试不全面，在使用中发现问题可以反馈给我，我会尽快修复。请提供错误信息和工作流截图，方便定位问题。
+提供的工作流仅供参考，可以尝试不同的组合方式测试推理效果，如有模板或节点优化调整建议，欢迎交流讨论
 
 ## 更新日志
+
+#### v3.1.1 （2026-05-04）
+
+**一、模板优化**
+- **模板内容调整**：新增序列帧分析模板，优化视频反推模板，强化所有包含人物相关的表情等细节元素描述
+
+**二、代码维护**
+- **bug处理**：多图传输、视频类处理发现的已知问题修复
 
 #### v3.1 （2026-04-30）
 
@@ -257,4 +266,3 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
 * [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) @comfyanonymous
-* [Whisper](https://github.com/openai/whisper) @openai
