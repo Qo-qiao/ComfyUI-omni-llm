@@ -532,21 +532,21 @@ class llama_cpp_unified_inference:
     preset_prompts["Empty - Nothing"] = ""
 
     # 添加分类预设提示词（顺序与 prompt_enhancer_preset_zh.py / prompt_enhancer_preset_en.py 保持一致）
-    preset_prompts["[Reverse] Tags"] = "NORMAL_DESCRIBE_TAGS"
-    preset_prompts["[Reverse] Describe"] = "NORMAL_DESCRIBE"
-    preset_prompts["[Normal] Expand"] = "PROMPT_EXPANDER"
-    preset_prompts["[Anime] Illustrious"] = "ILLUSTRIOUS"
-    preset_prompts["[Anime] Anima"] = "ANIMA"
-    preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
-    preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
-    preset_prompts["[Design] ERNIE - Image"] = "ERNIE_IMAGE"
-    preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
-    preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
-    preset_prompts["[Image Edit] Qwen - Image Layered"] = "QWEN_IMAGE_LAYERED"
-    preset_prompts["[Text to Video] LTX-2"] = "LTX2"
-    preset_prompts["[Text to Video] WAN - Text to Video"] = "WAN_T2V"
-    preset_prompts["[Image to Video] WAN - Image to Video"] = "WAN_I2V"
-    preset_prompts["[Image to Video] WAN - FLF to Video"] = "WAN_FLF2V"
+    preset_prompts["[[Reverse]] Tags"] = "NORMAL_DESCRIBE_TAGS"
+    preset_prompts["[[Reverse]] Describe"] = "NORMAL_DESCRIBE"
+    preset_prompts["[[Normal]] Expand"] = "PROMPT_EXPANDER"
+    preset_prompts["[[Anime]] Illustrious"] = "ILLUSTRIOUS"
+    preset_prompts["[[Anime]] Anima"] = "ANIMA"
+    preset_prompts["[[Portrait]] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
+    preset_prompts["[[General]] FLUX2 - Klein"] = "FLUX2_KLEIN"
+    preset_prompts["[[Design]] ERNIE - Image"] = "ERNIE_IMAGE"
+    preset_prompts["[[Poster]] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
+    preset_prompts["[[Image Edit]] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
+    preset_prompts["[[Image Edit]] Qwen - Image Layered"] = "QWEN_IMAGE_LAYERED"
+    preset_prompts["[[Text to Video]] LTX-2"] = "LTX2"
+    preset_prompts["[[Text to Video]] WAN - Text to Video"] = "WAN_T2V"
+    preset_prompts["[[Image to Video]] WAN - Image to Video"] = "WAN_I2V"
+    preset_prompts["[[Image to Video]] WAN - FLF to Video"] = "WAN_FLF2V"
     preset_prompts["[Video Analysis] Video - Frame Sequence Analysis"] = "VIDEO_FRAME_SEQUENCE_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Reverse Prompt"] = "VIDEO_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Detailed Scene Breakdown"] = "VIDEO_DETAILED_SCENE_BREAKDOWN"
@@ -554,7 +554,7 @@ class llama_cpp_unified_inference:
     preset_prompts["[Audio] Multi-Person Dialogue"] = "MULTI_SPEAKER_DIALOGUE"
     preset_prompts["[Music] Lyrics Creation"] = "LYRICS_CREATION"
     preset_prompts["[OCR] Enhanced OCR"] = "OCR_ENHANCED"
-    preset_prompts["[HighRes] Ultra HD Image Reverse"] = "ULTRA_HD_IMAGE_REVERSE"
+    preset_prompts["[[HighRes]] Ultra HD Image Reverse"] = "ULTRA_HD_IMAGE_REVERSE"
     preset_prompts["[Vision] Bounding Box"] = "VISION_BOUNDING_BOX"
 
     preset_tags = list(preset_prompts.keys())
@@ -681,7 +681,19 @@ class llama_cpp_unified_inference:
         return model_info
     
     def get_preset_text_by_language(self, preset_key, language, output_format="JSON格式"):
-        """根据语言和输出格式获取预设提示词文本"""
+        """
+        根据语言和输出格式获取预设提示词文本
+
+        优先使用新的 output_format_suffix 字段，保持向后兼容性
+
+        Args:
+            preset_key: 预设键名
+            language: 语言（"中文" 或 "English"）
+            output_format: 输出格式（"JSON格式" 或 "文本格式"）
+
+        Returns:
+            str: 格式化后的预设提示词文本
+        """
         if language == "中文":
             preset_map = {
                 "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_ZH,
@@ -736,15 +748,24 @@ class llama_cpp_unified_inference:
                 "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_EN,
                 "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
             }
-        
+
         preset = preset_map.get(preset_key, None)
         if preset is None:
             return preset_key
-        
+
+        # 获取基础模板
+        base_template = preset.get("input_template", preset_key)
+
+        # 优先使用新的 output_format_suffix 字段
+        suffix_map = preset.get("output_format_suffix", {})
+        if output_format in suffix_map:
+            return base_template + suffix_map[output_format]
+
+        # 向后兼容：检查旧字段
         if output_format == "文本格式" and "input_template_text" in preset:
-            return preset.get("input_template_text", preset.get("input_template", preset_key))
-        
-        return preset.get("input_template", preset_key)
+            return preset.get("input_template_text", base_template)
+
+        return base_template
     
 
     
