@@ -161,6 +161,155 @@ Performs LLM/VLM/Omni model inference, supporting text-only, single image, multi
 - Options: Auto Detect / Chinese / English / Japanese / Korean / French / German / Spanish
 - Recommended Setting: Select based on audio content
 
+#### Preset Template Indicators
+
+The preset template names use special bracket indicators to distinguish their output format capabilities:
+
+**[[]] Double Brackets - Format-Switching Presets**
+- Presets with double brackets (e.g., [[Reverse]] Describe) support both JSON and text output formats
+- Users can switch between formats using the `output_format` parameter
+- JSON format: Structured data with field names and values
+- Text format: Segmented display with **Field Name:** content pattern
+- Examples: [[Reverse]] Describe, [[Normal]] Expand, [[Illustration]] Illustrious
+
+**[] Single Brackets - Text-Only Presets**
+- Presets with single brackets (e.g., [Video Analysis] Video) only support text output
+- These presets maintain their specialized format without JSON conversion
+- Examples: [Video Analysis] Video - Frame Sequence Analysis, [Audio] Multi-Person Dialogue
+
+**Indicator Examples:**
+- [[Reverse]] Describe - Image Reverse Description (JSON/Text switchable)
+- [[Normal]] Expand - Prompt Expander (JSON/Text switchable)
+- [Video Analysis] Video - Frame Sequence Analysis (Text only)
+- [Audio] Multi-Person Dialogue (Text only)
+
+#### JSON Format Usage Guide
+
+**How JSON Format Works:**
+For presets with [[]] double brackets (format-switching presets), you can control the output format using the `output_format` parameter in the inference node. The system automatically adds format requirements to the prompt - you only need to focus on **providing quality input descriptions**.
+
+**Parameter Settings:**
+- **output_format**: `JSON格式` → System automatically adds JSON format requirements, outputs structured data
+- **output_format**: `文本格式` → System automatically adds text format requirements, outputs segmented display
+
+**User Input Prompt Guidelines:**
+
+##### ✅ Correct Input Approach
+
+**Principle: Clearly describe visual content to give the model enough material for structured output**
+
+**Example 1: Image Reverse Description ([[Reverse]] Describe)**
+```
+✅ Good Input:
+A 25-year-old Asian woman, long hair flowing, wearing a white dress,
+standing under a cherry blossom tree, sunlight from the side, background
+is blurred flower sea, portrait photography style, soft lighting effects
+
+❌ Poor Input:
+Beautiful woman photo
+```
+
+**Example 2: Prompt Expander ([[Normal]] Expand)**
+```
+✅ Good Input:
+A girl walking in a spring garden, wearing a white dress, surrounded by
+falling cherry blossoms, soft lighting, cinematic atmosphere
+
+❌ Poor Input:
+Spring girl
+```
+
+**Example 3: Commercial Poster Design ([[Multi-domain]] ERNIE Image)**
+```
+✅ Good Input:
+Movie poster, sci-fi theme, astronaut in space, Earth in background,
+neon light effects, futuristic design, space reserved at top for title
+
+❌ Poor Input:
+Sci-fi poster
+```
+
+##### 📋 Input Points for Different Presets
+
+**1. Image Reverse Description Presets ([[Reverse]] Describe, [[Reverse]] Tags)**
+- ✅ Provide detailed visual element descriptions (character, environment, lighting, composition)
+- ✅ Include style and quality requirements (e.g., "portrait photography", "cinematic feel")
+- ❌ Avoid overly brief or abstract descriptions
+
+**2. Prompt Expander Presets ([[Normal]] Expand)**
+- ✅ Provide core creative idea and scene description
+- ✅ Include emotional tone or atmosphere requirements
+- ❌ Avoid single words or context-lacking input
+
+**3. Multi-domain Design Presets ([[Multi-domain]] ERNIE Image, [[Poster]] Qwen Image)**
+- ✅ Clearly specify design type (keywords: poster, UI, portrait, etc.)
+- ✅ Describe subject, composition, color, atmosphere
+- ❌ Avoid missing key design type identifiers
+
+**4. Anime Character Presets ([[Illustration]] Illustrious, [[Japanese]] Anima)**
+- ✅ Provide character features (hairstyle, outfit, expression, pose)
+- ✅ Include background and style descriptions
+- ❌ Avoid overly simple character descriptions
+
+##### 🔍 Common Issues and Solutions
+
+| Issue | Possible Cause | Solution |
+|-------|---------------|----------|
+| Incomplete JSON output | Input description too brief | Provide more detailed visual descriptions covering multiple dimensions (character, scene, lighting, composition, etc.) |
+| Output always in text format | output_format parameter not set correctly | Check node parameters, ensure "JSON格式" option is selected |
+| Model doesn't understand JSON format requirement | Model capability limitation | Try switching to a more powerful model, or use text format |
+| Output contains extra explanations | Model not strictly following format | This is normal, manually extract JSON portion, or try lowering temperature parameter |
+| Certain fields always missing | Input lacks corresponding information | Supplement related dimension descriptions (character, action, clothing, etc.) |
+
+##### 💡 Input Quality Optimization Tips
+
+**1. Multi-dimensional Description**
+```
+✅ Good Input (multiple dimensions):
+Subject: Young woman, around 20 years old, long hair
+Outfit: White dress, minimalist design
+Environment: Inside a café, street view visible through window
+Lighting: Natural light from window, forming side light effect
+Composition: Medium shot, eye-level angle
+Atmosphere: Quiet, cozy afternoon tea time
+
+❌ Poor Input (single dimension):
+Girl in café
+```
+
+**2. Use Clear Keywords**
+```
+✅ Good Input:
+Commercial poster design, product is smartwatch, tech style,
+blue color scheme, minimalist composition, highlight product close-up
+
+❌ Poor Input:
+Design a poster
+```
+
+**3. Provide Context and Details**
+```
+✅ Good Input:
+Anime character design, female character, silver long hair, blue eyes,
+wearing futuristic combat outfit, standing pose, background is
+cyberpunk city night scene, neon light effects
+
+❌ Poor Input:
+Silver-haired girl
+```
+
+##### ⚠️ Important Notes
+
+1. **Format switching is automatic**: The system automatically adds format requirements based on your `output_format` selection. You don't need to repeat "please output JSON format" in your input.
+
+2. **Input quality determines output quality**: Even with JSON format selected, if input is too brief or vague, the model may not generate complete structured output.
+
+3. **Model capability limitations**: JSON format output requires models with strong structured output capabilities. Smaller models may perform poorly.
+
+4. **Temperature parameter impact**: It's recommended to set temperature to 0.1-0.3 for more stable JSON output.
+
+5. **Text format as fallback**: If JSON format output is unsatisfactory, you can switch to text format for complete segmented descriptions.
+
 #### Video Processing Parameters
 
 **Parameter Name: Maximum Frames (video_max_frames)**
