@@ -115,10 +115,11 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-#### v3.1.1 (2026-05-04)
+#### v3.1.1 (2026-05-06)
 
 **I. Template Optimization**
-- **Template Content Adjustment**: Add frame sequence analysis template, optimize video reverse prompt template, enhance facial expression and detail descriptions for all templates involving characters
+- **Template Content Adjustment**: Add frame sequence analysis template, optimize video reverse prompt template, enhance facial expression and detail descriptions for all templates involving characters, optimize ERNIE_IMAGE and QWEN_IMAGE_2512 output text classification confusion problem, and adjust some templates to be more suitable for European and American audiences (currently still updating, not completed yet, please understand if the generated results are not ideal)
+- **Template Function Distinction**: Add [[]] to preset templates, [] to text-only templates, to distinguish between JSON and text output
 
 **II. Code Maintenance**
 - **Bug Fixes**: Fix known issues found in multi-image transmission and video processing
