@@ -161,44 +161,12 @@ Performs LLM/VLM/Omni model inference, supporting text-only, single image, multi
 - Options: Auto Detect / Chinese / English / Japanese / Korean / French / German / Spanish
 - Recommended Setting: Select based on audio content
 
-#### Preset Template Indicators
-
-The preset template names use special bracket indicators to distinguish their output format capabilities:
-
-**[[]] Double Brackets - Format-Switching Presets**
-- Presets with double brackets (e.g., [[Reverse]] Describe) support both JSON and text output formats
-- Users can switch between formats using the `output_format` parameter
-- JSON format: Structured data with field names and values
-- Text format: Segmented display with **Field Name:** content pattern
-- Examples: [[Reverse]] Describe, [[Normal]] Expand, [[Illustration]] Illustrious
-
-**[] Single Brackets - Text-Only Presets**
-- Presets with single brackets (e.g., [Video Analysis] Video) only support text output
-- These presets maintain their specialized format without JSON conversion
-- Examples: [Video Analysis] Video - Frame Sequence Analysis, [Audio] Multi-Person Dialogue
-
-**Indicator Examples:**
-- [[Reverse]] Describe - Image Reverse Description (JSON/Text switchable)
-- [[Normal]] Expand - Prompt Expander (JSON/Text switchable)
-- [Video Analysis] Video - Frame Sequence Analysis (Text only)
-- [Audio] Multi-Person Dialogue (Text only)
-
-#### JSON Format Usage Guide
-
-**How JSON Format Works:**
-For presets with [[]] double brackets (format-switching presets), you can control the output format using the `output_format` parameter in the inference node. The system automatically adds format requirements to the prompt - you only need to focus on **providing quality input descriptions**.
-
-**Parameter Settings:**
-- **output_format**: `JSON格式` → System automatically adds JSON format requirements, outputs structured data
-- **output_format**: `文本格式` → System automatically adds text format requirements, outputs segmented display
-
-**User Input Prompt Guidelines:**
 
 ##### ✅ Correct Input Approach
 
 **Principle: Clearly describe visual content to give the model enough material for structured output**
 
-**Example 1: Image Reverse Description ([[Reverse]] Describe)**
+**Example 1: Image Reverse Description ([Reverse] Describe)**
 ```
 ✅ Good Input:
 A 25-year-old Asian woman, long hair flowing, wearing a white dress,
@@ -209,7 +177,7 @@ is blurred flower sea, portrait photography style, soft lighting effects
 Beautiful woman photo
 ```
 
-**Example 2: Prompt Expander ([[Normal]] Expand)**
+**Example 2: Prompt Expander ([Normal] Expand)**
 ```
 ✅ Good Input:
 A girl walking in a spring garden, wearing a white dress, surrounded by
@@ -219,7 +187,7 @@ falling cherry blossoms, soft lighting, cinematic atmosphere
 Spring girl
 ```
 
-**Example 3: Commercial Poster Design ([[Multi-domain]] ERNIE Image)**
+**Example 3: Commercial Poster Design ([Multi-domain] ERNIE Image)**
 ```
 ✅ Good Input:
 Movie poster, sci-fi theme, astronaut in space, Earth in background,
@@ -231,35 +199,26 @@ Sci-fi poster
 
 ##### 📋 Input Points for Different Presets
 
-**1. Image Reverse Description Presets ([[Reverse]] Describe, [[Reverse]] Tags)**
+**1. Image Reverse Description Presets ([Reverse] Describe, [Reverse] Tags)**
 - ✅ Provide detailed visual element descriptions (character, environment, lighting, composition)
 - ✅ Include style and quality requirements (e.g., "portrait photography", "cinematic feel")
 - ❌ Avoid overly brief or abstract descriptions
 
-**2. Prompt Expander Presets ([[Normal]] Expand)**
+**2. Prompt Expander Presets ([Normal] Expand)**
 - ✅ Provide core creative idea and scene description
 - ✅ Include emotional tone or atmosphere requirements
 - ❌ Avoid single words or context-lacking input
 
-**3. Multi-domain Design Presets ([[Multi-domain]] ERNIE Image, [[Poster]] Qwen Image)**
+**3. Multi-domain Design Presets ([Multi-domain] ERNIE Image, [Poster] Qwen Image)**
 - ✅ Clearly specify design type (keywords: poster, UI, portrait, etc.)
 - ✅ Describe subject, composition, color, atmosphere
 - ❌ Avoid missing key design type identifiers
 
-**4. Anime Character Presets ([[Illustration]] Illustrious, [[Japanese]] Anima)**
+**4. Anime Character Presets ([Illustration] Illustrious, [Japanese] Anima)**
 - ✅ Provide character features (hairstyle, outfit, expression, pose)
 - ✅ Include background and style descriptions
 - ❌ Avoid overly simple character descriptions
 
-##### 🔍 Common Issues and Solutions
-
-| Issue | Possible Cause | Solution |
-|-------|---------------|----------|
-| Incomplete JSON output | Input description too brief | Provide more detailed visual descriptions covering multiple dimensions (character, scene, lighting, composition, etc.) |
-| Output always in text format | output_format parameter not set correctly | Check node parameters, ensure "JSON格式" option is selected |
-| Model doesn't understand JSON format requirement | Model capability limitation | Try switching to a more powerful model, or use text format |
-| Output contains extra explanations | Model not strictly following format | This is normal, manually extract JSON portion, or try lowering temperature parameter |
-| Certain fields always missing | Input lacks corresponding information | Supplement related dimension descriptions (character, action, clothing, etc.) |
 
 ##### 💡 Input Quality Optimization Tips
 
@@ -297,18 +256,6 @@ cyberpunk city night scene, neon light effects
 ❌ Poor Input:
 Silver-haired girl
 ```
-
-##### ⚠️ Important Notes
-
-1. **Format switching is automatic**: The system automatically adds format requirements based on your `output_format` selection. You don't need to repeat "please output JSON format" in your input.
-
-2. **Input quality determines output quality**: Even with JSON format selected, if input is too brief or vague, the model may not generate complete structured output.
-
-3. **Model capability limitations**: JSON format output requires models with strong structured output capabilities. Smaller models may perform poorly.
-
-4. **Temperature parameter impact**: It's recommended to set temperature to 0.1-0.3 for more stable JSON output.
-
-5. **Text format as fallback**: If JSON format output is unsatisfactory, you can switch to text format for complete segmented descriptions.
 
 #### Video Processing Parameters
 
@@ -390,6 +337,136 @@ Silver-haired girl
 - **output_list**: Generated text list (supports batch output)
 - **state_uid**: Conversation state ID
 - **audio**: Generated audio data (only valid in text-to-audio mode)
+
+## Output Format Options: Natural Paragraph vs Structured Output
+
+This plugin supports two output format types for prompt templates, providing flexibility for different use cases.
+
+### 2.1 Natural Paragraph Output (自然段落)
+
+Natural paragraph output organizes all prompt elements into a coherent, flowing English paragraph without explicit field markers.
+
+**Characteristics:**
+- All visual elements (subject, lighting, composition, color, atmosphere, etc.) are integrated into seamless paragraphs
+- No field labels or markers like 【】 or **
+- Ideal for direct use in image/video generation prompts
+- Easier to read and understand at a glance
+- Best for users who prefer narrative-style descriptions
+
+**Example:**
+```
+A beautiful anime girl with long flowing black hair, gentle smile, standing in a cherry blossom garden. Masterpiece quality with cel shading and clean line art. Soft lighting creates dreamy atmosphere. She wears a white sailor uniform with red accents, dynamic pose with wind blowing through her hair. Background features falling cherry blossom petals against a gradient pink sky.
+```
+
+### 2.2 Structured Output (结构化输出)
+
+Structured output uses field markers with 【】 brackets to organize information into distinct categories, making it easier to locate specific details.
+
+**Characteristics:**
+- Each field is clearly labeled with 【】 brackets
+- Fields include: 【Subject Description】【Art Style】【Lighting】【Composition】【Color Palette】【Details】【Technical Parameters】【Clothing】, etc.
+- Ideal for systematic analysis and review
+- Easier to modify specific elements without rewriting entire prompts
+- Best for users who need precise control over prompt components
+
+**Example:**
+```
+【Subject Description】Beautiful anime girl, long flowing black hair, gentle smile
+【Art Style】Masterpiece, best quality, ultra-detailed, anime style, cel shading, clean line art
+【Lighting】Soft lighting, gentle sunlight, rim lighting, dreamy atmosphere
+【Composition】Dynamic pose, wind blowing through hair, full body, looking at viewer
+【Color Palette】White, red, pink gradient, soft pastel tones
+【Clothing】White sailor uniform with red accents, pleated skirt, frills
+【Background】Cherry blossom garden, falling petals, gradient pink sky
+```
+
+### 2.3 Templates with Keyword-Based Output Type Switching
+
+Some templates automatically detect keywords in your input to determine the appropriate output type and focus. These templates analyze your input content and intelligently adjust the output format.
+
+#### ERNIE_IMAGE_EN / ERNIE_IMAGE_ZH Template
+
+This template supports multiple design types and automatically detects keywords to switch output focus:
+
+**Supported Design Types:**
+
+| Keywords | Design Type | Output Focus |
+|----------|-------------|--------------|
+| poster, advertisement, movie poster, music poster | Commercial Poster | Visual impact, brand tone, typography, color contrast |
+| manga, comic, storyboard | Manga Panel | Narrative flow, panel layout, shot composition, speed lines |
+| UI, interface, app, web | UI Design | User experience, interface layout, interaction elements |
+| Person descriptions (a woman, long hair, 20 years old) | Portrait Photography | Character features, pose, lighting, makeup |
+| Product/object descriptions | Product Render | Material, lighting setup, camera angle, reflections |
+| Scene descriptions | Scene/Environment | Spatial structure, atmosphere, lighting, weather |
+
+**Example Inputs:**
+```
+Input: "Movie poster, sci-fi theme, astronaut in space"
+→ Detected Type: Commercial Poster
+→ Output Focus: Visual impact, brand tone, title layout, typography style
+
+Input: "Manga page, superhero fighting robot"
+→ Detected Type: Manga Panel
+→ Output Focus: Panel layout, action sequence, speed lines, sound effects
+
+Input: "E-commerce product photo, wireless headphones"
+→ Detected Type: Product Render
+→ Output Focus: Product material, studio lighting, angle, background
+```
+
+#### QWEN_IMAGE_2512_EN / QWEN_IMAGE_2512_ZH Template
+
+This template is optimized for 2512×2512 high-resolution output and supports similar keyword-based type detection:
+
+**Supported Design Types:**
+
+| Keywords | Design Type | High-Resolution Features |
+|----------|-------------|------------------------|
+| poster, advertisement, movie poster | Poster Design | Paper texture, ink splashes, gold foil effects |
+| brochure, booklet, catalog | Brochure Design | Paper texture, binding details, print quality |
+| infographic, data visualization | Infographic Design | Fine lines, small icons, chart clarity |
+| education, presentation | Educational Courseware | Vector sharpness, icon clarity, layout |
+| product, 3C, cosmetics, clothing | Product Render | Microscopic details, material texture, reflections |
+| illustration, concept art, fantasy | Art Illustration | Brushstroke texture, pigment granularity, paper grain |
+
+**Example Inputs:**
+```
+Input: "Luxury jewelry brochure, ruby ring"
+→ Detected Type: Brochure Design
+→ High-Res Features: Stone clarity, metal engravings, paper texture, gold embossing
+
+Input: "Fantasy illustration, dragon in mountains"
+→ Detected Type: Art Illustration
+→ High-Res Features: Scale texture, brushstrokes, atmospheric haze, lighting volumes
+```
+
+### 2.4 How Output Format Selection Works
+
+When you select a preset template:
+
+1. **System Prompt Loading**: The system loads both `input_template_natural` and `input_template_structured` variations
+2. **User Input Processing**: Your input is analyzed for keywords and context
+3. **Template Selection**: Based on the template type:
+   - **Standard Templates**: Output format is determined by your selection (Natural/Structured)
+   - **Smart Templates** (ERNIE, QWEN): Keywords are detected to determine output focus
+4. **Output Generation**: The model generates content following the selected format rules
+
+### 2.5 Choosing the Right Output Format
+
+**Choose Natural Paragraph when:**
+- You want direct, copy-paste ready prompts for image generation
+- You prefer reading flowing, narrative descriptions
+- You're new to prompt engineering and want simple, straightforward output
+
+**Choose Structured Output when:**
+- You need precise control over specific prompt components
+- You want to easily modify individual elements (lighting, composition, etc.)
+- You're doing systematic analysis or creating prompt variations
+
+**Use Keyword Detection (Smart Templates) when:**
+- You're working with mixed content types
+- You want the model to intelligently adapt output focus
+- You need domain-specific optimization (posters, manga, UI, products, etc.)
 
 ## 3. Llama-cpp Parameters Node (llama_cpp_parameters)
 
