@@ -17,12 +17,12 @@
       "image_list": "图像列表"
     },
     "tooltips": {
-      "json": "包含边界框信息的JSON字符串\n• 从推理节点获取的目标检测结果",
-      "mode": "选择解析模式\n• simple：简单解析模式\n• Qwen3-VL：Qwen3-VL模型格式\n• Qwen2.5-VL：Qwen2.5-VL模型格式",
-      "label": "按标签过滤边界框\n• 留空表示不过滤\n• 输入标签名称只显示匹配的边界框",
-      "image": "可选的输入图像\n• 用于在图像上绘制边界框",
-      "bboxes": "解析出的边界框列表\n• 包含位置和标签信息",
-      "image_list": "绘制了边界框的图像列表\n• 可视化检测结果"
+      "json": "包含边界框信息的JSON字符串",
+      "mode": "选择解析模式",
+      "label": "按标签过滤边界框",
+      "image": "可选的输入图像",
+      "bboxes": "解析出的边界框列表",
+      "image_list": "绘制了边界框的图像列表"
     }
   },
 
@@ -37,7 +37,7 @@
       "enable_timestamps": "启用时间戳",
       "max_new_tokens": "最大生成token数",
       "batch_size": "批处理大小",
-      "flash_attention": "启用FlashAttention2"
+      "flash_attention": "启用FlashAttention"
     },
     "widgets": {
       "asr_model": "ASR模型",
@@ -48,21 +48,21 @@
       "enable_timestamps": "启用时间戳",
       "max_new_tokens": "最大生成token数",
       "batch_size": "批处理大小",
-      "flash_attention": "启用FlashAttention2"
+      "flash_attention": "启用FlashAttention"
     },
     "outputs": {
       "asr_model": "ASR模型"
     },
     "tooltips": {
-      "asr_model": "选择ASR模型文件\n• 支持Whisper等语音识别模型\n• 格式：.gguf、.safetensors、.pt、.pth、.bin",
-      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载\n• GPU模式有效",
-      "language": "识别语言\n• auto：自动检测\n• zh：中文\n• en：英文\n• ja：日文\n• ko：韩文",
-      "task": "任务类型\n• transcribe：语音识别（默认）\n• translate：翻译成英文",
-      "backend": "推理后端选择\n• transformers：标准后端（默认）\n• vllm：高性能后端（仅Qwen3-ASR模型适用）",
-      "enable_timestamps": "启用时间戳功能\n• 需要Qwen3-ForcedAligner模型\n• 为识别结果添加时间戳信息",
-      "max_new_tokens": "最大生成token数\n• 控制输出文本长度\n• 默认：256",
-      "batch_size": "批处理大小\n• 影响处理速度\n• 默认：32",
-      "flash_attention": "启用FlashAttention2优化\n• 需要安装flash-attn库\n• 提升推理性能"
+      "asr_model": "选择ASR模型文件",
+      "n_gpu_layers": "加载到GPU的模型层数",
+      "language": "识别语言",
+      "task": "任务类型",
+      "backend": "推理后端选择",
+      "enable_timestamps": "启用时间戳功能",
+      "max_new_tokens": "最大生成token数",
+      "batch_size": "批处理大小",
+      "flash_attention": "启用FlashAttention"
     }
   },
   "llama_cpp_clean_states": {
@@ -79,8 +79,8 @@
       "any": "任意输出"
     },
     "tooltips": {
-      "any": "任意类型的输入\n• 用于触发节点执行",
-      "state_uid": "要清理的对话状态ID\n• -1：清理所有状态\n• 指定ID：清理特定状态"
+      "any": "任意类型的输入",
+      "state_uid": "要清理的对话状态ID"
     }
   },
   "forced_aligner_inference": {
@@ -107,15 +107,15 @@
       "subtitle_text": "字幕文本"
     },
     "tooltips": {
-      "aligner_model": "加载的强制对齐模型\n• 通过强制对齐模型加载器节点加载",
-      "audio": "输入音频数据\n• 支持单通道音频\n• 推荐采样率：16000Hz",
-      "text": "要对齐的文本内容\n• 需要与音频内容匹配",
-      "sample_rate": "音频采样率（Hz）\n• 默认：16000",
-      "output_format": "输出格式\n• Text：对齐文本\n• SRT：SRT字幕\n• VTT：VTT字幕",
-      "language": "文本语言\n• zh：中文\n• en：英文",
+      "aligner_model": "加载的强制对齐模型",
+      "audio": "输入音频数据",
+      "text": "要对齐的文本内容",
+      "sample_rate": "音频采样率（Hz）",
+      "output_format": "输出格式",
+      "language": "文本语言",
       "aligned_text": "对齐后的文本",
-      "timestamps": "细粒度时间戳\n• 包含单词级和音素级时间信息",
-      "subtitle_text": "字幕文本\n• 可直接保存为SRT/VTT文件"
+      "timestamps": "细粒度时间戳",
+      "subtitle_text": "字幕文本"
     }
   },
   "forced_aligner_loader": {
@@ -132,17 +132,17 @@
       "n_gpu_layers": "GPU模型层数",
       "precision": "精度",
       "batch_size": "批处理大小",
-      "flash_attention": "启用FlashAttention2"
+      "flash_attention": "启用FlashAttention"
     },
     "outputs": {
       "aligner_model": "对齐模型"
     },
     "tooltips": {
-      "forced_aligner_model": "选择强制对齐模型文件\n• Qwen3-ForcedAligner-0.6B：阿里通义千问强制对齐模型",
-      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载（推荐）\n• GPU模式有效，CPU模式自动忽略\n• 显存不足时可设为部分层数",
-      "precision": "模型精度选择\n• float16：半精度（推荐）\n• bfloat16：BF16精度\n• float32：单精度",
-      "batch_size": "批处理大小\n• 影响处理速度\n• 默认：32",
-      "flash_attention": "启用FlashAttention2优化\n• 需要安装flash-attn库\n• 提升推理性能",
+      "forced_aligner_model": "选择强制对齐模型文件",
+      "n_gpu_layers": "加载到GPU的模型层数",
+      "precision": "模型精度选择",
+      "batch_size": "批处理大小",
+      "flash_attention": "启用FlashAttention",
       "aligner_model": "加载的强制对齐模型对象"
     }
   },
@@ -293,25 +293,25 @@
       "tts_model": "TTS模型"
     },
     "tooltips": {
-      "tts_model": "选择TTS模型文件\n• 主流：Qwen3-TTS\n• 其他：Bark、VITS、XTTS、Coqui、Supertonic等\n• 格式：.safetensors、.pt、.pth、.bin 或模型目录",
-      "n_gpu_layers": "加载到GPU的模型层数\n• -1：全部加载（推荐）\n• GPU模式有效，CPU模式自动忽略\n• 显存不足时可设为部分层数",
-      "sample_rate": "音频采样率（Hz）\n• 影响音质和文件大小\n• Qwen3-TTS/IndexTTS-2推荐：24000",
-      "model_type": "模型类型选择\n• 自动检测：自动识别模型类型（推荐）\n• 手动指定：Qwen3-TTS、Bark、VITS、XTTS、Coqui、Supertonic等",
-      "voice": "选择音色类型\n• Vivian/Serena/Uncle_Fu/Dylan/Eric/Ryan/Aiden/Ono_Anna/Sohee\n• 支持多人对话模式（主流TTS模型）",
-      "emotion": "选择情绪风格\n• default：默认\n• happy：开心\n• sad：悲伤\n• angry：愤怒\n• surprised：惊讶\n• calm：平静\n• excited：兴奋\n• gentle：温柔\n• 增强语音表现力（主流TTS模型）",
-      "language": "选择合成语言\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• German：德语\n• French：法语\n• Russian：俄语\n• Portuguese：葡萄牙语\n• Spanish：西班牙语\n• Italian：意大利语\n• Qwen3-TTS支持10种语言",
-      "speed": "语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
-      "temperature": "生成温度\n• 值越高生成越随机\n• 推荐值：0.7",
-      "top_p": "核采样阈值（Top-P）\n• 控制生成多样性\n• 推荐值：0.9",
-      "top_k": "Top-K采样参数\n• 限制每步只从K个最高概率的token中选择\n• 推荐值：50",
-      "repetition_penalty": "重复惩罚\n• 值越高越避免重复\n• 推荐值：1.1",
-      "max_new_tokens": "最大生成token数\n• 影响输出音频长度\n• 推荐值：2048",
-      "use_cache": "是否使用KV缓存加速推理\n• True：启用缓存（推荐）\n• False：禁用缓存",
-      "ref_audio_path": "音色克隆参考音路径\n• wav格式，3~60秒最佳\n• 单声道48000Hz\n• 用于音色克隆",
-      "pitch": "音高偏移\n• 范围：-5.0到5.0\n• 调整语音音调",
-      "volume": "音量\n• 控制输出音量大小\n• 范围：0.1到2.0",
-      "use_8bit_quant": "使用8bit量化\n• 适配低显存显卡/入门级GPU\n• 降低显存占用但可能影响音质\n• 默认：False",
-      "flash_attention": "启用FlashAttention优化\n• 需要安装flash-attn库\n• 提升推理性能\n• 适用于NVIDIA GPU"
+      "tts_model": "选择TTS模型文件",
+      "n_gpu_layers": "加载到GPU的模型层数",
+      "sample_rate": "音频采样率（Hz）",
+      "model_type": "模型类型选择",
+      "voice": "选择音色类型",
+      "emotion": "选择情绪风格",
+      "language": "选择合成语言",
+      "speed": "语速倍数",
+      "temperature": "生成温度",
+      "top_p": "核采样阈值（Top-P）",
+      "top_k": "Top-K采样参数",
+      "repetition_penalty": "重复惩罚",
+      "max_new_tokens": "最大生成token数",
+      "use_cache": "是否使用KV缓存加速推理",
+      "ref_audio_path": "音色克隆参考音路径",
+      "pitch": "音高偏移",
+      "volume": "音量",
+      "use_8bit_quant": "使用8bit量化",
+      "flash_attention": "启用FlashAttention"
     }
   },
   "llama_cpp_unified_inference": {
@@ -376,35 +376,32 @@
     },
     "tooltips": {
       "llama_model": "选择加载的Llama模型",
-      "preset_prompt": "选择预设提示词模板\n• 包含文生图、图生视频、OCR等多种预设\n• 可快速生成特定格式的提示词",
-      "system_prompt": "系统提示词，定义AI助手的角色和行为\n• 可包含预设模板占位符#\n• 与预设模板配合使用时，可设置AI的角色扮演",
-      "text_input": "用户输入文本\n• 作为对话的用户消息内容\n• 支持多行文本输入\n• 可替换预设模板中的#占位符",
-      "inference_mode": "选择推理模式\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 视觉理解：处理图像内容并生成描述\n• [基础] 音频转文本：使用 ASR 或 Omni 模型将音频转换为文本\n• [基础] 文本转音频：生成文本后使用 TTS 模型转换为语音\n• [高级] 视频理解：从视频中提取帧并进行分析",
-      "prompt_language": "预设模板语言\n• Chinese：使用中文提示词\n• English：使用英文提示词",
-      "response_language": "响应语言\n• Chinese：强制中文输出\n• English：强制英文输出",
-      "asr_language": "ASR语音识别语言\n• Auto-detect：自动检测\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• French：法语\n• German：德语\n• Spanish：西班牙语",
-      "output_format": "输出格式控制：\n• JSON格式：输出JSON格式内容（遵循预设模板的output_format要求）\n• 文本格式：输出纯文本内容（使用input_template_text模板）",
-      "video_max_frames": "视频处理的最大帧数\n• 控制视频抽帧数量\n• 影响处理时间和显存占用",
-      "batch_combination": "批量输出选项：\n• 逐个输出：每张图片单独输出结果\n• 合并输出：所有结果合并为一个输出",
-      "image_max_size": "图像处理的最大尺寸\n• 控制图像缩放大小\n• 影响显存占用和处理速度",
-      "video_sampling": "视频抽帧模式\n• Auto uniform sampling：自动均匀采样\n• Manual frame indices：手动指定帧索引",
-      "video_manual_indices": "手动模式下的帧索引\n• 仅在video_sampling为手动时生效\n• 格式：逗号分隔的数字",
-      "audio_output_mode": "音频输出模式\n• TTS voice beautification output：先生成文本，再使用TTS模型转换为音频\n• Omni native audio output：使用Omni模型直接生成音频输出",
-      "seed": "随机种子\n• 影响生成结果的可重复性\n• 相同种子产生相同结果",
-      "force_offload": "推理完成后强制卸载模型\n• 释放显存\n• 适用于多模型切换场景",
-      "save_states": "保存对话状态\n• 支持多轮对话\n• 保持上下文连贯性",
-      "tts_language": "TTS合成语言\n• Chinese：中文\n• English：英文\n• Japanese：日语\n• Korean：韩语\n• German：德语\n• French：法语\n• Russian：俄语\n• Portuguese：葡萄牙语\n• Spanish：西班牙语\n• Italian：意大利语",
-      "tts_speed": "TTS语速倍数\n• 0.5：慢速\n• 1.0：正常（默认）\n• 2.0：快速",
-      "parameters": "选择参数设置节点\n• 控制生成参数如温度、采样等",
-      "images": "images\n• 支持单张或多张图像",
-      "video": "输入视频\n• 自动抽帧处理",
-      "asr_model": "ASR模型输入\n• 用于语音识别\n• 将音频转换为文本",
-      "tts_model": "TTS模型输入\n• 用于语音合成\n• 将文本转换为语音",
-      "queue_handler": "队列处理器\n• 管理批量任务",
+      "preset_prompt": "选择预设提示词模板",
+      "system_prompt": "系统提示词，定义AI助手的角色和行为",
+      "text_input": "用户输入文本",
+      "inference_mode": "选择推理模式",
+      "prompt_language": "提示词语言",
+      "response_language": "响应语言",
+      "asr_language": "ASR语音识别语言",
+      "output_format": "输出格式",
+      "video_max_frames": "视频处理的最大帧数",
+      "batch_combination": "批量输出选项",
+      "image_max_size": "图像处理的最大尺寸",
+      "video_sampling": "视频抽帧模式",
+      "video_manual_indices": "手动模式下的帧索引",
+      "seed": "随机种子",
+      "force_offload": "推理完成后强制卸载模型",
+      "save_states": "保存对话状态",
+      "parameters": "选择参数设置节点",
+      "images": "images",
+      "video": "输入视频",
+      "asr_model": "ASR模型输入",
+      "tts_model": "TTS模型输入",
+      "queue_handler": "队列处理器",
       "output": "生成的文本输出",
-      "output_list": "生成的文本输出列表\n• 批量处理时使用",
-      "state_uid": "对话状态ID\n• 用于多轮对话管理",
-      "audio": "生成的音频输出\n• 仅在音频输出模式下有效"
+      "output_list": "生成的文本输出列表",
+      "state_uid": "对话状态ID",
+      "audio": "生成的音频输出"
     }
   },
   "llama_cpp_unload_model": {
@@ -419,7 +416,7 @@
       "any": "任意输出"
     },
     "tooltips": {
-      "any": "任意类型的输入\n• 用于触发节点执行\n• 执行后卸载当前模型释放显存"
+      "any": "任意类型的输入"
     }
   },
   "multi_model_tts": {
@@ -452,18 +449,18 @@
       "dialogue_info": "对话信息"
     },
     "tooltips": {
-      "dialogue_text": "格式化的对话文本\n• 包含所有角色的对话内容",
-      "tts_model_1": "TTS模型1\n• 用于生成角色音频",
-      "tts_model_2": "TTS模型2\n• 用于生成角色音频",
-      "tts_model_3": "TTS模型3\n• 用于生成角色音频",
-      "tts_model_4": "TTS模型4\n• 用于生成角色音频",
-      "pause_duration": "说话人之间的停顿时间（秒）\n• 0.0-2.0",
+      "dialogue_text": "格式化的对话文本",
+      "tts_model_1": "TTS模型1用于生成角色音频",
+      "tts_model_2": "TTS模型2用于生成角色音频",
+      "tts_model_3": "TTS模型3用于生成角色音频",
+      "tts_model_4": "TTS模型4用于生成角色音频",
+      "pause_duration": "说话人之间的停顿时间（秒）",
       "add_silence": "是否在说话人之间添加静音",
-      "force_offload": "推理完成后强制卸载模型\n• 释放显存\n• 适用于多模型切换场景",
-      "output_format": "输出音频格式\n• wav：无压缩音频（质量最高）\n• flac：无损压缩（推荐）\n• mp3：有损压缩（文件最小）\n• ogg：开放格式（平衡）",
-      "text": "生成的对话文本\n• 可连接到文本处理节点",
-      "audio": "生成的音频数据\n• AUDIO类型，可直接连接音频保存节点",
-      "dialogue_info": "对话详细信息\n• 包含分段数、总时长、角色配置等信息"
+      "force_offload": "推理完成后强制卸载模型",
+      "output_format": "输出音频格式",
+      "text": "生成的对话文本",
+      "audio": "生成的音频数据",
+      "dialogue_info": "对话详细信息"
     }
   },
 
@@ -520,20 +517,20 @@
       "image4": "第四张输入图像",
       "image5": "第五张输入图像",
       "image6": "第六张输入图像",
-      "mode": "选择工作模式\n• Image Mode：分析图像内容\n• Text Mode：根据选项生成提示词",
-      "story_type": "选择内容创作类型\n• Coherent Story：连贯故事\n• Storyboard Description：分镜描述\n• Scene Analysis：场景分析\n• Character Development：角色发展\n• Emotional Progression：情感递进\n• Creative Writing：创意写作\n• Script Creation：脚本创作\n• Advertising Copy：广告文案\n• Product Introduction：产品介绍\n• Educational Content：教育内容",
-      "story_length": "选择内容长度\n• Short (100 words or less)：简短\n• Medium (200 words or less)：中等\n• Detailed (400 words or less)：详细\n• Complete (600 words or less)：完整",
-      "language": "选择输出语言\n• 中文/English",
-      "max_size": "图像最大尺寸（像素）\n• 控制图像缩放\n• 默认：256",
-      "custom_prompt": "自定义提示词\n• 用于指导内容创作",
-      "include_image_descriptions": "是否在故事前包含每张图像的描述\n• True：是\n• False：否",
-      "story_theme": "选择内容主题\n• No Specific Theme：无特定主题\n• Adventure Story：冒险故事\n• Romance Story：浪漫故事\n• Mystery Story：悬疑故事\n• Sci-Fi Story：科幻故事\n• Fantasy Story：奇幻故事\n• Daily Life：日常生活\n• Historical Story：历史故事\n• Future Technology：未来科技\n• Business Marketing：商业营销\n• Educational Popularization：科普教育\n• Entertainment Comedy：娱乐喜剧",
-      "narrative_style": "选择叙事风格\n• First Person：第一人称\n• Third Person：第三人称\n• Omniscient Perspective：全知视角\n• Multi-Perspective Switching：多视角切换",
-      "content_focus": "内容重点\n• Balanced Development：平衡发展\n• Emphasize Plot：强调情节\n• Emphasize Characters：强调角色\n• Emphasize Emotions：强调情感\n• Emphasize Visuals：强调视觉\n• Emphasize Dialogue：强调对话",
-      "target_audience": "选择目标受众\n• General Public：普通大众\n• Teenagers：青少年\n• Children：儿童\n• Professionals：专业人士\n• Specific Groups：特定群体",
-      "video_model": "选择视频生成模型类型\n• WAN2.2\n• LTX2\n• General Video：通用视频\n• Custom：自定义\n不同模型需要不同的提示词格式",
-      "images": "合并后的图像tensor\n• 可连接到推理节点的images输入\n• 支持多图反推",
-      "prompt": "生成的提示词\n• 可直接连接到推理节点的text_input输入"
+      "mode": "选择工作模式",
+      "story_type": "选择内容创作类型",
+      "story_length": "选择内容长度",
+      "language": "选择输出语言",
+      "max_size": "图像最大尺寸（像素）",
+      "custom_prompt": "自定义提示词",
+      "include_image_descriptions": "是否在故事前包含每张图像的描述",
+      "story_theme": "选择内容主题",
+      "narrative_style": "选择叙事风格",
+      "content_focus": "内容重点",
+      "target_audience": "选择目标受众",
+      "video_model": "选择视频生成模型类型",
+      "images": "合并后的图像tensor",
+      "prompt": "生成的提示词"
     }
   },
   "VideoLoader": {
@@ -564,13 +561,13 @@
       "audio": "音频"
     },
     "tooltips": {
-      "force_rate": "强制帧率\n• 0=使用视频原始帧率",
-      "custom_width": "自定义宽度\n• 0=保持原始尺寸",
-      "custom_height": "自定义高度\n• 0=保持原始尺寸",
-      "frame_load_cap": "帧数读取上限\n• 0=无限制",
-      "skip_first_frames": "跳过前几帧\n• 从指定帧开始读取",
-      "select_every_nth": "间隔采样\n• 每N帧取1帧",
-      "format": "输出格式\n• 控制颜色通道顺序",
+      "force_rate": "强制帧率",
+      "custom_width": "自定义宽度",
+      "custom_height": "自定义高度",
+      "frame_load_cap": "帧数读取上限",
+      "skip_first_frames": "跳过前几帧",
+      "select_every_nth": "间隔采样",
+      "format": "输出格式",
       "images": "images",
       "video": "处理后的视频对象",
       "audio": "提取的音频"
@@ -602,13 +599,13 @@
       "alignment_info": "对齐信息"
     },
     "tooltips": {
-      "tts_model": "TTS模型对象\n• 从TTS加载器获取",
-      "timestamps": "时间戳数据\n• 从强制对齐处理节点获取",
+      "tts_model": "TTS模型对象",
+      "timestamps": "时间戳数据",
       "text": "要合成的文本内容",
-      "sample_rate": "音频采样率（Hz）\n• 默认：24000",
-      "speed": "语速倍数\n• 0.5：慢速\n• 1.0：正常\n• 2.0：快速",
-      "align_mode": "选择对齐模式\n• 精确时间对齐：严格按照时间戳生成音频\n• 自然流对齐：保持自然语音节奏",
-      "silence_padding": "段落间静音填充（秒）\n• 在每个片段之后添加静音\n• 默认：0.1",
+      "sample_rate": "音频采样率",
+      "speed": "语速倍数",
+      "align_mode": "对齐模式",
+      "silence_padding": "段落间静音填充（秒）",
       "aligned_audio": "对齐后的音频",
       "alignment_info": "对齐处理信息"
     }
