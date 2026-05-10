@@ -668,7 +668,7 @@ class QwenTTSEngine(BaseTTSEngine):
             # 获取生成参数
             speaker_id = kwargs.get("speaker_id", 0)
             emotion = kwargs.get("emotion", "default")
-            language = kwargs.get("language", "Chinese")
+            language = kwargs.get("language", "中文")
             speed = kwargs.get("speed", 1.0)
             
             # 检查模型是否加载成功
@@ -748,7 +748,7 @@ class QwenTTSEngine(BaseTTSEngine):
         Returns:
             语言列表
         """
-        return ["Chinese", "English", "Japanese", "Korean", "German", "French", "Russian", "Portuguese", "Spanish", "Italian"]
+        return ["中文", "English", "Japanese", "Korean", "German", "French", "Russian", "Portuguese", "Spanish", "Italian"]
     
     def get_emotions(self):
         """
@@ -1265,7 +1265,7 @@ class llama_cpp_tts_loader:
             "optional": {
                 "voice": (["Vivian - 明亮略带锐气的年轻女声 (中文)", "Serena - 温暖柔和的年轻女声 (中文)", "Uncle_Fu - 音色低沉醇厚的成熟男声 (中文)", "Dylan - 清晰自然的北京青年男声 (中文北京方言)", "Eric - 活泼略带沙哑明亮感的成都男声 (中文四川方言)", "Ryan - 富有节奏感的动态男声 (英语)", "Aiden - 清晰中频的阳光美式男声 (英语)", "Ono_Anna - 轻快灵活的俏皮日语女声 (日语)", "Sohee - 富含情感的温暖韩语女声 (韩语)"], {"default": "Vivian - 明亮略带锐气的年轻女声 (中文)", "tooltip": "选择音色类型（Qwen3-TTS CustomVoice支持9种高级音色）"}),
                 "emotion": (["default", "happy", "sad", "angry", "surprised", "calm", "excited", "gentle"], {"default": "default", "tooltip": "选择情绪风格（主流TTS模型支持）"}),
-                "language": (["Chinese", "English", "Japanese", "Korean", "German", "French", "Russian", "Portuguese", "Spanish", "Italian"], {"default": "Chinese", "tooltip": "选择合成语言（Qwen3-TTS支持10种语言）"}),
+                "language": (["中文", "English", "Japanese", "Korean", "German", "French", "Russian", "Portuguese", "Spanish", "Italian"], {"default": "中文", "tooltip": "选择合成语言（Qwen3-TTS支持10种语言）"}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "生成温度，值越高越随机"}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0.1, "max": 1.0, "step": 0.05, "tooltip": "核采样参数，控制生成多样性"}),
                 "top_k": ("INT", {"default": 50, "min": 1, "max": 100, "step": 1, "tooltip": "Top-K采样参数"}),
@@ -1340,7 +1340,7 @@ class llama_cpp_tts_loader:
     }
     
     LANGUAGE_MAP = {
-        "Chinese": "chinese",
+        "中文": "chinese",
         "English": "english",
         "Japanese": "japanese",
         "Korean": "korean",
@@ -1354,7 +1354,7 @@ class llama_cpp_tts_loader:
 
     @classmethod
     def IS_CHANGED(s, tts_model, n_gpu_layers, sample_rate, model_type,
-                  voice="Vivian", emotion="default", language="Chinese", speed=1.0, temperature=0.7, top_p=0.9, top_k=50,
+                  voice="Vivian", emotion="default", language="中文", speed=1.0, temperature=0.7, top_p=0.9, top_k=50,
                   repetition_penalty=1.1, max_new_tokens=2048, use_cache=True,
                   ref_audio_path="", pitch=0.0, volume=1.0):
         # 提取纯音色名称（去掉描述部分）
@@ -1392,7 +1392,7 @@ class llama_cpp_tts_loader:
         return result
 
     def load_tts_model(self, tts_model, n_gpu_layers, sample_rate, model_type,
-                      voice="Vivian", emotion="default", language="Chinese", speed=1.0, temperature=0.7, top_p=0.9, top_k=50,
+                      voice="Vivian", emotion="default", language="中文", speed=1.0, temperature=0.7, top_p=0.9, top_k=50,
                       repetition_penalty=1.1, max_new_tokens=2048, use_cache=True,
                       ref_audio_path="", pitch=0.0, volume=1.0):
         if tts_model == "None" or tts_model == "请将TTS模型放入models/LLM文件夹":
@@ -1556,7 +1556,7 @@ class UnifiedTTSModelWrapper:
     }
 
     LANGUAGE_MAP = {
-        "Chinese": "chinese",
+        "中文": "chinese",
         "English": "english",
         "Japanese": "japanese",
         "Korean": "korean",
@@ -2121,7 +2121,7 @@ class UnifiedTTSModelWrapper:
             traceback.print_exc()
             return None
 
-    def _synthesize_qwen_tts(self, text, speaker_id, speed, sample_rate, ref_audio_path, pitch, volume, emotion="default", language="Chinese"):
+    def _synthesize_qwen_tts(self, text, speaker_id, speed, sample_rate, ref_audio_path, pitch, volume, emotion="default", language="中文"):
         """Qwen3-TTS 语音合成
 
         支持两种模式:

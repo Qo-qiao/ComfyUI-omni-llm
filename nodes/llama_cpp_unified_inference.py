@@ -195,7 +195,6 @@ from support.prompt_enhancer_preset_zh import (
     FLUX2_KLEIN_ZH,
     QWEN_IMAGE_2512_ZH,
     QWEN_IMAGE_EDIT_COMBINED_ZH,
-    QWEN_IMAGE_LAYERED_ZH,
     LTX2_ZH,
     WAN_T2V_ZH,
     WAN_I2V_ZH,
@@ -207,7 +206,6 @@ from support.prompt_enhancer_preset_zh import (
     MULTI_SPEAKER_DIALOGUE_ZH,
     LYRICS_CREATION_ZH,
     OCR_ENHANCED_ZH,
-    ULTRA_HD_IMAGE_REVERSE_ZH,
     VISION_BOUNDING_BOX_ZH,
     ILLUSTRIOUS_ZH,
     ANIMA_ZH,
@@ -222,7 +220,6 @@ from support.prompt_enhancer_preset_en import (
     FLUX2_KLEIN_EN,
     QWEN_IMAGE_2512_EN,
     QWEN_IMAGE_EDIT_COMBINED_EN,
-    QWEN_IMAGE_LAYERED_EN,
     LTX2_EN,
     WAN_T2V_EN,
     WAN_I2V_EN,
@@ -234,7 +231,6 @@ from support.prompt_enhancer_preset_en import (
     MULTI_SPEAKER_DIALOGUE_EN,
     LYRICS_CREATION_EN,
     OCR_ENHANCED_EN,
-    ULTRA_HD_IMAGE_REVERSE_EN,
     VISION_BOUNDING_BOX_EN,
     ILLUSTRIOUS_EN,
     ANIMA_EN,
@@ -305,7 +301,7 @@ class VideoProcessor:
         """获取视频处理的性能级别"""
         return "fast"
 
-    def process_video_input(self, video, max_frames: int = 16, sampling_method: str = "自动均匀采样", manual_indices: str = "") -> Optional[Dict]:
+    def process_video_input(self, video, max_frames: int = 16, sampling_method: str = "auto", manual_indices: str = "") -> Optional[Dict]:
         """处理视频输入，返回处理后的视频数据"""
         if not self._check_video_input(video):
             return None
@@ -343,7 +339,7 @@ class VideoProcessor:
 
         if hasattr(video_frames, 'shape') and video_frames.ndim == 4:
             total_frames = video_frames.shape[0]
-            if sampling_method == "自动均匀采样":
+            if sampling_method == "auto":
                 step = max(1, total_frames // max_frames)
                 indices = list(range(0, total_frames, step))[:max_frames]
             else:
@@ -532,21 +528,20 @@ class llama_cpp_unified_inference:
     preset_prompts["Empty - Nothing"] = ""
 
     # 添加分类预设提示词（顺序与 prompt_enhancer_preset_zh.py / prompt_enhancer_preset_en.py 保持一致）
-    preset_prompts["[[Reverse]] Tags"] = "NORMAL_DESCRIBE_TAGS"
-    preset_prompts["[[Reverse]] Describe"] = "NORMAL_DESCRIBE"
-    preset_prompts["[[Normal]] Expand"] = "PROMPT_EXPANDER"
-    preset_prompts["[[Anime]] Illustrious"] = "ILLUSTRIOUS"
-    preset_prompts["[[Anime]] Anima"] = "ANIMA"
-    preset_prompts["[[Portrait]] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
-    preset_prompts["[[General]] FLUX2 - Klein"] = "FLUX2_KLEIN"
-    preset_prompts["[[Design]] ERNIE - Image"] = "ERNIE_IMAGE"
-    preset_prompts["[[Poster]] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
-    preset_prompts["[[Image Edit]] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
-    preset_prompts["[[Image Edit]] Qwen - Image Layered"] = "QWEN_IMAGE_LAYERED"
-    preset_prompts["[[Text to Video]] LTX-2"] = "LTX2"
-    preset_prompts["[[Text to Video]] WAN - Text to Video"] = "WAN_T2V"
-    preset_prompts["[[Image to Video]] WAN - Image to Video"] = "WAN_I2V"
-    preset_prompts["[[Image to Video]] WAN - FLF to Video"] = "WAN_FLF2V"
+    preset_prompts["[Reverse] Tags"] = "NORMAL_DESCRIBE_TAGS"
+    preset_prompts["[Reverse] Describe"] = "NORMAL_DESCRIBE"
+    preset_prompts["[Normal] Expand"] = "PROMPT_EXPANDER"
+    preset_prompts["[Anime] Illustrious"] = "ILLUSTRIOUS"
+    preset_prompts["[Anime] Anima"] = "ANIMA"
+    preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
+    preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
+    preset_prompts["[Design] ERNIE - Image"] = "ERNIE_IMAGE"
+    preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
+    preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
+    preset_prompts["[Text to Video] LTX-2"] = "LTX2"
+    preset_prompts["[Text to Video] WAN - Text to Video"] = "WAN_T2V"
+    preset_prompts["[Image to Video] WAN - Image to Video"] = "WAN_I2V"
+    preset_prompts["[Image to Video] WAN - FLF to Video"] = "WAN_FLF2V"
     preset_prompts["[Video Analysis] Video - Frame Sequence Analysis"] = "VIDEO_FRAME_SEQUENCE_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Reverse Prompt"] = "VIDEO_TO_PROMPT"
     preset_prompts["[Video Analysis] Video - Detailed Scene Breakdown"] = "VIDEO_DETAILED_SCENE_BREAKDOWN"
@@ -554,7 +549,6 @@ class llama_cpp_unified_inference:
     preset_prompts["[Audio] Multi-Person Dialogue"] = "MULTI_SPEAKER_DIALOGUE"
     preset_prompts["[Music] Lyrics Creation"] = "LYRICS_CREATION"
     preset_prompts["[OCR] Enhanced OCR"] = "OCR_ENHANCED"
-    preset_prompts["[[HighRes]] Ultra HD Image Reverse"] = "ULTRA_HD_IMAGE_REVERSE"
     preset_prompts["[Vision] Bounding Box"] = "VISION_BOUNDING_BOX"
 
     preset_tags = list(preset_prompts.keys())
@@ -580,7 +574,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Image Edit] Qwen - Image Layered：图像分层编辑\n• [Text to Video] LTX-2：文本生视频提示词\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [HighRes] Ultra HD Image Reverse：超高清图像反推\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Text to Video] LTX-2：文本生视频\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [Vision] Bounding Box：视觉目标检测框"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的多模态助手。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
@@ -589,17 +583,17 @@ class llama_cpp_unified_inference:
                 "response_language": (["中文", "English"], {"default": "中文", "tooltip": "AI回复的语言"}),
                 
                 # ========== 输出格式设置 ==========
-                "output_format": (["JSON格式", "文本格式"], {
-                    "default": "文本格式",
-                    "tooltip": "输出格式控制：\n• JSON格式：输出JSON格式内容（遵循预设模板的output_format要求）\n• 文本格式：输出纯文本内容（使用input_template_text模板）"
+                "output_format": (["natural", "structured"], {
+                    "default": "natural",
+                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容\n• structured：输出结构化文本内容"
                 }),
                 
                 # ========== 视频处理参数 ==========
                 "video_max_frames": ("INT", {"default": 16, "min": 2, "max": 1024, "step": 1, 
                                               "tooltip": "视频模式：最大提取帧数"}),
-                "video_sampling": (["自动均匀采样", "手动指定帧索引"], 
-                                  {"default": "自动均匀采样", 
-                                   "tooltip": "视频帧采样方式：\n• 自动均匀采样：从视频中均匀抽取指定数量的帧\n• 手动指定帧索引：自定义要提取的帧号"}),
+                "video_sampling": (["auto", "manual"], 
+                                  {"default": "auto", 
+                                   "tooltip": "视频帧采样方式：\n• auto：自动均衡提取视频帧\n• manual：自定义要提取的帧"}),
                 "video_manual_indices": ("STRING", {"default": "", 
                                                      "placeholder": "例如: 0,10,20 或 0-10", 
                                                      "tooltip": "手动模式下的帧索引，仅在手动采样时生效"}),
@@ -609,9 +603,9 @@ class llama_cpp_unified_inference:
                                            "tooltip": "图像处理的最大边长（像素），较大的值需要更多显存"}),
                 
                 # ========== 批量输出选项 ==========
-                "batch_combination": (["逐个输出", "合并输出"], {
-                    "default": "逐个输出",
-                    "tooltip": "批量模式的结果处理方式：\n• 逐个输出：每张图片单独输出结果\n• 合并输出：所有结果合并为一个输出"
+                "batch_combination": (["separate", "combined"], {
+                    "default": "separate",
+                    "tooltip": "批量模式的结果处理方式：\n• separate：每张图片单独输出结果\n• combined：所有结果合并为一个输出"
                 }),
 
                 
@@ -689,7 +683,7 @@ class llama_cpp_unified_inference:
         Args:
             preset_key: 预设键名
             language: 语言（"中文" 或 "English"）
-            output_format: 输出格式（"JSON格式" 或 "文本格式"）
+            output_format: 输出格式（"structured" 或 "natural"）
 
         Returns:
             str: 格式化后的预设提示词文本
@@ -706,7 +700,6 @@ class llama_cpp_unified_inference:
                 "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
-                "QWEN_IMAGE_LAYERED": QWEN_IMAGE_LAYERED_ZH,
                 "LTX2": LTX2_ZH,
                 "WAN_T2V": WAN_T2V_ZH,
                 "WAN_I2V": WAN_I2V_ZH,
@@ -718,7 +711,6 @@ class llama_cpp_unified_inference:
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_ZH,
                 "LYRICS_CREATION": LYRICS_CREATION_ZH,
                 "OCR_ENHANCED": OCR_ENHANCED_ZH,
-                "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_ZH,
                 "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_ZH,
             }
         else:
@@ -733,7 +725,6 @@ class llama_cpp_unified_inference:
                 "ERNIE_IMAGE": ERNIE_IMAGE_EN,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
-                "QWEN_IMAGE_LAYERED": QWEN_IMAGE_LAYERED_EN,
                 "LTX2": LTX2_EN,
                 "WAN_T2V": WAN_T2V_EN,
                 "WAN_I2V": WAN_I2V_EN,
@@ -745,7 +736,6 @@ class llama_cpp_unified_inference:
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_EN,
                 "LYRICS_CREATION": LYRICS_CREATION_EN,
                 "OCR_ENHANCED": OCR_ENHANCED_EN,
-                "ULTRA_HD_IMAGE_REVERSE": ULTRA_HD_IMAGE_REVERSE_EN,
                 "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
             }
 
@@ -753,8 +743,13 @@ class llama_cpp_unified_inference:
         if preset is None:
             return preset_key
 
-        # 获取基础模板
-        base_template = preset.get("input_template", preset_key)
+        # 获取基础模板，优先使用不同格式的专用模板
+        if output_format == "natural" and "input_template_natural" in preset:
+            base_template = preset.get("input_template_natural")
+        elif output_format == "structured" and "input_template_structured" in preset:
+            base_template = preset.get("input_template_structured")
+        else:
+            base_template = preset.get("input_template", preset_key)
 
         # 优先使用新的 output_format_suffix 字段
         suffix_map = preset.get("output_format_suffix", {})
@@ -815,7 +810,7 @@ class llama_cpp_unified_inference:
             # 批量推理
             print(f"【批量推理】开始批量推理...")
             
-            if batch_combination == "逐个输出":
+            if batch_combination == "separate":
                 # 优化：使用批处理减少推理调用次数
                 # 对于数量较多的图片，分批次处理
                 batch_size = 4  # 每批处理4张图片
@@ -1383,7 +1378,7 @@ class llama_cpp_unified_inference:
                     )
                     
                     if batch_results:
-                        if batch_combination == "合并输出":
+                        if batch_combination == "combined":
                             generated_text = " | ".join(batch_results)
                             output_list = batch_results
                         else:
