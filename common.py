@@ -1848,7 +1848,10 @@ class LLAMA_CPP_STORAGE:
             # 构建MMProj路径
             mmproj_path = None
             if enable_mmproj and mmproj != "None":
-                mmproj_path = os.path.join(folder_paths.models_dir, 'LLM', mmproj)
+                if os.path.isabs(mmproj) and os.path.exists(mmproj):
+                    mmproj_path = os.path.normpath(mmproj)
+                else:
+                    mmproj_path = os.path.join(folder_paths.models_dir, 'LLM', mmproj)
                 if not os.path.exists(mmproj_path):
                     raise FileNotFoundError(f"MMProj文件不存在：{mmproj_path}")
 
