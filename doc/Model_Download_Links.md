@@ -146,7 +146,7 @@
 
 ## VLM Series (Vision-Language Models, supporting text generation and image reverse prompting for all visual models)
 
-### Qwen Series (qwen3.5 series models are more divergent, text content generated using preset templates may contain non-prompt information)
+### Qwen Series (Recommend to use clip model to select prompt reverse prompting model, such as Z-Image recommends to use qwen3VL model to generate prompt)
 
 **Model Series**: Qwen-VL
 **Specific Model**: Qwen2.5-7B-VL
@@ -179,8 +179,6 @@
 **Applicable Scenarios**: Low VRAM device deployment, embedded devices, mobile applications, basic dialogue, simple multimodal tasks
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-2B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 **ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen3.5-2B-GGUF (includes mmproj model)
-**Multi-part Model**: https://huggingface.co/huihui-ai/Huihui-Qwen3.5-2B-abliterated (nsfw)
-**ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3.5-2B
 
 
 **Specific Model**: Qwen3.5-4B (Reverse Prompting)
@@ -188,7 +186,6 @@
 **Applicable Scenarios**: Low VRAM device deployment, fast reasoning, mobile applications, lightweight dialogue, basic multimodal tasks, real-time interaction
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 **ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
-**Multi-part Model**: https://huggingface.co/huihui-ai/Huihui-Qwen3.5-4B-abliterated (nsfw)
 
 
 ### OCR Specialized Series
@@ -364,3 +361,29 @@
 **Key Features**: High-performance vision-language model, supports complex visual reasoning and multimodal interaction, excellent image understanding and text generation capabilities.
 **Applicable Scenarios**: Image reverse prompting, visual QA, complex scene understanding, instruction-based prompt generation, multimodal interaction tasks
 **Download Link**: https://huggingface.co/janhq/Jan-v2-VL-high-gguf (includes mmproj model)
+
+
+
+
+## CLIP Models (NSFW Version)
+Applicable generation models: ERNIE-Image
+https://huggingface.co/ponpoke/ERNIE-Image-Abliterated
+https://huggingface.co/ponpoke/ERNIE-Image-Abliterated-GGUF
+Corresponding model (abliterated_pe): ministral-3-3b.safetensors
+Corresponding model (abliterated_text_encoder): ernie-image-prompt-enhancer.safetensors
+
+Applicable generation models: flux2-klein-9b
+qwen_3_8b_fp8mixed.safetensors
+https://huggingface.co/edicamargo/qwen_3_8b_fp8mixed_abliterated
+
+Applicable generation models: Z-Image, flux2-klein-4b
+qwen_3_4b.safetensors
+https://huggingface.co/chinmankokumin/Qwen3-4B-abliterated-v2
+
+Applicable generation models: flux2-klein-4b
+flux2-klein-4b-uncensored-text-encoder
+https://huggingface.co/ponpoke/flux2-klein-4b-uncensored-text-encoder
+
+Applicable generation models: flux2-klein-9b
+flux2-klein-9b-uncensored-text-encoder
+https://huggingface.co/ponpoke/flux2-klein-9b-uncensored-text-encoder
