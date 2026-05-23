@@ -845,7 +845,20 @@ class llama_cpp_unified_inference:
                         output = engine.create_chat_completion(llama_model.llm, messages, gen_params)
                         
                         if output and 'choices' in output:
-                            text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
+                            content = output['choices'][0]['message']['content']
+                            # 处理content可能是列表的情况（多模态模型）
+                            if isinstance(content, list):
+                                text_parts = []
+                                for item in content:
+                                    if isinstance(item, dict) and item.get('type') == 'text':
+                                        text_parts.append(item.get('text', ''))
+                                    elif isinstance(item, str):
+                                        text_parts.append(item)
+                                text = ''.join(text_parts).lstrip().removeprefix(": ")
+                            elif isinstance(content, str):
+                                text = content.lstrip().removeprefix(": ")
+                            else:
+                                text = str(content).lstrip().removeprefix(": ")
                             batch_results.append(text)
                             print(f"【批量推理】图片 {img_idx+1} 完成: {text[:50]}...")
                         else:
@@ -877,7 +890,20 @@ class llama_cpp_unified_inference:
                 inference_time = end_time - start_time
                 
                 if output and 'choices' in output:
-                    combined_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
+                    content = output['choices'][0]['message']['content']
+                    # 处理content可能是列表的情况（多模态模型）
+                    if isinstance(content, list):
+                        text_parts = []
+                        for item in content:
+                            if isinstance(item, dict) and item.get('type') == 'text':
+                                text_parts.append(item.get('text', ''))
+                            elif isinstance(item, str):
+                                text_parts.append(item)
+                        combined_text = ''.join(text_parts).lstrip().removeprefix(": ")
+                    elif isinstance(content, str):
+                        combined_text = content.lstrip().removeprefix(": ")
+                    else:
+                        combined_text = str(content).lstrip().removeprefix(": ")
                     # 尝试分割结果（假设模型按顺序返回结果）
                     # 可以根据输出格式进行分割
                     lines = combined_text.split('\n')
@@ -944,7 +970,21 @@ class llama_cpp_unified_inference:
                 # 标准文本推理（所有模型类型）
                 output = self.engine.create_chat_completion(llama_model.llm, messages, gen_params)
                 if output and 'choices' in output:
-                    generated_text = output['choices'][0]['message']['content'].lstrip().removeprefix(": ")
+                    content = output['choices'][0]['message']['content']
+                    # 处理content可能是列表的情况（多模态模型）
+                    if isinstance(content, list):
+                        # 从列表中提取文本内容
+                        text_parts = []
+                        for item in content:
+                            if isinstance(item, dict) and item.get('type') == 'text':
+                                text_parts.append(item.get('text', ''))
+                            elif isinstance(item, str):
+                                text_parts.append(item)
+                        generated_text = ''.join(text_parts).lstrip().removeprefix(": ")
+                    elif isinstance(content, str):
+                        generated_text = content.lstrip().removeprefix(": ")
+                    else:
+                        generated_text = str(content).lstrip().removeprefix(": ")
                 
                 # 记录推理结束时间
                 end_time = time.time()
