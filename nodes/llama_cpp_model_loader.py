@@ -224,6 +224,9 @@ class llama_cpp_model_loader:
         resolved_model_path = self._resolve_llm_model_path(model)
         if resolved_model_path:
             model = resolved_model_path
+        resolved_mmproj_path = self._resolve_llm_model_path(mmproj)
+        if resolved_mmproj_path:
+            mmproj = resolved_mmproj_path
 
         # 处理"None"模型的情况
         if model == "None":
