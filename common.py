@@ -33,7 +33,7 @@ try:
     from llama_cpp import Llama
     from llama_cpp.llama_chat_format import (
         Llava15ChatHandler, Llava16ChatHandler, MoondreamChatHandler,
-        NanoLlavaChatHandler, Llama3VisionAlphaChatHandler, MiniCPMv26ChatHandler,
+        NanoLlavaChatHandler, Llama3VisionAlphaChatHandler, MiniCPMv26ChatHandler, MiniCPMv45ChatHandler,
         Qwen3VLChatHandler
     )
     # Qwen25VLChatHandler 在较新版本中才有，单独导入
@@ -1690,8 +1690,8 @@ class LLAMA_CPP_STORAGE:
             "nanoLLaVA": NanoLlavaChatHandler,
             "llama3-Vision-Alpha": Llama3VisionAlphaChatHandler,
             "MiniCPM-v2.6": MiniCPMv26ChatHandler,
-            "MiniCPM-v4.5": MiniCPMv26ChatHandler,
-            "MiniCPM-O-4.5": MiniCPMv26ChatHandler,
+            "MiniCPM-v4.5": MiniCPMv45ChatHandler,
+            "MiniCPM-O-4.5": MiniCPMv45ChatHandler,
             "Gemma3": Gemma3ChatHandler,
             "Gemma4": Gemma4ChatHandler,
             "GLM-4.6V": GLM46VChatHandler,
