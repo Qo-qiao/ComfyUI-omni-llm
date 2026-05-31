@@ -124,45 +124,51 @@ PROMPT_EXPANDER_EN = {
 }
 
 ILLUSTRIOUS_EN = {
-    "name": "Illustrious Anime Character Optimizer",
-    "description": "Specialized Prompt engineer for 2D anime/manga characters, focused on creating high-quality generation prompts, strengthening character features, action details, clothing texture and scene atmosphere. Supports four-dimension analysis: Camera, Subject, Environment, Lighting & Color",
-    "input_template_natural": "Optimize the user-provided 2D character description into a detailed, vivid and expressive prompt for AI generation tasks. If custom content is provided, use it as the basis: #\n\n**IMPORTANT: Must use pure 2D anime/manga style descriptions, strictly avoid realistic photography style terms.**\nDescribe shot perspective, character appearance features, action pose, scene environment, style features, lighting effects, color palette, details texture and clothing style.",
-    "input_template_structured": "Optimize the user-provided 2D character description into a detailed, vivid and expressive prompt for AI generation tasks. If custom content is provided, use it as the basis: #\n\n**IMPORTANT: Must use pure 2D anime/manga style descriptions, strictly avoid realistic photography style terms.**\nDescribe shot perspective, character appearance features, action pose, scene environment, style features, lighting effects, color palette, details texture and clothing style.",
+    "name": "Illustrious SDXL Anime Character Optimizer",
+    "description": "Specialized Prompt engineer for SDXL model designed 2D anime/manga characters, output tag-based character descriptions including shot perspective, subject features, clothing styling, environment scene, color palette, lighting effects, composition style, art style, texture details. Supports four-dimension tag-based analysis, optimized for SDXL high-resolution (1024x1024+) detail performance",
+    "input_template_natural": "Optimize the user-provided 2D character description into a detailed tag list for SDXL model AI generation tasks. If custom content is provided, use it as the basis: #\n\n**IMPORTANT: Must use pure 2D anime/manga style tags, strictly avoid realistic photography style terms.**\nTag count strictly controlled at 30-60, no duplicates.",
+    "input_template_structured": "Optimize the user-provided 2D character description into a detailed tag list for SDXL model AI generation tasks. If custom content is provided, use it as the basis: #\n\n**IMPORTANT: Must use pure 2D anime/manga style tags, strictly avoid realistic photography style terms.**\nEach category 5-8 tags, total tag count strictly controlled at 30-60, no duplicates.",
     "output_format_suffix": {
-        "natural": "\n\n**【Format Requirements】** Output natural paragraph text directly, describing shot perspective, character appearance features, action pose, scene environment, style features, lighting effects, color palette, details texture and clothing styling in detail, organizing all elements into a coherent English paragraph. Do not output any explanation or other content.",
-        "structured": "\n\n**【Format Requirements】** Include the following fields: 【Shot Perspective】【Character Appearance】【Action Pose】【Environment Scene】【Style Features】【Lighting Effects】【Color Palette】【Details Texture】【Clothing Styling】. Each field on one line, highly detailed, emphasizing anime style features. Do not add any explanation."
+        "natural": "\n\n**【Format Requirements】** Output pure comma-separated tag list directly, **tag count strictly controlled at 30-60, no duplicates**. Include quality tags, shot perspective tags, subject feature tags, clothing styling tags, environment scene tags, lighting effect tags, color palette tags, composition style tags, art style tags, texture detail tags. Example: tag1, tag2, tag3...\nDo not output any explanation or extra content.",
+        "structured": "\n\n**【Format Requirements】** Output using the following category fields, **each category 5-8 tags, total tag count strictly controlled at 30-60, no duplicates**:\n【Quality Tags】tag1, tag2...\n【Shot Perspective】tag1, tag2...\n【Subject Features】tag1, tag2...\n【Clothing Styling】tag1, tag2...\n【Environment Scene】tag1, tag2...\n【Color Palette】tag1, tag2...\n【Lighting Effects】tag1, tag2...\n【Composition Style】tag1, tag2...\n【Art Style】tag1, tag2...\n【Texture Details】tag1, tag2...\n\nOnly output tags, do not add any explanation."
     },
     "steps": [
-        "Camera dimension analysis: Identify shot angle (overhead, low angle, eye-level), focal length and shot type (half-body/full-body/close-up), composition style",
-        "Subject dimension analysis: Define character identity/age, physical features, hairstyle, eye expression, facial features",
-        "Environment dimension analysis: Describe scene background, weather and atmosphere, spatial layer details",
-        "Lighting and color dimension analysis: Analyze main light source/direction, light texture, overall color temperature/tone, color palette system"
+        "Quality tags: Determine SDXL high-quality tags such as masterpiece, best quality, ultra-detailed, high resolution, 1024x1024",
+        "Camera dimension analysis: Identify shot angle (overhead/low angle/eye-level), focal length and shot type (wide-angle/telephoto/standard/medium/close-up), depth of field type (deep/shallow)",
+        "Subject dimension analysis: Extract character identity/age, physical features, hairstyle, eye expression, facial features, action pose tags",
+        "Environment dimension analysis: Identify scene background, weather and atmosphere, spatial layer details (foreground/medium/background)",
+        "Lighting and color dimension analysis: Extract main light source/direction, light texture, overall color temperature/tone, color palette system, highlight/shadow tendency, contrast/saturation"
     ],
     "constraints": {
-        "max_length": 400,
-        "content_type": "Strictly describe 2D character visual elements: design, clothing details, hair, eyes, expression, pose, scene atmosphere, lighting",
-        "focus": "Ensure content conforms to 2D anime/manga style, strengthen expressiveness of character features and atmosphere",
-        "forbidden_terms": "Strictly avoid realistic photography style terms such as pores, texture, 4k texture, photograph, cinematic, camera, lens, film grain, photorealistic, photo",
-        "language_style": "Must use English anime tag vocabulary such as masterpiece, best quality, ultra-detailed, anime style, cel shading"
+        "max_tags": 100,
+        "min_tags": 30,
+        "content_type": "Strictly describe 2D character visual elements: design, clothing details, hair, eyes, expression, pose, scene atmosphere, lighting, suitable for SDXL high-resolution performance",
+        "excluded_content": "Do not include abstract concepts, explanations, marketing terms or technical jargon (for example, do not use 'SEO', 'brand-aligned', 'viral potential')",
+        "forbidden_terms": "Strictly avoid realistic photography style terms such as pores, realistic skin texture, 4K texture, photorealistic quality, cinematic lens",
+        "language": "All tags must be output in English",
+        "no_duplicates": "Absolutely no duplicate tags, only keep one tag for the same semantic meaning"
     },
     "task_requirements": [
-        "Focus on 2D character features",
-        "Art style (most critical): Must include masterpiece, best quality, ultra-detailed, anime style, manga style, illustration, cel shading",
-        "Style enhancement: cel shading, clean line art, soft color palette, anime art style",
-        "Facial features: big bright eyes, sparkling eyes, detailed eyelashes, small nose, delicate face, expressive eyes",
-        "Eyes: gradient eyes, star-shaped pupils, catchlights, sparkling eyes",
-        "Hair: twin tails, flowing hair, detailed hair strands, hair accessories",
-        "Clothing: frills, lace, ribbons, bows, pleated skirt, sailor uniform",
-        "Pose: dynamic pose, cute pose, elegant pose",
-        "Background: simple background, gradient background, dreamy atmosphere, cherry blossoms, petals",
-        "Lighting: soft lighting, rim lighting, gentle light, bloom effects",
-        "Shot perspective: describe shot angle (overhead/low angle/eye-level), shot type (half-body/full-body/close-up), composition style",
-        "Use English, avoid realistic terms"
+        "Focus on 2D character features, suitable for SDXL model",
+        "SDXL quality tags (most critical): Must include SDXL high-quality tags such as masterpiece, best quality, ultra-detailed, high resolution, 1024x1024, 8K, super clear, high quality",
+        "Art style: Must include style tags such as anime style, manga style, illustration, cel shading, clean line art",
+        "Style enhancement: cel shading, clean line art, soft color palette, anime art style, exquisite rendering",
+        "Facial features: Precisely describe 2D features such as big bright eyes, sparkling eyes, detailed eyelashes, small nose, delicate face, expressive eyes",
+        "Avoid realistic terms: Never use realistic skin, pores, texture, 4k texture, photograph, cinematic",
+        "Eyes: Describe eye shape, color, pupils, catchlights, gaze such as gradient eyes, star-shaped pupils, eye catchlights, sparkling eyes",
+        "Hair: Enhance 2D hair features such as twin tails, flowing hair, detailed hair strands, hair accessories",
+        "Clothing: Enhance 2D clothing elements such as frills, lace, ribbons, bows, pleated skirt, sailor uniform",
+        "Pose: Use 2D pose descriptions such as dynamic pose, cute pose, elegant pose",
+        "Background: Describe 2D background elements such as simple background, gradient background, dreamy atmosphere, cherry blossoms, petals",
+        "Lighting: Use 2D lighting descriptions such as soft lighting, rim lighting, gentle light, bloom effects",
+        "Shot perspective: Describe shot angle (overhead/low angle/eye-level), shot type (half-body/full-body/close-up), composition style",
+        "SDXL detail optimization: Enhance high resolution details, exquisite rendering, perfect composition, high quality SDXL-specific descriptions",
+        "Tag count strictly controlled at 30-60, each category 5-8 tags"
     ],
     "examples": [
         {
-            "natural": "Eye-level shot, half-body composition, soft diagonal framing. A 16-year-old anime girl with blue-purple gradient twintails that curl slightly at the ends. She has golden star-shaped pupils that sparkle, a delicate oval face, and snow-white skin with a faint pink blush. She wears a sweet smile. Her pose is cute with body slightly turned right, head tilted left, and hands clasped near her chest. The background is a pink-to-white gradient with floating cherry blossom petals creating a dreamy atmosphere. Style is masterpiece quality with cel shading and clean line art. Soft light from upper left creates gentle rim lighting around her hair with catchlights in her eyes. Color palette features white, red, and gold with soft pastels. Details include sailor uniform with gold trim, red bow tie, and pleated skirt. Clothing: white sailor top with navy collar, red bow, red-white pleated skirt, white knee-high socks, black shoes.",
-            "structured": "【Shot Perspective】Eye-level shot, half-body composition, soft diagonal framing\n【Character Appearance】16-year-old anime girl, blue-purple gradient twintails with slightly curled ends, golden star-shaped pupils with sparkle, delicate oval face, snow-white skin with faint pink blush, sweet smile\n【Action Pose】Cute pose, body slightly turned right, head tilted left, hands clasped near chest, slender soft fingers\n【Environment Scene】Pink-to-white gradient background, dreamy atmosphere, floating cherry blossom petals\n【Style Features】Masterpiece, best quality, ultra-detailed, anime style, cel shading, clean line art\n【Lighting Effects】Soft light from upper left, gentle rim light around hair, catchlights in eyes\n【Color Palette】White, red, gold palette, soft pastel tones, pink-purple gradient hair\n【Details Texture】Sailor uniform with gold trim, red bow tie, pleated skirt, delicate hair strands, subtle blush\n【Clothing Styling】White sailor top with navy collar, red bow, red-white pleated skirt, white knee-high socks, black shoes"
+            "natural": "masterpiece, best quality, ultra-detailed, high resolution, 1024x1024; eye-level shot, half-body composition, soft framing; 16-year-old anime girl, blue-purple gradient twintails, golden star-shaped pupils, delicate oval face, snow-white skin, pink blush, sweet smile; cute pose, body slightly turned, head tilted, hands clasped, gentle smile; white sailor uniform, navy collar, red bow, pleated skirt, lace trim, black shoes; pink gradient background, dreamy atmosphere, cherry blossom petals floating; soft side lighting, hair rim light, catchlights; white, red, gold, soft pastel tones; exquisite rendering, perfect composition, high resolution details; cel shading, clean line art, anime style",
+            "structured": "【Quality Tags】masterpiece, best quality, ultra-detailed, high resolution, 1024x1024, perfect composition, exquisite rendering\n【Shot Perspective】eye-level shot, half-body composition, soft diagonal framing\n【Subject Features】16-year-old anime girl, blue-purple gradient twintails, golden star-shaped pupils, delicate oval face, snow-white skin, pink blush, sweet smile, sparkling eyes\n【Clothing Styling】white sailor uniform, navy collar, red bow, pleated skirt, lace trim, black shoes, ribbon decorations\n【Environment Scene】pink gradient background, dreamy atmosphere, cherry blossom petals floating, petal decorations, simple background\n【Color Palette】white, red, gold, soft pastel tones, blue-purple gradient, gradient background\n【Lighting Effects】soft side lighting, hair rim light, catchlights, gentle diffused light\n【Composition Style】half-body composition, soft diagonal framing\n【Art Style】anime style, illustration, cel shading, clean line art, soft color palette, anime art style\n【Texture Details】high resolution details, delicate hair strands, lace texture, petal details, delicate texture"
         }
     ]
 }
