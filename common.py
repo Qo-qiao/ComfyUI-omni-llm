@@ -22,37 +22,159 @@ import platform
 import sys
 import functools
 import contextlib
+import subprocess
 from typing import Dict, List, Optional, Union
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter
 
-# -------------------------- 硬件检测（保留提速优化） --------------------------
-try:
-    import llama_cpp
-    from llama_cpp import Llama
-    from llama_cpp.llama_chat_format import (
-        Llava15ChatHandler, Llava16ChatHandler, MoondreamChatHandler,
-        NanoLlavaChatHandler, Llama3VisionAlphaChatHandler, MiniCPMv26ChatHandler, MiniCPMv45ChatHandler,
-        Qwen3VLChatHandler
-    )
-    # Qwen25VLChatHandler 在较新版本中才有，单独导入
+LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
+
+def _check_and_install_llama_cpp_python():
+    """检查并尝试安装llama-cpp-python，如果已安装则提示升级"""
     try:
-        from llama_cpp.llama_chat_format import Qwen25VLChatHandler
+        import llama_cpp
+        current_version = getattr(llama_cpp, '__version__', '未知版本')
+        print(f"【依赖检查】llama-cpp-python 已安装，版本: {current_version}")
+        print(f"【升级提示】如需使用MoE/MTP等新功能，建议升级到最新版本")
+        print(f"【升级地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
+        return True
     except ImportError:
-        Qwen25VLChatHandler = None
-        print("【提示】当前llama-cpp-python版本不支持Qwen25VLChatHandler，Qwen2.5-VL/Omni模型将使用备选方案")
-except ImportError as e:
-    print(f"【错误】缺少llama-cpp-python依赖，请运行：pip install llama-cpp-python")
+        print(f"【错误】缺少 llama-cpp-python 依赖")
+        print(f"【下载地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
+        print(f"【自动安装】正在尝试自动安装通用版本...")
+        
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "pip", "install", "llama-cpp-python", "--quiet"],
+                capture_output=True,
+                text=True,
+                timeout=600
+            )
+            
+            if result.returncode == 0:
+                print(f"【自动安装】llama-cpp-python 安装成功！")
+                try:
+                    import llama_cpp
+                    print(f"【自动安装】当前版本: {getattr(llama_cpp, '__version__', '未知')}")
+                except:
+                    pass
+                print(f"【功能提示】如需使用MoE/MTP等新功能，建议手动升级: {LLAMA_CPP_PYTHON_RELEASES_URL}")
+                return True
+            else:
+                print(f"【自动安装】安装失败: {result.stderr}")
+                print(f"【手动安装】请手动运行: pip install llama-cpp-python")
+                return False
+        except subprocess.TimeoutExpired:
+            print(f"【自动安装】安装超时，请手动安装: pip install llama-cpp-python")
+            return False
+        except Exception as e:
+            print(f"【自动安装】安装过程出错: {e}")
+            print(f"【手动安装】请手动运行: pip install llama-cpp-python")
+            return False
+
+def _check_dependency(dep_name, import_name, package_info, is_optional=False):
+    """检查单个依赖，显示详细信息"""
+    try:
+        module = __import__(import_name)
+        version = getattr(module, '__version__', '未知版本')
+        print(f"【依赖检查】✓ {dep_name} 已安装，版本: {version}")
+        return True, module
+    except ImportError:
+        if is_optional:
+            print(f"【依赖检查】⚠ {dep_name} 未安装（可选），功能受限")
+            print(f"【下载地址】{package_info.get('url', '')}")
+        else:
+            print(f"【依赖检查】✗ {dep_name} 未安装（必需）")
+            print(f"【下载地址】{package_info.get('url', '')}")
+        return False, None
+
+DEPENDENCY_INFO = {
+    "llama-cpp-python": {
+        "import_name": "llama_cpp",
+        "url": LLAMA_CPP_PYTHON_RELEASES_URL,
+        "required": True,
+        "auto_install": True
+    },
+    "torch": {
+        "import_name": "torch",
+        "url": "https://pytorch.org/",
+        "required": True
+    },
+    "Pillow": {
+        "import_name": "PIL",
+        "url": "https://pypi.org/project/Pillow/",
+        "required": True
+    },
+    "numpy": {
+        "import_name": "numpy",
+        "url": "https://pypi.org/project/numpy/",
+        "required": True
+    },
+    "scipy": {
+        "import_name": "scipy",
+        "url": "https://pypi.org/project/scipy/",
+        "required": True
+    },
+    "soundfile": {
+        "import_name": "soundfile",
+        "url": "https://pypi.org/project/soundfile/",
+        "required": False
+    },
+    "librosa": {
+        "import_name": "librosa",
+        "url": "https://pypi.org/project/librosa/",
+        "required": False
+    }
+}
+
+print("=" * 60)
+print("【ComfyUI-omni-llm】正在检查依赖...")
+print("=" * 60)
+
+LLAMA_CPP_AVAILABLE = False
+_llama_cpp = None
+
+if _check_and_install_llama_cpp_python():
+    try:
+        import llama_cpp
+        from llama_cpp import Llama
+        from llama_cpp.llama_chat_format import (
+            Llava15ChatHandler, Llava16ChatHandler, MoondreamChatHandler,
+            NanoLlavaChatHandler, Llama3VisionAlphaChatHandler, MiniCPMv26ChatHandler, MiniCPMv45ChatHandler,
+            Qwen3VLChatHandler
+        )
+        LLAMA_CPP_AVAILABLE = True
+        _llama_cpp = llama_cpp
+        
+        try:
+            from llama_cpp.llama_chat_format import Qwen25VLChatHandler
+        except ImportError:
+            Qwen25VLChatHandler = None
+            print("【提示】当前llama-cpp-python版本不支持Qwen25VLChatHandler，Qwen2.5-VL/Omni模型将使用备选方案")
+    except ImportError as e:
+        print(f"【错误】llama-cpp-python 导入失败: {e}")
+        print(f"【建议】请从以下地址下载并安装正确版本:")
+        print(f"【地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
+        exit(1)
+else:
+    print(f"【警告】llama-cpp-python 未正确安装，核心功能将不可用")
+    print(f"【建议】请从以下地址下载并安装正确版本:")
+    print(f"【地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
     exit(1)
 
-# 尝试导入音频处理库
+print("=" * 60)
+print(f"【依赖检查】音频处理依赖检查...")
+print("=" * 60)
+
 try:
     import soundfile as sf
     _SOUNDFILE = True
 except ImportError:
     _SOUNDFILE = False
     sf = None
+    print(f"【依赖检查】⚠ soundfile 未安装，音频保存功能受限")
+    print(f"【下载地址】https://pypi.org/project/soundfile/")
 
 try:
     import scipy.io.wavfile as wavfile
@@ -61,20 +183,17 @@ except ImportError:
     _SCIPY_WAV = False
     wavfile = None
 
-# 尝试导入Qwen35ChatHandler
 try:
     from llama_cpp.llama_chat_format import Qwen35ChatHandler
 except:
     Qwen35ChatHandler = None
 
-# 尝试导入Qwen25VLChatHandler（某些旧版本llama-cpp-python可能不支持）
 try:
     from llama_cpp.llama_chat_format import Qwen25VLChatHandler
 except:
     Qwen25VLChatHandler = None
     print("【警告】当前llama-cpp-python版本不支持Qwen25VLChatHandler，将使用备选方案")
 
-# 尝试导入GLM系列ChatHandler
 try:
     from llama_cpp.llama_chat_format import GLM46VChatHandler, GLM41VChatHandler, LFM2VLChatHandler
 except:
@@ -1797,6 +1916,44 @@ class LLAMA_CPP_STORAGE:
             cache_prompt = config.get("cache_prompt", False)
             enable_thinking = config.get("enable_thinking", False)
             
+            # MoE模型优化（完全自动，无需用户配置）
+            tensor_split_str = config.get("tensor_split", "")
+            
+            # MoE模型检测：基于模型名称常见MoE关键词
+            moe_keywords = [
+                "mixtral", "mixtral-8x", "mistrals", 
+                "qwen3-", "qwen3.", "qwen2.5-", "qwen2-",
+                "deepseek-v3", "deepseekv3", "deepseek-67b",
+                "llama-4", "llama4", "llama-3.1-70b",
+                "stripedhyena", "openbuddy",
+                "hermes", "nousresearch",
+                "solar", "solar-10.7b",
+                "fuse", "fusenet",
+                "gemma-2-", "gemma2-",
+                "DBRX", "dbrx", "catomix",
+                "moe", "-moe", "_moe",
+                "a3b", "8x22b", "8x7b", "8x141b"
+            ]
+            
+            # 检测是否为MoE模型（基于模型名称）
+            is_moe_model = any(keyword in model.lower() for keyword in moe_keywords)
+            
+            # 记录MoE检测结果
+            if is_moe_model:
+                print(f"【MoE检测】检测到MoE（Mixture of Experts）模型：{model}")
+            else:
+                print(f"【MoE检测】非MoE模型，跳过MoE优化：{model}")
+            
+            # MTP (Multi-Token Prediction) 模型检测
+            # MTP模型文件名通常包含"-mtp-"或"_mtp_"
+            is_mtp_model = "-mtp-" in model.lower() or "_mtp_" in model.lower()
+            
+            if is_mtp_model:
+                print(f"【MTP检测】检测到MTP（Multi-Token Prediction）模型：{model}")
+                print(f"【MTP提示】MTP模型需要llama.cpp源码编译版本才能启用推测解码加速")
+            else:
+                print(f"【MTP检测】非MTP模型，跳过MTP功能：{model}")
+            
             # 自动计算高级参数（从UI中移除，改为后台自动调整）
             # Flash Attention：根据GPU类型自动决定
             flash_attention = "Auto"
@@ -1878,6 +2035,23 @@ class LLAMA_CPP_STORAGE:
                 "qwen" not in model_lower and "glm" not in model_lower and
                 "minicpm" not in model_lower and "moondream" not in model_lower
             )
+            
+            # 必须配合mmproj使用的模型列表（Omni/多模态模型，不支持纯文本模式）
+            mmproj_required_models = [
+                "minicpm-o-4.5",
+                "minicpm-o-2.6",
+                "qwen2.5-omni",
+            ]
+            
+            # 检查是否需要mmproj
+            requires_mmproj = any(model_keyword in model_lower for model_keyword in mmproj_required_models)
+            
+            if requires_mmproj and not enable_mmproj:
+                raise ValueError(
+                    f"【模型加载错误】{model} 是Omni/多模态模型，必须配合MMProj模型使用！\n"
+                    f"【解决方法】在模型加载节点中启用「enable_mmproj」选项，并选择对应的mmproj模型文件\n"
+                    f"【提示】MiniCPM-O系列是视觉-语言模型，不支持纯文本生成模式"
+                )
             
             # 对于 Qwen3.5，即使是纯文本模型也需要初始化 ChatHandler 以控制 thinking 模式
             need_chat_handler = enable_mmproj and not is_text_only_model or "qwen35" in model_lower or "qwen3.5" in model_lower
@@ -2010,6 +2184,80 @@ class LLAMA_CPP_STORAGE:
             # Qwen3.5模型启用低显存模式
             if is_qwen35 and device_mode == "GPU":
                 llama_kwargs["low_vram"] = True
+            
+            # MoE模型优化配置（完全自动，仅MoE模型生效）
+            if is_moe_model and device_mode == "GPU":
+                try:
+                    llama_sig = inspect.signature(llama_cpp.Llama.__init__)
+                    
+                    # Tensor Split配置（多GPU支持）
+                    if tensor_split_str:
+                        try:
+                            tensor_split = [float(x.strip()) for x in tensor_split_str.split(',')]
+                            if 'tensor_split' in llama_sig.parameters:
+                                llama_kwargs["tensor_split"] = tensor_split
+                                print(f"【MoE优化】已设置tensor_split={tensor_split}")
+                            else:
+                                print(f"【MoE优化】当前llama-cpp-python版本不支持tensor_split参数，跳过")
+                        except ValueError:
+                            print(f"【MoE优化】tensor_split格式错误，应为逗号分隔的数字，如：0.5,0.5")
+                    
+                    # 针对MoE模型的特殊优化：使用--tensor-split标志优化专家分配
+                    # llama.cpp的tensor_split参数可以优化MoE模型的专家层分配
+                    if 'tensor_split' not in llama_kwargs and HARDWARE_INFO["gpu_count"] > 1:
+                        # 多GPU情况：自动计算tensor_split
+                        try:
+                            gpu_count = HARDWARE_INFO["gpu_count"]
+                            # 平均分配
+                            tensor_split = [1.0 / gpu_count] * gpu_count
+                            if 'tensor_split' in llama_sig.parameters:
+                                llama_kwargs["tensor_split"] = tensor_split
+                                print(f"【MoE优化】多GPU自动设置tensor_split={tensor_split}")
+                        except Exception as e:
+                            print(f"【MoE优化】自动设置tensor_split失败: {e}")
+                    
+                    # MoE模型建议：使用flash attention以提升性能
+                    if 'flash_attn' not in llama_kwargs and gpu_vendor == "NVIDIA":
+                        try:
+                            flash_available, _ = check_flash_attention()
+                            if flash_available:
+                                llama_kwargs["flash_attn"] = True
+                                print(f"【MoE优化】为MoE模型启用Flash Attention以提升性能")
+                        except:
+                            pass
+                            
+                except Exception as e:
+                    print(f"【MoE优化】MoE优化配置失败: {e}，跳过MoE优化")
+
+            # MTP (Multi-Token Prediction) 推测解码配置
+            if is_mtp_model and device_mode == "GPU":
+                try:
+                    llama_sig = inspect.signature(llama_cpp.Llama.__init__)
+                    
+                    # 检查是否支持MTP相关参数
+                    # llama.cpp的推测解码参数：spec_type, spec_draft_n_max
+                    mtp_params = {}
+                    
+                    if 'spec_type' in llama_sig.parameters:
+                        mtp_params['spec_type'] = 'draft-mtp'
+                        print(f"【MTP优化】已启用MTP推测解码类型")
+                    else:
+                        print(f"【MTP优化】当前llama-cpp-python版本不支持spec_type参数，跳过MTP")
+                    
+                    if 'spec_draft_n_max' in llama_sig.parameters and mtp_params:
+                        # 默认n=2，平衡速度和准确率
+                        mtp_params['spec_draft_n_max'] = 2
+                        print(f"【MTP优化】已设置spec_draft_n_max=2")
+                    
+                    if mtp_params:
+                        # 合并MTP参数到llama_kwargs
+                        llama_kwargs.update(mtp_params)
+                        print(f"【MTP优化】MTP推测解码加速已启用（需llama.cpp源码编译版本）")
+                    else:
+                        print(f"【MTP优化】无法启用MTP，推测解码功能不可用")
+                        
+                except Exception as e:
+                    print(f"【MTP优化】MTP配置失败: {e}，跳过MTP优化")
 
             # 打印优化参数
             if device_mode == "CPU":

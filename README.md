@@ -115,6 +115,18 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
+#### v3.1.2 (2026-05-31)
+
+**I. Node Optimization**
+- **Enhanced MoE Model Support**: Optimized tensor split logic for Mixture of Experts models, improved expert layer allocation for better performance
+- **Added Example Output Interface**: New example output interface to help users write better prompts based on preset template examples, improving generated text quality
+
+**II. Dependency Optimization**
+- **Dependency Detection Prompt**: New dependency detection feature to notify users if required dependencies are installed, avoiding missing dependency issues during use
+
+**III. Preset Template Adjustment**
+- **Template Optimization**: Image templates optimized for shot descriptions and AI-compatible logic descriptions; video templates optimized for content coherence and character expression descriptions; audio templates optimized for emotional expression of audio content (not yet tested, feedback welcome, templates continuously optimized)
+
 #### v3.1.1 (2026-05-10)
 
 **I. Template Optimization**
