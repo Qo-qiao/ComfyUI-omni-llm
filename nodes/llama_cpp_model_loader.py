@@ -139,6 +139,9 @@ class llama_cpp_model_loader:
                 "image_max_tokens": ("INT", {"default": 0, "min": 0, "max": 4096, "step": 32, "tooltip": "图片最大编码token数"}),
                 "attention_type": (["Auto", "Standard", "Flash", "XFormers"], {"default": default_attention_type, "tooltip": "注意力类型：Auto=自动选择，Standard=标准，Flash=Flash Attention（NVIDIA GPU推荐），XFormers=XFormers（实验性）"}),
                 "cache_prompt": ("BOOLEAN", {"default": False, "tooltip": "启用Prompt缓存，相同前缀的请求可复用KV Cache，提升批量推理速度"}),
+            },
+            "optional": {
+                "tensor_split": ("STRING", {"default": "", "tooltip": "多GPU tensor分割比例，格式：0.5,0.5（单GPU留空）"}),
             }
         }
     
@@ -173,7 +176,7 @@ class llama_cpp_model_loader:
         return None
     
     @classmethod
-    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False):
+    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False, tensor_split=""):
         if LLAMA_CPP_STORAGE.llm is None:
             return float("NaN") 
         
@@ -216,10 +219,11 @@ class llama_cpp_model_loader:
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
             "cache_prompt": cache_prompt,
+            "tensor_split": tensor_split,
         }
         return json.dumps(custom_config, sort_keys=True, ensure_ascii=False)
     
-    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False):
+    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False, tensor_split="", **kwargs):
         # 解析完整模型路径，避免同名冲突
         resolved_model_path = self._resolve_llm_model_path(model)
         if resolved_model_path:
@@ -337,7 +341,8 @@ class llama_cpp_model_loader:
             "image_min_tokens": image_min_tokens, "image_max_tokens": image_max_tokens,
             "n_batch": n_batch, "n_ubatch": n_ubatch, "n_threads": n_threads,
             "n_threads_batch": n_threads_batch, "attention_type": attention_type,
-            "cache_prompt": cache_prompt
+            "cache_prompt": cache_prompt,
+            "tensor_split": tensor_split,
         }
         if not LLAMA_CPP_STORAGE.llm or LLAMA_CPP_STORAGE.current_config != custom_config:
             LLAMA_CPP_STORAGE.load_model(custom_config)

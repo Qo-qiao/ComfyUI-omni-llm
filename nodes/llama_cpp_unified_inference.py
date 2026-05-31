@@ -625,9 +625,9 @@ class llama_cpp_unified_inference:
             },
         }
     
-    RETURN_TYPES = ("STRING", "STRING", "INT", "AUDIO")
-    RETURN_NAMES = ("output", "output_list", "state_uid", "audio")
-    OUTPUT_IS_LIST = (False, True, False, False)
+    RETURN_TYPES = ("STRING", "STRING", "INT", "AUDIO", "STRING")
+    RETURN_NAMES = ("output", "output_list", "state_uid", "audio", "example_output")
+    OUTPUT_IS_LIST = (False, True, False, False, False)
     FUNCTION = "process"
     CATEGORY = "llama-cpp-vlm"
     
@@ -762,8 +762,100 @@ class llama_cpp_unified_inference:
 
         return base_template
     
-
+    def get_preset_examples(self, preset_key, language, output_format="natural"):
+        """
+        获取预设模板的示例内容
+        
+        Args:
+            preset_key: 预设键名
+            language: 语言（"中文" 或 "English"）
+            output_format: 输出格式（"natural" 或 "structured"）
+            
+        Returns:
+            str: 格式化后的示例内容，多条示例之间用分段分隔
+        """
+        if language == "中文":
+            preset_map = {
+                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_ZH,
+                "NORMAL_DESCRIBE": NORMAL_DESCRIBE_ZH,
+                "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
+                "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
+                "ANIMA": ANIMA_ZH,
+                "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
+                "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
+                "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
+                "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
+                "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
+                "LTX2": LTX2_ZH,
+                "WAN_T2V": WAN_T2V_ZH,
+                "WAN_I2V": WAN_I2V_ZH,
+                "WAN_FLF2V": WAN_FLF2V_ZH,
+                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH,
+                "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
+                "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
+                "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_ZH,
+                "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_ZH,
+                "LYRICS_CREATION": LYRICS_CREATION_ZH,
+                "OCR_ENHANCED": OCR_ENHANCED_ZH,
+                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_ZH,
+            }
+        else:
+            preset_map = {
+                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_EN,
+                "NORMAL_DESCRIBE": NORMAL_DESCRIBE_EN,
+                "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
+                "ILLUSTRIOUS": ILLUSTRIOUS_EN,
+                "ANIMA": ANIMA_EN,
+                "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
+                "FLUX2_KLEIN": FLUX2_KLEIN_EN,
+                "ERNIE_IMAGE": ERNIE_IMAGE_EN,
+                "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
+                "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
+                "LTX2": LTX2_EN,
+                "WAN_T2V": WAN_T2V_EN,
+                "WAN_I2V": WAN_I2V_EN,
+                "WAN_FLF2V": WAN_FLF2V_EN,
+                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN,
+                "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
+                "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
+                "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_EN,
+                "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_EN,
+                "LYRICS_CREATION": LYRICS_CREATION_EN,
+                "OCR_ENHANCED": OCR_ENHANCED_EN,
+                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
+            }
+        
+        preset = preset_map.get(preset_key, None)
+        if preset is None:
+            return ""
+        
+        examples = preset.get("examples", [])
+        if not examples:
+            return ""
+        
+        result_parts = []
+        for i, example in enumerate(examples):
+            # 如果示例是字符串格式，直接使用（兼容旧格式）
+            if isinstance(example, str):
+                content = example
+            # 如果示例是字典格式，根据输出格式选择对应内容
+            elif isinstance(example, dict):
+                if output_format == "natural" and "natural" in example:
+                    content = example.get("natural", "")
+                elif output_format == "structured" and "structured" in example:
+                    content = example.get("structured", "")
+                else:
+                    # 如果指定格式不存在，尝试获取另一种格式，最后返回空字符串
+                    content = example.get("natural", example.get("structured", ""))
+            else:
+                content = ""
+            
+            if content:
+                result_parts.append(f"【示例 {i+1}】\n{content}")
+        
+        return "\n\n".join(result_parts) if result_parts else ""
     
+
     def _process_batch_inference(self, llama_model, images, system_prompt, final_prompt,
                                   image_max_size, batch_combination, gen_params,
                                   engine, model_info, mode):
@@ -1100,6 +1192,9 @@ class llama_cpp_unified_inference:
             preset_key = self.preset_prompts.get(preset_prompt, "")
             preset_text = self.get_preset_text_by_language(preset_key, preset_prompts_language, output_format)
             
+            # 获取预设模板的示例内容
+            example_output = self.get_preset_examples(preset_key, preset_prompts_language, output_format)
+            
             # 构建最终提示词
             if preset_prompt == "Empty - Nothing":
                 final_prompt = custom_prompt.strip() if custom_prompt.strip() else system_prompt.strip()
@@ -1161,7 +1256,7 @@ class llama_cpp_unified_inference:
                 if mode == "audio" and asr_text:
                     # 音频转文本模式，直接返回ASR结果
                     print("【无模型模式】音频转文本模式，仅返回ASR识别结果")
-                    return (generated_text, [generated_text], seed, None)
+                    return (generated_text, [generated_text], seed, None, example_output)
                 elif mode == "text_to_audio":
                     # 文本转音频模式，直接使用输入文本或ASR文本进行TTS合成
                     print("【无模型模式】文本转音频模式，直接进行TTS语音合成")
@@ -1235,7 +1330,7 @@ class llama_cpp_unified_inference:
                             audio_output["sample_rate"] = 24000
                             print("【TTS兼容】sample_rate缺失，已默认设为24000")
                     
-                    return (generated_text, [generated_text], seed, audio_output)
+                    return (generated_text, [generated_text], seed, audio_output, example_output)
 
             # 文本转音频优先直接使用输入文本
             if mode != "audio" and mode != "text_to_audio":
@@ -1451,7 +1546,7 @@ class llama_cpp_unified_inference:
                             # 直接返回结果
                             _uid = parameters.get("state_uid", None) if parameters else None
                             uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-                            return (generated_text, output_list, int(uid), None)
+                            return (generated_text, output_list, int(uid), None, example_output)
             
             # 执行推理（异步）
             import asyncio
@@ -1571,12 +1666,12 @@ class llama_cpp_unified_inference:
             _uid = parameters.get("state_uid", None) if parameters else None
             uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
             
-            return (generated_text, [generated_text], int(uid), audio_output)
+            return (generated_text, [generated_text], int(uid), audio_output, example_output)
         
         except Exception as e:
             error_message = ErrorHandler.handle_error(e, context={"mode": mode, "model_type": self.model_info.get("type", "unknown")})
             print(f"【处理错误】{str(e)}")
-            return (error_message, [error_message], seed, None)
+            return (error_message, [error_message], seed, None, example_output)
     
     @classmethod
     def _run_parallel_inference(cls, llm, tasks, params):
