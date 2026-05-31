@@ -174,7 +174,11 @@
       "image_min_tokens": "图片最小编码token数",
       "image_max_tokens": "图片最大编码token数",
       "attention_type": "注意力类型",
-      "cache_prompt": "缓存提示词"
+      "cache_prompt": "缓存提示词",
+      "tensor_split": "Tensor分割比例"
+    },
+    "optional": {
+      "tensor_split": "Tensor分割比例"
     },
     "outputs": {
       "llama_model": "Llama模型"
@@ -191,7 +195,8 @@
       "image_min_tokens": "图片最小编码token数\n• 保持默认0即可",
       "image_max_tokens": "图片最大编码token数\n• 保持默认0即可",
       "attention_type": "注意力类型\n• Auto：自动选择（推荐）\n• Standard：标准注意力\n• Flash：Flash Attention（NVIDIA GPU推荐）\n• XFormers：XFormers（实验性）",
-      "cache_prompt": "缓存提示词\n• 启用后会缓存提示词以提高性能\n• 适用于重复使用相同提示词的场景"
+      "cache_prompt": "缓存提示词\n• 启用后会缓存提示词以提高性能\n• 适用于重复使用相同提示词的场景",
+      "tensor_split": "多GPU tensor分割比例\n• 格式：0.5,0.5（单GPU留空）\n• 仅多GPU时使用"
     }
   },
   "llama_cpp_parameters": {
@@ -372,7 +377,8 @@
       "output": "输出",
       "output_list": "输出列表",
       "state_uid": "状态ID",
-      "audio": "音频输出"
+      "audio": "音频输出",
+      "example_output": "示例输出"
     },
     "tooltips": {
       "llama_model": "选择加载的Llama模型",
@@ -401,7 +407,8 @@
       "output": "生成的文本输出",
       "output_list": "生成的文本输出列表",
       "state_uid": "对话状态ID",
-      "audio": "生成的音频输出"
+      "audio": "生成的音频输出",
+      "example_output": "当前预设模板的示例内容，便于提示词书写参考"
     }
   },
   "llama_cpp_unload_model": {
