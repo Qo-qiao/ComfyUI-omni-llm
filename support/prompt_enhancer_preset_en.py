@@ -9,14 +9,15 @@ License: See LICENSE file for details
 
 NORMAL_DESCRIBE_TAGS_EN = {
     "name": "Image Tag Reverse Generator",
-    "description": "Image Tag Reverse Generator, analyzes provided image content and generates comma-separated tag lists, extracting visual elements and converting them into concise tag formats for guiding AI to generate images of the same style. Supports four-dimension analysis: Camera, Subject, Environment, Lighting & Color",
-    "input_template_natural": "Analyze the provided image content and generate detailed English tag list. Based on the visual information in @ and any custom content provided, create a clear comma-separated tag list for text-to-@ AI generation. **Total tags must be strictly controlled between 30-80, no duplicates, each tag concise and independent.** If custom content is provided, use it as the basis: #. **All tags must be in English.**",
-    "input_template_structured": "Analyze the provided image content and generate detailed English tag list. Based on the visual information in @ and any custom content provided, generate tags by category. **Each category 5-8 tags, total tags strictly controlled between 30-80, no duplicates.** If custom content is provided, use it as the basis: #. **All tags must be in English.**",
+    "description": "Image Tag Reverse Generator, analyzes provided image content and generates comma-separated tag lists, extracting visual elements and converting them into concise tag formats for guiding AI to generate images of the same style. Supports four-dimension analysis: Camera, Subject, Environment, Lighting & Color. Specially optimized for SDXL model high-quality tag output.",
+    "input_template_natural": "Analyze the provided image content and generate detailed English tag list. Based on the visual information in @ and any custom content provided, create a clear comma-separated tag list for text-to-@ AI generation. **Total tags must be strictly controlled between 30-60, no duplicates, each tag concise and independent.** If custom content is provided, use it as the basis: #. **All tags must be in English.**",
+    "input_template_structured": "Analyze the provided image content and generate detailed English tag list. Based on the visual information in @ and any custom content provided, generate tags by category. **Each category 5-8 tags, total tags strictly controlled between 30-60, no duplicates.** If custom content is provided, use it as the basis: #. **All tags must be in English.**",
     "output_format_suffix": {
-        "natural": "\n\n**【Format Requirements】** Output pure text comma-separated tag list directly, **total tags strictly controlled between 30-80, no duplicates**. Include shot perspective tags, subject feature tags, environment scene tags, lighting effect tags, color palette tags, composition style tags, art style tags, and texture detail tags. For example: tag1, tag2, tag3, ...\nDo not add any explanation or additional content.",
-        "structured": "\n\n**【Format Requirements】** Output using the following category fields, **each category 5-8 tags, total tags strictly controlled between 30-80, no duplicates**:\n【Shot Perspective】tag1, tag2, ...\n【Subject Features】tag1, tag2, ...\n【Clothing & Styling】tag1, tag2, ...\n【Environment & Scene】tag1, tag2, ...\n【Color Palette】tag1, tag2, ...\n【Lighting Effects】tag1, tag2, ...\n【Composition Style】tag1, tag2, ...\n【Art Style】tag1, tag2, ...\n【Texture & Details】tag1, tag2, ...\n\nOnly output tags, do not add any explanation."
+        "natural": "\n\n**【Format Requirements】** Output pure text comma-separated tag list directly, **total tags strictly controlled between 30-60, no duplicates**. Include SDXL quality tags, shot perspective tags, subject feature tags, environment scene tags, lighting effect tags, color palette tags, composition style tags, art style tags, and texture detail tags. **SDXL Quality Tags (most critical): Must include masterpiece, best quality, ultra-detailed, high resolution, 8K and other high-quality tags.** For example: tag1, tag2, tag3, ...\nDo not add any explanation or additional content.",
+        "structured": "\n\n**【Format Requirements】** Output using the following category fields, **each category 5-8 tags, total tags strictly controlled between 30-60, no duplicates**:\n【Quality Tags】masterpiece, best quality, ultra-detailed, high resolution, 8K, exquisite rendering, perfect composition\n【Shot Perspective】tag1, tag2, ...\n【Subject Features】tag1, tag2, ...\n【Clothing & Styling】tag1, tag2, ...\n【Environment & Scene】tag1, tag2, ...\n【Color Palette】tag1, tag2, ...\n【Lighting Effects】tag1, tag2, ...\n【Composition Style】tag1, tag2, ...\n【Art Style】tag1, tag2, ...\n【Texture & Details】tag1, tag2, ...\n\nOnly output tags, do not add any explanation."
     },
     "steps": [
+        "SDXL quality tags: Determine high-quality tags such as masterpiece, best quality, ultra-detailed, high resolution, 1024x1024, 8K",
         "Camera dimension analysis: Identify shot angle (overhead, low angle, eye-level), focal length and shot type (wide-angle, telephoto, standard, medium, close-up), depth of field type (deep/shallow)",
         "Subject dimension analysis: Extract subject identity/species, physical features, material texture clothing, action pose tags",
         "Environment dimension analysis: Identify core geographic location, weather and atmosphere, spatial layer details (foreground/midground/background)",
@@ -25,24 +26,25 @@ NORMAL_DESCRIBE_TAGS_EN = {
     "task_requirements": [
         "Analyze image content, extract visual elements and convert to English tags",
         "Tags should be concise, specific, and descriptive, facilitating AI to generate images of the same style",
-        "Total tags strictly controlled between 30-80",
+        "Total tags strictly controlled between 30-60",
         "Each category assigned 5-8 tags, avoiding tag duplication between categories",
         "Tags must accurately reflect image style and visual characteristics",
         "Organize tags by category, avoiding duplicates",
-        "Strengthen shot perspective tag extraction, including shot angle and focal length information"
+        "Strengthen shot perspective tag extraction, including shot angle and focal length information",
+        "SDXL Quality Tags (most critical): Must include SDXL high-quality tags such as masterpiece, best quality, ultra-detailed, high resolution, 1024x1024, 8K, exquisite rendering, perfect composition"
     ],
     "constraints": {
-        "max_tags": 80,
+        "max_tags": 60,
         "min_tags": 30,
-        "content_type": "Strictly describe visual elements such as shot perspective, subject, clothing, environment, colors, lighting, and composition",
+        "content_type": "Strictly describe visual elements such as shot perspective, subject, clothing, environment, colors, lighting, and composition, suitable for SDXL high-resolution performance",
         "excluded_content": "Do not include abstract concepts, interpretations, marketing terms, or technical jargon (e.g., do not use 'SEO', 'brand-aligned', 'viral potential')",
         "language": "All tags must be in English output",
         "no_duplicates": "Absolutely prohibited to repeat tags, only keep one for tags with the same meaning"
     },
     "examples": [
         {
-            "natural": "Eye-level shot, medium shot composition, shallow depth of field; Japanese fresh portrait, cherry blossom tree, 23-year-old Asian female, almond eyes, delicate cream skin, black wavy hair, natural makeup, matte lip gloss; white lace dress, pearl earrings; soft side lighting, afternoon natural light, hair rim light; pink, white, light pink, soft tones; 35mm prime lens, f/1.8 aperture, golden ratio composition; film texture, realistic photography; delicate skin texture, lace texture, pink petals, bokeh background",
-            "structured": "【Shot Perspective】Eye-level shot, medium shot composition, shallow depth of field\n【Subject Features】23-year-old Asian female, almond eyes, delicate cream skin, black wavy hair, natural makeup\n【Clothing & Styling】white lace dress, pearl earrings, matte lip gloss\n【Environment & Scene】cherry blossom tree, spring outdoor, pink petals falling, bokeh background with blurred green grass\n【Color Palette】pink, white, light pink, soft tones\n【Lighting Effects】soft side lighting, afternoon natural light, hair rim light\n【Composition Style】35mm prime lens, f/1.8 aperture, golden ratio composition\n【Art Style】Japanese fresh portrait, realistic photography, film texture\n【Texture & Details】delicate skin texture, lace texture, petal details"
+            "natural": "masterpiece, best quality, ultra-detailed, high resolution, eye-level shot, medium shot composition, shallow depth of field, Japanese fresh portrait, cherry blossom tree, 23-year-old Asian female, almond eyes, delicate cream skin, black wavy hair, natural makeup, matte lip gloss, white lace dress, pearl earrings, soft side lighting, afternoon natural light, hair rim light, pink, white, light pink, soft tones, 35mm prime lens, f/1.8 aperture, golden ratio composition, film texture, realistic photography, delicate skin texture, lace texture, pink petals, bokeh background",
+            "structured": "【Quality Tags】masterpiece, best quality, ultra-detailed, high resolution, exquisite rendering, perfect composition\n【Shot Perspective】eye-level shot, medium shot composition, shallow depth of field\n【Subject Features】23-year-old Asian female, almond eyes, delicate cream skin, black wavy hair, natural makeup\n【Clothing & Styling】white lace dress, pearl earrings, matte lip gloss\n【Environment & Scene】cherry blossom tree, spring outdoor, pink petals falling, bokeh background with blurred green grass\n【Color Palette】pink, white, light pink, soft tones\n【Lighting Effects】soft side lighting, afternoon natural light, hair rim light\n【Composition Style】35mm prime lens, f/1.8 aperture, golden ratio composition\n【Art Style】Japanese fresh portrait, realistic photography, film texture\n【Texture & Details】delicate skin texture, lace texture, petal details"
         }
     ]
 }
@@ -126,11 +128,11 @@ PROMPT_EXPANDER_EN = {
 ILLUSTRIOUS_EN = {
     "name": "Illustrious SDXL Anime Character Optimizer",
     "description": "Specialized Prompt engineer for SDXL model designed 2D anime/manga characters, output tag-based character descriptions including shot perspective, subject features, clothing styling, environment scene, color palette, lighting effects, composition style, art style, texture details. Supports four-dimension tag-based analysis, optimized for SDXL high-resolution  detail performance",
-    "input_template_natural": "Optimize the user-provided 2D character description into a detailed tag list for SDXL model AI generation tasks. If custom content is provided, use it as the basis: #\n\n**IMPORTANT: Must use pure 2D anime/manga style tags, strictly avoid realistic photography style terms.**\nTag count strictly controlled at 30-60, no duplicates.",
-    "input_template_structured": "Optimize the user-provided 2D character description into a detailed tag list for SDXL model AI generation tasks. If custom content is provided, use it as the basis: #\n\n**IMPORTANT: Must use pure 2D anime/manga style tags, strictly avoid realistic photography style terms.**\nEach category 5-8 tags, total tag count strictly controlled at 30-100, no duplicates.",
+    "input_template_natural": "Optimize the user-provided 2D anime character description into a pure text comma-separated tag list. User input: #\n\n**Rules:**\n1. Output ONLY tags, no explanations, format descriptions, or technical parameters\n2. Use pure 2D anime/manga style terms, strictly avoid realistic photography terms\n3. Total tags: 30-60, only one tag for the same semantic meaning, no duplicates\n4. Format: tag1, tag2, tag3, ...",
+    "input_template_structured": "Optimize the user-provided 2D anime character description into structured tag list. User input: #\n\n**Rules:**\n1. Output by categories, 5-8 tags per category\n2. Use pure 2D anime/manga style terms, strictly avoid realistic photography terms\n3. Total tags: 30-60, only one tag for the same semantic meaning, no duplicates\n4. Output ONLY tags, no explanations or technical parameters",
     "output_format_suffix": {
-        "natural": "\n\n**【Format Requirements】** Output pure comma-separated tag list directly, **tag count strictly controlled at 30-100, no duplicates**. Include quality tags, shot perspective tags, subject feature tags, clothing styling tags, environment scene tags, lighting effect tags, color palette tags, composition style tags, art style tags, texture detail tags. Example: tag1, tag2, tag3...\nDo not output any explanation or extra content.",
-        "structured": "\n\n**【Format Requirements】** Output using the following category fields, **each category 5-8 tags, total tag count strictly controlled at 30-100, no duplicates**:\n【Quality Tags】tag1, tag2...\n【Shot Perspective】tag1, tag2...\n【Subject Features】tag1, tag2...\n【Clothing Styling】tag1, tag2...\n【Environment Scene】tag1, tag2...\n【Color Palette】tag1, tag2...\n【Lighting Effects】tag1, tag2...\n【Composition Style】tag1, tag2...\n【Art Style】tag1, tag2...\n【Texture Details】tag1, tag2...\n\nOnly output tags, do not add any explanation."
+        "natural": "\n\n**Output Format:** Output pure comma-separated tags directly, **nothing else**.\n\nExample output: masterpiece, best quality, ultra-detailed, high resolution, eye-level shot, half-body composition, 16-year-old girl, blue-purple twintails, golden eyes, snow-white skin, sweet smile, white sailor uniform, red bow, pleated skirt, pink background, cherry blossom petals, soft side lighting, anime style, cel shading",
+        "structured": "\n\n**【Format Requirements】** Output using the following category fields, **each category 5-8 tags, total tag count strictly controlled at 30-60, only one tag for the same semantic meaning, absolutely no duplicates**:\n【Quality Tags】tag1, tag2...\n【Shot Perspective】tag1, tag2...\n【Subject Features】tag1, tag2...\n【Clothing Styling】tag1, tag2...\n【Environment Scene】tag1, tag2...\n【Color Palette】tag1, tag2...\n【Lighting Effects】tag1, tag2...\n【Composition Style】tag1, tag2...\n【Art Style】tag1, tag2...\n【Texture Details】tag1, tag2...\n\nOnly output tags, do not add any explanation."
     },
     "steps": [
         "Quality tags: Determine SDXL high-quality tags such as masterpiece, best quality, ultra-detailed, high resolution",
@@ -140,13 +142,14 @@ ILLUSTRIOUS_EN = {
         "Lighting and color dimension analysis: Extract main light source/direction, light texture, overall color temperature/tone, color palette system, highlight/shadow tendency, contrast/saturation"
     ],
     "constraints": {
-        "max_tags": 100,
+        "max_tags": 60,
         "min_tags": 30,
         "content_type": "Strictly describe 2D character visual elements: design, clothing details, hair, eyes, expression, pose, scene atmosphere, lighting, suitable for SDXL high-resolution performance",
         "excluded_content": "Do not include abstract concepts, explanations, marketing terms or technical jargon (for example, do not use 'SEO', 'brand-aligned', 'viral potential')",
         "forbidden_terms": "Strictly avoid realistic photography style terms such as pores, realistic skin texture, 4K texture, photorealistic quality, cinematic lens",
         "language": "All tags must be output in English",
-        "no_duplicates": "Absolutely no duplicate tags, only keep one tag for the same semantic meaning"
+        "no_duplicates": "Absolutely no duplicate tags, only keep one tag for the same semantic meaning",
+        "critical_rule": "Must strictly comply with tag count limits, output exceeding limits or containing duplicates will be invalid"
     },
     "task_requirements": [
         "Focus on 2D character features, suitable for SDXL model",
@@ -163,11 +166,11 @@ ILLUSTRIOUS_EN = {
         "Lighting: Use 2D lighting descriptions such as soft lighting, rim lighting, gentle light, bloom effects",
         "Shot perspective: Describe shot angle (overhead/low angle/eye-level), shot type (half-body/full-body/close-up), composition style",
         "SDXL detail optimization: Enhance high resolution details, exquisite rendering, perfect composition, high quality SDXL-specific descriptions",
-        "Tag count strictly controlled at 30-100, each category 5-8 tags"
+        "Tag count strictly controlled at 30-60, each category 5-8 tags, only one tag for the same semantic meaning, absolutely no duplicates"
     ],
     "examples": [
         {
-            "natural": "masterpiece, best quality, ultra-detailed, high resolution; eye-level shot, half-body composition, soft framing; 16-year-old anime girl, blue-purple gradient twintails, golden star-shaped pupils, delicate oval face, snow-white skin, pink blush, sweet smile; cute pose, body slightly turned, head tilted, hands clasped, gentle smile; white sailor uniform, navy collar, red bow, pleated skirt, lace trim, black shoes; pink gradient background, dreamy atmosphere, cherry blossom petals floating; soft side lighting, hair rim light, catchlights; white, red, gold, soft pastel tones; exquisite rendering, perfect composition, high resolution details; cel shading, clean line art, anime style",
+            "natural": "masterpiece, best quality, ultra-detailed, high resolution, eye-level shot, half-body composition, soft diagonal framing, 16-year-old anime girl, blue-purple gradient twintails, golden star-shaped pupils, delicate oval face, snow-white skin, pink blush, sweet smile, cute pose, body slightly turned, head tilted, hands clasped, white sailor uniform, navy collar, red bow, pleated skirt, lace trim, black shoes, pink gradient background, dreamy atmosphere, cherry blossom petals floating, soft side lighting, hair rim light, catchlights, soft pastel tones, exquisite rendering, perfect composition, cel shading, clean line art, anime style, delicate texture, high resolution details",
             "structured": "【Quality Tags】masterpiece, best quality, ultra-detailed, high resolution, perfect composition, exquisite rendering\n【Shot Perspective】eye-level shot, half-body composition, soft diagonal framing\n【Subject Features】16-year-old anime girl, blue-purple gradient twintails, golden star-shaped pupils, delicate oval face, snow-white skin, pink blush, sweet smile, sparkling eyes\n【Clothing Styling】white sailor uniform, navy collar, red bow, pleated skirt, lace trim, black shoes, ribbon decorations\n【Environment Scene】pink gradient background, dreamy atmosphere, cherry blossom petals floating, petal decorations, simple background\n【Color Palette】white, red, gold, soft pastel tones, blue-purple gradient, gradient background\n【Lighting Effects】soft side lighting, hair rim light, catchlights, gentle diffused light\n【Composition Style】half-body composition, soft diagonal framing\n【Art Style】anime style, illustration, cel shading, clean line art, soft color palette, anime art style\n【Texture Details】high resolution details, delicate hair strands, lace texture, petal details, delicate texture"
         }
     ]
