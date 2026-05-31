@@ -259,6 +259,7 @@ def get_hardware_info():
         "gpu_name": "未知显卡",
         "gpu_vram_total": 0.0,
         "gpu_vendor": "unknown",
+        "gpu_count": 0,
         "cpu_cores": os.cpu_count() or 4,
         "is_high_perf": False,
         "is_low_perf": True
@@ -266,6 +267,7 @@ def get_hardware_info():
     
     if hardware_info["has_cuda"]:
         try:
+            hardware_info["gpu_count"] = torch.cuda.device_count()
             device_prop = torch.cuda.get_device_properties(0)
             hardware_info["gpu_name"] = device_prop.name
             hardware_info["gpu_vram_total"] = round(device_prop.total_memory / (1024 ** 3), 2)
@@ -304,7 +306,7 @@ def get_hardware_info():
                 hardware_info["is_high_perf"] = False
                 hardware_info["is_low_perf"] = True
                 hardware_info["perf_level"] = "low"  # <4GB
-            print(f"【硬件检测】显卡：{hardware_info['gpu_name']}，显存：{hardware_info['gpu_vram_total']}GB")
+            print(f"【硬件检测】显卡：{hardware_info['gpu_name']}，显存：{hardware_info['gpu_vram_total']}GB，GPU数量：{hardware_info['gpu_count']}")
         except Exception as e:
             print(f"【提示】显卡信息检测失败，自动使用兼容模式：{e}")
     else:
@@ -317,8 +319,10 @@ def get_hardware_info():
                 # 尝试获取AMD显卡信息
                 try:
                     if hasattr(torch, 'hip'):
+                        hardware_info["gpu_count"] = torch.hip.device_count()
                         device_prop = torch.hip.get_device_properties(0)
                     elif hasattr(torch, 'rocm'):
+                        hardware_info["gpu_count"] = torch.rocm.device_count()
                         device_prop = torch.rocm.get_device_properties(0)
                     else:
                         raise AttributeError("No ROCm device properties available")
@@ -368,6 +372,7 @@ def get_hardware_info():
                     hardware_info["is_high_perf"] = False
                     hardware_info["is_low_perf"] = False
                     hardware_info["perf_level"] = "mid_high"  # 默认中高性能
+                    hardware_info["gpu_count"] = 1
                     print(f"【硬件检测】检测到AMD ROCm环境，使用默认设置")
             else:
                 # 尝试通过系统信息检测AMD显卡
@@ -384,6 +389,7 @@ def get_hardware_info():
                             hardware_info["is_high_perf"] = False
                             hardware_info["is_low_perf"] = False
                             hardware_info["perf_level"] = "mid"  # 默认中性能
+                            hardware_info["gpu_count"] = 1
                             print(f"【硬件检测】检测到AMD显卡（Windows）")
                     elif platform.system() == "Linux":
                         # Linux: 使用lspci命令
@@ -395,6 +401,7 @@ def get_hardware_info():
                             hardware_info["is_high_perf"] = False
                             hardware_info["is_low_perf"] = False
                             hardware_info["perf_level"] = "mid"  # 默认中性能
+                            hardware_info["gpu_count"] = 1
                             print(f"【硬件检测】检测到AMD显卡（Linux）")
                 except Exception:
                     pass
@@ -411,6 +418,7 @@ def get_hardware_info():
                                 hardware_info["is_high_perf"] = False
                                 hardware_info["is_low_perf"] = False
                                 hardware_info["perf_level"] = "mid_low"
+                                hardware_info["gpu_count"] = 1
                                 print(f"【硬件检测】检测到Intel显卡（Windows）")
                         elif platform.system() == "Linux":
                             result = subprocess.run(['lspci', '-nn'], capture_output=True, text=True, timeout=5)
@@ -421,6 +429,7 @@ def get_hardware_info():
                                 hardware_info["is_high_perf"] = False
                                 hardware_info["is_low_perf"] = False
                                 hardware_info["perf_level"] = "mid_low"
+                                hardware_info["gpu_count"] = 1
                                 print(f"【硬件检测】检测到Intel显卡（Linux）")
                     except Exception:
                         pass
@@ -822,7 +831,6 @@ class ChatHandlerManager:
         'minicpmv26': 'MiniCPM-v2.6',
         'minicpmo45': 'MiniCPM-O-4.5',
         'minicpmo26': 'MiniCPM-O-2.6',
-        'minicpmogguf': 'MiniCPM-O-GGUF',
         'minicpmlama3v25': 'MiniCPM-Llama3-V 2.5',
         'moondream3': 'Moondream3',
         'moondream2': 'Moondream2',
@@ -1871,8 +1879,15 @@ class LLAMA_CPP_STORAGE:
             elif mmproj_path:
                 init_params["clip_model_path"] = mmproj_path
             
-            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-O-4.5", "GLM-4.6V", "GLM-4.6V-Thinking", "Qwen3.5", "Qwen3.5-Thinking"]:
+            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-O-4.5", "GLM-4.6V", "GLM-4.6V-Thinking"]:
                 init_params["enable_thinking"] = think_mode
+            
+            # Qwen3.5 需要特殊处理 - 它可能继承自 MTMDChatHandler
+            if chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                init_params["enable_thinking"] = think_mode
+                # 只有当有 mmproj_path 时才设置 clip_model_path，纯文本模型不需要
+                if mmproj_path:
+                    init_params["clip_model_path"] = mmproj_path
             
             if _has_mtmd:
                 if image_max_tokens > 0:
@@ -2053,8 +2068,9 @@ class LLAMA_CPP_STORAGE:
                     f"【提示】MiniCPM-O系列是视觉-语言模型，不支持纯文本生成模式"
                 )
             
-            # 对于 Qwen3.5，即使是纯文本模型也需要初始化 ChatHandler 以控制 thinking 模式
-            need_chat_handler = enable_mmproj and not is_text_only_model or "qwen35" in model_lower or "qwen3.5" in model_lower
+            # 对于 Qwen3.5，只有启用了 mmproj 才需要初始化 ChatHandler
+            need_chat_handler = enable_mmproj and not is_text_only_model or \
+                                (("qwen35" in model_lower or "qwen3.5" in model_lower) and enable_mmproj)
             
             if need_chat_handler:
                 # 获取并初始化ChatHandler
