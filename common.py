@@ -861,6 +861,7 @@ class ChatHandlerManager:
         'internvl15': 'InternVL-1.5',
         'internvl20': 'InternVL-2.0',
         'olmocr2': 'olmOCR-2',
+        'toriigate': 'ToriiGate',
     }
     
     def __init__(self):
@@ -1020,8 +1021,11 @@ class ChatHandlerManager:
             ('qwen3-vl', 'Qwen3VLChatHandler'),
             ('qwen2.5-vl', qwen25_handler),  # 如果Qwen25VL不可用则使用Qwen3VL
             ('qwen2.5-omni', qwen25_handler),  # Omni系列模型
+            ('toriigate', qwen25_handler),  # ToriiGate基于Qwen2-VL
             ('qwen35', 'Qwen35ChatHandler'),
             ('qwen3.5', 'Qwen35ChatHandler'),  # 匹配带点的版本
+            ('qwen36', 'Qwen35ChatHandler'),   # Qwen3.6使用Qwen35ChatHandler（兼容）
+            ('qwen3.6', 'Qwen35ChatHandler'),  # 匹配带点的版本
             ('minicpm-v-4.5', 'MiniCPMv45ChatHandler'),
             ('minicpm-o-4.5', 'MiniCPMv45ChatHandler'),  # Omni版本
             ('minicpm-o-2.6', 'MiniCPMv26ChatHandler'),  # MiniCPM-O-2.6
@@ -1091,9 +1095,9 @@ base_models = ["LLaVA-1.6", "nanoLLaVA", "llama-joycaption", "moondream3-preview
                "MiniCPM-Llama3-V 2.5", "Llama-3.2-11B-Vision-Instruct", "CogVLM2", 
                "CogVLM-MOE", "Phi-3.5-vision-instruct", "Phi-3-vision-128k-instruct", 
                "Qwen2.5-VL", "Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3-VL-Chat", "Qwen3-VL-Instruct", 
-               "Qwen3.5", "Qwen3.5-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5",
+               "Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5",
                "LLaMA-3.1-Vision", "Zhipu-Vision", "智谱AI-Vision", "olmOCR-2", 
-               "InternVL-1.5", "InternVL-2.0", "Yi-VL-2.0", "Gemma-3", "Granite-DocLing", 
+               "InternVL-1.5", "InternVL-2.0", "Yi-VL-2.0", "Gemma-3", "Gemma-4", "Granite-DocLing", 
                "Lfm-2-VL", "Llama3-Vision-Alpha", "LLaVA-1.5", "MiniCPM-v2.6", "Obsidian", 
                "Youtu-VL-4B-Instruct", "EraX-VL-7B-V1.5", "MiMo-VL-7B-RL", "Yi-VL-6B"]
 
@@ -1103,6 +1107,8 @@ CHAT_HANDLER_MODEL_MAP = {
     'qwen3vl': 'Qwen3-VL',
     'qwen3vlchat': 'Qwen3-VL-Chat',
     'qwen3vlinstruct': 'Qwen3-VL-Instruct',
+    'qwen35': 'Qwen3.5',
+    'qwen36': 'Qwen3.6',
     'glm46v': 'GLM-4.6V',
     'glm41v': 'GLM-4.1V-Thinking',
     'minicpmv45': 'MiniCPM-v4.5',
@@ -1125,6 +1131,7 @@ CHAT_HANDLER_MODEL_MAP = {
     'internvl20': 'InternVL-2.0',
     'yivl20': 'Yi-VL-2.0',
     'gemma3': 'Gemma-3',
+    'gemma4': 'Gemma-4',
     'granitedocling': 'Granite-DocLing',
     'lfm2vl': 'Lfm-2-VL',
     'llama3visionalpha': 'Llama3-Vision-Alpha',
@@ -1140,7 +1147,8 @@ CHAT_HANDLER_MODEL_MAP = {
     'qwen25omni': 'Qwen2.5-Omni-7B',
     'asidcaptioner7b': 'ASID-Captioner-7B',
     'zen3vli1': 'zen3-vl-i1',
-    'paddleocr': 'PaddleOCR-VL-1.5'
+    'paddleocr': 'PaddleOCR-VL-1.5',
+    'toriigate': 'ToriiGate',
 }
 
 # -------------------------- Hook 工具模块 --------------------------
@@ -1505,6 +1513,10 @@ MODEL_FILE_CHAT_HANDLER_MAP = {
     'qwen2.5-vl': 'Qwen2.5-VL',
     'qwen3-vl': 'Qwen3-VL',
     'qwen2.5-omni': 'Qwen2.5-Omni',
+    'qwen35': 'Qwen3.5',
+    'qwen3.5': 'Qwen3.5',
+    'qwen36': 'Qwen3.6',
+    'qwen3.6': 'Qwen3.6',
     # MiniCPM 系列
     'minicpm-v-2.6': 'MiniCPM-v2.6',
     'minicpm-v-4.5': 'MiniCPM-v4.5',
@@ -1546,6 +1558,7 @@ MODEL_FILE_CHAT_HANDLER_MAP = {
     'obsidian': 'Obsidian',
     'cogvlm': 'CogVLM2',
     'cogvlm2': 'CogVLM2',
+    'toriigate': 'ToriiGate',
 }
 
 def detect_model_chat_handler(model_filename):
@@ -1601,6 +1614,10 @@ def detect_model_chat_handler(model_filename):
     if 'qwen' in filename_lower and '3.5' in filename_lower and 'vl' not in filename_lower:
         return 'Qwen3.5'
     
+    # Qwen3.6 检测（非VL版本）
+    if 'qwen' in filename_lower and ('3.6' in filename_lower or '36' in filename_lower) and 'vl' not in filename_lower:
+        return 'Qwen3.6'
+    
     if 'minicpm' in filename_lower:
         if 'llama3' in filename_lower:
             return 'MiniCPM-Llama3-V 2.5'
@@ -1623,8 +1640,11 @@ def detect_model_chat_handler(model_filename):
         elif '1.5' in filename_lower:
             return 'LLaVA-1.5'
     
-    if 'gemma' in filename_lower and '3' in filename_lower:
-        return 'Gemma-3'
+    if 'gemma' in filename_lower:
+        if '4' in filename_lower and '3' not in filename_lower:
+            return 'Gemma-4'
+        elif '3' in filename_lower:
+            return 'Gemma-3'
     
     if 'moondream' in filename_lower:
         return 'Moondream2'
@@ -1811,6 +1831,7 @@ class LLAMA_CPP_STORAGE:
             "Qwen3-VL": Qwen3VLChatHandler,
             "Qwen2.5-VL": Qwen25VLChatHandler,
             "Qwen2.5-Omni": Qwen25VLChatHandler,
+            "ToriiGate": Qwen25VLChatHandler,  # ToriiGate基于Qwen2-VL
             "LLaVA-1.5": Llava15ChatHandler,
             "LLaVA-1.6": Llava16ChatHandler,
             "Moondream2": MoondreamChatHandler,
@@ -1837,6 +1858,8 @@ class LLAMA_CPP_STORAGE:
             return Qwen25VLChatHandler
         if chat_handler_name.startswith("Qwen3.5"):
             return Qwen35ChatHandler
+        if chat_handler_name.startswith("Qwen3.6"):
+            return Qwen35ChatHandler  # Qwen3.6使用Qwen35ChatHandler兼容
         if chat_handler_name.startswith("Qwen3-VL"):
             return Qwen3VLChatHandler
         if chat_handler_name.startswith("MiniCPM-v4.5") or chat_handler_name.startswith("MiniCPM-v2.6") or chat_handler_name.startswith("MiniCPM-O-"):
@@ -2117,12 +2140,14 @@ class LLAMA_CPP_STORAGE:
                     recommended_gpu_layers = calculate_vram_layers(model_path, gpu_vram, mmproj_size_gb)
                     print(f"【VRAM计算】推荐GPU层数={recommended_gpu_layers}")
                     
-                    # Qwen3.5模型特殊内存优化：降低GPU层数以确保推理成功
+                    # Qwen3.5/Qwen3.6模型特殊内存优化：降低GPU层数以确保推理成功
                     is_qwen35_model = "qwen35" in model.lower() or "qwen3.5" in model.lower()
-                    if is_qwen35_model and recommended_gpu_layers > 16:
+                    is_qwen36_model = "qwen36" in model.lower() or "qwen3.6" in model.lower()
+                    if (is_qwen35_model or is_qwen36_model) and recommended_gpu_layers > 16:
                         original_layers = recommended_gpu_layers
                         recommended_gpu_layers = min(recommended_gpu_layers, 16)
-                        print(f"【Qwen3.5优化】降低GPU层数从{original_layers}到{recommended_gpu_layers}以确保推理成功")
+                        model_type = "Qwen3.6" if is_qwen36_model else "Qwen3.5"
+                        print(f"【{model_type}优化】降低GPU层数从{original_layers}到{recommended_gpu_layers}以确保推理成功")
             elif device_mode == "CPU":
                 print(f"【CPU模式】跳过GPU层数计算")
 

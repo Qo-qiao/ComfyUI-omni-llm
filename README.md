@@ -17,6 +17,8 @@ ComfyUI-omni-llm is a comprehensive ComfyUI plugin, deeply refactored and enhanc
 - **Professional Prompt System**: Built-in rich scenario-based preset templates
 - **Powerful Audio Capabilities**: Integrated ASR speech recognition and TTS speech synthesis functions
 
+[Tip] Models with thinking mode cannot provide accurate thought content filtering. It is recommended to use non-thinking mode models. All generated prompt content is for reference only and cannot guarantee perfect image generation. Please verify and optimize content based on your actual needs.
+
 
 ## Chinese Translation
 
@@ -114,6 +116,19 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 
 ## Changelog
+
+#### v3.1.3 (2026-06-06)
+
+**I. Model Support Optimization**
+- **Qwen3.6 Model Support**: Added Qwen3.6 series model support, including Qwen3.6-27B and Qwen3.6-35B-A3B large VRAM models, optimized context length configuration (default 8192) and GPU layer allocation (not tested due to limited personal hardware, please understand if runtime errors occur)
+- **Gemma4 Model Support**: Improved Gemma-4 series model support, including Gemma-4-E2B, Gemma-4-E4B, and Gemma4-26B-A4B model automatic recognition and loading
+
+**II. Preset Template Adjustment**
+- **Template Optimization**: 1.Optimized repetitive instruction content, resolved text generation content confusion caused by logic disorder
+2.Restructured output callback to JSON output format for precise image generation control
+3.Preset templates now feature intelligent category processing. Please add relevant keyword information such as poster, illustration, photography to prompts for model-based generation and reduced errors
+4.Illustrious preset template added ToriiGate model exclusive optimization, ToriiGate model recommended
+- **Template Addition**: Added Ideogram-4 model exclusive preset template (usage according to model requirements, generated results may not be ideal, please test yourself, recommended to use qwen3 series models)
 
 #### v3.1.2 (2026-05-31)
 
