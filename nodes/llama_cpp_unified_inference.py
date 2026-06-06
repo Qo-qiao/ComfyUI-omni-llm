@@ -793,7 +793,7 @@ class llama_cpp_unified_inference:
     preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
     preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
     preset_prompts["[Design] ERNIE - Image"] = "ERNIE_IMAGE"
-    preset_prompts["[Ideogram-4] Ideogram-4"] = "IDEOGRAM4"
+    preset_prompts["[Design] Ideogram-4"] = "IDEOGRAM4"
     preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
     preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
     preset_prompts["[Text to Video] LTX-2"] = "LTX2"
@@ -832,7 +832,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Ideogram-4] Ideogram-4：专业设计\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Text to Video] LTX-2：文本生视频\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Design] Ideogram-4：专业设计\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Text to Video] LTX-2：文本生视频\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [Vision] Bounding Box：视觉目标检测框"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的AI提示词处理专家。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
