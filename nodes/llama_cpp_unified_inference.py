@@ -210,6 +210,7 @@ from support.prompt_enhancer_preset_zh import (
     ILLUSTRIOUS_ZH,
     ANIMA_ZH,
     ERNIE_IMAGE_ZH,
+    IDEOGRAM4_ZH,
 )
 
 from support.prompt_enhancer_preset_en import (
@@ -235,6 +236,7 @@ from support.prompt_enhancer_preset_en import (
     ILLUSTRIOUS_EN,
     ANIMA_EN,
     ERNIE_IMAGE_EN,
+    IDEOGRAM4_EN,
 )
 
 
@@ -431,6 +433,261 @@ class llama_cpp_unified_inference:
                 del cache[key]
             print(f"【缓存管理】清理了 {items_to_remove} 个缓存条目，当前缓存大小: {len(cache)}")
     
+    def _filter_thinking_content(self, text):
+        """
+        过滤Qwen3.5/3.6等模型生成的思考内容
+        
+        支持多种思考格式：
+        1. Qwen3.5/3.6原生格式：<thinking>思考内容</thinking> 或 思考内容<|end_of_thinking|>
+        2. Thinking Process格式：Thinking Process: ...
+        3. 中文思考格式：思考：、分析：、推理：、逐步分析：
+        
+        Args:
+            text: 原始生成文本
+            
+        Returns:
+            过滤后的文本（去除思考内容，保留实际回答）
+        """
+        if not text:
+            return text
+        
+        # 定义Qwen3.5/3.6的思考结束标记（扩展版）
+        thinking_end_markers = [
+            '<|end_of_thinking|>',
+            '<|end_of_solution|>',
+            '<|finish_reason|>',
+            '</thinking>',
+            '</think>',
+            '</analysis>',
+        ]
+        
+        # 定义思考开始标记
+        thinking_start_markers = [
+            '<thinking>',
+            '<think>',
+            '<analysis>',
+        ]
+        
+        # 优先处理Qwen3.5/3.6原生思考格式 - 结束标记
+        for marker in thinking_end_markers:
+            if marker in text:
+                # 找到最后一个标记的位置，提取之后的内容
+                parts = text.split(marker)
+                if len(parts) >= 2:
+                    # 取最后一个标记之后的内容作为实际回答
+                    actual_response = parts[-1].strip()
+                    # 清理开头的空行和标记
+                    actual_response = re.sub(r'^\s*\n+', '', actual_response)
+                    if actual_response:
+                        return actual_response
+        
+        # 处理Qwen3.5/3.6原生思考格式 - 开始标记（去除标记内的内容）
+        for start_marker in thinking_start_markers:
+            pattern = re.escape(start_marker) + r'.*?' + r'(' + '|'.join(re.escape(m) for m in thinking_end_markers) + r')'
+            text = re.sub(pattern, '', text, flags=re.DOTALL)
+        
+        # 处理Thinking Process格式（英文）
+        thinking_patterns = [
+            r'^Thinking Process\s*:?\s*$',
+            r'^\s*\d+\.\s+\*\*\s*Analyze',
+            r'^Step \d+:',
+            r'^\*\*\s*Analyze',
+        ]
+        
+        # 处理中文思考格式
+        chinese_thinking_patterns = [
+            r'^思考\s*[：:]',
+            r'^分析\s*[：:]',
+            r'^推理\s*[：:]',
+            r'^逐步分析\s*[：:]',
+            r'^我来分析一下\s*[：:]',
+            r'^让我想想\s*[：:]',
+            r'^首先\s*[：:]',
+            r'^接下来\s*[：:]',
+            r'^然后\s*[：:]',
+        ]
+        
+        # 检查是否包含思考内容
+        has_thinking = False
+        
+        # 检查英文思考模式
+        for pattern in thinking_patterns:
+            if re.search(pattern, text, re.MULTILINE):
+                has_thinking = True
+                break
+        
+        # 检查中文思考模式
+        if not has_thinking:
+            for pattern in chinese_thinking_patterns:
+                if re.search(pattern, text, re.MULTILINE):
+                    has_thinking = True
+                    break
+        
+        # 检查数字编号的分析模式（如 "1. **分析"）
+        if not has_thinking:
+            if re.search(r'^\s*\d+\.\s+\*\*', text, re.MULTILINE):
+                has_thinking = True
+        
+        if not has_thinking:
+            # 没有检测到思考内容，直接返回原文本（但先清理可能的残留标记）
+            cleaned_text = self._clean_residual_markers(text)
+            return cleaned_text
+        
+        # 有思考内容，尝试提取最终的标签列表部分
+        lines = text.split('\n')
+        result_lines = []
+        
+        # 状态变量
+        in_thinking_block = False
+        in_final_tags = False
+        found_numbered_tags = False
+        found_tag_section = False
+        
+        for line in lines:
+            # 检测思考块开始（英文）
+            if re.match(r'^Thinking Process\s*:?\s*$', line) or re.match(r'^\s*\d+\.\s+\*\*\s*Analyze', line):
+                in_thinking_block = True
+                in_final_tags = False
+                continue
+            
+            # 检测思考块开始（中文）
+            if any(re.match(pattern, line) for pattern in chinese_thinking_patterns):
+                in_thinking_block = True
+                in_final_tags = False
+                continue
+            
+            # 在思考块中，检测是否到达最终标签列表
+            if in_thinking_block:
+                # 寻找以数字编号开始且包含逗号的行（标签列表特征）
+                if re.match(r'^\s*\d+\.\s*[^*]+,', line):
+                    in_final_tags = True
+                    found_numbered_tags = True
+                    found_tag_section = True
+                    result_lines.append(line)
+                    continue
+                
+                # 检测纯标签行（不含分析关键词，包含逗号）
+                if ',' in line and len(line.strip()) > 0:
+                    # 检查是否是标签行（不包含分析关键词）
+                    analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad', 
+                                        '分析', '推理', '思考', '步骤', '首先', '接下来', '然后']
+                    has_analysis_kw = any(kw in line for kw in analysis_keywords)
+                    
+                    # 检查是否是纯数字或百分比（可能是分析内容）
+                    is_analysis_line = re.match(r'^\s*\d+(\.\d+)?\s*$', line.strip()) or \
+                                      re.match(r'^\s*\d+(\.\d+)?%\s*$', line.strip()) or \
+                                      re.match(r'^\s*Total\s*[:：]\s*\d+\s*$', line.strip())
+                    
+                    if not has_analysis_kw and not is_analysis_line:
+                        # 这可能是标签内容，收集它
+                        if len(line.strip()) >= 2:  # 至少2个字符才认为是有效标签
+                            found_tag_section = True
+                            result_lines.append(line)
+                    continue
+            
+            # 不在思考块中，直接收集（但跳过空行和标记行）
+            if line.strip() and not any(m in line for m in thinking_start_markers + thinking_end_markers):
+                # 检查是否是分析行
+                analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad']
+                if not any(kw in line for kw in analysis_keywords):
+                    result_lines.append(line)
+        
+        # 如果找到了标签内容，返回过滤后的内容
+        if found_tag_section and result_lines:
+            result = '\n'.join(result_lines)
+            # 清理空行和多余空格
+            lines = [line.strip() for line in result.split('\n') if line.strip()]
+            cleaned_result = '\n'.join(lines).strip()
+            # 进一步清理残留标记
+            cleaned_result = self._clean_residual_markers(cleaned_result)
+            return cleaned_result
+        
+        # 如果没有找到明确的标签列表，尝试提取最后一段有意义的内容
+        # 这适用于思考内容在开头，实际回答在末尾的情况
+        cleaned_text = self._extract_final_response(text)
+        return cleaned_text
+    
+    def _clean_residual_markers(self, text):
+        """
+        清理文本中残留的标记和思考相关内容
+        
+        Args:
+            text: 待清理的文本
+            
+        Returns:
+            清理后的文本
+        """
+        if not text:
+            return text
+        
+        # 清理可能残留的思考标记
+        markers_to_remove = [
+            '<thinking>', '</thinking>',
+            '<think>', '</think>',
+            '<analysis>', '</analysis>',
+            '<|end_of_thinking|>',
+            '<|end_of_solution|>',
+            '<|finish_reason|>',
+        ]
+        
+        result = text
+        for marker in markers_to_remove:
+            result = result.replace(marker, '')
+        
+        # 清理连续的空行和空格
+        result = re.sub(r'\n\s*\n', '\n', result)
+        result = re.sub(r'^\s+|\s+$', '', result)
+        
+        return result
+    
+    def _extract_final_response(self, text):
+        """
+        从包含思考内容的文本中提取最终响应
+        
+        Args:
+            text: 原始文本
+            
+        Returns:
+            提取的最终响应
+        """
+        if not text:
+            return text
+        
+        lines = text.split('\n')
+        
+        # 找到最后一个包含逗号的段落（标签列表的特征）
+        last_comma_section = ''
+        comma_section_start = -1
+        
+        for i, line in enumerate(lines):
+            if ',' in line and len(line.strip()) >= 2:
+                # 检查是否是分析行（跳过）
+                analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad',
+                                    '分析', '推理', '思考']
+                if not any(kw in line for kw in analysis_keywords):
+                    comma_section_start = i
+        
+        if comma_section_start >= 0:
+            # 提取从逗号部分开始到结尾的内容
+            result_lines = []
+            for i in range(comma_section_start, len(lines)):
+                line = lines[i].strip()
+                if line:
+                    # 跳过分析行和纯数字行
+                    analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad']
+                    is_analysis_line = any(kw in line for kw in analysis_keywords)
+                    is_number_line = re.match(r'^\d+(\.\d+)?%?$', line)
+                    
+                    if not is_analysis_line and not is_number_line:
+                        result_lines.append(line)
+            
+            if result_lines:
+                result = '\n'.join(result_lines).strip()
+                return self._clean_residual_markers(result)
+        
+        # 如果没有找到逗号部分，返回清理后的原始文本
+        return self._clean_residual_markers(text)
+    
     @classmethod
     def add_to_cache(cls, cache_name, key, value):
         """
@@ -536,6 +793,7 @@ class llama_cpp_unified_inference:
     preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
     preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
     preset_prompts["[Design] ERNIE - Image"] = "ERNIE_IMAGE"
+    preset_prompts["[Ideogram-4] Ideogram-4"] = "IDEOGRAM4"
     preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
     preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
     preset_prompts["[Text to Video] LTX-2"] = "LTX2"
@@ -574,8 +832,8 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Text to Video] LTX-2：文本生视频\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [Vision] Bounding Box：视觉目标检测框"}),
-                "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的多模态助手。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Ideogram-4] Ideogram-4：专业设计\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Text to Video] LTX-2：文本生视频\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的AI提示词处理专家。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
                 # ========== 语言设置 ==========
@@ -585,7 +843,7 @@ class llama_cpp_unified_inference:
                 # ========== 输出格式设置 ==========
                 "output_format": (["natural", "structured"], {
                     "default": "natural",
-                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容\n• structured：输出结构化文本内容"
+                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容\n• structured：输出json结构化文本内容"
                 }),
                 
                 # ========== 视频处理参数 ==========
@@ -698,6 +956,7 @@ class llama_cpp_unified_inference:
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
                 "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
                 "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
+                "IDEOGRAM4": IDEOGRAM4_ZH,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
                 "LTX2": LTX2_ZH,
@@ -723,6 +982,7 @@ class llama_cpp_unified_inference:
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
                 "FLUX2_KLEIN": FLUX2_KLEIN_EN,
                 "ERNIE_IMAGE": ERNIE_IMAGE_EN,
+                "IDEOGRAM4": IDEOGRAM4_EN,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
                 "LTX2": LTX2_EN,
@@ -750,6 +1010,77 @@ class llama_cpp_unified_inference:
             base_template = preset.get("input_template_structured")
         else:
             base_template = preset.get("input_template", preset_key)
+
+        # 构建完整的提示词：基础模板 + 约束条件 + 任务要求 + 输出格式后缀
+        
+        # 添加约束条件
+        constraints = preset.get("constraints", {})
+        if constraints:
+            constraints_text = "\n\n**【约束条件】**\n"
+            for key, value in constraints.items():
+                if isinstance(value, str):
+                    constraints_text += f"- {key}：{value}\n"
+                else:
+                    constraints_text += f"- {key}：{str(value)}\n"
+            base_template += constraints_text
+        
+        # 添加任务要求
+        task_requirements = preset.get("task_requirements", [])
+        if task_requirements:
+            requirements_text = "\n\n**【任务要求】**\n"
+            for i, requirement in enumerate(task_requirements, 1):
+                requirements_text += f"{i}. {requirement}\n"
+            base_template += requirements_text
+        
+        # 添加四要素组合法（歌词创作等预设专用）
+        four_element_method = preset.get("four_element_method", {})
+        if four_element_method:
+            method_text = "\n\n**【四要素组合法】**\n"
+            for key, value in four_element_method.items():
+                if isinstance(value, list):
+                    method_text += f"- {key}：{', '.join(str(v) for v in value)}\n"
+                elif isinstance(value, dict):
+                    method_text += f"- {key}：\n"
+                    for k2, v2 in value.items():
+                        method_text += f"  - {k2}：{v2}\n"
+                else:
+                    method_text += f"- {key}：{value}\n"
+            base_template += method_text
+        
+        # 添加情绪示例（对话等预设专用）
+        emotion_examples = preset.get("emotion_examples", {})
+        if emotion_examples:
+            emotion_text = "\n\n**【情绪示例】**\n"
+            for emotion, example in emotion_examples.items():
+                emotion_text += f"- {emotion}：{example}\n"
+            base_template += emotion_text
+        
+        # 添加音色映射（多人对话预设专用）
+        voice_mapping = preset.get("voice_mapping", {})
+        if voice_mapping:
+            voice_text = "\n\n**【音色映射】**\n"
+            for voice, info in voice_mapping.items():
+                if isinstance(info, dict):
+                    voice_text += f"- {voice}：speaker_id={info.get('speaker_id', '?')}, {info.get('description', '')}\n"
+                else:
+                    voice_text += f"- {voice}：{info}\n"
+            base_template += voice_text
+        
+        # 添加通用原则（编辑提示等预设专用）
+        general_principles = preset.get("general_principles", [])
+        if general_principles:
+            principles_text = "\n\n**【通用原则】**\n"
+            for i, principle in enumerate(general_principles, 1):
+                principles_text += f"{i}. {principle}\n"
+            base_template += principles_text
+        
+        # 添加任务规则（编辑提示等预设专用）
+        task_rules = preset.get("task_rules", {})
+        if task_rules:
+            rules_text = "\n\n**【任务规则】**\n"
+            for key, value in task_rules.items():
+                rules_text += f"- {key}：{value}\n"
+            base_template += rules_text
 
         # 优先使用新的 output_format_suffix 字段
         suffix_map = preset.get("output_format_suffix", {})
@@ -784,6 +1115,7 @@ class llama_cpp_unified_inference:
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
                 "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
                 "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
+                "IDEOGRAM4": IDEOGRAM4_ZH,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
                 "LTX2": LTX2_ZH,
@@ -809,6 +1141,7 @@ class llama_cpp_unified_inference:
                 "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
                 "FLUX2_KLEIN": FLUX2_KLEIN_EN,
                 "ERNIE_IMAGE": ERNIE_IMAGE_EN,
+                "IDEOGRAM4": IDEOGRAM4_EN,
                 "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
                 "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
                 "LTX2": LTX2_EN,
@@ -1131,6 +1464,10 @@ class llama_cpp_unified_inference:
             print(f"【错误】推理多次失败")
             generated_text = "推理失败"
         
+        # 过滤Qwen3.5的思考内容（在缓存前过滤）
+        if generated_text and generated_text != "推理失败":
+            generated_text = self._filter_thinking_content(generated_text)
+        
         # 将结果添加到缓存
         result = (generated_text, audio_output)
         self.add_to_cache("_inference_cache", cache_key, result)
@@ -1373,7 +1710,7 @@ class llama_cpp_unified_inference:
                     # 降低temperature以获得更稳定的输出
                     gen_params["temperature"] = max(gen_params["temperature"] - 0.1, 0.5)
                     print(f"【视频优化】视频处理模式，调整max_tokens={gen_params['max_tokens']}, temperature={gen_params['temperature']}")
-                # Qwen3.5模型特殊内存优化
+                # Qwen3.5模型特殊内存优化和禁用思考模式
                 try:
                     from common import LLAMA_CPP_STORAGE
                     if LLAMA_CPP_STORAGE.current_config:
@@ -1385,7 +1722,15 @@ class llama_cpp_unified_inference:
                             gen_params["max_tokens"] = min(gen_params.get("max_tokens", 1024), 768)
                             # 降低top_p以减少内存使用
                             gen_params["top_p"] = max(gen_params.get("top_p", 0.9), 0.8)
-                            print(f"【Qwen3.5优化】调整内存参数: n_batch={gen_params['n_batch']}, max_tokens={gen_params['max_tokens']}, top_p={gen_params['top_p']}")
+                            # 禁用思考模式以避免混乱输出
+                            gen_params["enable_thinking"] = False
+                            # 添加思考结束标记作为停止序列
+                            stop_list = gen_params.get("stop", [])
+                            if isinstance(stop_list, str):
+                                stop_list = [stop_list]
+                            stop_list.extend(["<|end_of_thinking|>", "<|end_of_solution|>", "</think>"])
+                            gen_params["stop"] = stop_list
+                            print(f"【Qwen3.5优化】调整参数: n_batch={gen_params['n_batch']}, max_tokens={gen_params['max_tokens']}, top_p={gen_params['top_p']}, enable_thinking=False")
                 except Exception as e:
                     print(f"【Qwen3.5优化】内存参数调整时出错（忽略）: {e}")
                 self._perf_params_cache[cache_key] = gen_params.copy()
@@ -1519,6 +1864,10 @@ class llama_cpp_unified_inference:
                         else:
                             generated_text = batch_results[0] if batch_results else ""
                             output_list = batch_results
+                        
+                        # 过滤Qwen3.5的思考内容
+                        generated_text = self._filter_thinking_content(generated_text)
+                        output_list = [self._filter_thinking_content(item) for item in output_list]
                         
                         print(f"【批量推理】完成，生成 {len(batch_results)} 个结果")
                         
@@ -1661,11 +2010,14 @@ class llama_cpp_unified_inference:
                 mm.soft_empty_cache()
                 # 清理所有缓存
                 self.clear_all_caches()
-            
+
+            # 过滤思考内容
+            generated_text = self._filter_thinking_content(generated_text)
+
             # 处理UID
             _uid = parameters.get("state_uid", None) if parameters else None
             uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-            
+
             return (generated_text, [generated_text], int(uid), audio_output, example_output)
         
         except Exception as e:

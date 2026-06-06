@@ -275,8 +275,9 @@ class llama_cpp_model_loader:
         print(f"【自动参数】n_batch={n_batch}, n_ubatch={n_ubatch}, n_threads={n_threads}, n_threads_batch={n_threads_batch}")
         
         # 检查是否是Qwen3系列模型
-        is_qwen3 = "qwen3" in model.lower() or "qwen35" in model.lower()
+        is_qwen3 = "qwen3" in model.lower() or "qwen35" in model.lower() or "qwen36" in model.lower()
         is_qwen35 = "qwen35" in model.lower() or "qwen3.5" in model.lower()
+        is_qwen36 = "qwen36" in model.lower() or "qwen3.6" in model.lower()
         is_qwen3vl = "qwen3-vl" in model.lower() or "qwen3vl" in model.lower()
         
 
@@ -295,7 +296,17 @@ class llama_cpp_model_loader:
                 # 确保使用正确的ChatHandler
                 print(f"【提示】Qwen3.5模型将使用Qwen35ChatHandler")
             
-            # Qwen3系列模型（包括Qwen3-VL和Qwen3.5）需要至少1024个image tokens
+            # 针对Qwen3.6模型的特殊优化
+            if is_qwen36:
+                print(f"【GPU模式优化】Qwen3.6模型启用特殊GPU参数配置")
+                # Qwen3.6模型需要更大的上下文长度
+                if n_ctx < 8192:
+                    print(f"【GPU模式优化】Qwen3.6模型需要至少8192的上下文长度，自动调整从{n_ctx}到8192")
+                    n_ctx = 8192
+                # 确保使用正确的ChatHandler
+                print(f"【提示】Qwen3.6模型将使用Qwen35ChatHandler（兼容模式）")
+            
+            # Qwen3系列模型（包括Qwen3-VL、Qwen3.5和Qwen3.6）需要至少1024个image tokens
             if image_min_tokens < 1024:
                 print(f"【GPU模式优化】Qwen3系列模型需要至少1024 image tokens，自动调整image_min_tokens从{image_min_tokens}到1024")
                 image_min_tokens = 1024
