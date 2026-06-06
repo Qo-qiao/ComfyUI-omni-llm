@@ -180,6 +180,10 @@ class llama_cpp_model_loader:
         if LLAMA_CPP_STORAGE.llm is None:
             return float("NaN") 
         
+        # 解析模型路径，确保与 loadmodel 中使用的值一致
+        resolved_model_path = s._resolve_llm_model_path(model)
+        actual_model = resolved_model_path if resolved_model_path else model
+        
         # 根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）
         def get_auto_chat_handler(model_name):
             import common
@@ -200,13 +204,13 @@ class llama_cpp_model_loader:
             # 默认使用LLaVA-1.6
             return "LLaVA-1.6"
         
-        # 自动选择对话格式处理器，多模态功能由用户控制
-        chat_handler = get_auto_chat_handler(model)
+        # 使用解析后的路径来获取chat_handler，确保一致性
+        chat_handler = get_auto_chat_handler(actual_model)
         
-        resolved_path = s._resolve_llm_model_path(model)
+        # 注意：不包含model_path字段，因为它是动态计算的
+        # 只包含用户可配置的参数，避免不必要的重新加载
         custom_config = {
-            "model": model,
-            "model_path": resolved_path or "",
+            "model": actual_model,  # 使用解析后的路径，确保与loadmodel一致
             "chat_handler": chat_handler,
             "enable_mmproj": enable_mmproj,
             "mmproj": mmproj,
@@ -280,8 +284,8 @@ class llama_cpp_model_loader:
         is_qwen36 = "qwen36" in model.lower() or "qwen3.6" in model.lower()
         is_qwen3vl = "qwen3-vl" in model.lower() or "qwen3vl" in model.lower()
         
-
         
+
 
         # GPU模式下针对Qwen3系列模型的优化
         if is_qwen3:
@@ -344,6 +348,26 @@ class llama_cpp_model_loader:
         tts_status = "已启用" if enable_tts else "已禁用"
         print(f"【自动配置】根据模型 {model} 选择对话格式处理器: {chat_handler}，多模态功能{mmproj_status}，ASR功能{asr_status}，TTS功能{tts_status}")
 
+        # 构建用于配置比较的配置字典（与IS_CHANGED返回的格式一致）
+        # 只包含用户可配置的参数，不包含自动计算的参数
+        compare_config = {
+            "model": model,
+            "chat_handler": chat_handler,
+            "enable_mmproj": enable_mmproj,
+            "mmproj": mmproj,
+            "enable_asr": enable_asr,
+            "enable_tts": enable_tts,
+            "n_ctx": n_ctx,
+            "n_gpu_layers": n_gpu_layers,
+            "vram_limit": vram_limit,
+            "image_min_tokens": image_min_tokens,
+            "image_max_tokens": image_max_tokens,
+            "attention_type": attention_type,
+            "cache_prompt": cache_prompt,
+            "tensor_split": tensor_split,
+        }
+        
+        # 构建完整的配置字典（包含所有参数，用于实际加载模型）
         custom_config = {
             "model": model, "enable_mmproj": enable_mmproj, "mmproj": mmproj,
             "enable_asr": enable_asr, "enable_tts": enable_tts,
@@ -355,6 +379,23 @@ class llama_cpp_model_loader:
             "cache_prompt": cache_prompt,
             "tensor_split": tensor_split,
         }
-        if not LLAMA_CPP_STORAGE.llm or LLAMA_CPP_STORAGE.current_config != custom_config:
+        
+        # 使用compare_config进行比较，确保与IS_CHANGED返回的配置一致
+        # 只有当配置真正改变时才重新加载模型
+        current_config = LLAMA_CPP_STORAGE.current_config
+        config_changed = True
+        
+        if LLAMA_CPP_STORAGE.llm and current_config:
+            # 提取current_config中与compare_config对应的字段进行比较
+            current_compare_config = {
+                k: current_config.get(k) for k in compare_config.keys()
+            }
+            config_changed = current_compare_config != compare_config
+        
+        if not LLAMA_CPP_STORAGE.llm or config_changed:
+            print(f"【模型加载】配置已变化，重新加载模型...")
             LLAMA_CPP_STORAGE.load_model(custom_config)
+        else:
+            print(f"【模型加载】配置未变化，跳过重新加载")
+        
         return (LLAMA_CPP_STORAGE,)
