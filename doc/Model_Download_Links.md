@@ -146,6 +146,14 @@
 
 ## VLM Series (Vision-Language Models, supporting text generation and image reverse prompting for all visual models)
 
+### ToriiGate Series (Anime-specific)
+
+**Model Series**: ToriiGate
+**Specific Model**: ToriiGate-v0.4-7B
+**Key Features**: Based on Qwen2-VL, focused on understanding of anime and digital art domains. Supports structured output, multiple caption modes (regular summary, Midjourney style, DeviantArt style), bounding box location, and name recognition of characters. Descriptions are precise, dense, and avoid long padding words.
+**Applicable Scenarios**: Anime/digital art image description, character feature extraction, multi-character recognition, prompt generation, caption correction and cropping
+**Download Link（nsfw）**: https://huggingface.co/mradermacher/ToriiGate-v0.4-7B-GGUF (includes mmproj model)
+
 ### Qwen Series (Recommend to use clip model to select prompt reverse prompting model, such as Z-Image recommends to use qwen3VL model to generate prompt)
 
 **Model Series**: Qwen-VL
@@ -187,6 +195,15 @@
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 **ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
 
+**Specific Model**: Qwen3.6-27B (Large VRAM Required)
+**Key Features**: High-performance model from Qwen3.6 series with large parameter count, delivers exceptional reasoning capabilities and multimodal understanding, requires significant GPU memory.
+**Applicable Scenarios**: Advanced multimodal reasoning, complex visual tasks, high-quality content generation, professional-level inference
+**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.6-27B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
+
+**Specific Model**: Qwen3.6-35B-A3B (Large VRAM Required)
+**Key Features**: Flagship model from Qwen3.6 series with massive parameter count, offers state-of-the-art reasoning and multimodal capabilities, requires high-end GPU with ample VRAM.
+**Applicable Scenarios**: Complex visual reasoning, long context understanding, advanced multimodal tasks, high-precision content generation
+**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 
 ### OCR Specialized Series
 
@@ -224,6 +241,12 @@
 **Applicable Scenarios**: Prompt generation, image/video frame reverse prompting, multilingual OCR, batch image text extraction, daily visual reasoning
 **Download Link**: https://huggingface.co/openbmb/MiniCPM-V-4_5-gguf (includes mmproj model)
 
+
+**Model Series**: MiniCPM-V
+**Specific Model**: MiniCPM-V-4.6
+**Key Features**: Domestic lightweight multimodal flagship, balances accuracy and speed, supports arbitrary aspect ratio image recognition, excellent OCR capabilities, well-adapted ComfyUI nodes.
+**Applicable Scenarios**: Prompt generation, image/video frame reverse prompting, multilingual OCR, batch image text extraction, daily visual reasoning
+**Download Link**: https://huggingface.co/mradermacher/MiniCPM-V-4.6-GGUF (includes mmproj model)
 
 **Model Series**: MiniCPM-V
 **Specific Model**: MiniCPM-Llama3-V 2.5
@@ -282,6 +305,11 @@
 **Key Features**: Uncensored flagship model of Google Gemma 4 series, stronger visual understanding, longer context processing, and more accurate multilingual support, performance close to larger-scale models, supports more open content generation.
 **Applicable Scenarios**: Complex visual reasoning, long text understanding, multilingual translation, advanced multimodal interaction, scenarios requiring uncensored content
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
+
+**Specific Model**: Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced (Large VRAM Required)
+**Key Features**: Google Gemma 4 series uncensored flagship model, stronger visual understanding, longer context processing, and more accurate multilingual support, performance close to larger-scale models, supports more open content generation. Requires significant GPU memory.
+**Applicable Scenarios**: Complex visual reasoning, long text understanding, multilingual translation, advanced multimodal interaction, scenarios requiring uncensored content
+**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced (includes mmproj model)
 
 
 ### Youtu-VL Series
@@ -365,25 +393,29 @@
 
 
 
-## CLIP Models (NSFW Version)
-Applicable generation models: ERNIE-Image
-https://huggingface.co/ponpoke/ERNIE-Image-Abliterated
-https://huggingface.co/ponpoke/ERNIE-Image-Abliterated-GGUF
-Corresponding model (abliterated_pe): ministral-3-3b.safetensors
-Corresponding model (abliterated_text_encoder): ernie-image-prompt-enhancer.safetensors
+## CLIP Models (NSFW Version - Untested)
+**Applicable Generation Models**: ERNIE-Image
+- https://huggingface.co/ponpoke/ERNIE-Image-Abliterated
+- https://huggingface.co/ponpoke/ERNIE-Image-Abliterated-GGUF
+- Corresponding model (abliterated_pe): ministral-3-3b.safetensors
+- Corresponding model (abliterated_text_encoder): ernie-image-prompt-enhancer.safetensors
 
-Applicable generation models: flux2-klein-9b
-qwen_3_8b_fp8mixed.safetensors
-https://huggingface.co/edicamargo/qwen_3_8b_fp8mixed_abliterated
+**Applicable Generation Models**: flux2-klein-9b
+- qwen_3_8b_fp8mixed.safetensors
+- https://huggingface.co/edicamargo/qwen_3_8b_fp8mixed_abliterated
 
-Applicable generation models: Z-Image, flux2-klein-4b
-qwen_3_4b.safetensors
-https://huggingface.co/chinmankokumin/Qwen3-4B-abliterated-v2
+**Applicable Generation Models**: Z-Image, flux2-klein-4b
+- qwen_3_4b.safetensors
+- https://huggingface.co/chinmankokumin/Qwen3-4B-abliterated-v2
 
-Applicable generation models: flux2-klein-4b
-flux2-klein-4b-uncensored-text-encoder
-https://huggingface.co/ponpoke/flux2-klein-4b-uncensored-text-encoder
+**Applicable Generation Models**: flux2-klein-4b
+- flux2-klein-4b-uncensored-text-encoder
+- https://huggingface.co/ponpoke/flux2-klein-4b-uncensored-text-encoder
 
-Applicable generation models: flux2-klein-9b
-flux2-klein-9b-uncensored-text-encoder
-https://huggingface.co/ponpoke/flux2-klein-9b-uncensored-text-encoder
+**Applicable Generation Models**: flux2-klein-9b
+- flux2-klein-9b-uncensored-text-encoder
+- https://huggingface.co/ponpoke/flux2-klein-9b-uncensored-text-encoder
+
+**Applicable Generation Models**: Wan2.2
+- wan_umt5-xxl
+- https://huggingface.co/NSFW-API/NSFW-Wan-UMT5-XXL
