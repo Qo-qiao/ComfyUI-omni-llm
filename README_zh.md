@@ -25,7 +25,7 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 ## 协同插件推荐
 
-欢迎使用我的新插件，提示词存储插件[ComfyUI-prompt-storage](https://github.com/Qo-qiao/ComfyUI-prompt-storage) ，将你认为重要的提示词存储起来，方便后续使用。
+由于预设模板功能定位不同，部分预设模板和提示词更新到[ComfyUI-prompt-storage](https://github.com/Qo-qiao/ComfyUI-prompt-storage) ，可以与本插件配合使用增加扩展性。
 
 
 

@@ -26,7 +26,7 @@ Place the zh-CN files into the corresponding folder of translation plugins (Comf
 
 ## Recommended Companion Plugins
 
-Welcome to try my new plugin, the prompt storage plugin [ComfyUI-prompt-storage](https://github.com/Qo-qiao/ComfyUI-prompt-storage), which allows you to store important prompts for easy future use.
+Due to the different functional positioning of preset templates, some preset templates and prompts have been updated to [ComfyUI-prompt-storage](https://github.com/Qo-qiao/ComfyUI-prompt-storage), which can be used with this plugin to increase extensibility.
 
 
 
