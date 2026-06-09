@@ -193,7 +193,7 @@ ZIMAGE_TURBO_ZH = {
         "避免AI脸特征：禁止完美对称面部、自然的面部比例、真实的皮肤质感",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 700},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "古风/汉服",
@@ -256,7 +256,7 @@ FLUX2_KLEIN_ZH = {
         "避免AI脸特征：禁止完美对称面部、自然的面部比例、真实的皮肤质感",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 700},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "natural": "采用平拍视角，Hasselblad H6D-400c中画幅相机，80mm微距镜头，f/2.8，浅景深。在复古咖啡馆内，一位25岁年轻女性安静地坐在窗边。她棕色蓬松长发自然垂落，发梢微卷，面部非对称自然，皮肤纹理细腻，毛孔清晰可见，鼻翼两侧毛孔略大，脸颊有淡淡雀斑，眼下有轻微黑眼圈，自然的眉形，眼眸温柔有神，嘴唇呈现自然的粉色，唇纹细致。她专注地阅读一本精装书籍，眼神专注，右手手指轻轻翻页，左手托着书底。发丝根根清晰，发缝自然，鬓角有碎发。环境为复古咖啡馆，米白色薄纱窗帘半拉，午后阳光透过窗帘洒入，深棕色木纹桌面质感温润，木纹毛孔可见，复古铜制灯具悬挂。采用中景构图，人物位于画面三分之二处，三分法构图，前景有一杯虚化的咖啡。风格为精致写实摄影，杂志编辑风格，电影感色调。午后柔和侧光从右前方洒落，光线角度约45度，透过薄纱窗帘形成柔美散射，高光、中间调、阴影过渡自然，阴影边缘柔和，发丝有微妙的轮廓光。暖棕色系为主色调，搭配浅米色针织衫，低饱和度，温馨氛围。细节上皮肤毛孔清晰，织物针织纹理细腻，桌面木纹自然反光，书籍纸张颗粒真实，咖啡杯有精致花纹，窗帘褶皱自然。技术参数为超精细，8K，微米级细节，中画幅，色彩深度16bit。服装为浅米色针织衫，宽松舒适，袖口罗纹设计，针织纤维质感可见。",
@@ -281,7 +281,7 @@ ERNIE_IMAGE_ZH = {
         "人像/产品/场景：参照对应专业标准",
         "natural模式：输出自然段落；structured模式：输出JSON"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "商业海报",
@@ -378,7 +378,7 @@ QWEN_IMAGE_2512_ZH = {
         "高分辨率特性：必须描述2512x2512下可见的微观细节（纤维、颗粒、毛刺、反射高光边缘）",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "海报",
@@ -427,7 +427,7 @@ QWEN_IMAGE_EDIT_COMBINED_ZH = {
         "content_fill": "修复任务模板：对这张图像进行修复，消除指定瑕疵（划痕/污点），基于周围纹理智能填充。扩展任务模板：通过图像扩展将图像延伸到其边界之外，保持内容逻辑和风格一致。",
         "multi_image": "明确指定修改哪个图像的元素。风格化任务描述参考图像的风格，保留源图像视觉内容，仅迁移色彩/笔触/纹理。"
     },
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "task_requirements": [
         "提示简洁全面具体",
         "指令矛盾时合理推断修正",
@@ -464,7 +464,7 @@ LTX2_ZH = {
         "首先判断实拍或动漫，使用相应术语",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "实拍类",
@@ -507,7 +507,7 @@ WAN_T2V_ZH = {
         "风格专属字段需体现该类型的典型特征",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "科幻片",
@@ -539,7 +539,7 @@ WAN_I2V_ZH = {
         "首先判断实拍或动漫，使用相应术语",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "实拍类",
@@ -571,7 +571,7 @@ WAN_FLF2V_ZH = {
         "首先判断实拍或动漫，使用相应术语",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "实拍类",
@@ -602,7 +602,7 @@ VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH = {
         "首先判断实拍或动漫，使用相应术语",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "实拍类",
@@ -632,7 +632,7 @@ VIDEO_TO_PROMPT_ZH = {
         "无人物时省略人物字段",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "实拍类",
@@ -663,7 +663,7 @@ VIDEO_DETAILED_SCENE_BREAKDOWN_ZH = {
         "首先判断实拍或动漫，使用相应术语",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "实拍类",
@@ -713,7 +713,7 @@ MULTI_SPEAKER_DIALOGUE_ZH = {
         "对话流畅自然，符合人物设定",
         "natural模式：输出纯文本格式；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         "**音色：** 女声\n**说话人ID：** 0\n**情感：** 温柔\n**台词语气：** 明亮高音，节奏平稳+语调平缓\n**对话：** 妈妈：宝贝，该起床了，上学要迟到了哦！\n\n**音色：** 萝莉音\n**说话人ID：** 2\n**情感：** 慵懒\n**台词语气：** 气声起，节奏拖慢+语调下沉\n**对话：** 女儿：妈妈，再让我睡五分钟嘛…\n\n**音色：** 男声\n**说话人ID：** 1\n**情感：** 平静\n**台词语气：** 喉音下沉，节奏平稳+语调平缓\n**对话：** 爸爸：小懒虫，再不起床就要错过早餐了。"
     ]
@@ -735,7 +735,7 @@ LYRICS_CREATION_ZH = {
         "语言优美，押韵自然",
         "natural模式：输出自然段落；structured模式：输出结构化提示词"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "流行",
@@ -762,7 +762,6 @@ OCR_ENHANCED_ZH = {
         "区分文字层级，艺术字体尽可能还原描述",
         "natural模式和structured模式均输出结构化提示词"
     ],
-    "constraints": {"max_length": 500},
     "examples": [
         {
             "natural": "【标题】\n  - 内容：Summer Sale\n  - 字体：粗体手写体（Brush Script）\n  - 颜色：#FF6600（橙色）\n  - 位置：顶部中央\n【副标题】\n  - 内容：全场5折起\n  - 字体：简约无衬线体\n  - 颜色：白色\n  - 位置：标题下方\n【正文】\n  - 内容：活动时间：7月1日-7月15日\n  - 字体：常规无衬线体\n  - 颜色：#333333\n  - 位置：中部\n【正文】\n  - 内容：限时特惠，数量有限\n  - 字体：常规无衬线体\n  - 颜色：#333333\n  - 位置：中部下方\n【标语】限时抢购、错过再等一年\n【其他文字】www.example.com，客服热线：400-123-4567"

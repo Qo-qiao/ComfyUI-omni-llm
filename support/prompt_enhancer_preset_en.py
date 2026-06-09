@@ -168,7 +168,7 @@ ZIMAGE_TURBO_EN = {
         "Clear style (Japanese fresh, Korean refined, European/American fashion)",
         "Must include technical parameters: image quality, resolution, film simulation"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "style_category": "Japanese Fresh",
@@ -208,7 +208,7 @@ FLUX2_KLEIN_EN = {
         "Lighting and color convey emotional mood, describe lighting angle, attenuation characteristics, shadow hardness",
         "May include technical parameters: micron-level details, 8K resolution, medium format"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "natural": "Eye-level shot, Hasselblad H6D-400c medium format, 80mm macro lens, f/2.8, shallow depth of field. A 25-year-old young woman sits quietly by a café window. She has fluffy brown hair falling naturally, tips slightly curled, delicate skin texture with pores naturally visible with slight size variation, capillary flush near alae of nose, natural melanin gradient in mid-cheek area, fine wrinkles at outer eye corners and under eyes, subcutaneous capillary color variations, pores呈现真实3D凹坑结构带微阴影 under 45-degree side-top lighting, uneven natural sebum glow on cheekbone and nose bridge, natural eyebrows, gentle and expressive eyes, lips showing natural pink color. She intently reads a hardcover book, focused on the pages, right hand fingers gently turning pages, left hand supporting the book base. Environment is a vintage café, beige-white sheer curtains half-drawn, afternoon sunlight streaming through, dark brown wooden table with warm grain texture, vintage copper lamp hanging from ceiling. Style is exquisite realistic photography, magazine editorial style, cinematic color grading. Afternoon soft side lighting from front-right at 45-degree angle, streaming through sheer curtains creating soft diffusion, natural highlights, mid-tones, shadow transitions, subtle hair rim light. Warm brown tones dominated, light beige knit sweater, overall low saturation, warm atmosphere. Details include visible skin pores, delicate fabric texture, natural table wood grain reflection, realistic book pages, coffee cup with delicate pattern. Technical parameters: shot on Hasselblad H6D-400c, hyper-detailed, 8K resolution, micron-level detail, medium format, 16-bit color depth. Clothing: light beige knit sweater, loose and comfortable, simple ribbed design at cuffs.",
@@ -235,7 +235,7 @@ ERNIE_IMAGE_EN = {
         "UI design: Emphasize user experience, layout, interaction elements, design system (rounded corners/shadows)",
         "Portrait/product/scene: Follow corresponding professional standards"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "Poster",
@@ -324,7 +324,7 @@ QWEN_IMAGE_2512_EN = {
         "Art illustration: Brush strokes, paint thickness, paper texture, canvas fibers visible at high resolution",
         "High-resolution features: Must describe microscopic details visible at 2512x2512 (fibers, particles, burrs, reflection highlights)"
     ],
-    "constraints": {"max_length": 600},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "Poster",
@@ -358,7 +358,7 @@ QWEN_IMAGE_EDIT_COMBINED_EN = {
         "Maintain core intent, enhance clarity and visual feasibility",
         "Added objects must be consistent with scene logic and style"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "task_rules": {
         "add_delete_replace": {
             "description": "Add, delete, replace tasks",
@@ -449,7 +449,7 @@ LTX2_EN = {
         "Describe actions with speed, direction, rhythm; emotion words → specific actions",
         "Emphasize lighting changes, color transitions, visual effects"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "natural": "The camera slowly pushes in, capturing a Japanese Zen garden. Morning sunlight filters through bamboo groves, casting soft shadows on the perfectly raked gravel. Koi swim in the pond, creating gentle ripples. Distant temple bells ring as incense smoke rises from a burner. The camera orbits the garden, showcasing the serene meditative atmosphere.",
@@ -490,7 +490,7 @@ WAN_T2V_EN = {
         "Emphasize micro-expressions, eye direction, body language",
         "Describe how people interact with objects for logical action sequences"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "category": "Sci-Fi",
@@ -521,7 +521,7 @@ WAN_I2V_EN = {
         "Movement should be subtle and natural, avoid violent movements",
         "Camera: prefer static or very slow shots, maintain static feeling"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "natural": "The camera holds steady on a woman wearing a pearl necklace, standing by a rain-streaked window. She slowly turns her head toward the right, a faint melancholic smile crossing her lips. Her eyes glisten as if recalling a distant memory. Her chest rises with a soft sigh, and she gently lifts a hand to touch the pearls at her neck. The rain continues to streak down the window, creating a nostalgic and contemplative atmosphere.",
@@ -550,7 +550,7 @@ WAN_FLF2V_EN = {
         "Transition actions must precisely correspond to visual differences",
         "Camera movement: static or slow unless differences come from camera movement"
     ],
-    "constraints": {"max_length": 500},
+    "constraints": {"max_length": 800},
     "examples": [
         {
             "natural": "From a serene young woman sitting on a wooden boat dock, to a shot of a paper boat floating away on the lake. She gently picks up the folded paper boat beside her, leans forward, and carefully places it on the water. The camera pans down to follow the boat as it catches the current, drifting further away. When the camera pans back up to her face, she is looking into the distance with a wistful expression.",
@@ -579,7 +579,7 @@ VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN = {
         "First determine if realistic or animated, use corresponding terminology",
         "Natural mode: output natural paragraph; structured mode: output structured prompt"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "Realistic",
@@ -609,7 +609,7 @@ VIDEO_TO_PROMPT_EN = {
         "Omit character field when no characters present",
         "Natural mode: output natural paragraph; structured mode: output structured prompt"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "Realistic",
@@ -640,7 +640,7 @@ VIDEO_DETAILED_SCENE_BREAKDOWN_EN = {
         "First determine if realistic or animated, use corresponding terminology",
         "Natural mode: output natural paragraph; structured mode: output structured prompt"
     ],
-    "constraints": {"max_length": 800},
+    "constraints": {"max_length": 1000},
     "examples": [
         {
             "category": "Realistic",
@@ -692,7 +692,7 @@ VIDEO_SUBTITLE_FORMAT_EN = {
         "Output text format directly, no JSON"
     ],
     "constraints": {
-        "max_length": 500,
+        "max_length": 1000,
         "content_type": "Strictly follow standard subtitle format, including timecode (00:00:00,000 --> 00:00:05,000), line tone (Four-Element Method), and subtitle text",
         "focus": "Ensure timecode and text synchronization, subtitles concise and smooth, fitting frame rhythm and emotion"
     },
@@ -745,7 +745,7 @@ MULTI_SPEAKER_DIALOGUE_EN = {
         "Middle-aged": {"speaker_id": 5, "description": "Deep male voice"}
     },
     "constraints": {
-        "max_length": 500,
+        "max_length": 800,
         "content_type": "Strictly create dialogue text with multiple speakers, including voice type, speaker_id, emotion label, line tone (Four-Element Method), and dialogue content",
         "focus": "Ensure dialogue smooth and natural, fitting character settings, containing appropriate emotional expression and tone changes"
     },
@@ -793,7 +793,7 @@ LYRICS_CREATION_EN = {
         "Use punctuation (ellipsis, tilde, em dash) in lyrics to express tone"
     ],
     "constraints": {
-        "max_length": 600,
+        "max_length": 1000,
         "content_type": "Strictly create professional English lyrics with complete song structure (Verse, Chorus, Bridge, Outro), and apply Four-Element Method to describe vocal tone",
         "focus": "Ensure lyrics have good rhythm, emotional depth, and singability"
     },
@@ -816,7 +816,6 @@ OCR_ENHANCED_EN = {
         "Differentiate text hierarchy, restore artistic font descriptions as much as possible",
         "Both natural mode and structured mode output structured prompt format"
     ],
-    "constraints": {"max_length": 500},
     "examples": [
         {
             "natural": "【Title】\n  - Content: Summer Sale\n  - Font: Bold handwritten (Brush Script)\n  - Color: #FF6600 (Orange)\n  - Position: Top center\n【Subtitle】\n  - Content: Up to 50% off\n  - Font: Minimalist sans-serif\n  - Color: White\n  - Position: Below title\n【Body Text】\n  - Content: Event period: July 1 - July 15\n  - Font: Regular sans-serif\n  - Color: #333333\n  - Position: Middle\n【Body Text】\n  - Content: Limited time offer, limited quantity\n  - Font: Regular sans-serif\n  - Color: #333333\n  - Position: Lower middle\n【Slogans】Limited time offer, Don't miss out next year\n【Other Text】www.example.com, Customer service: 400-123-4567"
