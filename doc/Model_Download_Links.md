@@ -110,6 +110,7 @@
 **Audio Types**: Not only handles pure speech, but also supports singing voices and songs with background music (strong anti-noise/music scene capability).
 **Applicable Scenarios**: Speech recognition, real-time speech-to-text, meeting recording, audio content extraction, subtitle generation
 **Download Link**: https://huggingface.co/Qwen/Qwen3-ASR-1.7B
+**Download Link (nsfw)**: https://huggingface.co/freeuser17/Qwen3-ASR-1.7B-Uncensored
 **ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B
 
 
