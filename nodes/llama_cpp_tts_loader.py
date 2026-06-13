@@ -27,79 +27,31 @@ class BaseTTSEngine:
     基础TTS引擎类
     所有TTS引擎的基类，定义了通用的接口和方法
     """
-    
+
     def __init__(self, model_path, config, device="cpu"):
-        """
-        初始化TTS引擎
-        
-        Args:
-            model_path: 模型路径
-            config: 配置参数
-            device: 运行设备 (cpu/cuda)
-        """
         self.model_path = model_path
         self.config = config or {}
         self.device = device
         self.model = None
         self.processor = None
         self.model_type = "base"
-    
+
     def load_model(self):
-        """
-        加载模型
-        子类需要实现此方法
-        """
         raise NotImplementedError("Subclass must implement load_model method")
-    
+
     def generate(self, text, **kwargs):
-        """
-        生成语音
-        子类需要实现此方法
-        
-        Args:
-            text: 要转换的文本
-            **kwargs: 额外的生成参数
-            
-        Returns:
-            生成的音频数据和采样率
-        """
         raise NotImplementedError("Subclass must implement generate method")
-    
+
     def get_speaker_ids(self):
-        """
-        获取可用的说话人ID列表
-        子类需要实现此方法
-        
-        Returns:
-            说话人ID列表
-        """
         raise NotImplementedError("Subclass must implement get_speaker_ids method")
-    
+
     def get_languages(self):
-        """
-        获取支持的语言列表
-        子类需要实现此方法
-        
-        Returns:
-            语言列表
-        """
         raise NotImplementedError("Subclass must implement get_languages method")
-    
+
     def get_emotions(self):
-        """
-        获取支持的情绪列表
-        子类需要实现此方法
-        
-        Returns:
-            情绪列表
-        """
         raise NotImplementedError("Subclass must implement get_emotions method")
-    
+
     def release(self):
-        """
-        释放模型资源
-        子类需要实现此方法
-        """
         raise NotImplementedError("Subclass must implement release method")
 
 
@@ -794,140 +746,23 @@ class QwenTTSEngine(BaseTTSEngine):
 class TTSEngineFactory:
     """
     TTS引擎工厂类
-    使用工厂模式创建不同类型的TTS引擎
+    创建 Qwen3-TTS 引擎
     """
-    
+
     @staticmethod
     def create_engine(model_path, config, device="cpu"):
         """
-        根据模型类型创建TTS引擎
-        
+        创建 Qwen3-TTS 引擎
+
         Args:
             model_path: 模型路径
             config: 配置参数
             device: 设备（cuda或cpu）
-            
+
         Returns:
-            相应的TTS引擎实例
+            QwenTTSEngine 实例
         """
-        # 从配置中获取模型类型
-        model_type = config.get("model_type", "Auto-detect")
-        
-        # 检测模型类型
-        detected_type = TTSEngineFactory._detect_model_type(model_path, model_type)
-        
-        # 根据检测到的类型创建引擎
-        if detected_type in ["qwen_tts", "Qwen3-TTS", "qwen3_tts"]:
-            return QwenTTSEngine(model_path, config, device)
-        elif detected_type in ["kani_tts", "KaniTTS"]:
-            # 后续可以添加Kani TTS引擎
-            pass
-        elif detected_type in ["bark", "Bark"]:
-            # 后续可以添加Bark TTS引擎
-            pass
-        elif detected_type in ["vits", "VITS"]:
-            # 后续可以添加VITS TTS引擎
-            pass
-        elif detected_type in ["xtts", "XTTS"]:
-            # 后续可以添加XTTS引擎
-            pass
-        
-        # 默认返回None
-        return None
-    
-    @staticmethod
-    def _detect_model_type(model_path, manual_type):
-        """
-        检测模型类型
-        
-        Args:
-            model_path: 模型路径
-            manual_type: 手动指定的模型类型
-            
-        Returns:
-            检测到的模型类型
-        """
-        import os
-        import json
-        
-        if manual_type != "自动检测" and manual_type != "Auto-detect":
-            # 处理手动指定的模型类型
-            type_lower = manual_type.lower()
-            if type_lower == "kanitts":
-                return "kani_tts"
-            elif type_lower == "qwen3-tts":
-                return "qwen_tts"
-            else:
-                return type_lower.replace("-", "_")
-        
-        filename = os.path.basename(model_path).lower()
-        dirname = os.path.basename(os.path.dirname(model_path)).lower()
-        full_path_lower = model_path.lower()
-        detection_text = f"{filename} {dirname} {full_path_lower}"
-        
-        # 尝试从config.json检测
-        if os.path.isdir(model_path):
-            config_path = os.path.join(model_path, 'config.json')
-        else:
-            config_path = os.path.join(os.path.dirname(model_path), 'config.json')
-        
-        if os.path.exists(config_path):
-            try:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config_data = json.load(f)
-                
-                architectures = config_data.get('architectures', [])
-                model_type_cfg = config_data.get('model_type', '')
-                
-                if "Qwen3TTSForConditionalGeneration" in architectures or model_type_cfg == "qwen3_tts":
-                    return "qwen_tts"
-                elif "Lfm2ForCausalLM" in architectures or model_type_cfg == "lfm2":
-                    return "kani_tts"
-            except Exception:
-                pass
-        
-        # 基于文件名和路径检测
-        if "voicedesign" in detection_text or "customvoice" in detection_text:
-            return "qwen_tts"
-        
-        if "qwen" in detection_text and "tts" in detection_text:
-            return "qwen_tts"
-        elif "ming" in detection_text and "tts" in detection_text:
-            # Ming Omni TTS 目前与 Qwen3-TTS 兼容
-            return "qwen_tts"
-        elif "omni" in detection_text and "tts" in detection_text:
-            return "qwen_tts"
-        elif "kani" in detection_text and "tts" in detection_text:
-            return "kani_tts"
-        elif "bark" in detection_text:
-            return "bark"
-        elif "tortoise" in detection_text:
-            return "tortoise"
-        elif "coqui" in detection_text or "your_tts" in detection_text:
-            return "coqui"
-        elif "xtts" in detection_text:
-            return "xtts"
-        elif "vits" in detection_text:
-            return "vits"
-        elif "glow" in detection_text:
-            return "glow_tts"
-        elif "supertonic" in detection_text:
-            if "supertonic-2" in detection_text or "supertonic2" in detection_text:
-                return "supertonic_2"
-            return "supertonic"
-        elif filename.endswith(".gguf"):
-            return "gguf_tts"
-        elif filename.endswith(".safetensors") or filename.endswith(".pt") or filename.endswith(".pth"):
-            return "pytorch_tts"
-        else:
-            # 尝试基于文件扩展名检测
-            ext = os.path.splitext(filename)[1].lower()
-            if ext in [".safetensors", ".pt", ".pth", ".bin"]:
-                return "pytorch_tts"
-            elif ext == ".gguf":
-                return "gguf_tts"
-            else:
-                return "unknown"
+        return QwenTTSEngine(model_path, config, device)
 
 
 # ========== 模型文件检测和下载功能 ==========
@@ -947,10 +782,8 @@ def _check_network_connection():
 def _get_model_source():
     """根据网络连接选择模型源"""
     if _check_network_connection():
-        # 国内网络使用魔搭社区
         return "modelscope"
     else:
-        # 国外网络使用Hugging Face
         return "huggingface"
 
 def _download_file(url, save_path):
@@ -958,17 +791,15 @@ def _download_file(url, save_path):
     try:
         print(f"【文件下载】开始下载: {url}")
         print(f"【文件下载】保存路径: {save_path}")
-        
-        # 创建目录
+
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        
-        # 下载文件
+
         response = requests.get(url, stream=True, timeout=30)
         response.raise_for_status()
-        
+
         with open(save_path, 'wb') as f:
             shutil.copyfileobj(response.raw, f)
-        
+
         print(f"【文件下载】下载完成: {save_path}")
         return True
     except Exception as e:
@@ -976,13 +807,11 @@ def _download_file(url, save_path):
         return False
 
 def _download_model_files(model_name, model_path):
-    """下载模型必备文件"""
+    """下载模型必备文件（Qwen3-TTS）"""
     source = _get_model_source()
     print(f"【模型下载】使用源: {source}")
-    
-    # 定义模型文件映射
+
     model_files = {
-        # Qwen3-TTS模型文件
         "qwen3_tts": {
             "modelscope": {
                 "model.safetensors": f"https://modelscope.cn/api/v1/models/qwen/Qwen3-TTS/snapshots/master/model.safetensors",
@@ -998,30 +827,13 @@ def _download_model_files(model_name, model_path):
                 "preprocessor_config.json": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/preprocessor_config.json",
                 "speech_tokenizer/config.json": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/speech_tokenizer/config.json"
             }
-        },
-        # KaniTTS模型文件
-        "kani_tts": {
-            "modelscope": {
-                "model.safetensors": f"https://modelscope.cn/api/v1/models/Kani/KaniTTS/snapshots/master/model.safetensors",
-                "config.json": f"https://modelscope.cn/api/v1/models/Kani/KaniTTS/snapshots/master/config.json"
-            },
-            "huggingface": {
-                "model.safetensors": f"https://huggingface.co/Kani/KaniTTS/resolve/main/model.safetensors",
-                "config.json": f"https://huggingface.co/Kani/KaniTTS/resolve/main/config.json"
-            }
         }
     }
-    
-    model_type = None
+
     if "qwen3" in model_name.lower() and "tts" in model_name.lower():
-        model_type = "qwen3_tts"
-    elif "kani" in model_name.lower() and "tts" in model_name.lower():
-        model_type = "kani_tts"
-    
-    if model_type and model_type in model_files:
-        files_to_download = model_files[model_type][source]
+        files_to_download = model_files["qwen3_tts"][source]
         success = True
-        
+
         for filename, url in files_to_download.items():
             save_path = os.path.join(model_path, filename)
             if not os.path.exists(save_path):
@@ -1029,36 +841,28 @@ def _download_model_files(model_name, model_path):
                     os.makedirs(os.path.dirname(save_path), exist_ok=True)
                 if not _download_file(url, save_path):
                     success = False
-        
+
         return success
     else:
         print(f"【模型下载】未知模型类型: {model_name}")
         return False
 
-def _check_tts_model_files(model_path, model_type):
-    """检查TTS模型必备文件"""
-    required_files = []
-    
-    if model_type == "qwen3_tts":
-        required_files = [
-            "model.safetensors",
-            "config.json",
-            "tokenizer_config.json",
-            "preprocessor_config.json",
-            "speech_tokenizer/config.json"
-        ]
-    elif model_type == "kani_tts":
-        required_files = [
-            "model.safetensors",
-            "config.json"
-        ]
-    
+def _check_tts_model_files(model_path):
+    """检查Qwen3-TTS模型必备文件"""
+    required_files = [
+        "model.safetensors",
+        "config.json",
+        "tokenizer_config.json",
+        "preprocessor_config.json",
+        "speech_tokenizer/config.json"
+    ]
+
     missing_files = []
     for filename in required_files:
         file_path = os.path.join(model_path, filename)
         if not os.path.exists(file_path):
             missing_files.append(filename)
-    
+
     return missing_files
 
 
@@ -1104,26 +908,18 @@ class llama_cpp_tts_loader:
                             dir_name = os.path.basename(root).lower()
                             full_path_lower = root.lower()
 
-                            # 检查是否是包含TTS关键词的目录
-                            # TTS关键词列表
+                            # TTS关键词列表（Qwen3-TTS相关）
                             tts_keywords = [
-                                "tts", "kani",
-                                "bark", "vits", "xtts", "coqui", "supertonic",
-                                "tortoise", "glow", "your_tts",
-                                "voice", "voicedesign", "customvoice", "custom_voice"
+                                "tts", "voicedesign", "customvoice", "custom_voice", "voice"
                             ]
 
-                            # 检查目录名或完整路径是否包含TTS关键词
                             has_tts_keyword = any(keyword in dir_name or keyword in full_path_lower for keyword in tts_keywords)
 
                             # 对于Qwen和Omni系列，必须有明确的TTS关键词
                             if "qwen" in dir_name or "qwen" in full_path_lower or "omni" in dir_name or "omni" in full_path_lower:
-                                # Qwen-Omni不是TTS模型，跳过
                                 if "omni" in dir_name or "omni" in full_path_lower:
-                                    # 只有包含明确TTS关键词的Omni才是TTS模型
                                     has_tts_keyword = any(kw in dir_name or kw in full_path_lower for kw in ["tts", "voice", "customvoice", "voicedesign"])
                                 else:
-                                    # 其他Qwen模型也必须有TTS关键词
                                     has_tts_keyword = any(kw in dir_name or kw in full_path_lower for kw in ["tts", "voice", "customvoice", "voicedesign"])
 
                             is_tts_dir = has_tts_keyword
@@ -1157,24 +953,19 @@ class llama_cpp_tts_loader:
                                 folder_path_lower = root.lower()
                                 folder_name_lower = dir_name.lower()
 
-                                # TTS关键词列表
+                                # TTS关键词列表（Qwen3-TTS相关）
                                 tts_keywords = [
-                                    "tts", "kani", "bark", "vits", "xtts",
-                                    "coqui", "supertonic", "tortoise", "glow", "your_tts",
-                                    "voice", "voicedesign", "customvoice", "custom_voice"
+                                    "tts", "voicedesign", "customvoice", "custom_voice", "voice"
                                 ]
 
                                 # 对于Qwen系列，必须有TTS相关的关键词
                                 if "qwen" in folder_path_lower or "qwen" in folder_name_lower or "omni" in folder_path_lower or "omni" in folder_name_lower:
-                                    # Qwen-Omni不是TTS模型，跳过
                                     if "omni" in folder_path_lower or "omni" in folder_name_lower:
                                         if not any(kw in folder_path_lower or kw in folder_name_lower for kw in ["tts", "voice", "customvoice", "voicedesign"]):
                                             continue
-                                    # 其他Qwen模型也必须有TTS关键词
                                     elif not any(kw in folder_path_lower or kw in folder_name_lower for kw in ["tts", "voice", "customvoice", "voicedesign"]):
                                         continue
                                 elif not any(kw in folder_path_lower or kw in folder_name_lower for kw in tts_keywords):
-                                    # 非Qwen模型也必须有TTS关键词
                                     continue
 
                                 # 通过了所有检查，添加为TTS模型
@@ -1200,12 +991,9 @@ class llama_cpp_tts_loader:
                                 folder_path_lower = root.lower()
                                 folder_name_lower = dir_name.lower()
 
-                                # TTS关键词列表
+                                # TTS关键词列表（Qwen3-TTS相关）
                                 tts_keywords = [
-                                    "tts", "kani",
-                                    "bark", "vits", "xtts", "coqui", "supertonic",
-                                    "tortoise", "glow", "your_tts",
-                                    "voice", "voicedesign", "customvoice", "custom_voice"
+                                    "tts", "voicedesign", "customvoice", "custom_voice", "voice"
                                 ]
 
                                 # 检查是否包含TTS关键词
@@ -1213,15 +1001,12 @@ class llama_cpp_tts_loader:
 
                                 # 对于Qwen系列，必须有TTS相关的关键词
                                 if "qwen" in folder_path_lower or "qwen" in folder_name_lower:
-                                    # Qwen-Omni不是TTS模型，跳过
                                     if "omni" in folder_path_lower or "omni" in folder_name_lower:
                                         if not any(kw in folder_path_lower or kw in folder_name_lower for kw in ["tts", "voice", "customvoice", "voicedesign"]):
                                             continue
-                                    # 其他Qwen模型也必须有TTS关键词
                                     elif not has_tts_keyword:
                                         continue
                                 elif not has_tts_keyword:
-                                    # 非Qwen模型也必须有TTS关键词
                                     continue
                                     
                                     if current_folder_name:
@@ -1248,23 +1033,14 @@ class llama_cpp_tts_loader:
         if len(tts_list) == 1:
             tts_list = ["None", "请将TTS模型放入models/LLM文件夹"]
 
-        perf_level = HARDWARE_INFO.get("perf_level", "low")
-
-        if perf_level in ["high", "mid_high", "mid", "mid_low"]:
-            default_n_gpu_layers = -1
-        else:
-            default_n_gpu_layers = 20
-
         return {
             "required": {
-                "tts_model": (tts_list, {"tooltip": "选择TTS模型文件\n• 主流：Qwen3-TTS、KaniTTS\n• 其他：Bark、VITS、XTTS、Coqui、Supertonic等"}),
-                "n_gpu_layers": ("INT", {"default": default_n_gpu_layers, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载"}),
+                "tts_model": (tts_list, {"tooltip": "选择TTS模型（Qwen3-TTS）\n• 支持9种高级音色和多种情绪风格"}),
                 "sample_rate": ("INT", {"default": 24000, "min": 8000, "max": 48000, "step": 100, "tooltip": "音频采样率（Hz），Qwen3-TTS推荐24000"}),
-                "model_type": (["Auto-detect", "Qwen3-TTS", "KaniTTS", "Bark", "VITS", "XTTS", "Coqui", "Supertonic", "Supertonic-2", "GGUF-TTS", "PyTorch-TTS"], {"default": "Auto-detect", "tooltip": "模型类型，通常选择自动检测即可"}),
             },
             "optional": {
                 "voice": (["Vivian - 明亮略带锐气的年轻女声 (中文)", "Serena - 温暖柔和的年轻女声 (中文)", "Uncle_Fu - 音色低沉醇厚的成熟男声 (中文)", "Dylan - 清晰自然的北京青年男声 (中文北京方言)", "Eric - 活泼略带沙哑明亮感的成都男声 (中文四川方言)", "Ryan - 富有节奏感的动态男声 (英语)", "Aiden - 清晰中频的阳光美式男声 (英语)", "Ono_Anna - 轻快灵活的俏皮日语女声 (日语)", "Sohee - 富含情感的温暖韩语女声 (韩语)"], {"default": "Vivian - 明亮略带锐气的年轻女声 (中文)", "tooltip": "选择音色类型（Qwen3-TTS CustomVoice支持9种高级音色）"}),
-                "emotion": (["default", "happy", "sad", "angry", "surprised", "calm", "excited", "gentle"], {"default": "default", "tooltip": "选择情绪风格（主流TTS模型支持）"}),
+                "emotion": (["default", "happy", "sad", "angry", "surprised", "calm", "excited", "gentle"], {"default": "default", "tooltip": "选择情绪风格"}),
                 "language": (["中文", "English", "Japanese", "Korean", "German", "French", "Russian", "Portuguese", "Spanish", "Italian"], {"default": "中文", "tooltip": "选择合成语言（Qwen3-TTS支持10种语言）"}),
                 "temperature": ("FLOAT", {"default": 0.7, "min": 0.1, "max": 2.0, "step": 0.1, "tooltip": "生成温度，值越高越随机"}),
                 "top_p": ("FLOAT", {"default": 0.9, "min": 0.1, "max": 1.0, "step": 0.05, "tooltip": "核采样参数，控制生成多样性"}),
@@ -1353,7 +1129,7 @@ class llama_cpp_tts_loader:
     }
 
     @classmethod
-    def IS_CHANGED(s, tts_model, n_gpu_layers, sample_rate, model_type,
+    def IS_CHANGED(s, tts_model, sample_rate,
                   voice="Vivian", emotion="default", language="中文", speed=1.0, temperature=0.7, top_p=0.9, top_k=50,
                   repetition_penalty=1.1, max_new_tokens=2048, use_cache=True,
                   ref_audio_path="", pitch=0.0, volume=1.0):
@@ -1369,9 +1145,7 @@ class llama_cpp_tts_loader:
         config = OrderedDict([
             ("tts_model", tts_model),
             ("tts_model_path", resolved_path or ""),
-            ("n_gpu_layers", n_gpu_layers),
             ("sample_rate", sample_rate),
-            ("model_type", model_type),
             ("speaker_id", speaker_id),
             ("emotion", emotion_value),
             ("language", language),
@@ -1391,7 +1165,7 @@ class llama_cpp_tts_loader:
         print(f"【IS_CHANGED】模型: {tts_model}, 解析路径: {resolved_path}, 配置哈希: {hash(result) % 10000}")
         return result
 
-    def load_tts_model(self, tts_model, n_gpu_layers, sample_rate, model_type,
+    def load_tts_model(self, tts_model, sample_rate,
                       voice="Vivian", emotion="default", language="中文", speed=1.0, temperature=0.7, top_p=0.9, top_k=50,
                       repetition_penalty=1.1, max_new_tokens=2048, use_cache=True,
                       ref_audio_path="", pitch=0.0, volume=1.0):
@@ -1415,9 +1189,7 @@ class llama_cpp_tts_loader:
             from collections import OrderedDict
             config = OrderedDict([
                 ("tts_model", tts_model),
-                ("n_gpu_layers", n_gpu_layers),
                 ("sample_rate", sample_rate),
-                ("model_type", model_type),
                 ("speaker_id", speaker_id),
                 ("emotion", emotion_value),
                 ("language", language),
@@ -1477,8 +1249,7 @@ class llama_cpp_tts_loader:
                 print(f"【TTS统一加载器】检测到文件路径，自动使用所在目录: {model_path}")
             
             print(f"【TTS统一加载器】模型路径: {model_path}")
-            print(f"【TTS统一加载器】运行模式: GPU, GPU层数: {n_gpu_layers}")
-            print(f"【TTS统一加载器】采样率: {sample_rate}Hz, 模型类型: {model_type}")
+            print(f"【TTS统一加载器】采样率: {sample_rate}Hz")
 
             # 检测模型类型并检查必备文件
             model_dir = model_path
@@ -1493,7 +1264,7 @@ class llama_cpp_tts_loader:
             # 检查必备文件
             if detected_model_type:
                 print(f"【TTS统一加载器】检测模型类型: {detected_model_type}")
-                missing_files = _check_tts_model_files(model_dir, detected_model_type)
+                missing_files = _check_tts_model_files(model_dir)
                 
                 if missing_files:
                     print(f"【TTS统一加载器】检测到缺失文件: {missing_files}")
@@ -1540,9 +1311,9 @@ model_cache = {}
 class UnifiedTTSModelWrapper:
     """
     统一TTS模型包装器
-    支持所有TTS模型类型
+    支持Qwen3-TTS及未来扩展的TTS模型
     """
-    
+
     VOICE_MAP = {
         "Vivian": 0,
         "Serena": 1,
@@ -1577,11 +1348,9 @@ class UnifiedTTSModelWrapper:
         self.model_type = "unknown"
         self.tts_engine = None
 
-        # 生成缓存键
         cache_key = self._generate_cache_key(model_path, config, device)
         print(f"【TTS统一包装器】生成缓存键: {cache_key}")
 
-        # 检查缓存
         global model_cache
         if cache_key in model_cache:
             print(f"【TTS统一包装器】从缓存加载模型")
@@ -1593,82 +1362,34 @@ class UnifiedTTSModelWrapper:
             print(f"【TTS统一包装器】缓存加载成功，模型类型: {self.model_type}")
             return
 
-        # 检测模型类型
-        model_type_manual = config.get("model_type", "Auto-detect")
-        self.model_type = TTSEngineFactory._detect_model_type(model_path, model_type_manual)
-        print(f"【TTS统一包装器】检测到模型类型: {self.model_type}")
+        # 仅支持 Qwen3-TTS
+        self.model_type = "qwen_tts"
+        print(f"【TTS统一包装器】模型类型: {self.model_type}")
 
-        # 根据模型类型直接加载
-        if self.model_type in ["qwen_tts", "Qwen3-TTS", "qwen3_tts"]:
-            self._load_qwen_tts_model()
-        elif self.model_type in ["kani_tts", "KaniTTS"]:
-            self._load_kani_tts_model()
-        elif self.model_type in ["bark", "Bark"]:
-            self._load_bark_model()
-        elif self.model_type in ["vits", "VITS"]:
-            self._load_vits_model()
-        elif self.model_type in ["xtts", "XTTS"]:
-            self._load_xtts_model()
-        elif self.model_type in ["coqui", "Coqui"]:
-            self._load_coqui_model()
-        elif self.model_type in ["supertonic", "Supertonic"]:
-            self._load_supertonic_model()
-        elif self.model_type in ["supertonic_2", "Supertonic-2"]:
-            self._load_supertonic_2_model()
-        elif self.model_type in ["gguf_tts", "GGUF-TTS"]:
-            self._load_gguf_model()
-        elif self.model_type in ["pytorch_tts", "PyTorch-TTS"]:
-            self._load_pytorch_model()
-        else:
-            print(f"【TTS统一包装器警告】未知模型类型: {self.model_type}")
+        # 加载 Qwen3-TTS 模型
+        self._load_qwen_tts_model()
 
-        # 加载完成后检查模型状态
         if self.model is None:
             print(f"【TTS统一包装器错误】模型加载失败，self.model 为 None")
             print(f"【TTS统一包装器错误】模型类型: {self.model_type}")
             print(f"【TTS统一包装器错误】模型路径: {self.model_path}")
         else:
             print(f"【TTS统一包装器】模型加载完成，模型对象类型: {type(self.model).__name__}")
-            # 缓存模型
             model_cache[cache_key] = self
             print(f"【TTS统一包装器】模型已缓存，当前缓存大小: {len(model_cache)}")
 
     def _generate_cache_key(self, model_path, config, device):
-        """
-        生成缓存键
-        
-        Args:
-            model_path: 模型路径
-            config: 配置参数
-            device: 设备
-            
-        Returns:
-            缓存键字符串
-        """
         import json
         from collections import OrderedDict
-        
-        # 提取关键配置参数
+
         key_config = OrderedDict([
             ("model_path", os.path.normpath(model_path)),
-            ("model_type", config.get("model_type", "Auto-detect")),
             ("device", device),
-            ("n_gpu_layers", config.get("n_gpu_layers", 0)),
         ])
-        
+
         return json.dumps(key_config, ensure_ascii=False)
-    
+
     def generate(self, text, **kwargs):
-        """
-        生成语音
-
-        Args:
-            text: 要转换的文本
-            **kwargs: 额外的生成参数
-
-        Returns:
-            生成的音频数据和采样率
-        """
         return self.synthesize(
             text=text,
             speaker_id=kwargs.get("speaker_id", 0),
@@ -1679,32 +1400,17 @@ class UnifiedTTSModelWrapper:
             volume=kwargs.get("volume", 1.0),
             ref_audio_path=kwargs.get("ref_audio_path")
         )
-    
-    def get_speaker_ids(self):
-        """
-        获取可用的说话人ID列表
 
-        Returns:
-            说话人ID列表
-        """
+    def get_speaker_ids(self):
+        """获取可用的说话人ID列表"""
         return list(range(9))
 
     def get_languages(self):
-        """
-        获取支持的语言列表
-
-        Returns:
-            语言列表
-        """
+        """获取支持的语言列表"""
         return ["chinese", "english", "japanese", "korean", "german", "french", "russian", "portuguese", "spanish", "italian"]
 
     def get_emotions(self):
-        """
-        获取支持的情绪列表
-
-        Returns:
-            情绪列表
-        """
+        """获取支持的情绪列表"""
         return ["default", "happy", "sad", "angry", "surprised", "calm", "excited", "gentle"]
 
     def release(self):
@@ -1859,186 +1565,6 @@ class UnifiedTTSModelWrapper:
             traceback.print_exc()
             self.model = None
 
-    def _load_kani_tts_model(self):
-        try:
-            from transformers import AutoModelForTextToSpeech, AutoProcessor
-            print(f"【KaniTTS】正在加载模型...")
-
-            self.processor = AutoProcessor.from_pretrained(self.model_path, trust_remote_code=True)
-            self.model = AutoModelForTextToSpeech.from_pretrained(
-                self.model_path,
-                trust_remote_code=True,
-                torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
-                low_cpu_mem_usage=True
-            )
-
-            if self.device == "cuda" and torch.cuda.is_available():
-                self.model = self.model.to("cuda")
-                print(f"【KaniTTS】模型已加载到 GPU")
-            else:
-                print(f"【KaniTTS】模型已加载到 CPU")
-            print(f"【KaniTTS】模型加载成功")
-
-        except ImportError:
-            print("【KaniTTS错误】未安装transformers库")
-        except Exception as e:
-            print(f"【KaniTTS错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_bark_model(self):
-        try:
-            from bark import preload_models
-            print(f"【Bark】正在加载模型...")
-
-            preload_models(
-                text_use_gpu=self.device == "cuda",
-                fine_use_gpu=self.device == "cuda",
-                coarse_use_gpu=self.device == "cuda",
-                codec_use_gpu=self.device == "cuda"
-            )
-            self.model = "bark"
-            print(f"【Bark】模型加载成功")
-
-        except ImportError:
-            print("【Bark错误】未安装bark库，请运行: pip install bark")
-        except Exception as e:
-            print(f"【Bark错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_vits_model(self):
-        try:
-            print(f"【VITS】正在加载模型...")
-            if self.model_path.endswith(".pt") or self.model_path.endswith(".pth"):
-                state_dict = torch.load(self.model_path, map_location="cpu")
-                self.model = {"state_dict": state_dict}
-                print(f"【VITS】模型加载成功")
-            else:
-                print(f"【VITS错误】不支持的模型格式")
-        except Exception as e:
-            print(f"【VITS错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_xtts_model(self):
-        try:
-            from TTS.api import TTS
-            print(f"【XTTS】正在加载模型...")
-
-            self.model = TTS(model_path=self.model_path, config_path=os.path.join(os.path.dirname(self.model_path), "config.json"))
-            if self.device == "cuda" and torch.cuda.is_available():
-                self.model = self.model.to("cuda")
-                print(f"【XTTS】模型已加载到 GPU")
-            else:
-                print(f"【XTTS】模型已加载到 CPU")
-            print(f"【XTTS】模型加载成功")
-
-        except ImportError:
-            print("【XTTS错误】未安装TTS库，请运行: pip install TTS")
-        except Exception as e:
-            print(f"【XTTS错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_coqui_model(self):
-        try:
-            from TTS.api import TTS
-            print(f"【Coqui】正在加载模型...")
-
-            self.model = TTS(model_path=self.model_path, config_path=os.path.join(os.path.dirname(self.model_path), "config.json"))
-            if self.device == "cuda" and torch.cuda.is_available():
-                self.model = self.model.to("cuda")
-                print(f"【Coqui】模型已加载到 GPU")
-            else:
-                print(f"【Coqui】模型已加载到 CPU")
-            print(f"【Coqui】模型加载成功")
-
-        except ImportError:
-            print("【Coqui错误】未安装TTS库")
-        except Exception as e:
-            print(f"【Coqui错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_supertonic_model(self):
-        try:
-            import onnxruntime as ort
-            print(f"【Supertonic】正在加载模型...")
-
-            providers = ["CUDAExecutionProvider"] if self.device == "cuda" else ["CPUExecutionProvider"]
-            self.model = ort.InferenceSession(self.model_path, providers=providers)
-            print(f"【Supertonic】模型加载成功")
-
-        except ImportError:
-            print("【Supertonic错误】未安装onnxruntime库")
-        except Exception as e:
-            print(f"【Supertonic错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_supertonic_2_model(self):
-        try:
-            import onnxruntime as ort
-            print(f"【Supertonic-2】正在加载模型...")
-
-            providers = ["CUDAExecutionProvider"] if self.device == "cuda" else ["CPUExecutionProvider"]
-            self.model = ort.InferenceSession(self.model_path, providers=providers)
-            print(f"【Supertonic-2】模型加载成功")
-
-        except ImportError:
-            print("【Supertonic-2错误】未安装onnxruntime库")
-        except Exception as e:
-            print(f"【Supertonic-2错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_gguf_model(self):
-        try:
-            from llama_cpp import Llama
-            print(f"【GGUF TTS】正在加载模型...")
-
-            n_gpu_layers = self.config.get("n_gpu_layers", 0)
-            n_ctx = 8192
-            n_audio_ctx = 8192
-
-            self.model = Llama(
-                model_path=self.model_path, 
-                n_gpu_layers=n_gpu_layers, 
-                n_ctx=n_ctx, 
-                verbose=False,
-                audio=True,
-                n_audio_ctx=n_audio_ctx,
-                tensor_split=None,
-                offload_kqv=True
-            )
-            print(f"【GGUF TTS】模型加载成功，GPU层数: {n_gpu_layers}")
-
-        except ImportError:
-            print("【GGUF TTS错误】未安装llama-cpp-python库")
-        except Exception as e:
-            print(f"【GGUF TTS错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def _load_pytorch_model(self):
-        try:
-            print(f"【PyTorch TTS】正在加载模型...")
-
-            if self.model_path.endswith(".safetensors"):
-                from safetensors.torch import load_file
-                state_dict = load_file(self.model_path)
-            else:
-                state_dict = torch.load(self.model_path, map_location="cpu")
-
-            self.model = {"state_dict": state_dict}
-            print(f"【PyTorch TTS】模型加载成功")
-
-        except Exception as e:
-            print(f"【PyTorch TTS错误】加载模型失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
     # ========== 语音合成方法 ==========
 
     def synthesize(self, text, speaker_id=None, speed=None, emotion=None, language=None, temperature=None, top_p=None,
@@ -2090,30 +1616,8 @@ class UnifiedTTSModelWrapper:
         }
 
         try:
-            # 根据模型类型调用对应的合成方法
-            if self.model_type in ["qwen_tts", "Qwen3-TTS", "qwen3_tts"]:
-                return self._synthesize_qwen_tts(text, speaker_id, speed, sample_rate, ref_audio_path, pitch, volume, emotion, language)
-            elif self.model_type in ["kani_tts", "KaniTTS"]:
-                return self._synthesize_kani_tts(text, speaker_id, speed, sample_rate)
-            elif self.model_type in ["bark", "Bark"]:
-                return self._synthesize_bark(text, speed, sample_rate)
-            elif self.model_type in ["vits", "VITS"]:
-                return self._synthesize_vits(text, speed, sample_rate)
-            elif self.model_type in ["xtts", "XTTS"]:
-                return self._synthesize_xtts(text, speed, sample_rate)
-            elif self.model_type in ["coqui", "Coqui"]:
-                return self._synthesize_coqui(text, speed, sample_rate)
-            elif self.model_type in ["supertonic", "Supertonic"]:
-                return self._synthesize_supertonic(text, speed, sample_rate)
-            elif self.model_type in ["supertonic_2", "Supertonic-2"]:
-                return self._synthesize_supertonic_2(text, speed, sample_rate)
-            elif self.model_type in ["gguf_tts", "GGUF-TTS"]:
-                return self._synthesize_gguf(text, speed, sample_rate)
-            elif self.model_type in ["pytorch_tts", "PyTorch-TTS"]:
-                return self._synthesize_pytorch_tts(text, speed, sample_rate)
-            else:
-                print(f"【TTS合成错误】不支持的模型类型: {self.model_type}")
-                return None
+            # 调用 Qwen3-TTS 合成
+            return self._synthesize_qwen_tts(text, speaker_id, speed, sample_rate, ref_audio_path, pitch, volume, emotion, language)
 
         except Exception as e:
             print(f"【TTS合成错误】语音合成失败: {str(e)}")
@@ -2200,7 +1704,7 @@ class UnifiedTTSModelWrapper:
                                 if audio is not None:
                                     print(f"【Qwen3-TTS 合成】generate_custom_voice成功")
                             except Exception as e:
-                                print(f"【Qwen3-TTS 合成】generate_custom_voice失败: {e}")
+                                print(f"【Qwen3-TTS 合成】generate_custom_voice不支持，尝试其他方法: {e}")
 
                         # 方式2: generate方法
                         if audio is None and has_generate:
@@ -2220,7 +1724,7 @@ class UnifiedTTSModelWrapper:
                                 if audio is not None:
                                     print(f"【Qwen3-TTS 合成】generate方法成功")
                             except Exception as e:
-                                print(f"【Qwen3-TTS 合成】generate方法失败: {e}")
+                                print(f"【Qwen3-TTS 合成】generate方法不支持，尝试其他方法: {e}")
 
                         # 方式3: tts方法
                         if audio is None and has_tts:
@@ -2238,7 +1742,7 @@ class UnifiedTTSModelWrapper:
                                 if audio is not None:
                                     print(f"【Qwen3-TTS 合成】tts方法成功")
                             except Exception as e:
-                                print(f"【Qwen3-TTS 合成】tts方法失败: {e}")
+                                print(f"【Qwen3-TTS 合成】tts方法不支持，尝试其他方法: {e}")
 
                         # 方式4: generate_voice_design (VoiceDesign模型专用，较慢)
                         if audio is None and has_generate_voice_design:
@@ -2259,7 +1763,7 @@ class UnifiedTTSModelWrapper:
                                 if audio is not None:
                                     print(f"【Qwen3-TTS 合成】generate_voice_design成功")
                             except Exception as e:
-                                print(f"【Qwen3-TTS 合成】generate_voice_design失败: {e}")
+                                print(f"【Qwen3-TTS 合成】generate_voice_design不支持，尝试其他方法: {e}")
 
                     if audio is None:
                         print("【Qwen3-TTS 合成错误】所有调用方式都失败")
@@ -2272,15 +1776,7 @@ class UnifiedTTSModelWrapper:
                         audio = np.array(audio, dtype=np.float32)
 
                     print(f"【Qwen3-TTS 合成】qwen-tts 生成完成，音频形状: {audio.shape}")
-                    
-                    # 转换为 numpy
-                    if isinstance(audio, torch.Tensor):
-                        audio = audio.cpu().numpy()
-                    elif isinstance(audio, list):
-                        audio = np.array(audio, dtype=np.float32)
-                    
-                    print(f"【Qwen3-TTS 合成】qwen-tts 生成完成，音频形状: {audio.shape}")
-                    
+
                 except Exception as qwen_error:
                     print(f"【Qwen3-TTS 合成错误】qwen-tts 生成失败: {str(qwen_error)}")
                     import traceback
@@ -2420,244 +1916,6 @@ class UnifiedTTSModelWrapper:
             traceback.print_exc()
             return None
 
-    def _synthesize_kani_tts(self, text, speaker_id, speed, sample_rate):
-        try:
-            if self.model is None or self.processor is None:
-                raise RuntimeError("模型未加载")
-
-            inputs = self.processor(text=text, speaker_id=speaker_id, return_tensors="pt")
-            if self.device == "cuda" and torch.cuda.is_available():
-                inputs = {k: v.to("cuda") for k, v in inputs.items()}
-
-            with torch.no_grad():
-                outputs = self.model.generate(**inputs, speed=speed)
-
-            audio = outputs.get("audio", outputs.get("waveform", outputs)) if isinstance(outputs, dict) else outputs
-            if isinstance(audio, torch.Tensor):
-                audio = audio.cpu().numpy()
-
-            audio = audio.squeeze()
-            if audio.ndim > 1:
-                audio = audio.mean(axis=0)
-            if audio.dtype != np.float32:
-                audio = audio.astype(np.float32)
-
-            max_val = np.abs(audio).max()
-            if max_val > 0:
-                audio = audio / max_val
-
-            return {"waveform": audio, "sample_rate": sample_rate}
-
-        except Exception as e:
-            print(f"【KaniTTS合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_bark(self, text, speed, sample_rate):
-        try:
-            from bark import generate_audio
-            audio_array = generate_audio(text, history_prompt=None)
-
-            audio = np.array(audio_array) if not isinstance(audio_array, np.ndarray) else audio_array
-            audio = audio.squeeze()
-            if audio.ndim > 1:
-                audio = audio.mean(axis=0)
-            if audio.dtype != np.float32:
-                audio = audio.astype(np.float32)
-
-            max_val = np.abs(audio).max()
-            if max_val > 0:
-                audio = audio / max_val
-
-            return {"waveform": audio, "sample_rate": sample_rate}
-
-        except Exception as e:
-            print(f"【Bark合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_vits(self, text, speed, sample_rate):
-        try:
-            print(f"【VITS合成】VITS模型合成需要自定义实现")
-            return None
-        except Exception as e:
-            print(f"【VITS合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_xtts(self, text, speed, sample_rate):
-        try:
-            if self.model is None:
-                raise RuntimeError("模型未加载")
-
-            wav = self.model.tts(text=text, speed=speed)
-            audio = np.array(wav) if not isinstance(wav, np.ndarray) else wav
-
-            audio = audio.squeeze()
-            if audio.ndim > 1:
-                audio = audio.mean(axis=0)
-            if audio.dtype != np.float32:
-                audio = audio.astype(np.float32)
-
-            max_val = np.abs(audio).max()
-            if max_val > 0:
-                audio = audio / max_val
-
-            return {"waveform": audio, "sample_rate": sample_rate}
-
-        except Exception as e:
-            print(f"【XTTS合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_coqui(self, text, speed, sample_rate):
-        try:
-            if self.model is None:
-                raise RuntimeError("模型未加载")
-
-            wav = self.model.tts(text=text, speed=speed)
-            audio = np.array(wav) if not isinstance(wav, np.ndarray) else wav
-
-            audio = audio.squeeze()
-            if audio.ndim > 1:
-                audio = audio.mean(axis=0)
-            if audio.dtype != np.float32:
-                audio = audio.astype(np.float32)
-
-            max_val = np.abs(audio).max()
-            if max_val > 0:
-                audio = audio / max_val
-
-            return {"waveform": audio, "sample_rate": sample_rate}
-
-        except Exception as e:
-            print(f"【Coqui合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_supertonic(self, text, speed, sample_rate):
-        try:
-            print(f"【Supertonic合成】Supertonic模型合成需要自定义实现")
-            return None
-        except Exception as e:
-            print(f"【Supertonic合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_supertonic_2(self, text, speed, sample_rate):
-        try:
-            print(f"【Supertonic-2合成】Supertonic-2模型合成需要自定义实现")
-            return None
-        except Exception as e:
-            print(f"【Supertonic-2合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_gguf(self, text, speed, sample_rate):
-        try:
-            if self.model is None:
-                raise RuntimeError("模型未加载")
-
-            print(f"【GGUF TTS合成】开始合成音频...")
-
-            # 检查模型是否支持 create_audio 方法
-            if not hasattr(self.model, 'create_audio'):
-                print("【GGUF TTS合成错误】模型不支持音频合成功能")
-                return None
-
-            # 默认参数
-            voice = "default"
-            pitch = 1.0
-
-            # 生成音频
-            audio_result = self.model.create_audio(
-                text=text,
-                speed=speed,
-                voice=voice
-            )
-
-            # 处理音频数据
-            samples = audio_result.get("samples")
-            if samples is None:
-                print("【GGUF TTS合成错误】未获取到音频数据")
-                return None
-
-            audio = np.array(samples, dtype=np.float32)
-            audio = audio.squeeze()
-
-            if audio.ndim > 1:
-                audio = audio.mean(axis=0)
-            if audio.dtype != np.float32:
-                audio = audio.astype(np.float32)
-
-            max_val = np.abs(audio).max()
-            if max_val > 0:
-                audio = audio / max_val
-
-            return {"waveform": audio, "sample_rate": 24000}  # GGUF TTS 固定采样率
-
-        except Exception as e:
-            print(f"【GGUF TTS合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
-    def _synthesize_pytorch_tts(self, text, speed, sample_rate):
-        try:
-            print(f"【PyTorch TTS合成】进入通用回退处理，尝试从已加载模型获取音频")
-
-            if self.model is None:
-                print("【PyTorch TTS合成】模型未加载，无法生成")
-                return None
-
-            # 如果加载的模型是HuggingFace Transformers Text-to-Speech，可尝试直接调用 generate
-            if hasattr(self.model, 'generate'):
-                print("【PyTorch TTS合成】检测到generate方法，尝试调用")
-                with torch.no_grad():
-                    outputs = self.model.generate(text)
-
-                audio = None
-                if isinstance(outputs, dict):
-                    audio = outputs.get('audio') or outputs.get('waveform') or outputs.get('speech')
-                else:
-                    audio = outputs
-
-                if audio is None:
-                    print("【PyTorch TTS合成】generate未返回音频字段")
-                    return None
-
-                if isinstance(audio, torch.Tensor):
-                    audio = audio.cpu().numpy()
-                elif isinstance(audio, list):
-                    audio = np.array(audio, dtype=np.float32)
-
-                audio = np.array(audio, dtype=np.float32)
-                audio = audio.squeeze()
-                if audio.ndim > 1:
-                    audio = audio.mean(axis=0)
-
-                max_val = np.max(np.abs(audio)) if audio.size else 0
-                if max_val > 0:
-                    audio = audio / max_val
-
-                return {"waveform": audio, "sample_rate": sample_rate}
-
-            print("【PyTorch TTS合成】当前模型缺少generate方法，无法自动合成，请手动指定模型类型或实现自定义合成逻辑")
-            return None
-
-        except Exception as e:
-            print(f"【PyTorch TTS合成错误】{str(e)}")
-            import traceback
-            traceback.print_exc()
-            return None
-
     def get_model_info(self):
         return {
             "model_type": self.model_type,
@@ -2676,31 +1934,9 @@ class UnifiedTTSModelWrapper:
                 print("【TTS合成错误】模型未加载")
                 return None
 
-            # 根据模型类型调用对应的合成方法
-            if self.model_type in ["qwen_tts", "Qwen3-TTS", "qwen3_tts"]:
-                tts_language = language if language is not None else self.config.get("language", "中文")
-                return self._synthesize_qwen_tts(text, speaker_id, speed, self.config.get("sample_rate", 24000), ref_audio_path, pitch, volume, emotion, tts_language)
-            elif self.model_type in ["kani_tts", "KaniTTS"]:
-                return self._synthesize_kani_tts(text, speaker_id, speed, self.config.get("sample_rate", 24000), ref_audio_path, pitch, volume)
-            elif self.model_type == "bark":
-                return self._synthesize_bark(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "vits":
-                return self._synthesize_vits(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "xtts":
-                return self._synthesize_xtts(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "coqui":
-                return self._synthesize_coqui(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "supertonic":
-                return self._synthesize_supertonic(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "supertonic_2":
-                return self._synthesize_supertonic_2(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "gguf_tts":
-                return self._synthesize_gguf(text, self.config.get("sample_rate", 24000))
-            elif self.model_type == "pytorch_tts":
-                return self._synthesize_pytorch_tts(text, self.config.get("sample_rate", 24000))
-            else:
-                print(f"【TTS合成错误】不支持的模型类型: {self.model_type}")
-                return None
+            # 调用 Qwen3-TTS 合成
+            tts_language = language if language is not None else self.config.get("language", "中文")
+            return self._synthesize_qwen_tts(text, speaker_id, speed, self.config.get("sample_rate", 24000), ref_audio_path, pitch, volume, emotion, tts_language)
 
         except Exception as e:
             print(f"【TTS合成错误】{str(e)}")

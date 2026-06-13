@@ -34,7 +34,11 @@ class llama_cpp_parameters:
                 "mirostat_eta": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Mirostat学习率"}),
                 "mirostat_tau": ("FLOAT", {"default": 5.0, "min": 0.0, "max": 10.0, "step": 0.01, "tooltip": "Mirostat目标困惑度"}),
                 "state_uid": ("INT", {"default": -1, "min": -1, "max": 999999, "step": 1, "tooltip": "对话状态ID，-1=使用节点唯一ID"}),
-            }
+            },
+            "optional": {
+                # 推理预算控制参数（用于Qwen3.5-Thinking等支持thinking模式的模型）
+                "reasoning_budget": ("INT", {"default": -1, "min": -1, "max": 1024, "step": 1, "tooltip": "推理预算：-1=无限制，0=关闭思考模式，N=限制N个思考token"}),
+            }            
         }
     
     RETURN_TYPES = ("LLAMACPPARAMS",)
