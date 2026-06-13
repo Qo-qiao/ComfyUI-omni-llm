@@ -3,7 +3,9 @@
 # ===========================================
 # 安装说明：
 # 1. 基础安装：pip install -r requirements.txt
-# 2. 如果遇到 llama-cpp-python 问题，请手动安装适合您系统的版本
+#    - 会根据你的 Python 版本和操作系统自动选择合适的 wheel
+# 2. 如果自动安装失败或需要特定版本，请手动从以下地址下载：
+#    https://github.com/JamePeng/llama-cpp-python/releases
 # 3. site-packages 目录中已包含部分依赖，无需重复安装
 # ===========================================
 
@@ -16,26 +18,41 @@ Pillow
 requests
 numpy
 scipy>=1.7.0
-# for Windows
+diskcache
+gguf
+transformers
+packaging
+
+# ===========================================
+# llama-cpp-python 依赖（必须安装）
+# 使用 JamePeng 构建的带 CUDA/MPS 加速的预编译版本
+# 支持 Python 3.10-3.14，自动根据平台和版本选择
+# ===========================================
+
+# Windows (CUDA 12.8)
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-win-20260406/llama_cpp_python-0.3.35+cu128.basic-cp310-cp310-win_amd64.whl; python_version == "3.10" and platform_system == "Windows"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-win-20260406/llama_cpp_python-0.3.35+cu128.basic-cp311-cp311-win_amd64.whl; python_version == "3.11" and platform_system == "Windows"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-win-20260406/llama_cpp_python-0.3.35+cu128.basic-cp312-cp312-win_amd64.whl; python_version == "3.12" and platform_system == "Windows"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-win-20260406/llama_cpp_python-0.3.35+cu128.basic-cp313-cp313-win_amd64.whl; python_version == "3.13" and platform_system == "Windows"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-win-20260406/llama_cpp_python-0.3.35+cu128.basic-cp314-cp314-win_amd64.whl; python_version == "3.14" and platform_system == "Windows"
 
-# for Linux
+# Linux (CUDA 12.8)
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-linux-20260406/llama_cpp_python-0.3.35+cu128.basic-cp310-cp310-linux_x86_64.whl; python_version == "3.10" and platform_system == "Linux"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-linux-20260406/llama_cpp_python-0.3.35+cu128.basic-cp311-cp311-linux_x86_64.whl; python_version == "3.11" and platform_system == "Linux"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-linux-20260406/llama_cpp_python-0.3.35+cu128.basic-cp312-cp312-linux_x86_64.whl; python_version == "3.12" and platform_system == "Linux"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-linux-20260406/llama_cpp_python-0.3.35+cu128.basic-cp313-cp313-linux_x86_64.whl; python_version == "3.13" and platform_system == "Linux"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-cu128-Basic-linux-20260406/llama_cpp_python-0.3.35+cu128.basic-cp314-cp314-linux_x86_64.whl; python_version == "3.14" and platform_system == "Linux"
 
-# for macOS
+# macOS (Metal)
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-Metal-macos-20260406/llama_cpp_python-0.3.35-cp310-cp310-macosx_11_0_arm64.whl; python_version == "3.10" and platform_system == "Darwin"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-Metal-macos-20260406/llama_cpp_python-0.3.35-cp311-cp311-macosx_11_0_arm64.whl; python_version == "3.11" and platform_system == "Darwin"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-Metal-macos-20260406/llama_cpp_python-0.3.35-cp312-cp312-macosx_11_0_arm64.whl; python_version == "3.12" and platform_system == "Darwin"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-Metal-macos-20260406/llama_cpp_python-0.3.35-cp313-cp313-macosx_11_0_arm64.whl; python_version == "3.13" and platform_system == "Darwin"
 llama-cpp-python @ https://github.com/JamePeng/llama-cpp-python/releases/download/v0.3.35-Metal-macos-20260406/llama_cpp_python-0.3.35-cp314-cp314-macosx_11_0_arm64.whl; python_version == "3.14" and platform_system == "Darwin"
+
+# 通用 fallback（当上述特定版本不匹配时使用）
+llama-cpp-python
+
 # ===========================================
 # 音频处理核心依赖
 # ===========================================
@@ -52,9 +69,16 @@ soundfile
 # librosa>=0.10.0
 
 # ===========================================
+# 开发依赖（开发人员使用）
+# ===========================================
+# pytest
+# pytest-cov
+# black
+# isort
+
+# ===========================================
 # 安装后验证
 # ===========================================
-# 安装完成后，运行以下命令验证：
 # python -c "import llama_cpp; print('llama-cpp-python 版本:', llama_cpp.__version__)"
 # python -c "import numpy; print('numpy 导入成功')"
 # python -c "import torch; print('torch 导入成功')"

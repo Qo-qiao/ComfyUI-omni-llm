@@ -117,6 +117,24 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
+#### v3.1.4 (2026-06-13)
+
+The following updates are based on llama-cpp-python version 0.3.40, please install this version of llama-cpp-python first
+
+**I. Node Optimization**
+- **Optimized Node Parameters**: Removed redundant optional parameters from ASR and TTS nodes, streamlined code to retain only qwen-tts model parameters to avoid parameter errors during use
+- **Reasoning Budget Parameter**: Added `reasoning_budget` parameter to support thinking mode control for Qwen3.5-Thinking and similar models (-1=unlimited, 0=disable thinking, N=limit to N tokens), thinking models can now use text generation mode normally
+
+**II. Dependency Management Optimization**
+- **Multi-Platform Support**: Optimized `requirements.txt` to automatically select precompiled wheels for Windows/Linux/macOS (manual installation recommended to avoid automatic installation failures)
+
+**III. Code Quality Improvement**
+- **Exception Handling Optimization**: Replaced `exit(1)` forced exit with custom exception classes `LlamaCppDependencyError` and `ComfyUINotFoundError` to prevent program crashes
+- **Complete Parameter Passing**: Improved parameter passing for `create_chat_completion()`, supporting `presence_penalty`, `typical_p`, `mirostat` and other parameters
+
+**IV. Preset Template Optimization**
+- **Template Optimization**: Based on Seedance2.0 model prompts, added emotion and expression-related prompt content. Note: wan and other open-source models may not be suitable, generated content may not achieve expected results, please test and adjust yourself. (Same applies to previously adjusted image and audio preset templates)
+
 #### v3.1.3 (2026-06-06)
 
 **I. Model Support Optimization**

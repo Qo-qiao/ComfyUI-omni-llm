@@ -29,48 +29,145 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter
 
 LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
+MIN_LLAMA_CPP_VERSION = "0.3.35"
+
+class LlamaCppDependencyError(Exception):
+    """llama-cpp-python 依赖错误异常"""
+    pass
+
+class ComfyUINotFoundError(Exception):
+    """ComfyUI环境未找到异常"""
+    pass
+
+def _get_platform_wheel_url():
+    """根据当前环境获取最合适的预编译wheel URL"""
+    py_version = sys.version_info
+    py_tag = f"cp{py_version.major}{py_version.minor}"
+    
+    system = platform.system()
+    arch = platform.machine()
+    
+    # 根据平台选择合适的wheel
+    if system == "Windows":
+        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-Basic-win-20260406/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128.basic-{py_tag}-{py_tag}-win_amd64.whl"
+    elif system == "Linux":
+        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-Basic-linux-20260406/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128.basic-{py_tag}-{py_tag}-linux_x86_64.whl"
+    elif system == "Darwin":
+        # macOS 使用 Metal 版本
+        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-Metal-macos-20260406/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}-{py_tag}-{py_tag}-macosx_11_0_arm64.whl"
+    else:
+        base_url = None
+    
+    return base_url, system, py_tag
+
+def _check_llama_cpp_version(min_version=MIN_LLAMA_CPP_VERSION):
+    """检查llama-cpp-python版本是否满足最低要求"""
+    try:
+        import llama_cpp
+        from packaging import version
+        
+        current_version = getattr(llama_cpp, '__version__', '0.0.0')
+        
+        if version.parse(current_version) >= version.parse(min_version):
+            return True, current_version
+        else:
+            print(f"【警告】llama-cpp-python版本 {current_version} 低于要求的 {min_version}")
+            print(f"【警告】部分功能（如MoE/MTP/Qwen2.5-VL）可能不可用")
+            return False, current_version
+    except ImportError:
+        return False, None
+    except Exception as e:
+        print(f"【错误】版本检查失败: {e}")
+        return False, None
 
 def _check_and_install_llama_cpp_python():
-    """检查并尝试安装llama-cpp-python，如果已安装则提示升级"""
+    """检查并尝试安装llama-cpp-python，如果已安装则检查版本"""
     try:
         import llama_cpp
         current_version = getattr(llama_cpp, '__version__', '未知版本')
+        
+        is_version_ok, _ = _check_llama_cpp_version()
+        
         print(f"【依赖检查】llama-cpp-python 已安装，版本: {current_version}")
-        print(f"【升级提示】如需使用MoE/MTP等新功能，建议升级到最新版本")
+        if not is_version_ok:
+            print(f"【升级提示】建议升级到 {MIN_LLAMA_CPP_VERSION}+ 以获得完整功能支持")
         print(f"【升级地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
         return True
     except ImportError:
         print(f"【错误】缺少 llama-cpp-python 依赖")
         print(f"【下载地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
-        print(f"【自动安装】正在尝试自动安装通用版本...")
         
+        wheel_url, system, py_tag = _get_platform_wheel_url()
+        
+        if wheel_url:
+            print(f"【自动安装】检测到环境: {system} Python {py_tag}")
+            print(f"【自动安装】正在尝试安装预编译版本...")
+            
+            try:
+                result = subprocess.run(
+                    [sys.executable, "-m", "pip", "install", wheel_url, "--quiet"],
+                    capture_output=True,
+                    text=True,
+                    timeout=600
+                )
+                
+                if result.returncode == 0:
+                    print(f"【自动安装】llama-cpp-python 预编译版本安装成功！")
+                    try:
+                        import llama_cpp
+                        installed_version = getattr(llama_cpp, '__version__', '未知')
+                        print(f"【自动安装】当前版本: {installed_version}")
+                        
+                        is_version_ok, _ = _check_llama_cpp_version()
+                        if not is_version_ok:
+                            print(f"【功能提示】如需使用MoE/MTP等新功能，建议升级到最新版本")
+                    except:
+                        pass
+                    print(f"【升级地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
+                    return True
+                else:
+                    print(f"【自动安装】预编译版本安装失败，尝试通用版本...")
+            except subprocess.TimeoutExpired:
+                print(f"【自动安装】预编译版本安装超时，尝试通用版本...")
+            except Exception as e:
+                print(f"【自动安装】预编译版本安装出错: {e}，尝试通用版本...")
+        
+        # Fallback: 安装通用版本
+        print(f"【自动安装】正在尝试安装通用版本...")
         try:
             result = subprocess.run(
-                [sys.executable, "-m", "pip", "install", "llama-cpp-python", "--quiet"],
+                [sys.executable, "-m", "pip", "install", f"llama-cpp-python>={MIN_LLAMA_CPP_VERSION}", "--quiet"],
                 capture_output=True,
                 text=True,
                 timeout=600
             )
             
             if result.returncode == 0:
-                print(f"【自动安装】llama-cpp-python 安装成功！")
+                print(f"【自动安装】llama-cpp-python 通用版本安装成功！")
                 try:
                     import llama_cpp
-                    print(f"【自动安装】当前版本: {getattr(llama_cpp, '__version__', '未知')}")
+                    installed_version = getattr(llama_cpp, '__version__', '未知')
+                    print(f"【自动安装】当前版本: {installed_version}")
+                    
+                    is_version_ok, _ = _check_llama_cpp_version()
+                    if not is_version_ok:
+                        print(f"【功能提示】如需使用MoE/MTP等新功能，建议手动升级到带CUDA的版本")
                 except:
                     pass
-                print(f"【功能提示】如需使用MoE/MTP等新功能，建议手动升级: {LLAMA_CPP_PYTHON_RELEASES_URL}")
+                print(f"【升级地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
                 return True
             else:
-                print(f"【自动安装】安装失败: {result.stderr}")
-                print(f"【手动安装】请手动运行: pip install llama-cpp-python")
+                print(f"【自动安装】通用版本安装失败: {result.stderr}")
+                print(f"【手动安装】请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 手动下载适合您环境的wheel")
+                print(f"【手动安装】或运行: pip install llama-cpp-python>={MIN_LLAMA_CPP_VERSION}")
                 return False
         except subprocess.TimeoutExpired:
-            print(f"【自动安装】安装超时，请手动安装: pip install llama-cpp-python")
+            print(f"【自动安装】安装超时")
+            print(f"【手动安装】请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 手动下载适合您环境的wheel")
             return False
         except Exception as e:
             print(f"【自动安装】安装过程出错: {e}")
-            print(f"【手动安装】请手动运行: pip install llama-cpp-python")
+            print(f"【手动安装】请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 手动下载适合您环境的wheel")
             return False
 
 def _check_dependency(dep_name, import_name, package_info, is_optional=False):
@@ -139,29 +236,49 @@ if _check_and_install_llama_cpp_python():
     try:
         import llama_cpp
         from llama_cpp import Llama
-        from llama_cpp.llama_chat_format import (
-            Llava15ChatHandler, Llava16ChatHandler, MoondreamChatHandler,
-            NanoLlavaChatHandler, Llama3VisionAlphaChatHandler, MiniCPMv26ChatHandler, MiniCPMv45ChatHandler,
-            Qwen3VLChatHandler
-        )
+        import llama_cpp.llama_chat_format as chat_format
         LLAMA_CPP_AVAILABLE = True
         _llama_cpp = llama_cpp
+        _has_mtmd = True
         
-        try:
-            from llama_cpp.llama_chat_format import Qwen25VLChatHandler
-        except ImportError:
-            Qwen25VLChatHandler = None
-            print("【提示】当前llama-cpp-python版本不支持Qwen25VLChatHandler，Qwen2.5-VL/Omni模型将使用备选方案")
+        # 动态导入ChatHandler，不存在的设为None
+        chat_handlers_to_import = [
+            'Llava15ChatHandler', 'Llava16ChatHandler', 'MoondreamChatHandler',
+            'NanoLlavaChatHandler', 'Llama3VisionAlphaChatHandler', 'MiniCPMv26ChatHandler', 
+            'MiniCPMv45ChatHandler', 'Qwen3VLChatHandler', 'Qwen25VLChatHandler', 
+            'Qwen35ChatHandler', 'GLM46VChatHandler', 'GLM41VChatHandler', 
+            'LFM2VLChatHandler', 'Gemma3ChatHandler', 'Gemma4ChatHandler', 
+            'LFM25VLChatHandler', 'GraniteDoclingChatHandler', 'MTMDChatHandler',
+            'Qwen3ASRChatHandler', 'Llama32VisionInstructChatHandler', 'Llama31VisionChatHandler',
+            'Phi35VisionChatHandler', 'Phi3Vision128kChatHandler', 'InternLMXComposer2VLChatHandler',
+            'YiVL6BChatHandler', 'CogVLM2ChatHandler', 'ObsidianChatHandler',
+            'Qwen36VLChatHandler', 'YutuVL4BInstructChatHandler', 'EraXVL7BV15ChatHandler',
+            'MiMoVL7BRLChatHandler', 'ASIDCaptioner7BChatHandler', 'Zen3VLI1ChatHandler',
+            'LightOnOCR21BChatHandler', 'PaddleOCRChatHandler'
+        ]
+        
+        for handler_name in chat_handlers_to_import:
+            handler_cls = getattr(chat_format, handler_name, None)
+            globals()[handler_name] = handler_cls
+            if handler_cls is None:
+                print(f"【警告】llama-cpp-python 版本较低，{handler_name} 不可用")
+            
     except ImportError as e:
         print(f"【错误】llama-cpp-python 导入失败: {e}")
         print(f"【建议】请从以下地址下载并安装正确版本:")
         print(f"【地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
-        exit(1)
+        raise LlamaCppDependencyError(
+            f"llama-cpp-python 导入失败: {e}\n"
+            f"请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 下载并安装正确版本"
+        )
 else:
     print(f"【警告】llama-cpp-python 未正确安装，核心功能将不可用")
     print(f"【建议】请从以下地址下载并安装正确版本:")
     print(f"【地址】{LLAMA_CPP_PYTHON_RELEASES_URL}")
-    exit(1)
+    raise LlamaCppDependencyError(
+        f"llama-cpp-python 未正确安装\n"
+        f"请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 下载并安装"
+    )
 
 print("=" * 60)
 print(f"【依赖检查】音频处理依赖检查...")
@@ -184,56 +301,6 @@ except ImportError:
     wavfile = None
 
 try:
-    from llama_cpp.llama_chat_format import Qwen35ChatHandler
-except:
-    Qwen35ChatHandler = None
-
-try:
-    from llama_cpp.llama_chat_format import Qwen25VLChatHandler
-except:
-    Qwen25VLChatHandler = None
-    print("【警告】当前llama-cpp-python版本不支持Qwen25VLChatHandler，将使用备选方案")
-
-try:
-    from llama_cpp.llama_chat_format import GLM46VChatHandler, GLM41VChatHandler, LFM2VLChatHandler
-except:
-    GLM46VChatHandler = None
-    GLM41VChatHandler = None
-    LFM2VLChatHandler = None
-
-# 尝试导入Gemma3ChatHandler
-try:
-    from llama_cpp.llama_chat_format import Gemma3ChatHandler
-except:
-    Gemma3ChatHandler = None
-
-# 尝试导入Gemma4ChatHandler
-try:
-    from llama_cpp.llama_chat_format import Gemma4ChatHandler
-except:
-    Gemma4ChatHandler = None
-
-# 尝试导入LFM2.5VLChatHandler
-try:
-    from llama_cpp.llama_chat_format import LFM25VLChatHandler
-except:
-    LFM25VLChatHandler = None
-
-# 尝试导入GraniteDoclingChatHandler
-try:
-    from llama_cpp.llama_chat_format import GraniteDoclingChatHandler
-except:
-    GraniteDoclingChatHandler = None
-
-# MTMD支持检测
-try:
-    from llama_cpp.llama_chat_format import MTMDChatHandler
-    _has_mtmd = True
-except ImportError:
-    _has_mtmd = False
-    MTMDChatHandler = None
-
-try:
     import folder_paths
     import comfy.model_management as mm
     import comfy.utils
@@ -243,7 +310,9 @@ except ImportError as e:
     mm = None
     comfy = None
     print(f"【错误】未检测到ComfyUI环境，请将该文件放入ComfyUI/custom_nodes/ComfyUI-omni-llm/目录下")
-    exit(1)
+    raise ComfyUINotFoundError(
+        "未检测到ComfyUI环境，请将该文件放入ComfyUI/custom_nodes/ComfyUI-omni-llm/目录下"
+    )
 
 try:
     from tqdm import tqdm
@@ -1012,24 +1081,38 @@ class ChatHandlerManager:
         """
         model_lower = model_name.lower()
         
-        # 特殊规则匹配
-        # 根据Qwen25VLChatHandler是否可用动态选择
-        qwen25_handler = 'Qwen25VLChatHandler' if Qwen25VLChatHandler else 'Qwen3VLChatHandler'
+        # 备选handler映射：(首选, 备选)
+        fallback_map = {
+            'Qwen25VLChatHandler': 'Qwen3VLChatHandler',
+            'Qwen36VLChatHandler': 'Qwen35ChatHandler',
+            'Llama32VisionInstructChatHandler': 'Llama3VisionAlphaChatHandler',
+            'Llama31VisionChatHandler': 'Llama3VisionAlphaChatHandler',
+            'Phi35VisionChatHandler': 'Phi3Vision128kChatHandler',
+        }
         
+        # 获取handler名称，不存在时使用备选
+        def get_handler_name(handler_name):
+            if globals().get(handler_name):
+                return handler_name
+            return fallback_map.get(handler_name)
+        
+        # 基础规则（始终可用的handler）
         special_rules = [
-            # (关键词, ChatHandler名称)
             ('qwen3-vl', 'Qwen3VLChatHandler'),
-            ('qwen2.5-vl', qwen25_handler),  # 如果Qwen25VL不可用则使用Qwen3VL
-            ('qwen2.5-omni', qwen25_handler),  # Omni系列模型
-            ('toriigate', qwen25_handler),  # ToriiGate基于Qwen2-VL
+            ('qwen36-vl', get_handler_name('Qwen36VLChatHandler')),
+            ('qwen3.6-vl', get_handler_name('Qwen36VLChatHandler')),
+            ('qwen2.5-vl', get_handler_name('Qwen25VLChatHandler')),
+            ('qwen2.5-omni', get_handler_name('Qwen25VLChatHandler')),
+            ('toriigate', get_handler_name('Qwen25VLChatHandler')),
             ('qwen35', 'Qwen35ChatHandler'),
-            ('qwen3.5', 'Qwen35ChatHandler'),  # 匹配带点的版本
-            ('qwen36', 'Qwen35ChatHandler'),   # Qwen3.6使用Qwen35ChatHandler（兼容）
-            ('qwen3.6', 'Qwen35ChatHandler'),  # 匹配带点的版本
+            ('qwen3.5', 'Qwen35ChatHandler'),
+            ('qwen36', 'Qwen35ChatHandler'),
+            ('qwen3.6', 'Qwen35ChatHandler'),
+            ('qwen3-asr', 'Qwen3ASRChatHandler'),
             ('minicpm-v-4.5', 'MiniCPMv45ChatHandler'),
-            ('minicpm-o-4.5', 'MiniCPMv45ChatHandler'),  # Omni版本
-            ('minicpm-o-2.6', 'MiniCPMv26ChatHandler'),  # MiniCPM-O-2.6
-            ('minicpmo2.6', 'MiniCPMv26ChatHandler'),  # MiniCPM-O-2.6变体
+            ('minicpm-o-4.5', 'MiniCPMv45ChatHandler'),
+            ('minicpm-o-2.6', 'MiniCPMv26ChatHandler'),
+            ('minicpmo2.6', 'MiniCPMv26ChatHandler'),
             ('minicpm-v-2.6', 'MiniCPMv26ChatHandler'),
             ('minicpm-llama3-v-2.5', 'MiniCPMv26ChatHandler'),
             ('glm-4.6v', 'GLM46VChatHandler'),
@@ -1039,7 +1122,6 @@ class ChatHandlerManager:
             ('granite-docling', 'GraniteDoclingChatHandler'),
             ('lfm-2-vl', 'LFM2VLChatHandler'),
             ('lfm-2.5-vl', 'LFM25VLChatHandler'),
-            ('paddleocr', 'PaddleOCRChatHandler'),
             ('obsidian', 'ObsidianChatHandler'),
             ('llava-1.6', 'Llava16ChatHandler'),
             ('llava-1.5', 'Llava15ChatHandler'),
@@ -1047,21 +1129,40 @@ class ChatHandlerManager:
             ('moondream2', 'MoondreamChatHandler'),
             ('moondream-2', 'MoondreamChatHandler'),
             ('llama3visionalpha', 'Llama3VisionAlphaChatHandler'),
+        ]
+        
+        # 动态添加可能不可用的handler规则（无备选的模型）
+        optional_rules = [
             ('llama-3.2-11b-vision', 'Llama32VisionInstructChatHandler'),
             ('llama-3.1-vision', 'Llama31VisionChatHandler'),
             ('phi-3.5-vision', 'Phi35VisionChatHandler'),
             ('phi-3-vision', 'Phi3Vision128kChatHandler'),
             ('internvl', 'InternLMXComposer2VLChatHandler'),
-
+            ('yivl', 'YiVL6BChatHandler'),
+            ('cogvlm', 'CogVLM2ChatHandler'),
+            ('paddleocr', 'PaddleOCRChatHandler'),
             ('yutuvl', 'YutuVL4BInstructChatHandler'),
             ('erax-vl', 'EraXVL7BV15ChatHandler'),
             ('mimo-vl', 'MiMoVL7BRLChatHandler'),
             ('asid-captioner', 'ASIDCaptioner7BChatHandler'),
             ('zen3-vl', 'Zen3VLI1ChatHandler'),
             ('lightonocr', 'LightOnOCR21BChatHandler'),
-            ('yivl', 'YiVL6BChatHandler'),
-            ('cogvlm', 'CogVLM2ChatHandler'),
         ]
+        
+        for keyword, handler_name in optional_rules:
+            if globals().get(handler_name):
+                special_rules.append((keyword, handler_name))
+        
+        # Thinking模型支持
+        special_rules.extend([
+            ('thinking', 'Qwen35ChatHandler'),
+            ('qwen3-vl-thinking', 'Qwen3VLChatHandler'),
+            ('qwen3.5-thinking', 'Qwen35ChatHandler'),
+            ('qwen3.6-thinking', 'Qwen35ChatHandler'),
+            ('glm-4.6v-thinking', 'GLM46VChatHandler'),
+            ('glm-4.1v-thinking', 'GLM41VChatHandler'),
+            ('minicpm-v-4.5-thinking', 'MiniCPMv45ChatHandler'),
+        ])
         
         for keyword, handler_name in special_rules:
             if keyword in model_lower:
@@ -1095,11 +1196,12 @@ base_models = ["LLaVA-1.6", "nanoLLaVA", "llama-joycaption", "moondream3-preview
                "MiniCPM-Llama3-V 2.5", "Llama-3.2-11B-Vision-Instruct", "CogVLM2", 
                "CogVLM-MOE", "Phi-3.5-vision-instruct", "Phi-3-vision-128k-instruct", 
                "Qwen2.5-VL", "Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3-VL-Chat", "Qwen3-VL-Instruct", 
-               "Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5",
-               "LLaMA-3.1-Vision", "Zhipu-Vision", "智谱AI-Vision", "olmOCR-2", 
+               "Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5",
+               "Qwen3-ASR", "LLaMA-3.1-Vision", "Zhipu-Vision", "智谱AI-Vision", "olmOCR-2", 
                "InternVL-1.5", "InternVL-2.0", "Yi-VL-2.0", "Gemma-3", "Gemma-4", "Granite-DocLing", 
-               "Lfm-2-VL", "Llama3-Vision-Alpha", "LLaVA-1.5", "MiniCPM-v2.6", "Obsidian", 
-               "Youtu-VL-4B-Instruct", "EraX-VL-7B-V1.5", "MiMo-VL-7B-RL", "Yi-VL-6B"]
+               "Lfm-2-VL", "Lfm-2.5-VL", "Llama3-Vision-Alpha", "LLaVA-1.5", "MiniCPM-v2.6", "Obsidian", 
+               "Youtu-VL-4B-Instruct", "EraX-VL-7B-V1.5", "MiMo-VL-7B-RL", "Yi-VL-6B",
+               "PaddleOCR", "Zen3-VL-I1", "LightOn-OCR-2-1B", "ASID-Captioner-7B"]
 
 # ChatHandler名称到标准模型名称的映射
 CHAT_HANDLER_MODEL_MAP = {
@@ -2664,6 +2766,29 @@ class BaseInferenceEngine:
 
             if "seed" in params:
                 completion_params["seed"] = params["seed"]
+
+            # 添加推理预算控制参数（支持Qwen3.5-Thinking等模型）
+            # reasoning_budget: -1=无限制推理，0=关闭思考模式，N=限制N个推理token
+            reasoning_budget = params.get("reasoning_budget", -1)
+            if reasoning_budget != -1:
+                completion_params["reasoning_budget"] = reasoning_budget
+                print(f"【推理预算】设置 reasoning_budget={reasoning_budget}")
+
+            # 添加present_penalty参数（注意：llama-cpp-python使用present_penalty而非presence_penalty）
+            if "presence_penalty" in params:
+                completion_params["present_penalty"] = params["presence_penalty"]
+
+            # 添加typical_p参数
+            if "typical_p" in params:
+                completion_params["typical_p"] = params["typical_p"]
+
+            # 添加mirostat参数
+            if "mirostat_mode" in params:
+                completion_params["mirostat_mode"] = params["mirostat_mode"]
+                if "mirostat_eta" in params:
+                    completion_params["mirostat_eta"] = params["mirostat_eta"]
+                if "mirostat_tau" in params:
+                    completion_params["mirostat_tau"] = params["mirostat_tau"]
 
             output = llm.create_chat_completion(**completion_params)
             return output

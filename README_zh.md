@@ -123,6 +123,23 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 提供的工作流仅供参考，可以尝试不同的组合方式测试推理效果，如有模板或节点优化调整建议，欢迎交流讨论
 
 ## 更新日志
+#### v3.1.4 （2026-06-13）
+以下更新基于llama-cpp-python 0.3.40版本，请先安装该版本的llama-cpp-python
+
+**一、节点优化**
+- **优化节点参数**：asr、tts节点移除多余选项参数，移除冗余代码，只保留qwentts模型参数，避免用户在使用过程中出现参数错误的情况
+- **推理预算参数**：新增`reasoning_budget`参数，支持Qwen3.5-Thinking等模型的思考模式控制（-1=无限制，0=关闭思考，N=限制N个token），思考类模型可以正常使用文本生成模式了
+
+**二、依赖管理优化**
+- **多平台支持**：优化`requirements.txt`，支持Windows/Linux/macOS多平台自动选择预编译wheel（推荐手动安装，避免自动安装失败）
+
+**三、代码质量提升**
+- **异常处理优化**：将`exit(1)`强制退出改为自定义异常类`LlamaCppDependencyError`和`ComfyUINotFoundError`，避免程序崩溃
+- **参数传递完整**：完善`create_chat_completion()`参数传递，支持`presence_penalty`、`typical_p`、`mirostat`等参数
+
+**四、预设模板优化**
+- **模板优化**：基于Seedance2.0模型提示词，添加情绪与表情相关提示词内容，wan等开源模型可能不适用，生成内容无法达到预期效果，请自测调整。（之前调整的图片、音频类预设模板也是一样）
+
 #### v3.1.3 （2026-06-06）
 
 **一、模型支持优化**
