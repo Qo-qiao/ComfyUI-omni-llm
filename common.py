@@ -249,12 +249,7 @@ if _check_and_install_llama_cpp_python():
             'Qwen35ChatHandler', 'GLM46VChatHandler', 'GLM41VChatHandler', 
             'LFM2VLChatHandler', 'Gemma3ChatHandler', 'Gemma4ChatHandler', 
             'LFM25VLChatHandler', 'GraniteDoclingChatHandler', 'MTMDChatHandler',
-            'Qwen3ASRChatHandler', 'Llama32VisionInstructChatHandler', 'Llama31VisionChatHandler',
-            'Phi35VisionChatHandler', 'Phi3Vision128kChatHandler', 'InternLMXComposer2VLChatHandler',
-            'YiVL6BChatHandler', 'CogVLM2ChatHandler', 'ObsidianChatHandler',
-            'Qwen36VLChatHandler', 'YutuVL4BInstructChatHandler', 'EraXVL7BV15ChatHandler',
-            'MiMoVL7BRLChatHandler', 'ASIDCaptioner7BChatHandler', 'Zen3VLI1ChatHandler',
-            'LightOnOCR21BChatHandler', 'PaddleOCRChatHandler'
+            'Qwen3ASRChatHandler', 'ObsidianChatHandler', 'PaddleOCRChatHandler'
         ]
         
         for handler_name in chat_handlers_to_import:
