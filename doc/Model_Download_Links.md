@@ -181,7 +181,7 @@
 **Alternative Link**: https://huggingface.co/mradermacher/Qwen3-VL-8B-maid-GGUF (includes mmproj model)
 **ModelScope Link**: https://www.modelscope.cn/models/Zyi4082/Qwen3-VL-8B-Maid-GGUF (includes mmproj model)
 
-
+### For Qwen3.5, Qwen3.6 and other thinking models using text generation mode, mmproj model must be enabled. Some preset templates may not work, please test and adjust or use non-thinking models
 **Model Series**: Qwen3.5
 **Specific Model**: Qwen3.5-2B
 **Key Features**: Ultra-lightweight version of Qwen3.5 series, smallest parameter count, suitable for devices with extremely limited resources, supports multimodal input and basic dialogue capabilities.
@@ -193,8 +193,11 @@
 **Specific Model**: Qwen3.5-4B (Reverse Prompting)
 **Key Features**: Lightweight version of Qwen3.5 series, smaller parameter count but retains powerful reasoning capabilities, suitable for low VRAM devices, supports multimodal input and tool calling, fast response.
 **Applicable Scenarios**: Low VRAM device deployment, fast reasoning, mobile applications, lightweight dialogue, basic multimodal tasks, real-time interaction
-**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-**ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
+**Download Link（nsfw）**：https://huggingface.co/mradermacher/Qwen3.5-4B_Abliterated-GGUF (includes mmproj model)
+**Alternative Link（nsfw）**：https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
+**Download Link（mtp）**：https://huggingface.co/mradermacher/Qwen3.5-4B-MiniFantasy-MTP-GGUF (includes mmproj model)
+**ModelScope Link**：https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
+
 
 **Specific Model**: Qwen3.6-27B (Large VRAM Required)
 **Key Features**: High-performance model from Qwen3.6 series with large parameter count, delivers exceptional reasoning capabilities and multimodal understanding, requires significant GPU memory.
