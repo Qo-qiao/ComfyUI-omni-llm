@@ -1204,13 +1204,19 @@ CHAT_HANDLER_MODEL_MAP = {
     'qwen3vl': 'Qwen3-VL',
     'qwen3vlchat': 'Qwen3-VL-Chat',
     'qwen3vlinstruct': 'Qwen3-VL-Instruct',
+    'qwen3vlthinking': 'Qwen3-VL-Thinking',
     'qwen35': 'Qwen3.5',
+    'qwen35thinking': 'Qwen3.5-Thinking',
     'qwen36': 'Qwen3.6',
+    'qwen36thinking': 'Qwen3.6-Thinking',
+    'qwen36vl': 'Qwen3.6-VL',
+    'qwen36vlthinking': 'Qwen3.6-VL-Thinking',
     'glm46v': 'GLM-4.6V',
     'glm41v': 'GLM-4.1V-Thinking',
     'minicpmv45': 'MiniCPM-v4.5',
+    'minicpmv45thinking': 'MiniCPM-v4.5-Thinking',
     'minicpmv26': 'MiniCPM-v2.6',
-    'minicpmlama3v25': 'MiniCPM-Llama3-V 2.5',
+    'minicpmllama3v25': 'MiniCPM-Llama3-V 2.5',
     'moondream3': 'moondream3-preview',
     'moondream2': 'Moondream2',
     'internlmxcomposer2vl': 'InternLM-XComposer2-VL',
@@ -1925,7 +1931,13 @@ class LLAMA_CPP_STORAGE:
 
         handler_map = {
             "Qwen3.5": Qwen35ChatHandler,
+            "Qwen3.5-Thinking": Qwen35ChatHandler,
+            "Qwen3.6": Qwen35ChatHandler,
+            "Qwen3.6-Thinking": Qwen35ChatHandler,
+            "Qwen3.6-VL": Qwen3VLChatHandler,
+            "Qwen3.6-VL-Thinking": Qwen3VLChatHandler,
             "Qwen3-VL": Qwen3VLChatHandler,
+            "Qwen3-VL-Thinking": Qwen3VLChatHandler,
             "Qwen2.5-VL": Qwen25VLChatHandler,
             "Qwen2.5-Omni": Qwen25VLChatHandler,
             "ToriiGate": Qwen25VLChatHandler,  # ToriiGate基于Qwen2-VL
@@ -1936,6 +1948,7 @@ class LLAMA_CPP_STORAGE:
             "llama3-Vision-Alpha": Llama3VisionAlphaChatHandler,
             "MiniCPM-v2.6": MiniCPMv26ChatHandler,
             "MiniCPM-v4.5": MiniCPMv45ChatHandler,
+            "MiniCPM-v4.5-Thinking": MiniCPMv45ChatHandler,
             "MiniCPM-O-4.5": MiniCPMv45ChatHandler,
             "Gemma3": Gemma3ChatHandler,
             "Gemma4": Gemma4ChatHandler,
@@ -1956,6 +1969,9 @@ class LLAMA_CPP_STORAGE:
         if chat_handler_name.startswith("Qwen3.5"):
             return Qwen35ChatHandler
         if chat_handler_name.startswith("Qwen3.6"):
+            # Qwen3.6-VL系列使用Qwen3VLChatHandler，其他Qwen3.6使用Qwen35ChatHandler兼容
+            if "VL" in chat_handler_name or "vl" in chat_handler_name:
+                return Qwen3VLChatHandler
             return Qwen35ChatHandler  # Qwen3.6使用Qwen35ChatHandler兼容
         if chat_handler_name.startswith("Qwen3-VL"):
             return Qwen3VLChatHandler
@@ -1986,11 +2002,11 @@ class LLAMA_CPP_STORAGE:
             handler_name = handler_cls.__name__
             print(f"【ChatHandler初始化】开始初始化：{handler_name}")
             
-            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni"]
+            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni", "Qwen3.6-VL", "Qwen3.6-VL-Thinking"]
             
             if mmproj_path and chat_handler_name in vl_handlers:
                 init_params["clip_model_path"] = mmproj_path
-                if chat_handler_name in ["Qwen3-VL", "Qwen3-VL-Thinking"]:
+                if chat_handler_name in ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3.6-VL", "Qwen3.6-VL-Thinking"]:
                     init_params["force_reasoning"] = think_mode
                     if image_max_tokens > 0:
                         init_params["image_max_tokens"] = image_max_tokens
@@ -1999,15 +2015,23 @@ class LLAMA_CPP_STORAGE:
             elif mmproj_path:
                 init_params["clip_model_path"] = mmproj_path
             
-            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-O-4.5", "GLM-4.6V", "GLM-4.6V-Thinking"]:
+            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
                 init_params["enable_thinking"] = think_mode
             
-            # Qwen3.5 需要特殊处理 - 它可能继承自 MTMDChatHandler
-            if chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking"]:
+            # Qwen3.5/Qwen3.6 需要特殊处理 - 它可能继承自 MTMDChatHandler
+            if chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking"]:
                 init_params["enable_thinking"] = think_mode
-                # 只有当有 mmproj_path 时才设置 clip_model_path，纯文本模型不需要
+                # Qwen35ChatHandler继承自MTMDChatHandler，需要clip_model_path参数
                 if mmproj_path:
                     init_params["clip_model_path"] = mmproj_path
+                    # 为Qwen3.5/Qwen3.6添加视觉token参数，确保推理成功
+                    if image_max_tokens > 0:
+                        init_params["image_max_tokens"] = image_max_tokens
+                    if image_min_tokens > 0:
+                        init_params["image_min_tokens"] = image_min_tokens
+                else:
+                    print(f"【ChatHandler初始化错误】Qwen3.5/Qwen3.6需要clip_model_path，但mmproj_path为空")
+                    return None
             
             if _has_mtmd:
                 if image_max_tokens > 0:
@@ -2176,6 +2200,10 @@ class LLAMA_CPP_STORAGE:
                 "minicpm-o-4.5",
                 "minicpm-o-2.6",
                 "qwen2.5-omni",
+                "qwen35",
+                "qwen3.5",
+                "qwen36",
+                "qwen3.6",
             ]
             
             # 检查是否需要mmproj
@@ -2185,12 +2213,17 @@ class LLAMA_CPP_STORAGE:
                 raise ValueError(
                     f"【模型加载错误】{model} 是Omni/多模态模型，必须配合MMProj模型使用！\n"
                     f"【解决方法】在模型加载节点中启用「enable_mmproj」选项，并选择对应的mmproj模型文件\n"
-                    f"【提示】MiniCPM-O系列是视觉-语言模型，不支持纯文本生成模式"
+                    f"【提示】Qwen3.5/Qwen3.6/MiniCPM-O系列是视觉-语言模型，需要mmproj才能正常使用"
                 )
             
-            # 对于 Qwen3.5，只有启用了 mmproj 才需要初始化 ChatHandler
+            # Qwen3系列模型（Qwen3.5、Qwen3.6）需要特定的ChatHandler来处理消息格式
+            # 注意：Qwen35ChatHandler继承自MTMDChatHandler，需要clip_model_path参数
+            # 因此只有在启用mmproj时才初始化ChatHandler，纯文本模型跳过初始化
+            is_qwen3_model = "qwen35" in model_lower or "qwen3.5" in model_lower or \
+                            "qwen36" in model_lower or "qwen3.6" in model_lower
+            
             need_chat_handler = enable_mmproj and not is_text_only_model or \
-                                (("qwen35" in model_lower or "qwen3.5" in model_lower) and enable_mmproj)
+                                (is_qwen3_model and enable_mmproj)
             
             if need_chat_handler:
                 # 获取并初始化ChatHandler
@@ -2303,6 +2336,21 @@ class LLAMA_CPP_STORAGE:
                 "f16_kv": f16_kv,
                 "cache_prompt": cache_prompt,
             }
+
+            # Qwen3.5/Qwen3.6模型需要设置chat_format为qwen以确保消息格式正确
+            # 当ChatHandler为None时，使用chat_format参数指定消息格式
+            is_qwen35_model = "qwen35" in model.lower() or "qwen3.5" in model.lower()
+            is_qwen36_model = "qwen36" in model.lower() or "qwen3.6" in model.lower()
+            if (is_qwen35_model or is_qwen36_model) and cls.chat_handler is None:
+                try:
+                    llama_sig = inspect.signature(llama_cpp.Llama.__init__)
+                    if 'chat_format' in llama_sig.parameters:
+                        llama_kwargs["chat_format"] = "qwen"
+                        print(f"【Qwen3.5/3.6优化】已设置chat_format=qwen")
+                    else:
+                        print(f"【Qwen3.5/3.6优化】当前llama-cpp-python版本不支持chat_format参数")
+                except Exception as e:
+                    print(f"【Qwen3.5/3.6优化】设置chat_format失败: {e}")
 
             # Flash Attention 配置（仅 NVIDIA GPU）
             if device_mode == "GPU" and gpu_vendor == "NVIDIA":
