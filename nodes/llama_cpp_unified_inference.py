@@ -932,7 +932,7 @@ class llama_cpp_unified_inference:
         
         return model_info
     
-    def get_preset_text_by_language(self, preset_key, language, output_format="JSON格式"):
+    def get_preset_text_by_language(self, preset_key, language, output_format="JSON格式", input_mode="text"):
         """
         根据语言和输出格式获取预设提示词文本
 
@@ -942,6 +942,7 @@ class llama_cpp_unified_inference:
             preset_key: 预设键名
             language: 语言（"中文" 或 "English"）
             output_format: 输出格式（"structured" 或 "natural"）
+            input_mode: 输入模式（"text"、"images"、"video"）
 
         Returns:
             str: 格式化后的预设提示词文本
@@ -1010,6 +1011,9 @@ class llama_cpp_unified_inference:
             base_template = preset.get("input_template_structured")
         else:
             base_template = preset.get("input_template", preset_key)
+
+        # 替换模板中的 {mode} 占位符为实际的输入模式（video/image/text）
+        base_template = base_template.replace("{mode}", input_mode)
 
         # 构建完整的提示词：基础模板 + 约束条件 + 任务要求 + 输出格式后缀
         
@@ -1384,8 +1388,11 @@ class llama_cpp_unified_inference:
             return cached_result
         
         retry_count = 0
-        max_retries = 2
+        max_retries = 3
         success = False
+        
+        # 检查是否是MTP模型
+        is_mtp_model = "-mtp-" in model_path.lower() or "_mtp_" in model_path.lower()
         
         while retry_count < max_retries and not success:
             try:
@@ -1427,6 +1434,15 @@ class llama_cpp_unified_inference:
                         raw_content = output['choices'][0]['message']['content']
                         print(f"【调试】原始返回内容: {raw_content[:100]}...")
                         print(f"【调试】原始内容长度: {len(raw_content)}")
+                    
+                    # MTP模型特殊处理：如果推测解码导致空结果，尝试调整参数重试
+                    if is_mtp_model and retry_count == 1:
+                        print(f"【MTP优化】MTP模型生成空结果，尝试禁用推测解码重试...")
+                        # 临时调整参数，移除可能导致问题的MTP相关设置
+                        gen_params = gen_params.copy()
+                        # 增加temperature以鼓励生成
+                        gen_params["temperature"] = min(gen_params.get("temperature", 0.7) + 0.2, 1.0)
+                        print(f"【MTP优化】调整temperature到 {gen_params['temperature']}")
 
             except Exception as e:
                 # 记录推理结束时间（即使出错）
@@ -1527,7 +1543,7 @@ class llama_cpp_unified_inference:
             
             # 获取预设提示词
             preset_key = self.preset_prompts.get(preset_prompt, "")
-            preset_text = self.get_preset_text_by_language(preset_key, preset_prompts_language, output_format)
+            preset_text = self.get_preset_text_by_language(preset_key, preset_prompts_language, output_format, mode)
             
             # 获取预设模板的示例内容
             example_output = self.get_preset_examples(preset_key, preset_prompts_language, output_format)
@@ -1552,6 +1568,10 @@ class llama_cpp_unified_inference:
                     final_prompt = final_prompt.replace("如果提供了自定义内容，请以此为基础：", "")
                     final_prompt = final_prompt.replace("和提供的自定义内容", "")
                     final_prompt = final_prompt.replace("  ", " ").strip()
+            
+            # 添加示例内容作为参考，引导模型生成更详细的输出
+            if example_output:
+                final_prompt += f"\n\n**【示例】**\n{example_output}"
             
             # 添加语言指示
             if output_language == "中文":
@@ -1710,29 +1730,35 @@ class llama_cpp_unified_inference:
                     # 降低temperature以获得更稳定的输出
                     gen_params["temperature"] = max(gen_params["temperature"] - 0.1, 0.5)
                     print(f"【视频优化】视频处理模式，调整max_tokens={gen_params['max_tokens']}, temperature={gen_params['temperature']}")
-                # Qwen3.5模型特殊内存优化和禁用思考模式
-                try:
-                    from common import LLAMA_CPP_STORAGE
-                    if LLAMA_CPP_STORAGE.current_config:
-                        chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                        if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
-                            # 降低批处理大小以减少内存使用
+                # Qwen3系列模型特殊内存优化和禁用思考模式
+            try:
+                from common import LLAMA_CPP_STORAGE
+                if LLAMA_CPP_STORAGE.current_config:
+                    chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                        # 视频模式需要更激进的参数调整以避免KV缓存耗尽
+                        if video_input and has_video:
+                            # 视频模式下大幅降低批处理大小以避免KV缓存耗尽
+                            gen_params["n_batch"] = min(gen_params.get("n_batch", 512), 128)
+                            print(f"【Qwen3-VL视频优化】视频模式：降低n_batch到128以避免KV缓存耗尽")
+                        else:
+                            # 图像模式使用适中的批处理大小
                             gen_params["n_batch"] = min(gen_params.get("n_batch", 512), 256)
-                            # 减少最大token数
-                            gen_params["max_tokens"] = min(gen_params.get("max_tokens", 1024), 768)
-                            # 降低top_p以减少内存使用
-                            gen_params["top_p"] = max(gen_params.get("top_p", 0.9), 0.8)
-                            # 禁用思考模式以避免混乱输出
-                            gen_params["enable_thinking"] = False
-                            # 添加思考结束标记作为停止序列
-                            stop_list = gen_params.get("stop", [])
-                            if isinstance(stop_list, str):
-                                stop_list = [stop_list]
-                            stop_list.extend(["<|end_of_thinking|>", "<|end_of_solution|>", "</think>"])
-                            gen_params["stop"] = stop_list
-                            print(f"【Qwen3.5优化】调整参数: n_batch={gen_params['n_batch']}, max_tokens={gen_params['max_tokens']}, top_p={gen_params['top_p']}, enable_thinking=False")
-                except Exception as e:
-                    print(f"【Qwen3.5优化】内存参数调整时出错（忽略）: {e}")
+                        # 减少最大token数
+                        gen_params["max_tokens"] = min(gen_params.get("max_tokens", 1024), 768)
+                        # 降低top_p以减少内存使用
+                        gen_params["top_p"] = max(gen_params.get("top_p", 0.9), 0.8)
+                        # 禁用思考模式以避免混乱输出
+                        gen_params["enable_thinking"] = False
+                        # 添加思考结束标记作为停止序列
+                        stop_list = gen_params.get("stop", [])
+                        if isinstance(stop_list, str):
+                            stop_list = [stop_list]
+                        stop_list.extend(["<|end_of_thinking|>", "<|end_of_solution|>", "</think>"])
+                        gen_params["stop"] = stop_list
+                        print(f"【Qwen3优化】调整参数: n_batch={gen_params['n_batch']}, max_tokens={gen_params['max_tokens']}, top_p={gen_params['top_p']}, enable_thinking=False")
+            except Exception as e:
+                print(f"【Qwen3优化】内存参数调整时出错（忽略）: {e}")
                 self._perf_params_cache[cache_key] = gen_params.copy()
             
             # 应用用户自定义参数
@@ -1763,36 +1789,60 @@ class llama_cpp_unified_inference:
             if final_prompt:
                 content.append({"type": "text", "text": final_prompt})
             
+            # 获取当前ChatHandler信息用于优化
+            current_chat_handler = ""
+            try:
+                from common import LLAMA_CPP_STORAGE
+                if LLAMA_CPP_STORAGE.current_config:
+                    current_chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+            except Exception as e:
+                pass
+            
             # 先添加视频帧
             if len(video_frames) > 0:
-                # Qwen3.5模型特殊图像大小优化
-                qwen35_image_size = image_max_size
+                # Qwen3-VL视频模式：在推理前清理KV缓存以避免内存不足
                 try:
                     from common import LLAMA_CPP_STORAGE
-                    if LLAMA_CPP_STORAGE.current_config:
-                        chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                        if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
-                            # 保持合理图像大小以匹配image_max_tokens（1024）
-                            qwen35_image_size = min(image_max_size, 512)
-                            if qwen35_image_size < 256:
-                                qwen35_image_size = 256
-                            print(f"【Qwen3.5优化】调整视频帧大小为: {qwen35_image_size}")
+                    if LLAMA_CPP_STORAGE.llm and current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                        # 清理KV缓存以腾出空间给视频帧
+                        if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
+                            LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
+                            print(f"【Qwen3-VL视频优化】已清理KV缓存，为视频帧腾出空间")
+                        if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
+                            if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
+                                LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
                 except Exception as e:
-                    print(f"【Qwen3.5优化】视频帧大小调整时出错（忽略）: {e}")
+                    print(f"【Qwen3-VL视频优化】KV缓存清理时出错（忽略）: {e}")
+
+                # Qwen3系列模型特殊优化：限制帧数和降低图像大小
+                qwen3_image_size = image_max_size
+                qwen3_frame_limit = len(video_frames)
                 
-                for i, frame in enumerate(video_frames):
-                    # 处理PyTorch张量或numpy数组
+                if current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                    # 限制帧数以避免内存不足（每帧大约需要256-512 tokens）
+                    qwen3_frame_limit = min(len(video_frames), 8)
+                    # 降低图像大小以减少内存使用
+                    qwen3_image_size = min(image_max_size, 256)
+                    if qwen3_image_size < 128:
+                        qwen3_image_size = 128
+                    if len(video_frames) > qwen3_frame_limit:
+                        print(f"【Qwen3优化】限制视频帧数从 {len(video_frames)} 到 {qwen3_frame_limit} 以避免内存不足")
+                    print(f"【Qwen3优化】调整视频帧大小为: {qwen3_image_size}")
+                
+                # 截取限制后的帧数
+                video_frames_to_use = video_frames[:qwen3_frame_limit]
+                
+                for i, frame in enumerate(video_frames_to_use):
                     if hasattr(frame, 'cpu'):
                         img = frame.cpu().numpy()
                     else:
                         img = frame
-                    img_np = scale_image(img, qwen35_image_size)
+                    img_np = scale_image(img, qwen3_image_size)
                     img_base64 = image2base64(img_np)
                     content.append({
                         "type": "image_url",
                         "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}
                     })
-                    # 清理内存
                     del img, img_np, img_base64
                     import gc
                     gc.collect()
@@ -1802,38 +1852,69 @@ class llama_cpp_unified_inference:
                 if len(images.shape) == 3:
                     images = images.unsqueeze(0)
                 
-                # Qwen3.5模型特殊图像大小优化
-                qwen35_image_size = image_max_size
-                try:
-                    from common import LLAMA_CPP_STORAGE
-                    if LLAMA_CPP_STORAGE.current_config:
-                        chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                        if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
-                            # 保持合理图像大小以匹配image_max_tokens（1024）
-                            # 512大小可以保证足够的图像质量同时控制内存使用
-                            qwen35_image_size = min(image_max_size, 512)
-                            if qwen35_image_size < 256:
-                                qwen35_image_size = 256
-                            print(f"【Qwen3.5优化】调整图像大小为: {qwen35_image_size}")
-                except Exception as e:
-                    print(f"【Qwen3.5优化】图像大小调整时出错（忽略）: {e}")
+                # Qwen3系列模型特殊图像大小优化
+                qwen3_image_size = image_max_size
+                if current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                    qwen3_image_size = min(image_max_size, 256)
+                    if qwen3_image_size < 128:
+                        qwen3_image_size = 128
+                    print(f"【Qwen3优化】调整图像大小为: {qwen3_image_size}")
                 
                 for i in range(images.shape[0]):
-                    # 处理PyTorch张量或numpy数组
                     if hasattr(images[i], 'cpu'):
                         img = images[i].cpu().numpy()
                     else:
                         img = images[i]
-                    img_np = scale_image(img, qwen35_image_size)
+                    img_np = scale_image(img, qwen3_image_size)
                     img_base64 = image2base64(img_np)
                     content.append({
                         "type": "image_url",
                         "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}
                     })
-                    # 清理内存
                     del img, img_np, img_base64
                     import gc
                     gc.collect()
+            
+            # 回退机制：当ChatHandler为None且没有图像/视频内容时，将列表格式转换为字符串格式
+            # 这是因为某些模型（如MTP模型）不支持列表格式的content
+            # 特殊处理：Qwen3.5/3.6启用mmproj时，根据推理模式决定是否使用纯文本格式
+            # - text模式：强制使用纯文本格式，避免模型误判为图片反推
+            # - images/batch_images/video模式：正常使用多模态功能
+            has_visual_content = len(video_frames) > 0 or (images is not None and mode in ["images"])
+            chat_handler_available = False
+            enable_mmproj = False
+            is_qwen3_model = False
+            try:
+                from common import LLAMA_CPP_STORAGE
+                chat_handler_available = LLAMA_CPP_STORAGE.chat_handler is not None
+                if LLAMA_CPP_STORAGE.current_config:
+                    enable_mmproj = LLAMA_CPP_STORAGE.current_config.get("enable_mmproj", False)
+                    current_chat_handler_name = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                    is_qwen3_model = current_chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking"]
+            except Exception as e:
+                pass
+            
+            # 判断是否需要强制使用纯文本格式：
+            # 1. ChatHandler不可用且无视觉内容（原有逻辑）
+            # 2. Qwen3.5/3.6启用mmproj且为文本生成模式（根据推理模式判定）
+            is_text_mode = mode == "text"
+            force_text_mode = (not chat_handler_available and not has_visual_content) or \
+                              (is_qwen3_model and enable_mmproj and is_text_mode)
+            
+            if force_text_mode and isinstance(content, list):
+                # 将列表格式转换为纯文本字符串
+                text_parts = []
+                for item in content:
+                    if isinstance(item, dict) and item.get('type') == 'text':
+                        text_parts.append(item.get('text', ''))
+                    elif isinstance(item, str):
+                        text_parts.append(item)
+                content = ''.join(text_parts).strip()
+                if is_qwen3_model and enable_mmproj and is_text_mode:
+                    print(f"【Qwen3.5/3.6优化】文本生成模式，强制使用纯文本格式")
+                else:
+                    print(f"【回退模式】ChatHandler为None，已将content从列表格式转换为字符串格式")
+            
             messages = self.engine.build_messages(system_prompt, content)
             
             print(f"【推理】使用模型: {self.model_info['key']}, 消息数: {len(messages)}")
@@ -1875,12 +1956,12 @@ class llama_cpp_unified_inference:
                         if audio_output_mode == "TTS音色美化输出" and enable_tts and audio_output is None and generated_text:
                             pass  # 继续到TTS处理
                         else:
-                            # Qwen3.5 模型特殊内存清理（防止多余内容）
+                            # Qwen3系列模型特殊内存清理（防止多余内容）
                             try:
                                 from common import LLAMA_CPP_STORAGE
                                 if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
                                     chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
                                         if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
                                             LLAMA_CPP_STORAGE.llm.n_tokens = 0
                                         if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
@@ -1888,9 +1969,9 @@ class llama_cpp_unified_inference:
                                         if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
                                             if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
                                                 LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
-                                        print("【Qwen3.5优化】已清理模型内存，防止多余内容")
+                                        print("【Qwen3优化】已清理模型内存，防止多余内容")
                             except Exception as e:
-                                print(f"【Qwen3.5优化】内存清理时出错（忽略）: {e}")
+                                print(f"【Qwen3优化】内存清理时出错（忽略）: {e}")
 
                             # 直接返回结果
                             _uid = parameters.get("state_uid", None) if parameters else None
@@ -1988,12 +2069,12 @@ class llama_cpp_unified_inference:
                     audio_output["sample_rate"] = 24000
                     print("【TTS兼容】sample_rate缺失，已默认设为24000")
 
-            # Qwen3.5 模型特殊内存清理（防止多余内容）
+            # Qwen3系列模型特殊内存清理（防止多余内容）
             try:
                 from common import LLAMA_CPP_STORAGE
                 if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
                     chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking"]:
+                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
                         if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
                             LLAMA_CPP_STORAGE.llm.n_tokens = 0
                         if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
@@ -2001,9 +2082,9 @@ class llama_cpp_unified_inference:
                         if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
                             if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
                                 LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
-                        print("【Qwen3.5优化】已清理模型内存，防止多余内容")
+                        print("【Qwen3优化】已清理模型内存，防止多余内容")
             except Exception as e:
-                print(f"【Qwen3.5优化】内存清理时出错（忽略）: {e}")
+                print(f"【Qwen3优化】内存清理时出错（忽略）: {e}")
 
             # 强制卸载
             if force_offload:

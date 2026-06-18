@@ -283,6 +283,7 @@ class llama_cpp_model_loader:
         is_qwen35 = "qwen35" in model.lower() or "qwen3.5" in model.lower()
         is_qwen36 = "qwen36" in model.lower() or "qwen3.6" in model.lower()
         is_qwen3vl = "qwen3-vl" in model.lower() or "qwen3vl" in model.lower()
+        is_qwen36vl = "qwen36-vl" in model.lower() or "qwen3.6-vl" in model.lower()
         
         
 
@@ -299,6 +300,14 @@ class llama_cpp_model_loader:
                 print(f"【GPU模式优化】Qwen3.5模型启用特殊GPU参数配置")
                 # 确保使用正确的ChatHandler
                 print(f"【提示】Qwen3.5模型将使用Qwen35ChatHandler")
+                # Qwen3.5模型需要合理的image tokens（仅当用户未设置时自动调整）
+                if enable_mmproj and image_min_tokens == 0:
+                    image_min_tokens = 256
+                    print(f"【GPU模式优化】Qwen3.5模型自动设置image_min_tokens为256")
+                # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
+                if enable_mmproj and image_max_tokens < image_min_tokens:
+                    image_max_tokens = image_min_tokens
+                    print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
             
             # 针对Qwen3.6模型的特殊优化
             if is_qwen36:
@@ -308,17 +317,35 @@ class llama_cpp_model_loader:
                     print(f"【GPU模式优化】Qwen3.6模型需要至少8192的上下文长度，自动调整从{n_ctx}到8192")
                     n_ctx = 8192
                 # 确保使用正确的ChatHandler
-                print(f"【提示】Qwen3.6模型将使用Qwen35ChatHandler（兼容模式）")
+                if is_qwen36vl:
+                    print(f"【提示】Qwen3.6-VL模型将使用Qwen3VLChatHandler")
+                else:
+                    print(f"【提示】Qwen3.6模型将使用Qwen35ChatHandler（兼容模式）")
+                # Qwen3.6模型需要合理的image tokens（仅当用户未设置时自动调整）
+                if enable_mmproj and image_min_tokens == 0:
+                    image_min_tokens = 256
+                    print(f"【GPU模式优化】Qwen3.6模型自动设置image_min_tokens为256")
+                # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
+                if enable_mmproj and image_max_tokens < image_min_tokens:
+                    image_max_tokens = image_min_tokens
+                    print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
             
-            # Qwen3系列模型（包括Qwen3-VL、Qwen3.5和Qwen3.6）需要至少1024个image tokens
-            if image_min_tokens < 1024:
-                print(f"【GPU模式优化】Qwen3系列模型需要至少1024 image tokens，自动调整image_min_tokens从{image_min_tokens}到1024")
-                image_min_tokens = 1024
-            
-            # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
-            if image_max_tokens < image_min_tokens:
-                image_max_tokens = image_min_tokens
-                print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
+            # 针对Qwen3-VL模型的特殊优化
+            if is_qwen3vl:
+                print(f"【GPU模式优化】Qwen3-VL模型启用特殊GPU参数配置")
+                # Qwen3-VL模型需要更大的上下文长度（视频处理时需要更多tokens）
+                # 每个视频帧大约需要1024-2048 tokens，8帧需要约16384 tokens
+                if n_ctx < 16384:
+                    print(f"【GPU模式优化】Qwen3-VL模型需要至少16384的上下文长度以支持视频处理，自动调整从{n_ctx}到16384")
+                    n_ctx = 16384
+                # Qwen3-VL模型需要合理的image tokens（仅当用户未设置时自动调整）
+                if enable_mmproj and image_min_tokens == 0:
+                    image_min_tokens = 1024  # 提高到1024以支持视频帧
+                    print(f"【GPU模式优化】Qwen3-VL模型自动设置image_min_tokens为1024")
+                # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
+                if enable_mmproj and image_max_tokens < image_min_tokens:
+                    image_max_tokens = image_min_tokens
+                    print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
         
         # 根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）
         def get_auto_chat_handler(model_name):
