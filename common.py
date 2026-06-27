@@ -245,7 +245,7 @@ if _check_and_install_llama_cpp_python():
         chat_handlers_to_import = [
             'Llava15ChatHandler', 'Llava16ChatHandler', 'MoondreamChatHandler',
             'NanoLlavaChatHandler', 'Llama3VisionAlphaChatHandler', 'MiniCPMv26ChatHandler', 
-            'MiniCPMv45ChatHandler', 'Qwen3VLChatHandler', 'Qwen25VLChatHandler', 
+            'MiniCPMv45ChatHandler', 'MiniCPMv46ChatHandler', 'Qwen3VLChatHandler', 'Qwen25VLChatHandler', 
             'Qwen35ChatHandler', 'GLM46VChatHandler', 'GLM41VChatHandler', 
             'LFM2VLChatHandler', 'Gemma3ChatHandler', 'Gemma4ChatHandler', 
             'LFM25VLChatHandler', 'GraniteDoclingChatHandler', 'MTMDChatHandler',
@@ -892,8 +892,12 @@ class ChatHandlerManager:
         'glm46vthinking': 'GLM-4.6V-Thinking',
         'glm41v': 'GLM-4.1V-Thinking',
         'minicpmv45': 'MiniCPM-v4.5',
+        'minicpmv45thinking': 'MiniCPM-v4.5-Thinking',
+        'minicpmv46': 'MiniCPM-v4.6',
+        'minicpmv46thinking': 'MiniCPM-v4.6-Thinking',
         'minicpmv26': 'MiniCPM-v2.6',
         'minicpmo45': 'MiniCPM-O-4.5',
+        'minicpmo46': 'MiniCPM-O-4.6',
         'minicpmo26': 'MiniCPM-O-2.6',
         'minicpmlama3v25': 'MiniCPM-Llama3-V 2.5',
         'moondream3': 'Moondream3',
@@ -1106,6 +1110,8 @@ class ChatHandlerManager:
             ('qwen3-asr', 'Qwen3ASRChatHandler'),
             ('minicpm-v-4.5', 'MiniCPMv45ChatHandler'),
             ('minicpm-o-4.5', 'MiniCPMv45ChatHandler'),
+            ('minicpm-v-4.6', 'MiniCPMv46ChatHandler'),
+            ('minicpm-o-4.6', 'MiniCPMv46ChatHandler'),
             ('minicpm-o-2.6', 'MiniCPMv26ChatHandler'),
             ('minicpmo2.6', 'MiniCPMv26ChatHandler'),
             ('minicpm-v-2.6', 'MiniCPMv26ChatHandler'),
@@ -1157,6 +1163,7 @@ class ChatHandlerManager:
             ('glm-4.6v-thinking', 'GLM46VChatHandler'),
             ('glm-4.1v-thinking', 'GLM41VChatHandler'),
             ('minicpm-v-4.5-thinking', 'MiniCPMv45ChatHandler'),
+            ('minicpm-v-4.6-thinking', 'MiniCPMv46ChatHandler'),
         ])
         
         for keyword, handler_name in special_rules:
@@ -1187,11 +1194,11 @@ chat_handler_manager = ChatHandlerManager()
 
 # 基础模型列表（无需ChatHandler的模型 - 保留向后兼容）
 base_models = ["LLaVA-1.6", "nanoLLaVA", "llama-joycaption", "moondream3-preview", "Moondream2", 
-               "MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking", "GLM-4.1V-Thinking", "InternLM-XComposer2-VL", "DreamOmni2", 
+               "MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking", "GLM-4.1V-Thinking", "InternLM-XComposer2-VL", "DreamOmni2", 
                "MiniCPM-Llama3-V 2.5", "Llama-3.2-11B-Vision-Instruct", "CogVLM2", 
                "CogVLM-MOE", "Phi-3.5-vision-instruct", "Phi-3-vision-128k-instruct", 
                "Qwen2.5-VL", "Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3-VL-Chat", "Qwen3-VL-Instruct", 
-               "Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5",
+               "Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5", "MiniCPM-O-4.6",
                "Qwen3-ASR", "LLaMA-3.1-Vision", "Zhipu-Vision", "智谱AI-Vision", "olmOCR-2", 
                "InternVL-1.5", "InternVL-2.0", "Yi-VL-2.0", "Gemma-3", "Gemma-4", "Granite-DocLing", 
                "Lfm-2-VL", "Lfm-2.5-VL", "Llama3-Vision-Alpha", "LLaVA-1.5", "MiniCPM-v2.6", "Obsidian", 
@@ -1215,8 +1222,12 @@ CHAT_HANDLER_MODEL_MAP = {
     'glm41v': 'GLM-4.1V-Thinking',
     'minicpmv45': 'MiniCPM-v4.5',
     'minicpmv45thinking': 'MiniCPM-v4.5-Thinking',
+    'minicpmv46': 'MiniCPM-v4.6',
+    'minicpmv46thinking': 'MiniCPM-v4.6-Thinking',
     'minicpmv26': 'MiniCPM-v2.6',
     'minicpmllama3v25': 'MiniCPM-Llama3-V 2.5',
+    'minicpmo45': 'MiniCPM-O-4.5',
+    'minicpmo46': 'MiniCPM-O-4.6',
     'moondream3': 'moondream3-preview',
     'moondream2': 'Moondream2',
     'internlmxcomposer2vl': 'InternLM-XComposer2-VL',
@@ -1247,6 +1258,7 @@ CHAT_HANDLER_MODEL_MAP = {
     'yivl6b': 'Yi-VL-6B',
     'lightonocr21b': 'LightOnOCR-2-1B',
     'minicpmo45': 'MiniCPM-O-4.5',
+    'minicpmo46': 'MiniCPM-O-4.6',
     'qwen25omni': 'Qwen2.5-Omni-7B',
     'asidcaptioner7b': 'ASID-Captioner-7B',
     'zen3vli1': 'zen3-vl-i1',
@@ -1623,7 +1635,9 @@ MODEL_FILE_CHAT_HANDLER_MAP = {
     # MiniCPM 系列
     'minicpm-v-2.6': 'MiniCPM-v2.6',
     'minicpm-v-4.5': 'MiniCPM-v4.5',
+    'minicpm-v-4.6': 'MiniCPM-v4.6',
     'minicpm-o-4.5': 'MiniCPM-O-4.5',
+    'minicpm-o-4.6': 'MiniCPM-O-4.6',
     'minicpm-llama3-v-2.5': 'MiniCPM-Llama3-V 2.5',
     # GLM 系列
     'glm-4.6v': 'GLM-4.6V',
@@ -1724,8 +1738,12 @@ def detect_model_chat_handler(model_filename):
     if 'minicpm' in filename_lower:
         if 'llama3' in filename_lower:
             return 'MiniCPM-Llama3-V 2.5'
+        elif 'o-4.6' in filename_lower or 'o_4.6' in filename_lower or 'o4.6' in filename_lower:
+            return 'MiniCPM-O-4.6'
         elif 'o-4' in filename_lower or 'o_4' in filename_lower or 'o4' in filename_lower:
             return 'MiniCPM-O-4.5'
+        elif 'v-4.6' in filename_lower or 'v_4.6' in filename_lower or 'v4.6' in filename_lower:
+            return 'MiniCPM-v4.6'
         elif 'v-4' in filename_lower or 'v_4' in filename_lower or 'v4' in filename_lower:
             return 'MiniCPM-v4.5'
         elif 'v-2' in filename_lower or 'v_2' in filename_lower or 'v2' in filename_lower:
@@ -1949,7 +1967,10 @@ class LLAMA_CPP_STORAGE:
             "MiniCPM-v2.6": MiniCPMv26ChatHandler,
             "MiniCPM-v4.5": MiniCPMv45ChatHandler,
             "MiniCPM-v4.5-Thinking": MiniCPMv45ChatHandler,
+            "MiniCPM-v4.6": MiniCPMv46ChatHandler,
+            "MiniCPM-v4.6-Thinking": MiniCPMv46ChatHandler,
             "MiniCPM-O-4.5": MiniCPMv45ChatHandler,
+            "MiniCPM-O-4.6": MiniCPMv46ChatHandler,
             "Gemma3": Gemma3ChatHandler,
             "Gemma4": Gemma4ChatHandler,
             "GLM-4.6V": GLM46VChatHandler,
@@ -1975,6 +1996,8 @@ class LLAMA_CPP_STORAGE:
             return Qwen35ChatHandler  # Qwen3.6使用Qwen35ChatHandler兼容
         if chat_handler_name.startswith("Qwen3-VL"):
             return Qwen3VLChatHandler
+        if chat_handler_name.startswith("MiniCPM-v4.6") or chat_handler_name.startswith("MiniCPM-O-4.6"):
+            return MiniCPMv46ChatHandler
         if chat_handler_name.startswith("MiniCPM-v4.5") or chat_handler_name.startswith("MiniCPM-v2.6") or chat_handler_name.startswith("MiniCPM-O-"):
             return MiniCPMv26ChatHandler
         if "Llama3" in chat_handler_name and "MiniCPM" in chat_handler_name:
@@ -2015,7 +2038,7 @@ class LLAMA_CPP_STORAGE:
             elif mmproj_path:
                 init_params["clip_model_path"] = mmproj_path
             
-            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
+            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
                 init_params["enable_thinking"] = think_mode
             
             # Qwen3.5/Qwen3.6 需要特殊处理 - 它可能继承自 MTMDChatHandler

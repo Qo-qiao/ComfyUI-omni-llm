@@ -124,8 +124,17 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 ## 更新日志
 
+#### v3.1.6 （2026-06-27）
+以下更新基于llama-cpp-python 0.3.40版本，请先安装该版本的llama-cpp-python
+
+- **预设模板优化**：由于原预设模板功能定位重复，分类混杂严重影响出图效果和用户使用体验，现将模板按照不同类别做专属优化，添加细化人像摄影、平面设计、视频制作等不同类别各专业名词，添加各主流类别使用场景预设模板30多个（其余部分使用频率不高的预设模板将整合到ComfyUI-prompt-storage插件中）请根据实际情况选择使用。
+
+<details>
+<summary>📋 历史版本</summary>
+
 #### v3.1.5 （2026-06-18）
 以下更新基于llama-cpp-python 0.3.40版本，请先安装该版本的llama-cpp-python
+
 - **优化节点参数**：完善qwen3系列推理逻辑，qwen3.5、qwen3.6等思考类模型使用文本生成模式必须启用mmproj模型，部分预设模板可能无法使用，请自测调整或使用非思考类模型
 - **修复推理问题**：修复预设模板功能修改导致的推理失败或内容不匹配问题，添加示例引导，减少生成内容跑偏的情况
 - **预设模板优化**：完善预设模板示例内容（不同预设模板有不同方向优化，如人像请使用zimage预设模板，生成使用其他模型，请根据实际情况自行搭配调整）
@@ -314,6 +323,8 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 - 添加了卸载模型节点（减少显存占用）
 - 添加了硬件优化模块，适配高低不同性能硬件，提高推理速度，确保不同硬件都能流畅使用
 - 重写了Prompt Style预设信息
+
+</details>
 
 ## 致谢
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6

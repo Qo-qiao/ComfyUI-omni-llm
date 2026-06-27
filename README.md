@@ -117,8 +117,20 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-#### v3.1.5 (2026-06-18)
+#### v3.1.6 (2026-06-27)
+
 The following updates are based on llama-cpp-python version 0.3.40, please install this version of llama-cpp-python first
+
+- **Preset Template Optimization**: Optimized preset templates to improve out-image quality and user experience. Added detailed preset templates examples for different categories (portrait, design, video, etc.).
+- **Rewrite Prompt Style preset information**
+
+<details>
+<summary>📋 Older Versions</summary>
+
+#### v3.1.5 (2026-06-18)
+
+The following updates are based on llama-cpp-python version 0.3.40, please install this version of llama-cpp-python first
+
 - **Optimized Node Parameters**: Improved Qwen3 series inference logic. For Qwen3.5, Qwen3.6 and other thinking models using text generation mode, mmproj model must be enabled. Some preset templates may not work, please test and adjust or use non-thinking models
 - **Fixed Inference Issues**: Fixed inference failures or content mismatch issues caused by preset template function modifications. Added example guidance to reduce the chance of generated content deviating from expected results
 - **Preset Template Optimization**: Improved preset template examples (different preset templates have different optimization directions, e.g., use zimage preset template for portraits, use other models for generation, please adjust according to actual needs)
@@ -304,7 +316,8 @@ The following updates are based on llama-cpp-python version 0.3.40, please insta
 - Add session cleanup node (releases resources occupied by current conversation, reduces occurrence of no results)
 - Add model unload node (reduces VRAM usage)
 - Add hardware optimization module, adapts to different performance hardware, improves inference speed, ensures smooth use on different hardware
-- Rewrite Prompt Style preset information
+
+</details>
 
 ## Acknowledgments
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6

@@ -33,7 +33,6 @@ from multi_model_tts import multi_model_tts
 from llama_cpp_asr_loader import llama_cpp_asr_loader
 from forced_aligner_loader import forced_aligner_loader
 from forced_aligner_inference import forced_aligner_inference
-from json_to_bbox import json_to_bbox
 from multi_image_input import MultiImageInput
 from video_loader import VideoLoader
 from tts_align import tts_align
@@ -49,7 +48,6 @@ NODE_CLASS_MAPPINGS = {
     "llama_cpp_asr_loader": llama_cpp_asr_loader,
     "forced_aligner_loader": forced_aligner_loader,
     "forced_aligner_inference": forced_aligner_inference,
-    "json_to_bbox": json_to_bbox,
     "multi_image_input": MultiImageInput,
     "llama_cpp_unified_inference": llama_cpp_unified_inference,
     "VideoLoader": VideoLoader,
@@ -67,7 +65,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "llama_cpp_asr_loader": "Llama-cpp ASR Model Loader",
     "forced_aligner_loader": "Forced Aligner Model Loader",
     "forced_aligner_inference": "Forced Aligner Inference",
-    "json_to_bbox": "JSON to Bounding Box",
     "multi_image_input": "Multi-Image Input (Story Creation)",
     "llama_cpp_unified_inference": "Llama CPP Unified Inference",
     "VideoLoader": "Video Loader",
@@ -78,4 +75,4 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
 
 # 版本信息
-VERSION = "3.1.5"
+VERSION = "3.1.6"
