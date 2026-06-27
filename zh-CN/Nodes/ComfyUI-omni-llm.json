@@ -1,31 +1,4 @@
 {
-  "json_to_bbox": {
-    "title": "JSON转边界框",
-    "inputs": {
-      "json": "JSON数据",
-      "mode": "模式",
-      "label": "标签过滤",
-      "image": "图像"
-    },
-    "widgets": {
-      "json": "JSON数据",
-      "mode": "模式",
-      "label": "标签过滤"
-    },
-    "outputs": {
-      "bboxes": "边界框",
-      "image_list": "图像列表"
-    },
-    "tooltips": {
-      "json": "包含边界框信息的JSON字符串",
-      "mode": "选择解析模式",
-      "label": "按标签过滤边界框",
-      "image": "可选的输入图像",
-      "bboxes": "解析出的边界框列表",
-      "image_list": "绘制了边界框的图像列表"
-    }
-  },
-
   "llama_cpp_asr_loader": {
     "title": "Llama-cpp ASR模型加载器",
     "inputs": {
@@ -214,7 +187,8 @@
       "mirostat_mode": "Mirostat模式",
       "mirostat_eta": "Mirostat学习率",
       "mirostat_tau": "Mirostat目标困惑度",
-      "state_uid": "对话状态ID"
+      "state_uid": "对话状态ID",
+      "reasoning_budget": "推理预算"
     },
     "widgets": {
       "max_tokens": "最大token数",
@@ -229,7 +203,8 @@
       "mirostat_mode": "Mirostat模式",
       "mirostat_eta": "Mirostat学习率",
       "mirostat_tau": "Mirostat目标困惑度",
-      "state_uid": "对话状态ID"
+      "state_uid": "对话状态ID",
+      "reasoning_budget": "推理预算"
     },
     "outputs": {
       "parameters": "参数"
@@ -247,7 +222,8 @@
       "mirostat_mode": "Mirostat采样模式\n• 0：关闭（默认）\n• 1：基础版\n• 2：版本2（推荐）\n\n自适应控制生成多样性",
       "mirostat_eta": "Mirostat学习率\n• 控制适应性调整速度\n• 推荐值：0.1",
       "mirostat_tau": "Mirostat目标困惑度\n• 控制生成多样性\n• 推荐值：5-7",
-      "state_uid": "对话状态ID\n• -1：使用节点唯一ID\n• 用于多轮对话管理"
+      "state_uid": "对话状态ID\n• -1：使用节点唯一ID\n• 用于多轮对话管理",
+      "reasoning_budget": "推理预算（用于支持thinking模式的模型如Qwen3.5-Thinking）\n• -1：无限制\n• 0：关闭思考模式\n• N：限制N个思考token"
     }
   },
   "llama_cpp_tts_loader": {
