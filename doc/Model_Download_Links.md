@@ -368,7 +368,7 @@
 **Download Link**: https://huggingface.co/noctrex/LightOnOCR-2-1B-GGUF (includes mmproj model)
 
 
-### MiMo-VL Series
+### MiMo-VL Series (Temporary Unavailable)
 
 **Model Series**: MiMo-VL
 **Specific Model**: MiMo-VL-7B-RL-2508
@@ -378,7 +378,7 @@
 **Alternative Link**: https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF (includes mmproj model)
 
 
-### Nex-N2 Series
+### Nex-N2 Series (Temporary Unavailable)
 
 **Model Series**: Nex-N2
 **Specific Model**: Huihui-Nex-N2-mini-abliterated-APEX
@@ -389,10 +389,6 @@
 
 
 ## CLIP Models (NSFW Version - Untested)
-
-**Applicable Generation Models**：Krea-2
-- qwen3_vl_4b_fp8_abliterated.safetensors
-- https://huggingface.co/sdfasdfasdfsdfsdf/qwen3_vl_4b_fp8_abliterated_comfyui
 
 **Applicable Generation Models**：Boogu-Image
 - qwen3vl-8b-abliterated-fp8-scaled.safetensors
