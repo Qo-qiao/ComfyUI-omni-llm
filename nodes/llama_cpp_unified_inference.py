@@ -188,54 +188,70 @@ class ErrorHandler:
 
 # 导入预设提示词库
 from support.prompt_enhancer_preset_zh import (
-    NORMAL_DESCRIBE_TAGS_ZH,
-    NORMAL_DESCRIBE_ZH,
+    IMAGE_REVERSE_TAGS_ZH,
+    IMAGE_REVERSE_DESCRIBE_ZH,
     PROMPT_EXPANDER_ZH,
-    ZIMAGE_TURBO_ZH,
-    FLUX2_KLEIN_ZH,
-    QWEN_IMAGE_2512_ZH,
-    QWEN_IMAGE_EDIT_COMBINED_ZH,
-    LTX2_ZH,
-    WAN_T2V_ZH,
-    WAN_I2V_ZH,
-    WAN_FLF2V_ZH,
-    VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH,
+    ILLUSTRIOUS_ZH,
+    ANIME_PROMPT_ZH,
+    REALISTIC_FEMALE_ZH,
+    REALISTIC_MALE_ZH,
+    WESTERN_FEMALE_ZH,
+    WESTERN_MALE_ZH,
+    INFLUENCER_PORTRAIT_ZH,
+    MALE_PORTRAIT_ZH,
+    YOUNG_BOY_PORTRAIT_ZH,
+    MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
+    MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
+    ART_ILLUSTRATION_ZH,
+    POSTER_DESIGN_ZH,
+    SCENE_DESIGN_ZH,
+    INTERIOR_DESIGN_ZH,
+    ECOMMERCE_ZH,
+    FOOD_PHOTOGRAPHY_ZH,
+    EDIT_COMBINED_ZH,
+    UNIVERSAL_VIDEO_ZH,
+    CONTINUING_I2V_ZH,
+    CONTINUING_FLF2V_ZH,
+    VIDEO_FRAME_SEQUENCE_ZH,
     VIDEO_TO_PROMPT_ZH,
-    VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
+    VIDEO_SCENE_BREAKDOWN_ZH,
     VIDEO_SUBTITLE_FORMAT_ZH,
     MULTI_SPEAKER_DIALOGUE_ZH,
     LYRICS_CREATION_ZH,
-    OCR_ENHANCED_ZH,
-    VISION_BOUNDING_BOX_ZH,
-    ILLUSTRIOUS_ZH,
-    ANIMA_ZH,
-    ERNIE_IMAGE_ZH,
     IDEOGRAM4_ZH,
 )
 
 from support.prompt_enhancer_preset_en import (
-    NORMAL_DESCRIBE_TAGS_EN,
-    NORMAL_DESCRIBE_EN,
+    IMAGE_REVERSE_TAGS_EN,
+    IMAGE_REVERSE_DESCRIBE_EN,
     PROMPT_EXPANDER_EN,
-    ZIMAGE_TURBO_EN,
-    FLUX2_KLEIN_EN,
-    QWEN_IMAGE_2512_EN,
-    QWEN_IMAGE_EDIT_COMBINED_EN,
-    LTX2_EN,
-    WAN_T2V_EN,
-    WAN_I2V_EN,
-    WAN_FLF2V_EN,
-    VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN,
+    ILLUSTRIOUS_EN,
+    ANIME_PROMPT_EN,
+    REALISTIC_FEMALE_EN,
+    REALISTIC_MALE_EN,
+    WESTERN_FEMALE_EN,
+    WESTERN_MALE_EN,
+    INFLUENCER_PORTRAIT_EN,
+    MALE_PORTRAIT_EN,
+    YOUNG_BOY_PORTRAIT_EN,
+    MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
+    MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
+    ART_ILLUSTRATION_EN,
+    POSTER_DESIGN_EN,
+    SCENE_DESIGN_EN,
+    INTERIOR_DESIGN_EN,
+    ECOMMERCE_EN,
+    FOOD_PHOTOGRAPHY_EN,
+    EDIT_COMBINED_EN,
+    UNIVERSAL_VIDEO_EN,
+    CONTINUING_I2V_EN,
+    CONTINUING_FLF2V_EN,
+    VIDEO_FRAME_SEQUENCE_EN,
     VIDEO_TO_PROMPT_EN,
-    VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
+    VIDEO_SCENE_BREAKDOWN_EN,
     VIDEO_SUBTITLE_FORMAT_EN,
     MULTI_SPEAKER_DIALOGUE_EN,
     LYRICS_CREATION_EN,
-    OCR_ENHANCED_EN,
-    VISION_BOUNDING_BOX_EN,
-    ILLUSTRIOUS_EN,
-    ANIMA_EN,
-    ERNIE_IMAGE_EN,
     IDEOGRAM4_EN,
 )
 
@@ -785,29 +801,37 @@ class llama_cpp_unified_inference:
     preset_prompts["Empty - Nothing"] = ""
 
     # 添加分类预设提示词（顺序与 prompt_enhancer_preset_zh.py / prompt_enhancer_preset_en.py 保持一致）
-    preset_prompts["[Reverse] Tags"] = "NORMAL_DESCRIBE_TAGS"
-    preset_prompts["[Reverse] Describe"] = "NORMAL_DESCRIBE"
+    preset_prompts["[Reverse] Tags"] = "IMAGE_REVERSE_TAGS"
+    preset_prompts["[Reverse] Describe"] = "IMAGE_REVERSE_DESCRIBE"
     preset_prompts["[Normal] Expand"] = "PROMPT_EXPANDER"
-    preset_prompts["[Anime] Illustrious"] = "ILLUSTRIOUS"
-    preset_prompts["[Anime] Anima"] = "ANIMA"
-    preset_prompts["[Portrait] ZIMAGE - Turbo"] = "ZIMAGE_TURBO"
-    preset_prompts["[General] FLUX2 - Klein"] = "FLUX2_KLEIN"
-    preset_prompts["[Design] ERNIE - Image"] = "ERNIE_IMAGE"
-    preset_prompts["[Design] Ideogram-4"] = "IDEOGRAM4"
-    preset_prompts["[Poster] Qwen - Image 2512"] = "QWEN_IMAGE_2512"
-    preset_prompts["[Image Edit] Qwen - Image Edit Combined"] = "QWEN_IMAGE_EDIT_COMBINED"
-    preset_prompts["[Text to Video] LTX-2"] = "LTX2"
-    preset_prompts["[Text to Video] WAN - Text to Video"] = "WAN_T2V"
-    preset_prompts["[Image to Video] WAN - Image to Video"] = "WAN_I2V"
-    preset_prompts["[Image to Video] WAN - FLF to Video"] = "WAN_FLF2V"
-    preset_prompts["[Video Analysis] Video - Frame Sequence Analysis"] = "VIDEO_FRAME_SEQUENCE_TO_PROMPT"
-    preset_prompts["[Video Analysis] Video - Reverse Prompt"] = "VIDEO_TO_PROMPT"
-    preset_prompts["[Video Analysis] Video - Detailed Scene Breakdown"] = "VIDEO_DETAILED_SCENE_BREAKDOWN"
-    preset_prompts["[Video Analysis] Video - Subtitle Format"] = "VIDEO_SUBTITLE_FORMAT"
-    preset_prompts["[Audio] Multi-Person Dialogue"] = "MULTI_SPEAKER_DIALOGUE"
+    preset_prompts["[Anime] Expand Tags"] = "ILLUSTRIOUS"
+    preset_prompts["[Anime] Prompt Expand"] = "ANIME_PROMPT"
+    preset_prompts["[Portrait] Asian Female"] = "REALISTIC_FEMALE"
+    preset_prompts["[Portrait] Asian Male"] = "REALISTIC_MALE"
+    preset_prompts["[Portrait] Western Female"] = "WESTERN_FEMALE"
+    preset_prompts["[Portrait] Western Male"] = "WESTERN_MALE"
+    preset_prompts["[Portrait] Influencer"] = "INFLUENCER_PORTRAIT"
+    preset_prompts["[Portrait] Male Portrait"] = "MALE_PORTRAIT"
+    preset_prompts["[Portrait] Young Boy"] = "YOUNG_BOY_PORTRAIT"
+    preset_prompts["[Portrait] Middle Elderly Female"] = "MIDDLE_ELDERLY_FEMALE_PORTRAIT"
+    preset_prompts["[Portrait] Middle Elderly Male"] = "MIDDLE_ELDERLY_MALE_PORTRAIT"
+    preset_prompts["[Design] Art Illustration"] = "ART_ILLUSTRATION"
+    preset_prompts["[Design] Poster Design"] = "POSTER_DESIGN"
+    preset_prompts["[Design] Scene Design"] = "SCENE_DESIGN"
+    preset_prompts["[Design] Interior Design"] = "INTERIOR_DESIGN"
+    preset_prompts["[Design] Ecommerce Product"] = "ECOMMERCE"
+    preset_prompts["[Design] Food Photography"] = "FOOD_PHOTOGRAPHY"
+    preset_prompts["[Edit] Combined"] = "EDIT_COMBINED"
+    preset_prompts["[Text to Video] Universal"] = "UNIVERSAL_VIDEO"
+    preset_prompts["[Image to Video] I2V"] = "CONTINUING_I2V"
+    preset_prompts["[Image to Video] FLF2V"] = "CONTINUING_FLF2V"
+    preset_prompts["[Video Analysis] Frame Sequence"] = "VIDEO_FRAME_SEQUENCE"
+    preset_prompts["[Video Analysis] Reverse Prompt"] = "VIDEO_TO_PROMPT"
+    preset_prompts["[Video Analysis] Scene Breakdown"] = "VIDEO_SCENE_BREAKDOWN"
+    preset_prompts["[Video Analysis] Subtitle"] = "VIDEO_SUBTITLE_FORMAT"
+    preset_prompts["[Audio] Multi-Speaker Dialogue"] = "MULTI_SPEAKER_DIALOGUE"
     preset_prompts["[Music] Lyrics Creation"] = "LYRICS_CREATION"
-    preset_prompts["[OCR] Enhanced OCR"] = "OCR_ENHANCED"
-    preset_prompts["[Vision] Bounding Box"] = "VISION_BOUNDING_BOX"
+    preset_prompts["[Design] Ideogram-4"] = "IDEOGRAM4"
 
     preset_tags = list(preset_prompts.keys())
     
@@ -832,7 +856,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推标签格式的描述\n• [Reverse] Describe：反推详细描述文本\n• [Normal] Expand：提示词扩写，丰富描述内容\n• [Anime] Illustrious：二次元角色风格描述\n• [Anime] Anima：二次元内容生成\n• [Portrait] ZIMAGE - Turbo：人像强化描述\n• [General] FLUX2 - Klein：通用细节强化\n• [Design] ERNIE - Image：海报、漫画分镜、UI设计强化\n• [Design] Ideogram-4：专业设计\n• [Poster] Qwen - Image 2512：多领域设计强化\n• [Image Edit] Qwen - Image Edit Combined：图像编辑组合模式\n• [Text to Video] LTX-2：文本生视频\n• [Text to Video] WAN - Text to Video：WAN文本生视频\n• [Image to Video] WAN - Image to Video：WAN图像生视频\n• [Image to Video] WAN - FLF to Video：WAN 首尾帧生视频\n• [Video Analysis] Video - Frame Sequence Analysis：视频帧序列分析\n• [Video Analysis] Video - Reverse Prompt：视频反推提示词\n• [Video Analysis] Video - Detailed Scene Breakdown：视频分镜分析\n• [Video Analysis] Video - Subtitle Format：视频字幕格式生成\n• [Audio] Multi-Person Dialogue：多人对话处理\n• [Music] Lyrics Creation：歌词创作\n• [OCR] Enhanced OCR：增强型文字识别\n• [Vision] Bounding Box：视觉目标检测框"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推XL标签格式提示词\n• [Reverse] Describe：通用图片反推提示词\n• [Normal] Expand：通用提示词文本优化\n• [Anime] Expand Tags：二次元角色风格文本优化\n• [Anime] Prompt Expand：二次元内容文本优化\n• [Portrait] Asian Female：真实亚洲女性人像文本优化\n• [Portrait] Asian Male：真实亚洲男性人像文本优化\n• [Portrait] Western Female：真实欧美女性人像文本优化\n• [Portrait] Western Male：真实欧美男性人像文本优化\n• [Portrait] Influencer：完美女性人像文本优化\n• [Portrait] Male Portrait：完美男性人像文本优化\n• [Portrait] Young Boy：儿童人像文本优化\n• [Portrait] Middle Elderly Female：中老年女性人像文本优化\n• [Portrait] Middle Elderly Male：中老年男性人像文本优化\n• [Design] Art Illustration：艺术插画文本优化\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计文本优化\n• [Design] Interior Design：室内设计文本优化\n• [Design] Ecommerce Product：电商产品\n• [Design] Food Photography：美食摄影文本优化\n• [Edit] Combined：图像编辑文本优化\n• [Text to Video] Universal：扩写文本内容\n• [Image to Video] I2V：根据图片扩写文本内容\n• [Image to Video] FLF2V：根据首尾帧图片扩写文本内容\n• [Video Analysis] Frame Sequence：帧分析视频内容\n• [Video Analysis] Reverse Prompt：通用视频反推提示词\n• [Video Analysis] Scene Breakdown：反推各分镜场景内容\n• [Video Analysis] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化\n• [Music] Lyrics Creation：歌词创作文本优化\n• [Design] Ideogram-4：json结构化提示词"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的AI提示词处理专家。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
@@ -949,55 +973,71 @@ class llama_cpp_unified_inference:
         """
         if language == "中文":
             preset_map = {
-                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_ZH,
-                "NORMAL_DESCRIBE": NORMAL_DESCRIBE_ZH,
+                "IMAGE_REVERSE_TAGS": IMAGE_REVERSE_TAGS_ZH,
+                "IMAGE_REVERSE_DESCRIBE": IMAGE_REVERSE_DESCRIBE_ZH,
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
                 "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
-                "ANIMA": ANIMA_ZH,
-                "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
-                "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
-                "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
-                "IDEOGRAM4": IDEOGRAM4_ZH,
-                "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
-                "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
-                "LTX2": LTX2_ZH,
-                "WAN_T2V": WAN_T2V_ZH,
-                "WAN_I2V": WAN_I2V_ZH,
-                "WAN_FLF2V": WAN_FLF2V_ZH,
-                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH,
+                "ANIME_PROMPT": ANIME_PROMPT_ZH,
+                "REALISTIC_FEMALE": REALISTIC_FEMALE_ZH,
+                "REALISTIC_MALE": REALISTIC_MALE_ZH,
+                "WESTERN_FEMALE": WESTERN_FEMALE_ZH,
+                "WESTERN_MALE": WESTERN_MALE_ZH,
+                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_ZH,
+                "MALE_PORTRAIT": MALE_PORTRAIT_ZH,
+                "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_ZH,
+                "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
+                "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
+                "ART_ILLUSTRATION": ART_ILLUSTRATION_ZH,
+                "POSTER_DESIGN": POSTER_DESIGN_ZH,
+                "SCENE_DESIGN": SCENE_DESIGN_ZH,
+                "INTERIOR_DESIGN": INTERIOR_DESIGN_ZH,
+                "ECOMMERCE": ECOMMERCE_ZH,
+                "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_ZH,
+                "EDIT_COMBINED": EDIT_COMBINED_ZH,
+                "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_ZH,
+                "CONTINUING_I2V": CONTINUING_I2V_ZH,
+                "CONTINUING_FLF2V": CONTINUING_FLF2V_ZH,
+                "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_ZH,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
-                "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
+                "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_ZH,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_ZH,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_ZH,
                 "LYRICS_CREATION": LYRICS_CREATION_ZH,
-                "OCR_ENHANCED": OCR_ENHANCED_ZH,
-                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_ZH,
+                "IDEOGRAM4": IDEOGRAM4_ZH,
             }
         else:
             preset_map = {
-                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_EN,
-                "NORMAL_DESCRIBE": NORMAL_DESCRIBE_EN,
+                "IMAGE_REVERSE_TAGS": IMAGE_REVERSE_TAGS_EN,
+                "IMAGE_REVERSE_DESCRIBE": IMAGE_REVERSE_DESCRIBE_EN,
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
                 "ILLUSTRIOUS": ILLUSTRIOUS_EN,
-                "ANIMA": ANIMA_EN,
-                "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
-                "FLUX2_KLEIN": FLUX2_KLEIN_EN,
-                "ERNIE_IMAGE": ERNIE_IMAGE_EN,
-                "IDEOGRAM4": IDEOGRAM4_EN,
-                "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
-                "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
-                "LTX2": LTX2_EN,
-                "WAN_T2V": WAN_T2V_EN,
-                "WAN_I2V": WAN_I2V_EN,
-                "WAN_FLF2V": WAN_FLF2V_EN,
-                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN,
+                "ANIME_PROMPT": ANIME_PROMPT_EN,
+                "REALISTIC_FEMALE": REALISTIC_FEMALE_EN,
+                "REALISTIC_MALE": REALISTIC_MALE_EN,
+                "WESTERN_FEMALE": WESTERN_FEMALE_EN,
+                "WESTERN_MALE": WESTERN_MALE_EN,
+                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_EN,
+                "MALE_PORTRAIT": MALE_PORTRAIT_EN,
+                "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_EN,
+                "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
+                "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
+                "ART_ILLUSTRATION": ART_ILLUSTRATION_EN,
+                "POSTER_DESIGN": POSTER_DESIGN_EN,
+                "SCENE_DESIGN": SCENE_DESIGN_EN,
+                "INTERIOR_DESIGN": INTERIOR_DESIGN_EN,
+                "ECOMMERCE": ECOMMERCE_EN,
+                "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_EN,
+                "EDIT_COMBINED": EDIT_COMBINED_EN,
+                "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_EN,
+                "CONTINUING_I2V": CONTINUING_I2V_EN,
+                "CONTINUING_FLF2V": CONTINUING_FLF2V_EN,
+                "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_EN,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
-                "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
+                "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_EN,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_EN,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_EN,
                 "LYRICS_CREATION": LYRICS_CREATION_EN,
-                "OCR_ENHANCED": OCR_ENHANCED_EN,
-                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
+                "IDEOGRAM4": IDEOGRAM4_EN,
             }
 
         preset = preset_map.get(preset_key, None)
@@ -1111,55 +1151,71 @@ class llama_cpp_unified_inference:
         """
         if language == "中文":
             preset_map = {
-                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_ZH,
-                "NORMAL_DESCRIBE": NORMAL_DESCRIBE_ZH,
+                "IMAGE_REVERSE_TAGS": IMAGE_REVERSE_TAGS_ZH,
+                "IMAGE_REVERSE_DESCRIBE": IMAGE_REVERSE_DESCRIBE_ZH,
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
                 "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
-                "ANIMA": ANIMA_ZH,
-                "ZIMAGE_TURBO": ZIMAGE_TURBO_ZH,
-                "FLUX2_KLEIN": FLUX2_KLEIN_ZH,
-                "ERNIE_IMAGE": ERNIE_IMAGE_ZH,
-                "IDEOGRAM4": IDEOGRAM4_ZH,
-                "QWEN_IMAGE_2512": QWEN_IMAGE_2512_ZH,
-                "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_ZH,
-                "LTX2": LTX2_ZH,
-                "WAN_T2V": WAN_T2V_ZH,
-                "WAN_I2V": WAN_I2V_ZH,
-                "WAN_FLF2V": WAN_FLF2V_ZH,
-                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_ZH,
+                "ANIME_PROMPT": ANIME_PROMPT_ZH,
+                "REALISTIC_FEMALE": REALISTIC_FEMALE_ZH,
+                "REALISTIC_MALE": REALISTIC_MALE_ZH,
+                "WESTERN_FEMALE": WESTERN_FEMALE_ZH,
+                "WESTERN_MALE": WESTERN_MALE_ZH,
+                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_ZH,
+                "MALE_PORTRAIT": MALE_PORTRAIT_ZH,
+                "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_ZH,
+                "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
+                "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
+                "ART_ILLUSTRATION": ART_ILLUSTRATION_ZH,
+                "POSTER_DESIGN": POSTER_DESIGN_ZH,
+                "SCENE_DESIGN": SCENE_DESIGN_ZH,
+                "INTERIOR_DESIGN": INTERIOR_DESIGN_ZH,
+                "ECOMMERCE": ECOMMERCE_ZH,
+                "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_ZH,
+                "EDIT_COMBINED": EDIT_COMBINED_ZH,
+                "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_ZH,
+                "CONTINUING_I2V": CONTINUING_I2V_ZH,
+                "CONTINUING_FLF2V": CONTINUING_FLF2V_ZH,
+                "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_ZH,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
-                "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_ZH,
+                "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_ZH,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_ZH,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_ZH,
                 "LYRICS_CREATION": LYRICS_CREATION_ZH,
-                "OCR_ENHANCED": OCR_ENHANCED_ZH,
-                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_ZH,
+                "IDEOGRAM4": IDEOGRAM4_ZH,
             }
         else:
             preset_map = {
-                "NORMAL_DESCRIBE_TAGS": NORMAL_DESCRIBE_TAGS_EN,
-                "NORMAL_DESCRIBE": NORMAL_DESCRIBE_EN,
+                "IMAGE_REVERSE_TAGS": IMAGE_REVERSE_TAGS_EN,
+                "IMAGE_REVERSE_DESCRIBE": IMAGE_REVERSE_DESCRIBE_EN,
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
                 "ILLUSTRIOUS": ILLUSTRIOUS_EN,
-                "ANIMA": ANIMA_EN,
-                "ZIMAGE_TURBO": ZIMAGE_TURBO_EN,
-                "FLUX2_KLEIN": FLUX2_KLEIN_EN,
-                "ERNIE_IMAGE": ERNIE_IMAGE_EN,
-                "IDEOGRAM4": IDEOGRAM4_EN,
-                "QWEN_IMAGE_2512": QWEN_IMAGE_2512_EN,
-                "QWEN_IMAGE_EDIT_COMBINED": QWEN_IMAGE_EDIT_COMBINED_EN,
-                "LTX2": LTX2_EN,
-                "WAN_T2V": WAN_T2V_EN,
-                "WAN_I2V": WAN_I2V_EN,
-                "WAN_FLF2V": WAN_FLF2V_EN,
-                "VIDEO_FRAME_SEQUENCE_TO_PROMPT": VIDEO_FRAME_SEQUENCE_TO_PROMPT_EN,
+                "ANIME_PROMPT": ANIME_PROMPT_EN,
+                "REALISTIC_FEMALE": REALISTIC_FEMALE_EN,
+                "REALISTIC_MALE": REALISTIC_MALE_EN,
+                "WESTERN_FEMALE": WESTERN_FEMALE_EN,
+                "WESTERN_MALE": WESTERN_MALE_EN,
+                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_EN,
+                "MALE_PORTRAIT": MALE_PORTRAIT_EN,
+                "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_EN,
+                "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
+                "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
+                "ART_ILLUSTRATION": ART_ILLUSTRATION_EN,
+                "POSTER_DESIGN": POSTER_DESIGN_EN,
+                "SCENE_DESIGN": SCENE_DESIGN_EN,
+                "INTERIOR_DESIGN": INTERIOR_DESIGN_EN,
+                "ECOMMERCE": ECOMMERCE_EN,
+                "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_EN,
+                "EDIT_COMBINED": EDIT_COMBINED_EN,
+                "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_EN,
+                "CONTINUING_I2V": CONTINUING_I2V_EN,
+                "CONTINUING_FLF2V": CONTINUING_FLF2V_EN,
+                "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_EN,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
-                "VIDEO_DETAILED_SCENE_BREAKDOWN": VIDEO_DETAILED_SCENE_BREAKDOWN_EN,
+                "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_EN,
                 "VIDEO_SUBTITLE_FORMAT": VIDEO_SUBTITLE_FORMAT_EN,
                 "MULTI_SPEAKER_DIALOGUE": MULTI_SPEAKER_DIALOGUE_EN,
                 "LYRICS_CREATION": LYRICS_CREATION_EN,
-                "OCR_ENHANCED": OCR_ENHANCED_EN,
-                "VISION_BOUNDING_BOX": VISION_BOUNDING_BOX_EN,
+                "IDEOGRAM4": IDEOGRAM4_EN,
             }
         
         preset = preset_map.get(preset_key, None)
