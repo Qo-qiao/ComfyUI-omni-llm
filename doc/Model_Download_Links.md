@@ -106,9 +106,9 @@
 
 **Model Series**: Qwen-ASR
 **Specific Model**: Qwen3-ASR-1.7B
-**Key Features**: Language coverage: Very extensive, supporting 28+ languages and 20+ Chinese dialects (such as Northeastern Mandarin, Sichuan dialect, Cantonese, Wu dialect, Minnan dialect, etc.).
-**Audio Types**: Not only handles pure speech, but also supports singing voices and songs with background music (strong anti-noise/music scene capability).
-**Applicable Scenarios**: Speech recognition, real-time speech-to-text, meeting recording, audio content extraction, subtitle generation
+**Key Features**: Extensive language coverage, supports 28+ languages and 20+ Chinese dialects. Compared to the 0.6B version, it offers higher recognition accuracy, stronger processing capability for low-quality audio and complex accents, and supports continuous recognition of longer audio.
+**Audio Types**: Supports pure speech, singing voices, and songs with background music (strong anti-noise/music scene capability).
+**Applicable Scenarios**: High-precision speech recognition, real-time speech-to-text, meeting recording, audio content extraction, subtitle generation
 **Download Link**: https://huggingface.co/Qwen/Qwen3-ASR-1.7B
 **Download Link (nsfw)**: https://huggingface.co/freeuser17/Qwen3-ASR-1.7B-Uncensored
 **ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B
@@ -147,15 +147,15 @@
 
 ## VLM Series (Vision-Language Models, supporting text generation and image reverse prompting for all visual models)
 
-### ToriiGate Series (Anime-specific)
+### ToriiGate Series (XL Anime-specialized)
 
 **Model Series**: ToriiGate
 **Specific Model**: ToriiGate-v0.4-7B
 **Key Features**: Based on Qwen2-VL, focused on understanding of anime and digital art domains. Supports structured output, multiple caption modes (regular summary, Midjourney style, DeviantArt style), bounding box location, and name recognition of characters. Descriptions are precise, dense, and avoid long padding words.
 **Applicable Scenarios**: Anime/digital art image description, character feature extraction, multi-character recognition, prompt generation, caption correction and cropping
-**Download Link（nsfw）**: https://huggingface.co/mradermacher/ToriiGate-v0.4-7B-GGUF (includes mmproj model)
+**Download Link (nsfw)**: https://huggingface.co/mradermacher/ToriiGate-v0.4-7B-GGUF (includes mmproj model)
 
-### Qwen Series (Recommend to use clip model to select prompt reverse prompting model, such as Z-Image recommends to use qwen3VL model to generate prompt)
+### Qwen Series (Recommend to use clip model to select prompt reverse prompting model. For Chinese prompts, recommend qwen, MiMo series. For English prompts, recommend Llama series. For large VRAM devices, recommend larger models)
 
 **Model Series**: Qwen-VL
 **Specific Model**: Qwen2.5-7B-VL
@@ -165,8 +165,7 @@
 **ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen2.5-VL-7B-Instruct-GGUF (includes mmproj model)
 
 
-**Model Series**: Qwen-VL (Text Generation & Reverse Prompting, Recommended)
-**Specific Model**: Qwen3-VL-8B-Instruct
+**Specific Model**: Qwen3-VL-8B-Instruct (Text Generation & Reverse Prompting, Recommended)
 **Key Features**: Qwen3-VL instruction-optimized version, highest instruction following accuracy, supports complex visual instruction execution (e.g., "extract all tables from the image and generate text").
 **Applicable Scenarios**: Instruction-based OCR extraction, complex image-text reverse prompting, professional visual task processing, high-precision prompt generation
 **Download Link (nsfw)**: https://huggingface.co/mradermacher/Qwen3-VL-8B-Instruct-abliterated-v2.0-GGUF (includes mmproj model)
@@ -191,32 +190,37 @@
 
 
 **Specific Model**: Qwen3.5-4B (Reverse Prompting)
-**Key Features**: Lightweight version of Qwen3.5 series, smaller parameter count but retains powerful reasoning capabilities, suitable for low VRAM devices, supports multimodal input and tool calling, fast response.
+**Key Features**: Lightweight version of Qwen3.5 series, moderate parameter count, balances reasoning capability with resource consumption, supports multimodal input and tool calling, fast response, suitable for low VRAM devices.
 **Applicable Scenarios**: Low VRAM device deployment, fast reasoning, mobile applications, lightweight dialogue, basic multimodal tasks, real-time interaction
-**Download Link（nsfw）**：https://huggingface.co/mradermacher/Qwen3.5-4B_Abliterated-GGUF (includes mmproj model)
-**Alternative Link（nsfw）**：https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-**Download Link（mtp）**：https://huggingface.co/mradermacher/Qwen3.5-4B-MiniFantasy-MTP-GGUF (includes mmproj model)
-**ModelScope Link**：https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
+**Download Link (nsfw)**: https://huggingface.co/mradermacher/Qwen3.5-4B_Abliterated-GGUF (includes mmproj model)
+**Alternative Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
+**Download Link (mtp)**: https://huggingface.co/mradermacher/Qwen3.5-4B-MiniFantasy-MTP-GGUF (includes mmproj model)
+**ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
+
+
+**Specific Model**: Qwen3.5-9B (Reverse Prompting)
+**Key Features**: Balanced version of Qwen3.5 series, moderate parameter count, balances reasoning capability with resource consumption, supports multimodal input and tool calling, suitable for medium VRAM devices.
+**Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text dialogue, image understanding analysis, video frame content recognition
+**Download Link (nsfw)**: https://huggingface.co/mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF (includes mmproj model)
 
 
 **Specific Model**: Qwen3.6-27B (Large VRAM Required)
-**Key Features**: High-performance model from Qwen3.6 series with large parameter count, delivers exceptional reasoning capabilities and multimodal understanding, requires significant GPU memory.
-**Applicable Scenarios**: Advanced multimodal reasoning, complex visual tasks, high-quality content generation, professional-level inference
+**Key Features**: High-performance version of Qwen3.6 series, large parameter count with strong reasoning capability, supports complex multimodal tasks and long context processing, suitable for large VRAM device deployment.
+**Applicable Scenarios**: Large VRAM device deployment, complex image-text reasoning, professional image analysis, long text understanding, video content deep analysis, high-precision generation tasks
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.6-27B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 
 **Specific Model**: Qwen3.6-35B-A3B (Large VRAM Required)
-**Key Features**: Flagship model from Qwen3.6 series with massive parameter count, offers state-of-the-art reasoning and multimodal capabilities, requires high-end GPU with ample VRAM.
-**Applicable Scenarios**: Complex visual reasoning, long context understanding, advanced multimodal tasks, high-precision content generation
+**Key Features**: MoE version of Qwen3.6 series, 35B total parameters with only 3B active parameters for inference, balances high performance with inference efficiency, A3B architecture optimizes VRAM usage, supports complex multimodal tasks.
+**Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text analysis, long text understanding, video content deep analysis
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 
 ### OCR Specialized Series
 
-**Model Series**: olmOCR
-**Specific Model**: olmOCR-2-7B-1025
-
-**Key Features**: Specialized OCR fine-tuning, supports formula, table, and old scanned document recognition, high text extraction accuracy, no additional modifications required, excellent local reasoning efficiency.
-**Applicable Scenarios**: Poster text recognition, document OCR, text extraction, academic paper formula recognition, batch scanned document text extraction
-**Download Link**: https://huggingface.co/Mungert/olmOCR-2-7B-1025-GGUF (includes mmproj model)
+**Model Series**: Unlimited-OCR
+**Specific Model**: Unlimited-OCR-GGUF
+**Key Features**: Fine-tuned for OCR-specific tasks, outstanding capability in recognizing formulas, tables, and old scanned documents, high text extraction accuracy, no additional configuration required, excellent local inference efficiency.
+**Applicable Scenarios**: Poster text recognition, document OCR, academic paper formula recognition, batch scanned document text extraction, form information extraction, ancient text digitization
+**Download Link**: https://huggingface.co/sahilchachra/Unlimited-OCR-GGUF (includes mmproj model)
 
 
 ### LLaMA Series
@@ -239,33 +243,19 @@
 
 ### MiniCPM Series
 
-**Model Series**: MiniCPM-V
-**Specific Model**: MiniCPM-V-4.5
-**Key Features**: Domestic lightweight multimodal flagship, balances accuracy and speed, supports arbitrary aspect ratio image recognition, excellent OCR capabilities, well-adapted ComfyUI nodes.
-**Applicable Scenarios**: Prompt generation, image/video frame reverse prompting, multilingual OCR, batch image text extraction, daily visual reasoning
-**Download Link**: https://huggingface.co/openbmb/MiniCPM-V-4_5-gguf (includes mmproj model)
-
-
-**Model Series**: MiniCPM-V
-**Specific Model**: MiniCPM-V-4.6
-**Key Features**: Domestic lightweight multimodal flagship, balances accuracy and speed, supports arbitrary aspect ratio image recognition, excellent OCR capabilities, well-adapted ComfyUI nodes.
-**Applicable Scenarios**: Prompt generation, image/video frame reverse prompting, multilingual OCR, batch image text extraction, daily visual reasoning
-**Download Link**: https://huggingface.co/mradermacher/MiniCPM-V-4.6-GGUF (includes mmproj model)
-
-**Model Series**: MiniCPM-V
-**Specific Model**: MiniCPM-Llama3-V 2.5
-**Key Features**: Optimized based on Llama3 base, lightweight and efficient, improved image-text fusion capabilities, high batch reasoning efficiency, stable local deployment.
-**Applicable Scenarios**: Batch image reverse prompting, fast prompt generation, lightweight OCR, low-spec device ComfyUI workflows
-**Download Link**: https://huggingface.co/openbmb/MiniCPM-Llama3-V-2_5-gguf (includes mmproj model)
+**Specific Model**: MiniCPM-V-4.6-abliterated-MAX
+**Key Features**: Upgraded version of MiniCPM-V-4.5, further improved visual recognition accuracy, stronger capability for recognizing complex scenes and small targets, optimized inference speed, supports longer context multimodal understanding.
+**Applicable Scenarios**: High-precision prompt generation, fine-grained image/video frame reverse prompting, multilingual OCR, complex scene image analysis, daily visual reasoning
+**Download Link (nsfw)**: https://huggingface.co/mradermacher/MiniCPM-V-4.6-abliterated-MAX-GGUF (includes mmproj model)
 
 
 ### GLM Series
 
 **Model Series**: GLM-4
-**Specific Model**: GLM-4.6V-Flash
+**Specific Model**: GLM-4.6V-Flash-abliterated
 **Key Features**: Zhipu large-parameter multimodal model, top-tier OCR and complex document parsing capabilities, supports high-resolution image recognition, stable local reasoning, adapts to complex visual tasks.
 **Applicable Scenarios**: Professional OCR text extraction, complex document/table recognition, academic paper analysis, high-precision image reverse prompting, multilingual image-text reasoning
-**Download Link**: https://huggingface.co/unsloth/GLM-4.6V-Flash-GGUF (includes mmproj model)
+**Download Link (nsfw)**: https://huggingface.co/seanbailey518/Huihui-GLM-4.6V-Flash-abliterated-GGUF (includes mmproj model)
 
 
 ### JoyCaption Series
@@ -290,7 +280,7 @@
 ### Gemma Series
 
 **Model Series**: Gemma
-**Specific Model**: google_gemma-3-4b-it
+**Specific Model**: gemma-3-4b-it
 **Key Features**: Google Gemma 3 series multimodal model, features vision-language understanding, long context processing, and enhanced multilingual support, runs on single GPU, outperforms models with similar parameter counts.
 **Applicable Scenarios**: Multilingual prompt generation, complex visual reasoning, long text understanding, multimodal interaction tasks
 **Download Link**: https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF (includes mmproj model)
@@ -311,8 +301,8 @@
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
 
 **Specific Model**: Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced (Large VRAM Required)
-**Key Features**: Google Gemma 4 series uncensored flagship model, stronger visual understanding, longer context processing, and more accurate multilingual support, performance close to larger-scale models, supports more open content generation. Requires significant GPU memory.
-**Applicable Scenarios**: Complex visual reasoning, long text understanding, multilingual translation, advanced multimodal interaction, scenarios requiring uncensored content
+**Key Features**: MoE version of Google Gemma 4 series, 26B total parameters with only 4B active parameters for inference, balances large model performance with inference efficiency, A4B architecture optimizes VRAM usage, supports complex visual reasoning and long context processing, supports more open content generation.
+**Applicable Scenarios**: High-quality visual reasoning, long text understanding, multilingual translation, advanced multimodal interaction, complex tasks requiring uncensored content
 **Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced (includes mmproj model)
 
 
@@ -346,10 +336,11 @@
 ### LLaMA Vision Series
 
 **Model Series**: LLaMA-Vision
-**Specific Model**: Llama-3.2-11B-Vision-Instruct
+**Specific Model**: Llama-3.2-11B-Vision-Instruct-abliterated
 **Key Features**: Meta official multimodal model, balanced across all scenarios, strong complex visual reasoning capabilities, supports high-resolution image recognition, adapts to various ComfyUI visual tasks.
 **Applicable Scenarios**: High-precision image reverse prompting, complex document OCR, video frame key information extraction, professional visual reasoning
-**Download Link**: https://huggingface.co/leafspark/Llama-3.2-11B-Vision-Instruct-GGUF (includes mmproj model)
+**Download Link (nsfw)**: https://huggingface.co/case01/Llama-3.2-11B-Vision-Instruct-abliterated-gguf
+**mmproj Model**: https://huggingface.co/leafspark/Llama-3.2-11B-Vision-Instruct-GGUF
 
 
 **Model Series**: LLaMA-Vision
@@ -380,24 +371,33 @@
 ### MiMo-VL Series
 
 **Model Series**: MiMo-VL
-**Specific Model**: MiMo-VL-7B-RL
+**Specific Model**: MiMo-VL-7B-RL-2508
 **Key Features**: Xiaomi open-source multimodal vision-language model, 7B parameters, trained with reinforcement learning, four-stage pre-training (projector warm-up, vision-language alignment, general multimodal pre-training, long-context supervised fine-tuning), outperforms 10-billion-level models with small parameter count.
 **Applicable Scenarios**: Chinese-English bilingual dialogue, complex visual reasoning, multimodal interaction, long context understanding, creative prompt generation
-**Download Link**: https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF (includes mmproj model)
+**Download Link**: https://huggingface.co/mradermacher/MiMo-VL-7B-RL-2508-GGUF (includes mmproj model)
+**Alternative Link**: https://huggingface.co/unsloth/MiMo-VL-7B-RL-GGUF (includes mmproj model)
 
 
-### Jan Series
+### Nex-N2 Series
 
-**Model Series**: Jan-VL
-**Specific Model**: Jan-v2-VL-high
-**Key Features**: High-performance vision-language model, supports complex visual reasoning and multimodal interaction, excellent image understanding and text generation capabilities.
-**Applicable Scenarios**: Image reverse prompting, visual QA, complex scene understanding, instruction-based prompt generation, multimodal interaction tasks
-**Download Link**: https://huggingface.co/janhq/Jan-v2-VL-high-gguf (includes mmproj model)
-
+**Model Series**: Nex-N2
+**Specific Model**: Huihui-Nex-N2-mini-abliterated-APEX
+**Key Features**: Uncensored version fine-tuned from Nex-N2-mini multimodal model, excellent visual understanding and image-text reasoning capabilities, supports image description, OCR text extraction and multimodal interaction, fast inference speed, suitable for daily visual tasks.
+**Applicable Scenarios**: Image reverse prompting, OCR text extraction, image-text QA, daily visual reasoning, multimodal interaction tasks
+**Download Link (nsfw)**: https://huggingface.co/SC117/Huihui-Nex-N2-mini-abliterated-APEX-GGUF (includes mmproj model)
 
 
 
 ## CLIP Models (NSFW Version - Untested)
+
+**Applicable Generation Models**：Krea-2
+- qwen3_vl_4b_fp8_abliterated.safetensors
+- https://huggingface.co/sdfasdfasdfsdfsdf/qwen3_vl_4b_fp8_abliterated_comfyui
+
+**Applicable Generation Models**：Boogu-Image
+- qwen3vl-8b-abliterated-fp8-scaled.safetensors
+- https://huggingface.co/AEmotionStudio/qwen3vl-8b-abliterated-fp8-scaled
+
 **Applicable Generation Models**: ERNIE-Image
 - https://huggingface.co/ponpoke/ERNIE-Image-Abliterated
 - https://huggingface.co/ponpoke/ERNIE-Image-Abliterated-GGUF
