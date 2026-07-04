@@ -18,7 +18,12 @@ import sys
 import requests
 import shutil
 import tempfile
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+site_packages_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "site-packages")
+if os.path.exists(site_packages_path):
+    sys.path.insert(0, site_packages_path)
+
 from common import HARDWARE_INFO, folder_paths
 
 
@@ -812,26 +817,51 @@ def _download_model_files(model_name, model_path):
     print(f"【模型下载】使用源: {source}")
 
     model_files = {
-        "qwen3_tts": {
+        "qwen3_tts_customvoice": {
             "modelscope": {
-                "model.safetensors": f"https://modelscope.cn/api/v1/models/qwen/Qwen3-TTS/snapshots/master/model.safetensors",
-                "config.json": f"https://modelscope.cn/api/v1/models/qwen/Qwen3-TTS/snapshots/master/config.json",
-                "tokenizer.json": f"https://modelscope.cn/api/v1/models/qwen/Qwen3-TTS/snapshots/master/tokenizer.json",
-                "preprocessor_config.json": f"https://modelscope.cn/api/v1/models/qwen/Qwen3-TTS/snapshots/master/preprocessor_config.json",
-                "speech_tokenizer/config.json": f"https://modelscope.cn/api/v1/models/qwen/Qwen3-TTS/snapshots/master/speech_tokenizer/config.json"
+                "model.safetensors": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/snapshots/master/model.safetensors",
+                "config.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/snapshots/master/config.json",
+                "tokenizer.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/snapshots/master/tokenizer.json",
+                "preprocessor_config.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/snapshots/master/preprocessor_config.json",
+                "speech_tokenizer/config.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/snapshots/master/speech_tokenizer/config.json"
             },
             "huggingface": {
-                "model.safetensors": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/model.safetensors",
-                "config.json": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/config.json",
-                "tokenizer.json": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/tokenizer.json",
-                "preprocessor_config.json": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/preprocessor_config.json",
-                "speech_tokenizer/config.json": f"https://huggingface.co/Qwen/Qwen3-TTS/resolve/main/speech_tokenizer/config.json"
+                "model.safetensors": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/main/model.safetensors",
+                "config.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/main/config.json",
+                "tokenizer.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/main/tokenizer.json",
+                "preprocessor_config.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/main/preprocessor_config.json",
+                "speech_tokenizer/config.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice/resolve/main/speech_tokenizer/config.json"
+            }
+        },
+        "qwen3_tts_voicedesign": {
+            "modelscope": {
+                "model.safetensors": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/snapshots/master/model.safetensors",
+                "config.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/snapshots/master/config.json",
+                "tokenizer.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/snapshots/master/tokenizer.json",
+                "preprocessor_config.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/snapshots/master/preprocessor_config.json",
+                "speech_tokenizer/config.json": f"https://modelscope.cn/api/v1/models/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/snapshots/master/speech_tokenizer/config.json"
+            },
+            "huggingface": {
+                "model.safetensors": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/resolve/main/model.safetensors",
+                "config.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/resolve/main/config.json",
+                "tokenizer.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/resolve/main/tokenizer.json",
+                "preprocessor_config.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/resolve/main/preprocessor_config.json",
+                "speech_tokenizer/config.json": f"https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-VoiceDesign/resolve/main/speech_tokenizer/config.json"
             }
         }
     }
 
+    model_type = None
     if "qwen3" in model_name.lower() and "tts" in model_name.lower():
-        files_to_download = model_files["qwen3_tts"][source]
+        if "customvoice" in model_name.lower():
+            model_type = "qwen3_tts_customvoice"
+        elif "voicedesign" in model_name.lower():
+            model_type = "qwen3_tts_voicedesign"
+        else:
+            model_type = "qwen3_tts_customvoice"
+    
+    if model_type and model_type in model_files:
+        files_to_download = model_files[model_type][source]
         success = True
 
         for filename, url in files_to_download.items():
@@ -1058,7 +1088,7 @@ class llama_cpp_tts_loader:
     RETURN_TYPES = ("TTSMODEL",)
     RETURN_NAMES = ("tts_model",)
     FUNCTION = "load_tts_model"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
 
     @classmethod
     def _resolve_tts_model_path(s, tts_model):
@@ -1347,6 +1377,9 @@ class UnifiedTTSModelWrapper:
         self.processor = None
         self.model_type = "unknown"
         self.tts_engine = None
+        self.qwen_tts_variant = "CustomVoice"
+        self.qwen_tts_sampling_rate = 24000
+        self.user_selected_model_file = None
 
         cache_key = self._generate_cache_key(model_path, config, device)
         print(f"【TTS统一包装器】生成缓存键: {cache_key}")
@@ -1359,7 +1392,13 @@ class UnifiedTTSModelWrapper:
             self.processor = cached_instance.processor
             self.model_type = cached_instance.model_type
             self.tts_engine = cached_instance.tts_engine
-            print(f"【TTS统一包装器】缓存加载成功，模型类型: {self.model_type}")
+            if hasattr(cached_instance, 'qwen_tts_variant'):
+                self.qwen_tts_variant = cached_instance.qwen_tts_variant
+            if hasattr(cached_instance, 'qwen_tts_sampling_rate'):
+                self.qwen_tts_sampling_rate = cached_instance.qwen_tts_sampling_rate
+            if hasattr(cached_instance, 'user_selected_model_file'):
+                self.user_selected_model_file = cached_instance.user_selected_model_file
+            print(f"【TTS统一包装器】缓存加载成功，模型类型: {self.model_type}, 变体: {self.qwen_tts_variant}")
             return
 
         # 仅支持 Qwen3-TTS
@@ -1440,6 +1479,64 @@ class UnifiedTTSModelWrapper:
             print("【TTS资源释放】已清理GPU缓存")
         else:
             print("【TTS资源释放】CUDA不可用，仅清理CPU内存")
+
+    def _get_voice_design_instruct(self, emotion, speed, pitch, volume, speaker_id=None):
+        """生成语音设计指令"""
+        instruct_parts = []
+        
+        if speaker_id is not None:
+            speaker_desc_map = {
+                0: "明亮略带锐气的年轻女声",
+                1: "温暖柔和的年轻女声",
+                2: "音色低沉醇厚的成熟男声",
+                3: "清晰自然的北京青年男声",
+                4: "活泼略带沙哑明亮感的成都男声",
+                5: "富有节奏感的动态男声",
+                6: "清晰中频的阳光美式男声",
+                7: "轻快灵活的俏皮日语女声",
+                8: "富含情感的温暖韩语女声"
+            }
+            speaker_desc = speaker_desc_map.get(speaker_id, "")
+            if speaker_desc:
+                instruct_parts.append(f"音色: {speaker_desc}")
+        
+        if emotion and emotion != "default":
+            emotion_map = {
+                "default": "中性",
+                "happy": "开心",
+                "sad": "悲伤",
+                "angry": "愤怒",
+                "excited": "兴奋",
+                "calm": "平静",
+                "surprised": "惊讶",
+                "gentle": "温柔"
+            }
+            emotion_desc = emotion_map.get(emotion, emotion)
+            instruct_parts.append(f"情绪: {emotion_desc}")
+        
+        if speed > 1.0:
+            instruct_parts.append(f"语速: 快速")
+        elif speed < 1.0:
+            instruct_parts.append(f"语速: 慢速")
+        else:
+            instruct_parts.append(f"语速: 正常")
+        
+        if pitch != 0.0:
+            if pitch > 0.0:
+                instruct_parts.append(f"音调: 高")
+            else:
+                instruct_parts.append(f"音调: 低")
+        
+        if volume != 1.0:
+            if volume > 1.0:
+                instruct_parts.append(f"音量: 大")
+            else:
+                instruct_parts.append(f"音量: 小")
+        
+        if not instruct_parts:
+            return "请自然地朗读文本"
+        
+        return "; ".join(instruct_parts)
 
     def _load_qwen_tts_model(self):
         try:
@@ -1678,92 +1775,109 @@ class UnifiedTTSModelWrapper:
 
                         voice_id_to_name = {v: k for k, v in self.VOICE_MAP.items()}
                         speaker_name = voice_id_to_name.get(speaker_id, "Vivian")
-                        print(f"【Qwen3-TTS 合成】speaker_id={speaker_id} -> speaker_name={speaker_name}")
+                        print(f"【Qwen3-TTS 合成】speaker_id={speaker_id} -> speaker_name={speaker_name}, 模型变体: {self.qwen_tts_variant}")
 
-                        # 方式1: generate_custom_voice (CustomVoice模型专用，最快)
-                        if has_generate_custom_voice:
-                            try:
-                                print(f"【Qwen3-TTS 合成】使用generate_custom_voice方法...")
-                                outputs = self.model.generate_custom_voice(
-                                    text=text,
-                                    language=language_code,
-                                    speaker=speaker_name,
-                                    speed=speed,
-                                    pitch=pitch,
-                                    volume=volume
-                                )
-                                if isinstance(outputs, dict):
-                                    audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
-                                elif isinstance(outputs, tuple):
-                                    audio = outputs[0]
-                                    if len(outputs) > 1:
-                                        sample_rate = outputs[1]
-                                        print(f"【Qwen3-TTS 合成】从返回值获取采样率: {sample_rate}")
-                                else:
-                                    audio = outputs
-                                if audio is not None:
-                                    print(f"【Qwen3-TTS 合成】generate_custom_voice成功")
-                            except Exception as e:
-                                print(f"【Qwen3-TTS 合成】generate_custom_voice不支持，尝试其他方法: {e}")
+                        if self.qwen_tts_variant == "VoiceDesign":
+                            if has_generate_voice_design:
+                                try:
+                                    print(f"【Qwen3-TTS 合成】VoiceDesign模型，优先使用generate_voice_design方法...")
+                                    simple_instruct = self._get_voice_design_instruct(emotion, speed, pitch, volume, speaker_id)
+                                    outputs = self.model.generate_voice_design(
+                                        text=text,
+                                        instruct=simple_instruct,
+                                        language=language_code
+                                    )
+                                    if isinstance(outputs, dict):
+                                        audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
+                                    elif isinstance(outputs, tuple):
+                                        audio = outputs[0]
+                                    else:
+                                        audio = outputs
+                                    if audio is not None:
+                                        print(f"【Qwen3-TTS 合成】generate_voice_design成功")
+                                except Exception as e:
+                                    print(f"【Qwen3-TTS 合成】generate_voice_design不支持，尝试其他方法: {e}")
+                        else:
+                            if has_generate_custom_voice:
+                                try:
+                                    print(f"【Qwen3-TTS 合成】CustomVoice模型，使用generate_custom_voice方法...")
+                                    outputs = self.model.generate_custom_voice(
+                                        text=text,
+                                        language=language_code,
+                                        speaker=speaker_name,
+                                        speed=speed,
+                                        pitch=pitch,
+                                        volume=volume
+                                    )
+                                    if isinstance(outputs, dict):
+                                        audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
+                                    elif isinstance(outputs, tuple):
+                                        audio = outputs[0]
+                                        if len(outputs) > 1:
+                                            sample_rate = outputs[1]
+                                            print(f"【Qwen3-TTS 合成】从返回值获取采样率: {sample_rate}")
+                                    else:
+                                        audio = outputs
+                                    if audio is not None:
+                                        print(f"【Qwen3-TTS 合成】generate_custom_voice成功")
+                                except Exception as e:
+                                    print(f"【Qwen3-TTS 合成】generate_custom_voice不支持，尝试其他方法: {e}")
 
-                        # 方式2: generate方法
-                        if audio is None and has_generate:
-                            try:
-                                print(f"【Qwen3-TTS 合成】使用generate方法...")
-                                outputs = self.model.generate(
-                                    text=text,
-                                    speaker_id=speaker_id,
-                                    speed=speed,
-                                    pitch=pitch,
-                                    volume=volume
-                                )
-                                if isinstance(outputs, dict):
-                                    audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
-                                else:
-                                    audio = outputs
-                                if audio is not None:
-                                    print(f"【Qwen3-TTS 合成】generate方法成功")
-                            except Exception as e:
-                                print(f"【Qwen3-TTS 合成】generate方法不支持，尝试其他方法: {e}")
+                            if audio is None and has_generate:
+                                try:
+                                    print(f"【Qwen3-TTS 合成】使用generate方法...")
+                                    outputs = self.model.generate(
+                                        text=text,
+                                        speaker_id=speaker_id,
+                                        speed=speed,
+                                        pitch=pitch,
+                                        volume=volume
+                                    )
+                                    if isinstance(outputs, dict):
+                                        audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
+                                    else:
+                                        audio = outputs
+                                    if audio is not None:
+                                        print(f"【Qwen3-TTS 合成】generate方法成功")
+                                except Exception as e:
+                                    print(f"【Qwen3-TTS 合成】generate方法不支持，尝试其他方法: {e}")
 
-                        # 方式3: tts方法
-                        if audio is None and has_tts:
-                            try:
-                                print(f"【Qwen3-TTS 合成】使用tts方法...")
-                                outputs = self.model.tts(
-                                    text=text,
-                                    speaker_id=speaker_id,
-                                    speed=speed
-                                )
-                                if isinstance(outputs, dict):
-                                    audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
-                                else:
-                                    audio = outputs
-                                if audio is not None:
-                                    print(f"【Qwen3-TTS 合成】tts方法成功")
-                            except Exception as e:
-                                print(f"【Qwen3-TTS 合成】tts方法不支持，尝试其他方法: {e}")
+                            if audio is None and has_tts:
+                                try:
+                                    print(f"【Qwen3-TTS 合成】使用tts方法...")
+                                    outputs = self.model.tts(
+                                        text=text,
+                                        speaker_id=speaker_id,
+                                        speed=speed
+                                    )
+                                    if isinstance(outputs, dict):
+                                        audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
+                                    else:
+                                        audio = outputs
+                                    if audio is not None:
+                                        print(f"【Qwen3-TTS 合成】tts方法成功")
+                                except Exception as e:
+                                    print(f"【Qwen3-TTS 合成】tts方法不支持，尝试其他方法: {e}")
 
-                        # 方式4: generate_voice_design (VoiceDesign模型专用，较慢)
-                        if audio is None and has_generate_voice_design:
-                            try:
-                                print(f"【Qwen3-TTS 合成】使用generate_voice_design方法...")
-                                simple_instruct = self._get_voice_design_instruct(emotion, speed, pitch, volume, speaker_id)
-                                outputs = self.model.generate_voice_design(
-                                    text=text,
-                                    instruct=simple_instruct,
-                                    language=language_code
-                                )
-                                if isinstance(outputs, dict):
-                                    audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
-                                elif isinstance(outputs, tuple):
-                                    audio = outputs[0]
-                                else:
-                                    audio = outputs
-                                if audio is not None:
-                                    print(f"【Qwen3-TTS 合成】generate_voice_design成功")
-                            except Exception as e:
-                                print(f"【Qwen3-TTS 合成】generate_voice_design不支持，尝试其他方法: {e}")
+                            if audio is None and has_generate_voice_design:
+                                try:
+                                    print(f"【Qwen3-TTS 合成】使用generate_voice_design方法...")
+                                    simple_instruct = self._get_voice_design_instruct(emotion, speed, pitch, volume, speaker_id)
+                                    outputs = self.model.generate_voice_design(
+                                        text=text,
+                                        instruct=simple_instruct,
+                                        language=language_code
+                                    )
+                                    if isinstance(outputs, dict):
+                                        audio = outputs.get("audio") or outputs.get("waveform") or outputs.get("speech")
+                                    elif isinstance(outputs, tuple):
+                                        audio = outputs[0]
+                                    else:
+                                        audio = outputs
+                                    if audio is not None:
+                                        print(f"【Qwen3-TTS 合成】generate_voice_design成功")
+                                except Exception as e:
+                                    print(f"【Qwen3-TTS 合成】generate_voice_design不支持，尝试其他方法: {e}")
 
                     if audio is None:
                         print("【Qwen3-TTS 合成错误】所有调用方式都失败")
@@ -1978,11 +2092,12 @@ class UnifiedTTSModelWrapper:
             emotion_desc = emotion_map.get(emotion, emotion)
             instruct_parts.append(f"情绪: {emotion_desc}")
         
-        if speed != 1.0:
-            if speed > 1.0:
-                instruct_parts.append(f"语速: 快速")
-            else:
-                instruct_parts.append(f"语速: 慢速")
+        if speed > 1.0:
+            instruct_parts.append(f"语速: 快速")
+        elif speed < 1.0:
+            instruct_parts.append(f"语速: 慢速")
+        else:
+            instruct_parts.append(f"语速: 正常")
         
         if pitch != 0.0:
             if pitch > 0.0:

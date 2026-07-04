@@ -19,7 +19,13 @@ import shutil
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+site_packages_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "site-packages")
+if os.path.exists(site_packages_path):
+    sys.path.insert(0, site_packages_path)
+
 from common import folder_paths
+
+aligner_model_cache = {}
 
 # 自动检测并安装缺失的依赖
 def _check_network_connection():
@@ -236,7 +242,6 @@ class forced_aligner_loader:
         return {
             "required": {
                 "forced_aligner_model": (forced_aligner_list, {"tooltip": "选择强制对齐模型文件\n• Qwen3-ForcedAligner-0.6B：阿里通义千问强制对齐模型"}),
-                "n_gpu_layers": ("INT", {"default": 0, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载"}),
             },
             "optional": {
                 "precision": (["float16", "bfloat16", "float32"], {"default": "float16", "tooltip": "模型精度选择"}),
@@ -248,7 +253,7 @@ class forced_aligner_loader:
     RETURN_TYPES = ("ALIGNERMODEL",)
     RETURN_NAMES = ("aligner_model",)
     FUNCTION = "load_forced_aligner_model"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     @classmethod
     def _resolve_forced_aligner_model_path(s, forced_aligner_model):
@@ -279,7 +284,7 @@ class forced_aligner_loader:
         return None
     
     @classmethod
-    def IS_CHANGED(s, forced_aligner_model, n_gpu_layers=0, precision="float16", batch_size=32, flash_attention=False):
+    def IS_CHANGED(s, forced_aligner_model, precision="float16", batch_size=32, flash_attention=False):
         resolved_path = s._resolve_forced_aligner_model_path(forced_aligner_model)
         
         # 使用有序字典确保键顺序一致
@@ -287,7 +292,6 @@ class forced_aligner_loader:
         config = OrderedDict([
             ("forced_aligner_model", forced_aligner_model),
             ("forced_aligner_model_path", resolved_path or ""),
-            ("n_gpu_layers", n_gpu_layers),
             ("precision", precision),
             ("batch_size", batch_size),
             ("flash_attention", flash_attention),
@@ -301,7 +305,7 @@ class forced_aligner_loader:
         self.loaded_model = None
         self.current_config = None
     
-    def load_forced_aligner_model(self, forced_aligner_model, n_gpu_layers=0, precision="float16", batch_size=32, flash_attention=False):
+    def load_forced_aligner_model(self, forced_aligner_model, precision="float16", batch_size=32, flash_attention=False):
         if forced_aligner_model == "None" or forced_aligner_model == "请将Qwen3-ForcedAligner-0.6B模型放入models/LLM文件夹":
             print("【强制对齐模型加载器】未选择强制对齐模型")
             return (None,)
@@ -317,7 +321,6 @@ class forced_aligner_loader:
             from collections import OrderedDict
             config = OrderedDict([
                 ("forced_aligner_model", forced_aligner_model),
-                ("n_gpu_layers", n_gpu_layers),
                 ("precision", precision),
                 ("batch_size", batch_size),
                 ("flash_attention", flash_attention),
@@ -367,7 +370,7 @@ class forced_aligner_loader:
                 print(f"【强制对齐模型加载器】检测到文件路径，自动使用所在目录: {model_path}")
             
             print(f"【强制对齐模型加载器】模型路径: {model_path}")
-            print(f"【强制对齐模型加载器】运行模式: {'GPU' if torch.cuda.is_available() else 'CPU'}, GPU层数: {n_gpu_layers}")
+            print(f"【强制对齐模型加载器】运行模式: {'GPU' if torch.cuda.is_available() else 'CPU'}")
             print(f"【强制对齐模型加载器】精度: {precision}")
             
             # 检查必备文件
@@ -444,6 +447,18 @@ class forced_aligner_loader:
                 self.loaded_model = ForcedAlignerModelWrapper(model, config)
                 self.current_config = config
                 
+                # 将模型添加到缓存（先释放旧模型）
+                cache_key = forced_aligner_model
+                if cache_key in aligner_model_cache:
+                    old_model = aligner_model_cache[cache_key]
+                    if old_model is not None and hasattr(old_model, 'release'):
+                        try:
+                            old_model.release()
+                            print(f"【强制对齐模型加载器】已释放旧模型缓存[{cache_key}]")
+                        except Exception:
+                            pass
+                aligner_model_cache[cache_key] = self.loaded_model
+                
                 # 检查模型是否成功加载
                 if self.loaded_model.model is None:
                     print("【强制对齐模型加载器错误】模型包装器创建成功，但内部模型加载失败")
@@ -482,6 +497,39 @@ class ForcedAlignerModelWrapper:
         self.model = model
         self.config = config
         self.model_type = "qwen_forced_aligner"
+    
+    def release(self):
+        """
+        释放模型资源
+        """
+        try:
+            if self.model is not None:
+                # 将模型移到CPU
+                if hasattr(self.model, 'to'):
+                    try:
+                        self.model = self.model.to('cpu')
+                    except Exception:
+                        pass
+                
+                del self.model
+                self.model = None
+            
+            # 强制垃圾回收
+            import gc
+            gc.collect()
+            
+            # 同步GPU操作并清空缓存
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+                torch.cuda.empty_cache()
+                print("【强制对齐包装器】已清理GPU缓存")
+            else:
+                print("【强制对齐包装器】CUDA不可用，仅清理CPU内存")
+            
+            print("【强制对齐包装器】强制对齐模型已卸载")
+            
+        except Exception as e:
+            print(f"【强制对齐清理错误】{str(e)}")
     
     def align(self, audio_data, text, sample_rate=16000, language="zh"):
         """执行强制对齐

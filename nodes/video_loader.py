@@ -55,7 +55,7 @@ class VideoLoader:
     RETURN_TYPES = ("IMAGE", "VIDEO", "AUDIO")
     RETURN_NAMES = ("images", "video", "audio")
     FUNCTION = "load_video"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def load_video(self, video, force_rate=0, custom_width=0, custom_height=0, 
                    frame_load_cap=0, skip_first_frames=0, select_every_nth=1):

@@ -39,7 +39,7 @@ class tts_align:
     RETURN_TYPES = ("AUDIO", "JSON")
     RETURN_NAMES = ("aligned_audio", "alignment_info")
     FUNCTION = "align_tts"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def align_tts(self, tts_model, timestamps, text, sample_rate=24000, 
                   align_mode="Natural Flow", silence_padding=0.1):

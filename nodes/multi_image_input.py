@@ -112,7 +112,7 @@ class MultiImageInput:
     RETURN_NAMES = ("images", "prompt")
     OUTPUT_IS_LIST = (False, False)
     FUNCTION = "process_multi_images"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def process_multi_images(self, image1=None, image2=None, image3=None, image4=None, image5=None, image6=None, mode="Image Mode", story_type="Coherent Story", story_length="Medium (200 words or less)", language="中文", max_size=256, 
                           custom_prompt="", include_image_descriptions=True, 

@@ -43,7 +43,7 @@ class forced_aligner_inference:
     RETURN_TYPES = ("STRING", "JSON", "STRING")
     RETURN_NAMES = ("aligned_text", "timestamps", "subtitle_text")
     FUNCTION = "run_forced_aligner"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def run_forced_aligner(self, aligner_model, audio, text, sample_rate=16000, output_format="Text", language="zh"):
         """

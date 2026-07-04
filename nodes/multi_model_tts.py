@@ -48,7 +48,7 @@ class multi_model_tts:
     RETURN_TYPES = ("STRING", "AUDIO", "DICT")
     RETURN_NAMES = ("text", "audio", "dialogue_info")
     FUNCTION = "generate_multi_model_audio"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def generate_multi_model_audio(self, dialogue_text,
                                   tts_model_1=None, tts_model_2=None, tts_model_3=None, tts_model_4=None,

@@ -44,7 +44,7 @@ class llama_cpp_parameters:
     RETURN_TYPES = ("LLAMACPPARAMS",)
     RETURN_NAMES = ("parameters",)
     FUNCTION = "process"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def process(self, **kwargs):
         return (kwargs,)

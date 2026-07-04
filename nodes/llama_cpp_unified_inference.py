@@ -74,6 +74,8 @@ class ErrorHandler:
     @staticmethod
     def _classify_error(error_message):
         """分类错误类型"""
+        if error_message is None:
+            return "unknown"
         error_message_lower = error_message.lower()
         
         if any(keyword in error_message_lower for keyword in ["out of memory", "oom", "failed to find a memory slot"]):
@@ -187,72 +189,91 @@ class ErrorHandler:
         return error_prompt
 
 # 导入预设提示词库
-from support.prompt_enhancer_preset_zh import (
-    IMAGE_REVERSE_TAGS_ZH,
-    IMAGE_REVERSE_DESCRIBE_ZH,
+
+from support.preset_universal import (
     PROMPT_EXPANDER_ZH,
-    ILLUSTRIOUS_ZH,
-    ANIME_PROMPT_ZH,
-    REALISTIC_FEMALE_ZH,
-    REALISTIC_MALE_ZH,
-    WESTERN_FEMALE_ZH,
-    WESTERN_MALE_ZH,
-    INFLUENCER_PORTRAIT_ZH,
-    MALE_PORTRAIT_ZH,
-    YOUNG_BOY_PORTRAIT_ZH,
-    MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
-    MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
-    ART_ILLUSTRATION_ZH,
-    POSTER_DESIGN_ZH,
-    SCENE_DESIGN_ZH,
-    INTERIOR_DESIGN_ZH,
-    ECOMMERCE_ZH,
-    FOOD_PHOTOGRAPHY_ZH,
+    PROMPT_EXPANDER_EN,
     EDIT_COMBINED_ZH,
-    UNIVERSAL_VIDEO_ZH,
-    CONTINUING_I2V_ZH,
-    CONTINUING_FLF2V_ZH,
-    VIDEO_FRAME_SEQUENCE_ZH,
-    VIDEO_TO_PROMPT_ZH,
-    VIDEO_SCENE_BREAKDOWN_ZH,
-    VIDEO_SUBTITLE_FORMAT_ZH,
-    MULTI_SPEAKER_DIALOGUE_ZH,
-    LYRICS_CREATION_ZH,
+    EDIT_COMBINED_EN,
     IDEOGRAM4_ZH,
+    IDEOGRAM4_EN,
 )
 
-from support.prompt_enhancer_preset_en import (
+from support.preset_image_reverse import (
+    IMAGE_REVERSE_TAGS_ZH,
+    IMAGE_REVERSE_DESCRIBE_ZH,
     IMAGE_REVERSE_TAGS_EN,
     IMAGE_REVERSE_DESCRIBE_EN,
-    PROMPT_EXPANDER_EN,
+)
+
+from support.preset_anime import (
+    ILLUSTRIOUS_ZH,
     ILLUSTRIOUS_EN,
+    ANIME_PROMPT_ZH,
     ANIME_PROMPT_EN,
+)
+
+from support.preset_portrait import (
+    REALISTIC_FEMALE_ZH,
     REALISTIC_FEMALE_EN,
+    REALISTIC_MALE_ZH,
     REALISTIC_MALE_EN,
+    WESTERN_FEMALE_ZH,
     WESTERN_FEMALE_EN,
+    WESTERN_MALE_ZH,
     WESTERN_MALE_EN,
+    INFLUENCER_PORTRAIT_ZH,
     INFLUENCER_PORTRAIT_EN,
+    MALE_PORTRAIT_ZH,
     MALE_PORTRAIT_EN,
+    YOUNG_BOY_PORTRAIT_ZH,
     YOUNG_BOY_PORTRAIT_EN,
+    MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
     MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
+    MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
     MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
+)
+
+from support.preset_design import (
+    ART_ILLUSTRATION_ZH,
     ART_ILLUSTRATION_EN,
+    POSTER_DESIGN_ZH,
     POSTER_DESIGN_EN,
+    SCENE_DESIGN_ZH,
     SCENE_DESIGN_EN,
+    INTERIOR_DESIGN_ZH,
     INTERIOR_DESIGN_EN,
+    ARCHITECTURE_RENDERING_ZH,
+    ARCHITECTURE_RENDERING_EN,
+    ECOMMERCE_ZH,
     ECOMMERCE_EN,
+    FOOD_PHOTOGRAPHY_ZH,
     FOOD_PHOTOGRAPHY_EN,
-    EDIT_COMBINED_EN,
+
+)
+
+from support.preset_video_audio import (
+    UNIVERSAL_VIDEO_ZH,
     UNIVERSAL_VIDEO_EN,
+    CONTINUING_I2V_ZH,
     CONTINUING_I2V_EN,
+    CONTINUING_FLF2V_ZH,
     CONTINUING_FLF2V_EN,
+    CONTINUING_MULTI_STORYBOARD_ZH,
+    CONTINUING_MULTI_STORYBOARD_EN,
+    VIDEO_FRAME_SEQUENCE_ZH,
     VIDEO_FRAME_SEQUENCE_EN,
+    VIDEO_TO_PROMPT_ZH,
     VIDEO_TO_PROMPT_EN,
+    VIDEO_SCENE_BREAKDOWN_ZH,
     VIDEO_SCENE_BREAKDOWN_EN,
+    VIDEO_SUBTITLE_FORMAT_ZH,
     VIDEO_SUBTITLE_FORMAT_EN,
+    MULTI_SPEAKER_DIALOGUE_ZH,
     MULTI_SPEAKER_DIALOGUE_EN,
+    LYRICS_CREATION_ZH,
     LYRICS_CREATION_EN,
-    IDEOGRAM4_EN,
+
 )
 
 
@@ -451,181 +472,39 @@ class llama_cpp_unified_inference:
     
     def _filter_thinking_content(self, text):
         """
-        过滤Qwen3.5/3.6等模型生成的思考内容
-        
-        支持多种思考格式：
-        1. Qwen3.5/3.6原生格式：<thinking>思考内容</thinking> 或 思考内容<|end_of_thinking|>
-        2. Thinking Process格式：Thinking Process: ...
-        3. 中文思考格式：思考：、分析：、推理：、逐步分析：
+        清理模型输出中的思考标记
         
         Args:
             text: 原始生成文本
             
         Returns:
-            过滤后的文本（去除思考内容，保留实际回答）
+            清理后的文本
         """
         if not text:
             return text
         
-        # 定义Qwen3.5/3.6的思考结束标记（扩展版）
+        # 优先处理Qwen3.5/3.6原生思考格式 - 结束标记后为实际回答
         thinking_end_markers = [
             '<|end_of_thinking|>',
             '<|end_of_solution|>',
             '<|finish_reason|>',
-            '</thinking>',
-            '</think>',
-            '</analysis>',
         ]
         
-        # 定义思考开始标记
-        thinking_start_markers = [
-            '<thinking>',
-            '<think>',
-            '<analysis>',
-        ]
-        
-        # 优先处理Qwen3.5/3.6原生思考格式 - 结束标记
         for marker in thinking_end_markers:
             if marker in text:
-                # 找到最后一个标记的位置，提取之后的内容
                 parts = text.split(marker)
                 if len(parts) >= 2:
-                    # 取最后一个标记之后的内容作为实际回答
                     actual_response = parts[-1].strip()
-                    # 清理开头的空行和标记
                     actual_response = re.sub(r'^\s*\n+', '', actual_response)
                     if actual_response:
-                        return actual_response
+                        return self._clean_residual_markers(actual_response)
         
-        # 处理Qwen3.5/3.6原生思考格式 - 开始标记（去除标记内的内容）
-        for start_marker in thinking_start_markers:
-            pattern = re.escape(start_marker) + r'.*?' + r'(' + '|'.join(re.escape(m) for m in thinking_end_markers) + r')'
-            text = re.sub(pattern, '', text, flags=re.DOTALL)
-        
-        # 处理Thinking Process格式（英文）
-        thinking_patterns = [
-            r'^Thinking Process\s*:?\s*$',
-            r'^\s*\d+\.\s+\*\*\s*Analyze',
-            r'^Step \d+:',
-            r'^\*\*\s*Analyze',
-        ]
-        
-        # 处理中文思考格式
-        chinese_thinking_patterns = [
-            r'^思考\s*[：:]',
-            r'^分析\s*[：:]',
-            r'^推理\s*[：:]',
-            r'^逐步分析\s*[：:]',
-            r'^我来分析一下\s*[：:]',
-            r'^让我想想\s*[：:]',
-            r'^首先\s*[：:]',
-            r'^接下来\s*[：:]',
-            r'^然后\s*[：:]',
-        ]
-        
-        # 检查是否包含思考内容
-        has_thinking = False
-        
-        # 检查英文思考模式
-        for pattern in thinking_patterns:
-            if re.search(pattern, text, re.MULTILINE):
-                has_thinking = True
-                break
-        
-        # 检查中文思考模式
-        if not has_thinking:
-            for pattern in chinese_thinking_patterns:
-                if re.search(pattern, text, re.MULTILINE):
-                    has_thinking = True
-                    break
-        
-        # 检查数字编号的分析模式（如 "1. **分析"）
-        if not has_thinking:
-            if re.search(r'^\s*\d+\.\s+\*\*', text, re.MULTILINE):
-                has_thinking = True
-        
-        if not has_thinking:
-            # 没有检测到思考内容，直接返回原文本（但先清理可能的残留标记）
-            cleaned_text = self._clean_residual_markers(text)
-            return cleaned_text
-        
-        # 有思考内容，尝试提取最终的标签列表部分
-        lines = text.split('\n')
-        result_lines = []
-        
-        # 状态变量
-        in_thinking_block = False
-        in_final_tags = False
-        found_numbered_tags = False
-        found_tag_section = False
-        
-        for line in lines:
-            # 检测思考块开始（英文）
-            if re.match(r'^Thinking Process\s*:?\s*$', line) or re.match(r'^\s*\d+\.\s+\*\*\s*Analyze', line):
-                in_thinking_block = True
-                in_final_tags = False
-                continue
-            
-            # 检测思考块开始（中文）
-            if any(re.match(pattern, line) for pattern in chinese_thinking_patterns):
-                in_thinking_block = True
-                in_final_tags = False
-                continue
-            
-            # 在思考块中，检测是否到达最终标签列表
-            if in_thinking_block:
-                # 寻找以数字编号开始且包含逗号的行（标签列表特征）
-                if re.match(r'^\s*\d+\.\s*[^*]+,', line):
-                    in_final_tags = True
-                    found_numbered_tags = True
-                    found_tag_section = True
-                    result_lines.append(line)
-                    continue
-                
-                # 检测纯标签行（不含分析关键词，包含逗号）
-                if ',' in line and len(line.strip()) > 0:
-                    # 检查是否是标签行（不包含分析关键词）
-                    analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad', 
-                                        '分析', '推理', '思考', '步骤', '首先', '接下来', '然后']
-                    has_analysis_kw = any(kw in line for kw in analysis_keywords)
-                    
-                    # 检查是否是纯数字或百分比（可能是分析内容）
-                    is_analysis_line = re.match(r'^\s*\d+(\.\d+)?\s*$', line.strip()) or \
-                                      re.match(r'^\s*\d+(\.\d+)?%\s*$', line.strip()) or \
-                                      re.match(r'^\s*Total\s*[:：]\s*\d+\s*$', line.strip())
-                    
-                    if not has_analysis_kw and not is_analysis_line:
-                        # 这可能是标签内容，收集它
-                        if len(line.strip()) >= 2:  # 至少2个字符才认为是有效标签
-                            found_tag_section = True
-                            result_lines.append(line)
-                    continue
-            
-            # 不在思考块中，直接收集（但跳过空行和标记行）
-            if line.strip() and not any(m in line for m in thinking_start_markers + thinking_end_markers):
-                # 检查是否是分析行
-                analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad']
-                if not any(kw in line for kw in analysis_keywords):
-                    result_lines.append(line)
-        
-        # 如果找到了标签内容，返回过滤后的内容
-        if found_tag_section and result_lines:
-            result = '\n'.join(result_lines)
-            # 清理空行和多余空格
-            lines = [line.strip() for line in result.split('\n') if line.strip()]
-            cleaned_result = '\n'.join(lines).strip()
-            # 进一步清理残留标记
-            cleaned_result = self._clean_residual_markers(cleaned_result)
-            return cleaned_result
-        
-        # 如果没有找到明确的标签列表，尝试提取最后一段有意义的内容
-        # 这适用于思考内容在开头，实际回答在末尾的情况
-        cleaned_text = self._extract_final_response(text)
-        return cleaned_text
+        # 清理残留标记
+        return self._clean_residual_markers(text)
     
     def _clean_residual_markers(self, text):
         """
-        清理文本中残留的标记和思考相关内容
+        清理文本中残留的思考标记
         
         Args:
             text: 待清理的文本
@@ -636,7 +515,6 @@ class llama_cpp_unified_inference:
         if not text:
             return text
         
-        # 清理可能残留的思考标记
         markers_to_remove = [
             '<thinking>', '</thinking>',
             '<think>', '</think>',
@@ -650,59 +528,10 @@ class llama_cpp_unified_inference:
         for marker in markers_to_remove:
             result = result.replace(marker, '')
         
-        # 清理连续的空行和空格
         result = re.sub(r'\n\s*\n', '\n', result)
         result = re.sub(r'^\s+|\s+$', '', result)
         
         return result
-    
-    def _extract_final_response(self, text):
-        """
-        从包含思考内容的文本中提取最终响应
-        
-        Args:
-            text: 原始文本
-            
-        Returns:
-            提取的最终响应
-        """
-        if not text:
-            return text
-        
-        lines = text.split('\n')
-        
-        # 找到最后一个包含逗号的段落（标签列表的特征）
-        last_comma_section = ''
-        comma_section_start = -1
-        
-        for i, line in enumerate(lines):
-            if ',' in line and len(line.strip()) >= 2:
-                # 检查是否是分析行（跳过）
-                analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad',
-                                    '分析', '推理', '思考']
-                if not any(kw in line for kw in analysis_keywords):
-                    comma_section_start = i
-        
-        if comma_section_start >= 0:
-            # 提取从逗号部分开始到结尾的内容
-            result_lines = []
-            for i in range(comma_section_start, len(lines)):
-                line = lines[i].strip()
-                if line:
-                    # 跳过分析行和纯数字行
-                    analysis_keywords = ['Analyze', 'Drafting', 'Refining', 'Count', 'Check', 'Need', 'Total:', 'Mental', 'Scratchpad']
-                    is_analysis_line = any(kw in line for kw in analysis_keywords)
-                    is_number_line = re.match(r'^\d+(\.\d+)?%?$', line)
-                    
-                    if not is_analysis_line and not is_number_line:
-                        result_lines.append(line)
-            
-            if result_lines:
-                result = '\n'.join(result_lines).strip()
-                return self._clean_residual_markers(result)
-        
-        # 如果没有找到逗号部分，返回清理后的原始文本
-        return self._clean_residual_markers(text)
     
     @classmethod
     def add_to_cache(cls, cache_name, key, value):
@@ -819,12 +648,14 @@ class llama_cpp_unified_inference:
     preset_prompts["[Design] Poster Design"] = "POSTER_DESIGN"
     preset_prompts["[Design] Scene Design"] = "SCENE_DESIGN"
     preset_prompts["[Design] Interior Design"] = "INTERIOR_DESIGN"
+    preset_prompts["[Design] Architecture Rendering"] = "ARCHITECTURE_RENDERING"
     preset_prompts["[Design] Ecommerce Product"] = "ECOMMERCE"
     preset_prompts["[Design] Food Photography"] = "FOOD_PHOTOGRAPHY"
     preset_prompts["[Edit] Combined"] = "EDIT_COMBINED"
     preset_prompts["[Text to Video] Universal"] = "UNIVERSAL_VIDEO"
     preset_prompts["[Image to Video] I2V"] = "CONTINUING_I2V"
     preset_prompts["[Image to Video] FLF2V"] = "CONTINUING_FLF2V"
+    preset_prompts["[Image to Video] Multi Storyboard"] = "CONTINUING_MULTI_STORYBOARD"
     preset_prompts["[Video Analysis] Frame Sequence"] = "VIDEO_FRAME_SEQUENCE"
     preset_prompts["[Video Analysis] Reverse Prompt"] = "VIDEO_TO_PROMPT"
     preset_prompts["[Video Analysis] Scene Breakdown"] = "VIDEO_SCENE_BREAKDOWN"
@@ -856,7 +687,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推XL标签格式提示词\n• [Reverse] Describe：通用图片反推提示词\n• [Normal] Expand：通用提示词文本优化\n• [Anime] Expand Tags：二次元角色风格文本优化\n• [Anime] Prompt Expand：二次元内容文本优化\n• [Portrait] Asian Female：真实亚洲女性人像文本优化\n• [Portrait] Asian Male：真实亚洲男性人像文本优化\n• [Portrait] Western Female：真实欧美女性人像文本优化\n• [Portrait] Western Male：真实欧美男性人像文本优化\n• [Portrait] Influencer：完美女性人像文本优化\n• [Portrait] Male Portrait：完美男性人像文本优化\n• [Portrait] Young Boy：儿童人像文本优化\n• [Portrait] Middle Elderly Female：中老年女性人像文本优化\n• [Portrait] Middle Elderly Male：中老年男性人像文本优化\n• [Design] Art Illustration：艺术插画文本优化\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计文本优化\n• [Design] Interior Design：室内设计文本优化\n• [Design] Ecommerce Product：电商产品\n• [Design] Food Photography：美食摄影文本优化\n• [Edit] Combined：图像编辑文本优化\n• [Text to Video] Universal：扩写文本内容\n• [Image to Video] I2V：根据图片扩写文本内容\n• [Image to Video] FLF2V：根据首尾帧图片扩写文本内容\n• [Video Analysis] Frame Sequence：帧分析视频内容\n• [Video Analysis] Reverse Prompt：通用视频反推提示词\n• [Video Analysis] Scene Breakdown：反推各分镜场景内容\n• [Video Analysis] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化\n• [Music] Lyrics Creation：歌词创作文本优化\n• [Design] Ideogram-4：json结构化提示词"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推XL标签格式提示词\n• [Reverse] Describe：通用图片反推提示词\n• [Normal] Expand：通用提示词文本优化\n• [Anime] Expand Tags：二次元角色风格文本优化\n• [Anime] Prompt Expand：二次元内容文本优化\n• [Portrait] Asian Female：真实亚洲女性人像文本优化\n• [Portrait] Asian Male：真实亚洲男性人像文本优化\n• [Portrait] Western Female：真实欧美女性人像文本优化\n• [Portrait] Western Male：真实欧美男性人像文本优化\n• [Portrait] Influencer：完美女性人像文本优化\n• [Portrait] Male Portrait：完美男性人像文本优化\n• [Portrait] Young Boy：儿童人像文本优化\n• [Portrait] Middle Elderly Female：中老年女性人像文本优化\n• [Portrait] Middle Elderly Male：中老年男性人像文本优化\n• [Design] Art Illustration：艺术插画文本优化\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计文本优化\n• [Design] Interior Design：室内设计文本优化\n• [Design] Architecture Rendering：建筑外观与园林渲染\n• [Design] Ecommerce Product：电商产品文本优化\n• [Design] Food Photography：美食摄影文本优化\n• [Edit] Combined：图像编辑文本优化\n• [Text to Video] Universal：扩写视频文本内容\n• [Image to Video] I2V：根据图片扩写视频文本内容\n• [Image to Video] FLF2V：根据首尾帧图片扩写视频文本内容\n• [Image to Video] Multi Storyboard:根据多张图片与文本扩写视频文本内容\n• [Video Analysis] Frame Sequence：帧分析视频内容\n• [Video Analysis] Reverse Prompt：通用视频反推提示词\n• [Video Analysis] Scene Breakdown：反推各分镜场景内容\n• [Video Analysis] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化\n• [Music] Lyrics Creation：歌词创作文本优化\n• [Design] Ideogram-4：json结构化提示词"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的AI提示词处理专家。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
@@ -911,7 +742,7 @@ class llama_cpp_unified_inference:
     RETURN_NAMES = ("output", "output_list", "state_uid", "audio", "example_output")
     OUTPUT_IS_LIST = (False, True, False, False, False)
     FUNCTION = "process"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
     
     def __init__(self):
         self.engine = None
@@ -991,12 +822,14 @@ class llama_cpp_unified_inference:
                 "POSTER_DESIGN": POSTER_DESIGN_ZH,
                 "SCENE_DESIGN": SCENE_DESIGN_ZH,
                 "INTERIOR_DESIGN": INTERIOR_DESIGN_ZH,
+                "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_ZH,
                 "ECOMMERCE": ECOMMERCE_ZH,
                 "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_ZH,
                 "EDIT_COMBINED": EDIT_COMBINED_ZH,
                 "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_ZH,
                 "CONTINUING_I2V": CONTINUING_I2V_ZH,
                 "CONTINUING_FLF2V": CONTINUING_FLF2V_ZH,
+                "CONTINUING_MULTI_STORYBOARD": CONTINUING_MULTI_STORYBOARD_ZH,
                 "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_ZH,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
                 "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_ZH,
@@ -1025,12 +858,14 @@ class llama_cpp_unified_inference:
                 "POSTER_DESIGN": POSTER_DESIGN_EN,
                 "SCENE_DESIGN": SCENE_DESIGN_EN,
                 "INTERIOR_DESIGN": INTERIOR_DESIGN_EN,
+                "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_EN,
                 "ECOMMERCE": ECOMMERCE_EN,
                 "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_EN,
                 "EDIT_COMBINED": EDIT_COMBINED_EN,
                 "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_EN,
                 "CONTINUING_I2V": CONTINUING_I2V_EN,
                 "CONTINUING_FLF2V": CONTINUING_FLF2V_EN,
+                "CONTINUING_MULTI_STORYBOARD": CONTINUING_MULTI_STORYBOARD_EN,
                 "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_EN,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
                 "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_EN,
@@ -1167,14 +1002,17 @@ class llama_cpp_unified_inference:
                 "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
                 "ART_ILLUSTRATION": ART_ILLUSTRATION_ZH,
                 "POSTER_DESIGN": POSTER_DESIGN_ZH,
-                "SCENE_DESIGN": SCENE_DESIGN_ZH,
+        """_summary_
+        """                "SCENE_DESIGN": SCENE_DESIGN_ZH,
                 "INTERIOR_DESIGN": INTERIOR_DESIGN_ZH,
+                "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_ZH,
                 "ECOMMERCE": ECOMMERCE_ZH,
                 "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_ZH,
                 "EDIT_COMBINED": EDIT_COMBINED_ZH,
                 "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_ZH,
                 "CONTINUING_I2V": CONTINUING_I2V_ZH,
                 "CONTINUING_FLF2V": CONTINUING_FLF2V_ZH,
+                "CONTINUING_MULTI_STORYBOARD": CONTINUING_MULTI_STORYBOARD_ZH,
                 "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_ZH,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_ZH,
                 "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_ZH,
@@ -1203,12 +1041,14 @@ class llama_cpp_unified_inference:
                 "POSTER_DESIGN": POSTER_DESIGN_EN,
                 "SCENE_DESIGN": SCENE_DESIGN_EN,
                 "INTERIOR_DESIGN": INTERIOR_DESIGN_EN,
+                "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_EN,
                 "ECOMMERCE": ECOMMERCE_EN,
                 "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_EN,
                 "EDIT_COMBINED": EDIT_COMBINED_EN,
                 "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_EN,
                 "CONTINUING_I2V": CONTINUING_I2V_EN,
                 "CONTINUING_FLF2V": CONTINUING_FLF2V_EN,
+                "CONTINUING_MULTI_STORYBOARD": CONTINUING_MULTI_STORYBOARD_EN,
                 "VIDEO_FRAME_SEQUENCE": VIDEO_FRAME_SEQUENCE_EN,
                 "VIDEO_TO_PROMPT": VIDEO_TO_PROMPT_EN,
                 "VIDEO_SCENE_BREAKDOWN": VIDEO_SCENE_BREAKDOWN_EN,
@@ -1430,6 +1270,11 @@ class llama_cpp_unified_inference:
         
         # 生成缓存键
         model_path = getattr(llama_model, 'model_path', str(llama_model))
+        
+        # 如果没有选择模型，直接返回空结果
+        if not model_path or model_path.lower() == "none":
+            print("【推理】未选择模型，跳过推理")
+            return generated_text, audio_output
         cache_content = {
             "model_path": model_path,
             "messages": messages,
@@ -1448,7 +1293,9 @@ class llama_cpp_unified_inference:
         success = False
         
         # 检查是否是MTP模型
-        is_mtp_model = "-mtp-" in model_path.lower() or "_mtp_" in model_path.lower()
+        is_mtp_model = False
+        if model_path:
+            is_mtp_model = "-mtp-" in model_path.lower() or "_mtp_" in model_path.lower()
         
         while retry_count < max_retries and not success:
             try:
@@ -1571,7 +1418,7 @@ class llama_cpp_unified_inference:
             # 检查输入
             has_images = images is not None and (hasattr(images, 'numel') and images.numel() > 0)
             has_video = self.video_processor._check_video_input(video)
-            has_audio = False
+            has_audio = audio is not None
             
             # 处理自定义提示词
             custom_prompt = text_input
@@ -1744,6 +1591,10 @@ class llama_cpp_unified_inference:
                             print("【TTS兼容】sample_rate缺失，已默认设为24000")
                     
                     return (generated_text, [generated_text], seed, audio_output, example_output)
+                else:
+                    # 其他模式但没有LLM模型，返回空结果
+                    print(f"【无模型模式】模式: {mode}，未选择LLM模型，返回空结果")
+                    return ("", [""], seed, None, example_output)
 
             # 文本转音频优先直接使用输入文本
             if mode != "audio" and mode != "text_to_audio":

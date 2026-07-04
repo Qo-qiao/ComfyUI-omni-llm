@@ -148,7 +148,7 @@ class llama_cpp_model_loader:
     RETURN_TYPES = ("LLAMACPPMODEL",)
     RETURN_NAMES = ("llama_model",)
     FUNCTION = "loadmodel"
-    CATEGORY = "llama-cpp-vlm"
+    CATEGORY = "omni-llm"
 
     @classmethod
     def _resolve_llm_model_path(s, model):
