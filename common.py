@@ -28,8 +28,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter
 
+site_packages_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site-packages")
+if os.path.exists(site_packages_path):
+    sys.path.insert(0, site_packages_path)
+
 LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
-MIN_LLAMA_CPP_VERSION = "0.3.35"
+MIN_LLAMA_CPP_VERSION = "0.3.40"
 
 class LlamaCppDependencyError(Exception):
     """llama-cpp-python 依赖错误异常"""
@@ -47,14 +51,14 @@ def _get_platform_wheel_url():
     system = platform.system()
     arch = platform.machine()
     
-    # 根据平台选择合适的wheel
+    # 根据平台选择合适的wheel（与 requirements.txt 保持一致）
     if system == "Windows":
-        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-Basic-win-20260406/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128.basic-{py_tag}-{py_tag}-win_amd64.whl"
+        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-win-20260608/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128-{py_tag}-{py_tag}-win_amd64.whl"
     elif system == "Linux":
-        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-Basic-linux-20260406/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128.basic-{py_tag}-{py_tag}-linux_x86_64.whl"
+        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-linux-20260607/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128-{py_tag}-{py_tag}-linux_x86_64.whl"
     elif system == "Darwin":
         # macOS 使用 Metal 版本
-        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-Metal-macos-20260406/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}-{py_tag}-{py_tag}-macosx_11_0_arm64.whl"
+        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-Metal-macos-20260607/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}-{py_tag}-{py_tag}-macosx_11_0_arm64.whl"
     else:
         base_url = None
     
@@ -170,61 +174,6 @@ def _check_and_install_llama_cpp_python():
             print(f"【手动安装】请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 手动下载适合您环境的wheel")
             return False
 
-def _check_dependency(dep_name, import_name, package_info, is_optional=False):
-    """检查单个依赖，显示详细信息"""
-    try:
-        module = __import__(import_name)
-        version = getattr(module, '__version__', '未知版本')
-        print(f"【依赖检查】✓ {dep_name} 已安装，版本: {version}")
-        return True, module
-    except ImportError:
-        if is_optional:
-            print(f"【依赖检查】⚠ {dep_name} 未安装（可选），功能受限")
-            print(f"【下载地址】{package_info.get('url', '')}")
-        else:
-            print(f"【依赖检查】✗ {dep_name} 未安装（必需）")
-            print(f"【下载地址】{package_info.get('url', '')}")
-        return False, None
-
-DEPENDENCY_INFO = {
-    "llama-cpp-python": {
-        "import_name": "llama_cpp",
-        "url": LLAMA_CPP_PYTHON_RELEASES_URL,
-        "required": True,
-        "auto_install": True
-    },
-    "torch": {
-        "import_name": "torch",
-        "url": "https://pytorch.org/",
-        "required": True
-    },
-    "Pillow": {
-        "import_name": "PIL",
-        "url": "https://pypi.org/project/Pillow/",
-        "required": True
-    },
-    "numpy": {
-        "import_name": "numpy",
-        "url": "https://pypi.org/project/numpy/",
-        "required": True
-    },
-    "scipy": {
-        "import_name": "scipy",
-        "url": "https://pypi.org/project/scipy/",
-        "required": True
-    },
-    "soundfile": {
-        "import_name": "soundfile",
-        "url": "https://pypi.org/project/soundfile/",
-        "required": False
-    },
-    "librosa": {
-        "import_name": "librosa",
-        "url": "https://pypi.org/project/librosa/",
-        "required": False
-    }
-}
-
 print("=" * 60)
 print("【ComfyUI-omni-llm】正在检查依赖...")
 print("=" * 60)
@@ -240,23 +189,6 @@ if _check_and_install_llama_cpp_python():
         LLAMA_CPP_AVAILABLE = True
         _llama_cpp = llama_cpp
         _has_mtmd = True
-        
-        # 动态导入ChatHandler，不存在的设为None
-        chat_handlers_to_import = [
-            'Llava15ChatHandler', 'Llava16ChatHandler', 'MoondreamChatHandler',
-            'NanoLlavaChatHandler', 'Llama3VisionAlphaChatHandler', 'MiniCPMv26ChatHandler', 
-            'MiniCPMv45ChatHandler', 'MiniCPMv46ChatHandler', 'Qwen3VLChatHandler', 'Qwen25VLChatHandler', 
-            'Qwen35ChatHandler', 'GLM46VChatHandler', 'GLM41VChatHandler', 
-            'LFM2VLChatHandler', 'Gemma3ChatHandler', 'Gemma4ChatHandler', 
-            'LFM25VLChatHandler', 'GraniteDoclingChatHandler', 'MTMDChatHandler',
-            'Qwen3ASRChatHandler', 'ObsidianChatHandler', 'PaddleOCRChatHandler'
-        ]
-        
-        for handler_name in chat_handlers_to_import:
-            handler_cls = getattr(chat_format, handler_name, None)
-            globals()[handler_name] = handler_cls
-            if handler_cls is None:
-                print(f"【警告】llama-cpp-python 版本较低，{handler_name} 不可用")
             
     except ImportError as e:
         print(f"【错误】llama-cpp-python 导入失败: {e}")
@@ -274,26 +206,6 @@ else:
         f"llama-cpp-python 未正确安装\n"
         f"请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 下载并安装"
     )
-
-print("=" * 60)
-print(f"【依赖检查】音频处理依赖检查...")
-print("=" * 60)
-
-try:
-    import soundfile as sf
-    _SOUNDFILE = True
-except ImportError:
-    _SOUNDFILE = False
-    sf = None
-    print(f"【依赖检查】⚠ soundfile 未安装，音频保存功能受限")
-    print(f"【下载地址】https://pypi.org/project/soundfile/")
-
-try:
-    import scipy.io.wavfile as wavfile
-    _SCIPY_WAV = True
-except ImportError:
-    _SCIPY_WAV = False
-    wavfile = None
 
 try:
     import folder_paths
@@ -1071,6 +983,7 @@ class ChatHandlerManager:
     def get_handler_for_model(self, model_name):
         """
         根据模型名称获取最佳匹配的ChatHandler
+        使用统一的MODEL_REGISTRY进行匹配
         
         Args:
             model_name: 模型名称或文件名
@@ -1080,7 +993,6 @@ class ChatHandlerManager:
         """
         model_lower = model_name.lower()
         
-        # 备选handler映射：(首选, 备选)
         fallback_map = {
             'Qwen25VLChatHandler': 'Qwen3VLChatHandler',
             'Qwen36VLChatHandler': 'Qwen35ChatHandler',
@@ -1089,88 +1001,17 @@ class ChatHandlerManager:
             'Phi35VisionChatHandler': 'Phi3Vision128kChatHandler',
         }
         
-        # 获取handler名称，不存在时使用备选
-        def get_handler_name(handler_name):
-            if globals().get(handler_name):
-                return handler_name
-            return fallback_map.get(handler_name)
+        for pattern, handler_name, _, _ in MODEL_REGISTRY:
+            if pattern in model_lower:
+                if self._handlers.get(handler_name):
+                    return handler_name, self._handlers[handler_name]
+                fallback_name = fallback_map.get(handler_name)
+                if fallback_name and self._handlers.get(fallback_name):
+                    return fallback_name, self._handlers[fallback_name]
         
-        # 基础规则（始终可用的handler）
-        special_rules = [
-            ('qwen3-vl', 'Qwen3VLChatHandler'),
-            ('qwen36-vl', get_handler_name('Qwen36VLChatHandler')),
-            ('qwen3.6-vl', get_handler_name('Qwen36VLChatHandler')),
-            ('qwen2.5-vl', get_handler_name('Qwen25VLChatHandler')),
-            ('qwen2.5-omni', get_handler_name('Qwen25VLChatHandler')),
-            ('toriigate', get_handler_name('Qwen25VLChatHandler')),
-            ('qwen35', 'Qwen35ChatHandler'),
-            ('qwen3.5', 'Qwen35ChatHandler'),
-            ('qwen36', 'Qwen35ChatHandler'),
-            ('qwen3.6', 'Qwen35ChatHandler'),
-            ('qwen3-asr', 'Qwen3ASRChatHandler'),
-            ('minicpm-v-4.5', 'MiniCPMv45ChatHandler'),
-            ('minicpm-o-4.5', 'MiniCPMv45ChatHandler'),
-            ('minicpm-v-4.6', 'MiniCPMv46ChatHandler'),
-            ('minicpm-o-4.6', 'MiniCPMv46ChatHandler'),
-            ('minicpm-o-2.6', 'MiniCPMv26ChatHandler'),
-            ('minicpmo2.6', 'MiniCPMv26ChatHandler'),
-            ('minicpm-v-2.6', 'MiniCPMv26ChatHandler'),
-            ('minicpm-llama3-v-2.5', 'MiniCPMv26ChatHandler'),
-            ('glm-4.6v', 'GLM46VChatHandler'),
-            ('glm-4.1v', 'GLM41VChatHandler'),
-            ('gemma-3', 'Gemma3ChatHandler'),
-            ('gemma-4', 'Gemma4ChatHandler'),
-            ('granite-docling', 'GraniteDoclingChatHandler'),
-            ('lfm-2-vl', 'LFM2VLChatHandler'),
-            ('lfm-2.5-vl', 'LFM25VLChatHandler'),
-            ('obsidian', 'ObsidianChatHandler'),
-            ('llava-1.6', 'Llava16ChatHandler'),
-            ('llava-1.5', 'Llava15ChatHandler'),
-            ('nanollava', 'NanoLlavaChatHandler'),
-            ('moondream2', 'MoondreamChatHandler'),
-            ('moondream-2', 'MoondreamChatHandler'),
-            ('llama3visionalpha', 'Llama3VisionAlphaChatHandler'),
-        ]
-        
-        # 动态添加可能不可用的handler规则（无备选的模型）
-        optional_rules = [
-            ('llama-3.2-11b-vision', 'Llama32VisionInstructChatHandler'),
-            ('llama-3.1-vision', 'Llama31VisionChatHandler'),
-            ('phi-3.5-vision', 'Phi35VisionChatHandler'),
-            ('phi-3-vision', 'Phi3Vision128kChatHandler'),
-            ('internvl', 'InternLMXComposer2VLChatHandler'),
-            ('yivl', 'YiVL6BChatHandler'),
-            ('cogvlm', 'CogVLM2ChatHandler'),
-            ('paddleocr', 'PaddleOCRChatHandler'),
-            ('yutuvl', 'YutuVL4BInstructChatHandler'),
-            ('erax-vl', 'EraXVL7BV15ChatHandler'),
-            ('mimo-vl', 'MiMoVL7BRLChatHandler'),
-            ('asid-captioner', 'ASIDCaptioner7BChatHandler'),
-            ('zen3-vl', 'Zen3VLI1ChatHandler'),
-            ('lightonocr', 'LightOnOCR21BChatHandler'),
-        ]
-        
-        for keyword, handler_name in optional_rules:
-            if globals().get(handler_name):
-                special_rules.append((keyword, handler_name))
-        
-        # Thinking模型支持
-        special_rules.extend([
-            ('thinking', 'Qwen35ChatHandler'),
-            ('qwen3-vl-thinking', 'Qwen3VLChatHandler'),
-            ('qwen3.5-thinking', 'Qwen35ChatHandler'),
-            ('qwen3.6-thinking', 'Qwen35ChatHandler'),
-            ('glm-4.6v-thinking', 'GLM46VChatHandler'),
-            ('glm-4.1v-thinking', 'GLM41VChatHandler'),
-            ('minicpm-v-4.5-thinking', 'MiniCPMv45ChatHandler'),
-            ('minicpm-v-4.6-thinking', 'MiniCPMv46ChatHandler'),
-        ])
-        
-        for keyword, handler_name in special_rules:
-            if keyword in model_lower:
-                handler = self.get_handler(handler_name)
-                if handler:
-                    return handler_name, handler
+        if 'thinking' in model_lower:
+            if self._handlers.get('Qwen35ChatHandler'):
+                return 'Qwen35ChatHandler', self._handlers['Qwen35ChatHandler']
         
         return None, None
     
@@ -1199,72 +1040,11 @@ base_models = ["LLaVA-1.6", "nanoLLaVA", "llama-joycaption", "moondream3-preview
                "CogVLM-MOE", "Phi-3.5-vision-instruct", "Phi-3-vision-128k-instruct", 
                "Qwen2.5-VL", "Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3-VL-Chat", "Qwen3-VL-Instruct", 
                "Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "Qwen2.5-Omni", "MiniCPM-O-4.5", "MiniCPM-O-4.6",
-               "Qwen3-ASR", "LLaMA-3.1-Vision", "Zhipu-Vision", "智谱AI-Vision", "olmOCR-2", 
+               "LLaMA-3.1-Vision", "olmOCR-2", 
                "InternVL-1.5", "InternVL-2.0", "Yi-VL-2.0", "Gemma-3", "Gemma-4", "Granite-DocLing", 
                "Lfm-2-VL", "Lfm-2.5-VL", "Llama3-Vision-Alpha", "LLaVA-1.5", "MiniCPM-v2.6", "Obsidian", 
-               "Youtu-VL-4B-Instruct", "EraX-VL-7B-V1.5", "MiMo-VL-7B-RL", "Yi-VL-6B",
+               "Youtu-VL-4B-Instruct", "EraX-VL-7B-V1.5", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508", "Yi-VL-6B",
                "PaddleOCR", "Zen3-VL-I1", "LightOn-OCR-2-1B", "ASID-Captioner-7B"]
-
-# ChatHandler名称到标准模型名称的映射
-CHAT_HANDLER_MODEL_MAP = {
-    'qwen25vl': 'Qwen2.5-VL',
-    'qwen3vl': 'Qwen3-VL',
-    'qwen3vlchat': 'Qwen3-VL-Chat',
-    'qwen3vlinstruct': 'Qwen3-VL-Instruct',
-    'qwen3vlthinking': 'Qwen3-VL-Thinking',
-    'qwen35': 'Qwen3.5',
-    'qwen35thinking': 'Qwen3.5-Thinking',
-    'qwen36': 'Qwen3.6',
-    'qwen36thinking': 'Qwen3.6-Thinking',
-    'qwen36vl': 'Qwen3.6-VL',
-    'qwen36vlthinking': 'Qwen3.6-VL-Thinking',
-    'glm46v': 'GLM-4.6V',
-    'glm41v': 'GLM-4.1V-Thinking',
-    'minicpmv45': 'MiniCPM-v4.5',
-    'minicpmv45thinking': 'MiniCPM-v4.5-Thinking',
-    'minicpmv46': 'MiniCPM-v4.6',
-    'minicpmv46thinking': 'MiniCPM-v4.6-Thinking',
-    'minicpmv26': 'MiniCPM-v2.6',
-    'minicpmllama3v25': 'MiniCPM-Llama3-V 2.5',
-    'minicpmo45': 'MiniCPM-O-4.5',
-    'minicpmo46': 'MiniCPM-O-4.6',
-    'moondream3': 'moondream3-preview',
-    'moondream2': 'Moondream2',
-    'internlmxcomposer2vl': 'InternLM-XComposer2-VL',
-
-    'llama32visioninstruct': 'Llama-3.2-11B-Vision-Instruct',
-    'cogvlm2': 'CogVLM2',
-    'cogvlmmoe': 'CogVLM-MOE',
-    'phi35vision': 'Phi-3.5-vision-instruct',
-    'phi3vision128k': 'Phi-3-vision-128k-instruct',
-    'llama31vision': 'LLaMA-3.1-Vision',
-    'zhipuvision': 'Zhipu-Vision',
-    'zhipu-aivision': '智谱AI-Vision',
-    'olmocr2': 'olmOCR-2',
-    'internvl15': 'InternVL-1.5',
-    'internvl20': 'InternVL-2.0',
-    'yivl20': 'Yi-VL-2.0',
-    'gemma3': 'Gemma-3',
-    'gemma4': 'Gemma-4',
-    'granitedocling': 'Granite-DocLing',
-    'lfm2vl': 'Lfm-2-VL',
-    'llama3visionalpha': 'Llama3-Vision-Alpha',
-    'llava15': 'LLaVA-1.5',
-    'llava16': 'LLaVA-1.6',
-    'obsidian': 'Obsidian',
-    'yutuvl4binstruct': 'Youtu-VL-4B-Instruct',
-    'eraxvl7bv15': 'EraX-VL-7B-V1.5',
-    'mimovl7brl': 'MiMo-VL-7B-RL',
-    'yivl6b': 'Yi-VL-6B',
-    'lightonocr21b': 'LightOnOCR-2-1B',
-    'minicpmo45': 'MiniCPM-O-4.5',
-    'minicpmo46': 'MiniCPM-O-4.6',
-    'qwen25omni': 'Qwen2.5-Omni-7B',
-    'asidcaptioner7b': 'ASID-Captioner-7B',
-    'zen3vli1': 'zen3-vl-i1',
-    'paddleocr': 'PaddleOCR-VL-1.5',
-    'toriigate': 'ToriiGate',
-}
 
 # -------------------------- Hook 工具模块 --------------------------
 
@@ -1622,66 +1402,107 @@ def parse_json(json_str):
         print(f"【错误】解析JSON失败：{e}")
         return {}
 
-# 模型文件名到ChatHandler的映射（用于自动检测）
-MODEL_FILE_CHAT_HANDLER_MAP = {
-    # Qwen 系列
-    'qwen2.5-vl': 'Qwen2.5-VL',
-    'qwen3-vl': 'Qwen3-VL',
-    'qwen2.5-omni': 'Qwen2.5-Omni',
-    'qwen35': 'Qwen3.5',
-    'qwen3.5': 'Qwen3.5',
-    'qwen36': 'Qwen3.6',
-    'qwen3.6': 'Qwen3.6',
-    # MiniCPM 系列
-    'minicpm-v-2.6': 'MiniCPM-v2.6',
-    'minicpm-v-4.5': 'MiniCPM-v4.5',
-    'minicpm-v-4.6': 'MiniCPM-v4.6',
-    'minicpm-o-4.5': 'MiniCPM-O-4.5',
-    'minicpm-o-4.6': 'MiniCPM-O-4.6',
-    'minicpm-llama3-v-2.5': 'MiniCPM-Llama3-V 2.5',
-    # GLM 系列
-    'glm-4.6v': 'GLM-4.6V',
-    'glm-4.1v': 'GLM-4.1V-Thinking',
-    # LLaVA 系列
-    'llava-1.6': 'LLaVA-1.6',
-    'llava-1.5': 'LLaVA-1.5',
-    'nanollava': 'nanoLLaVA',
-    # 其他模型
-    'gemma-3': 'Gemma-3',
-    'gemma-4': 'Gemma-4',
-    'moondream2': 'Moondream2',
-    'moondream-2': 'Moondream2',
-    'llama-3.2-11b-vision': 'Llama-3.2-11B-Vision-Instruct',
-    'llama-3.1-vision': 'LLaMA-3.1-Vision',
-    'phi-3.5-vision': 'Phi-3.5-vision-instruct',
-    'phi-3-vision': 'Phi-3-vision-128k-instruct',
-    'yi-vl': 'Yi-VL-6B',
-    'internvl': 'InternVL-1.5',
-    'internvl2': 'InternVL-2.0',
-    'glm-4v': 'GLM-4.6V',
-    'joycaption': 'llama-joycaption',
-    'llama-joycaption': 'llama-joycaption',
-    'olmocr': 'olmOCR-2',
-    'lightonocr': 'LightOnOCR-2-1B',
-    'paddleocr': 'PaddleOCR-VL-1.5',
-    'granite-docling': 'Granite-DocLing',
-    'lfm-2-vl': 'Lfm-2-VL',
-    'lfm-2.5-vl': 'Lfm-2.5-VL',
-    'erax-vl': 'EraX-VL-7B-V1.5',
-    'mimo-vl': 'MiMo-VL-7B-RL',
-    'asid-captioner': 'ASID-Captioner-7B',
-    'zen3-vl': 'zen3-vl-i1',
-    'youtu-vl': 'Youtu-VL-4B-Instruct',
-    'obsidian': 'Obsidian',
-    'cogvlm': 'CogVLM2',
-    'cogvlm2': 'CogVLM2',
-    'toriigate': 'ToriiGate',
-}
+# 统一模型注册表 - 将文件名模式直接映射到 (handler_name, display_name)
+# 格式: (pattern, handler_class_name, display_name, priority)
+# 按优先级排序：更具体的模式在前（数字越大优先级越高）
+MODEL_REGISTRY = [
+    # ===== Qwen 系列 =====
+    ('qwen3.6-vl-thinking', 'Qwen3VLChatHandler', 'Qwen3.6-VL-Thinking', 30),
+    ('qwen3-vl-thinking', 'Qwen3VLChatHandler', 'Qwen3-VL-Thinking', 30),
+    ('qwen3.6-vl', 'Qwen3VLChatHandler', 'Qwen3.6-VL', 25),
+    ('qwen3-vl', 'Qwen3VLChatHandler', 'Qwen3-VL', 25),
+    ('qwen2.5-vl', 'Qwen25VLChatHandler', 'Qwen2.5-VL', 25),
+    ('qwen2.5-omni', 'Qwen25VLChatHandler', 'Qwen2.5-Omni', 25),
+    ('mineru2.5-pro', 'Qwen25VLChatHandler', 'MinerU2.5-Pro', 25),
+    ('qwen3.5-thinking', 'Qwen35ChatHandler', 'Qwen3.5-Thinking', 20),
+    ('qwen3.6-thinking', 'Qwen35ChatHandler', 'Qwen3.6-Thinking', 20),
+    ('qwen3.5', 'Qwen35ChatHandler', 'Qwen3.5', 15),
+    ('qwen35', 'Qwen35ChatHandler', 'Qwen3.5', 15),
+    ('qwen3.6', 'Qwen35ChatHandler', 'Qwen3.6', 15),
+    ('qwen36', 'Qwen35ChatHandler', 'Qwen3.6', 15),
+    ('toriigate', 'Qwen25VLChatHandler', 'ToriiGate', 15),
+    
+    # ===== MiniCPM 系列 =====
+    ('minicpm-o-4.6', 'MiniCPMv46ChatHandler', 'MiniCPM-O-4.6', 30),
+    ('minicpm-v-4.6', 'MiniCPMv46ChatHandler', 'MiniCPM-v4.6', 30),
+    ('minicpm-o-4.6-thinking', 'MiniCPMv46ChatHandler', 'MiniCPM-O-4.6-Thinking', 30),
+    ('minicpm-v-4.6-thinking', 'MiniCPMv46ChatHandler', 'MiniCPM-v4.6-Thinking', 30),
+    ('minicpm-o-4.5', 'MiniCPMv45ChatHandler', 'MiniCPM-O-4.5', 25),
+    ('minicpm-v-4.5', 'MiniCPMv45ChatHandler', 'MiniCPM-v4.5', 25),
+    ('minicpm-o-4.5-thinking', 'MiniCPMv45ChatHandler', 'MiniCPM-O-4.5-Thinking', 25),
+    ('minicpm-v-4.5-thinking', 'MiniCPMv45ChatHandler', 'MiniCPM-v4.5-Thinking', 25),
+    ('minicpm-llama3-v-2.5', 'MiniCPMv26ChatHandler', 'MiniCPM-Llama3-V 2.5', 20),
+    ('minicpm-v-2.6', 'MiniCPMv26ChatHandler', 'MiniCPM-v2.6', 20),
+    ('minicpmo2.6', 'MiniCPMv26ChatHandler', 'MiniCPM-v2.6', 20),
+    
+    # ===== GLM 系列 =====
+    ('glm-4.6v-thinking', 'GLM46VChatHandler', 'GLM-4.6V-Thinking', 30),
+    ('glm-4.6v', 'GLM46VChatHandler', 'GLM-4.6V', 25),
+    ('glm-4v', 'GLM46VChatHandler', 'GLM-4.6V', 25),
+    ('glm-4.1v-thinking', 'GLM41VChatHandler', 'GLM-4.1V-Thinking', 25),
+    ('glm-4.1v', 'GLM41VChatHandler', 'GLM-4.1V-Thinking', 25),
+    
+    # ===== LLaVA 系列 =====
+    ('llava-1.6', 'Llava16ChatHandler', 'LLaVA-1.6', 20),
+    ('llava-1.5', 'Llava15ChatHandler', 'LLaVA-1.5', 20),
+    ('nanollava', 'NanoLlavaChatHandler', 'nanoLLaVA', 20),
+    
+    # ===== Gemma 系列 =====
+    ('gemma-4', 'Gemma4ChatHandler', 'Gemma-4', 20),
+    ('gemma-3', 'Gemma3ChatHandler', 'Gemma-3', 20),
+    
+    # ===== 其他视觉模型 =====
+    ('llama-3.2-11b-vision', 'Llama32VisionInstructChatHandler', 'Llama-3.2-11B-Vision-Instruct', 20),
+    ('llama-3.1-vision', 'Llama31VisionChatHandler', 'LLaMA-3.1-Vision', 20),
+    ('phi-3.5-vision', 'Phi35VisionChatHandler', 'Phi-3.5-vision-instruct', 20),
+    ('phi-3-vision', 'Phi3Vision128kChatHandler', 'Phi-3-vision-128k-instruct', 20),
+    ('yi-vl', 'YiVL6BChatHandler', 'Yi-VL-6B', 20),
+    ('internvl2', 'InternLMXComposer2VLChatHandler', 'InternVL-2.0', 20),
+    ('internvl', 'InternLMXComposer2VLChatHandler', 'InternVL-1.5', 20),
+    ('mimo-vl-2508', 'Qwen25VLChatHandler', 'MiMo-VL-7B-RL-2508', 20),
+    ('mimo-vl', 'Qwen25VLChatHandler', 'MiMo-VL-7B-RL', 20),
+    ('lfm-2.5-vl', 'LFM25VLChatHandler', 'Lfm-2.5-VL', 20),
+    ('lfm-2-vl', 'LFM2VLChatHandler', 'Lfm-2-VL', 20),
+    ('granite-docling', 'GraniteDoclingChatHandler', 'Granite-DocLing', 20),
+    
+    # ===== OCR/ASR 模型 =====
+    ('joycaption', 'Llava15ChatHandler', 'llama-joycaption', 15),
+    ('llama-joycaption', 'Llava15ChatHandler', 'llama-joycaption', 15),
+    ('olmocr', 'ObsidianChatHandler', 'olmOCR-2', 15),
+    ('lightonocr', 'LightOnOCR21BChatHandler', 'LightOnOCR-2-1B', 15),
+    ('paddleocr', 'PaddleOCRChatHandler', 'PaddleOCR-VL-1.5', 15),
+    ('erax-vl', 'EraXVL7BV15ChatHandler', 'EraX-VL-7B-V1.5', 15),
+    ('asid-captioner', 'ASIDCaptioner7BChatHandler', 'ASID-Captioner-7B', 15),
+    ('zen3-vl', 'Zen3VLI1ChatHandler', 'zen3-vl-i1', 15),
+    ('youtu-vl', 'YutuVL4BInstructChatHandler', 'Youtu-VL-4B-Instruct', 15),
+    ('obsidian', 'ObsidianChatHandler', 'Obsidian', 15),
+    
+    # ===== CogVLM =====
+    ('cogvlm2', 'CogVLM2ChatHandler', 'CogVLM2', 15),
+    ('cogvlm', 'CogVLM2ChatHandler', 'CogVLM2', 15),
+    
+    # ===== Moondream =====
+    ('moondream2', 'MoondreamChatHandler', 'Moondream2', 15),
+    ('moondream-2', 'MoondreamChatHandler', 'Moondream2', 15),
+    
+    # ===== Llama3 Vision Alpha =====
+    ('llama3visionalpha', 'Llama3VisionAlphaChatHandler', 'Llama3-Vision-Alpha', 15),
+    
+    # ===== MTMDChatHandler (DeepSeek-OCR) =====
+    ('deepseek-ocr', 'MTMDChatHandler', 'DeepSeek-OCR', 15),
+    
+    # ===== Step3-VL =====
+    ('step3-vl', 'Step3VLChatHandler', 'Step3-VL', 15),
+]
+
+MODEL_REGISTRY.sort(key=lambda x: -x[3])
+
+MODEL_FILE_CHAT_HANDLER_MAP = {}
 
 def detect_model_chat_handler(model_filename):
     """
     根据模型文件名自动检测应该使用的ChatHandler
-    优先使用ChatHandlerManager进行智能匹配
+    使用统一的MODEL_REGISTRY进行匹配
     
     Args:
         model_filename: 模型文件名（如 'Qwen3-VL-8B-Instruct-Q4_K_M.gguf'）
@@ -1692,86 +1513,15 @@ def detect_model_chat_handler(model_filename):
     if not model_filename:
         return None
     
-    # 首先尝试使用ChatHandlerManager进行匹配
-    handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_filename)
-    if handler_name and handler_cls:
-        info = chat_handler_manager.get_handler_info(handler_name)
-        if info:
-            print(f"【智能匹配】模型 {model_filename} -> {info['display_name']} ({handler_name})")
-            return info['display_name']
-    
-    # 回退到原有的映射表匹配
-    # 转换为小写以便匹配
     filename_lower = model_filename.lower()
-    
-    # 移除文件扩展名
     filename_lower = filename_lower.replace('.gguf', '').replace('.safetensors', '')
     
-    # 先处理特殊情况（避免被通用规则覆盖）
-    if 'nanollava' in filename_lower:
-        return 'nanoLLaVA'
-    
-    # 尝试直接匹配
-    for pattern, handler_display_name in MODEL_FILE_CHAT_HANDLER_MAP.items():
+    for pattern, handler_name, display_name, _ in MODEL_REGISTRY:
         if pattern in filename_lower:
-            return handler_display_name
-    
-    # 特殊规则：如果包含特定关键词
-    # 优先检测Omni模型（Omni模型同时支持音频和视觉）
-    if 'qwen' in filename_lower and '2.5' in filename_lower:
-        if 'omni' in filename_lower:
-            return 'Qwen2.5-Omni' 
-        elif 'vl' in filename_lower:
-            return 'Qwen2.5-VL'
-    elif 'qwen' in filename_lower and 'vl' in filename_lower:
-        if '3' in filename_lower:
-            return 'Qwen3-VL'
-    
-    # Qwen3.5 检测（非VL版本）
-    if 'qwen' in filename_lower and '3.5' in filename_lower and 'vl' not in filename_lower:
-        return 'Qwen3.5'
-    
-    # Qwen3.6 检测（非VL版本）
-    if 'qwen' in filename_lower and ('3.6' in filename_lower or '36' in filename_lower) and 'vl' not in filename_lower:
-        return 'Qwen3.6'
-    
-    if 'minicpm' in filename_lower:
-        if 'llama3' in filename_lower:
-            return 'MiniCPM-Llama3-V 2.5'
-        elif 'o-4.6' in filename_lower or 'o_4.6' in filename_lower or 'o4.6' in filename_lower:
-            return 'MiniCPM-O-4.6'
-        elif 'o-4' in filename_lower or 'o_4' in filename_lower or 'o4' in filename_lower:
-            return 'MiniCPM-O-4.5'
-        elif 'v-4.6' in filename_lower or 'v_4.6' in filename_lower or 'v4.6' in filename_lower:
-            return 'MiniCPM-v4.6'
-        elif 'v-4' in filename_lower or 'v_4' in filename_lower or 'v4' in filename_lower:
-            return 'MiniCPM-v4.5'
-        elif 'v-2' in filename_lower or 'v_2' in filename_lower or 'v2' in filename_lower:
-            return 'MiniCPM-v2.6'
-    
-    if 'glm' in filename_lower and ('4v' in filename_lower or '4.6v' in filename_lower or '46v' in filename_lower):
-        return 'GLM-4.6V'
-    
-    if 'glm' in filename_lower and ('4.1v' in filename_lower or '41v' in filename_lower):
-        return 'GLM-4.1V-Thinking'
-    
-    if 'llava' in filename_lower:
-        if '1.6' in filename_lower:
-            return 'LLaVA-1.6'
-        elif '1.5' in filename_lower:
-            return 'LLaVA-1.5'
-    
-    if 'gemma' in filename_lower:
-        if '4' in filename_lower and '3' not in filename_lower:
-            return 'Gemma-4'
-        elif '3' in filename_lower:
-            return 'Gemma-3'
-    
-    if 'moondream' in filename_lower:
-        return 'Moondream2'
-    
-    if 'mimo' in filename_lower and 'vl' in filename_lower:
-        return 'MiMo-VL-7B-RL'
+            handler_cls = chat_handler_manager.get_handler(handler_name)
+            if handler_cls:
+                print(f"【智能匹配】模型 {model_filename} -> {display_name} ({handler_name})")
+                return display_name
     
     return None
 
@@ -1947,63 +1697,67 @@ class LLAMA_CPP_STORAGE:
         if not chat_handler_name or chat_handler_name == "None":
             return None
 
-        handler_map = {
-            "Qwen3.5": Qwen35ChatHandler,
-            "Qwen3.5-Thinking": Qwen35ChatHandler,
-            "Qwen3.6": Qwen35ChatHandler,
-            "Qwen3.6-Thinking": Qwen35ChatHandler,
-            "Qwen3.6-VL": Qwen3VLChatHandler,
-            "Qwen3.6-VL-Thinking": Qwen3VLChatHandler,
-            "Qwen3-VL": Qwen3VLChatHandler,
-            "Qwen3-VL-Thinking": Qwen3VLChatHandler,
-            "Qwen2.5-VL": Qwen25VLChatHandler,
-            "Qwen2.5-Omni": Qwen25VLChatHandler,
-            "ToriiGate": Qwen25VLChatHandler,  # ToriiGate基于Qwen2-VL
-            "LLaVA-1.5": Llava15ChatHandler,
-            "LLaVA-1.6": Llava16ChatHandler,
-            "Moondream2": MoondreamChatHandler,
-            "nanoLLaVA": NanoLlavaChatHandler,
-            "llama3-Vision-Alpha": Llama3VisionAlphaChatHandler,
-            "MiniCPM-v2.6": MiniCPMv26ChatHandler,
-            "MiniCPM-v4.5": MiniCPMv45ChatHandler,
-            "MiniCPM-v4.5-Thinking": MiniCPMv45ChatHandler,
-            "MiniCPM-v4.6": MiniCPMv46ChatHandler,
-            "MiniCPM-v4.6-Thinking": MiniCPMv46ChatHandler,
-            "MiniCPM-O-4.5": MiniCPMv45ChatHandler,
-            "MiniCPM-O-4.6": MiniCPMv46ChatHandler,
-            "Gemma3": Gemma3ChatHandler,
-            "Gemma4": Gemma4ChatHandler,
-            "GLM-4.6V": GLM46VChatHandler,
-            "GLM-4.1V-Thinking": GLM41VChatHandler,
-            "Lfm-2-VL": LFM2VLChatHandler,
-            "LFM2-VL": LFM2VLChatHandler,
-            "LFM2.5-VL": LFM25VLChatHandler,
-            "Granite-Docling": GraniteDoclingChatHandler,
+        display_name_to_handler = {
+            "Qwen3.5": "Qwen35ChatHandler",
+            "Qwen3.5-Thinking": "Qwen35ChatHandler",
+            "Qwen3.6": "Qwen35ChatHandler",
+            "Qwen3.6-Thinking": "Qwen35ChatHandler",
+            "Qwen3.6-VL": "Qwen3VLChatHandler",
+            "Qwen3.6-VL-Thinking": "Qwen3VLChatHandler",
+            "Qwen3-VL": "Qwen3VLChatHandler",
+            "Qwen3-VL-Thinking": "Qwen3VLChatHandler",
+            "Qwen2.5-VL": "Qwen25VLChatHandler",
+            "Qwen2.5-Omni": "Qwen25VLChatHandler",
+            "ToriiGate": "Qwen25VLChatHandler",
+            "MinerU2.5-Pro": "Qwen25VLChatHandler",
+            "DeepSeek-OCR": "MTMDChatHandler",
+            "Step3-VL": "Step3VLChatHandler",
+            "LLaVA-1.5": "Llava15ChatHandler",
+            "LLaVA-1.6": "Llava16ChatHandler",
+            "Moondream2": "MoondreamChatHandler",
+            "nanoLLaVA": "NanoLlavaChatHandler",
+            "llama3-Vision-Alpha": "Llama3VisionAlphaChatHandler",
+            "MiniCPM-v2.6": "MiniCPMv26ChatHandler",
+            "MiniCPM-v4.5": "MiniCPMv45ChatHandler",
+            "MiniCPM-v4.5-Thinking": "MiniCPMv45ChatHandler",
+            "MiniCPM-v4.6": "MiniCPMv46ChatHandler",
+            "MiniCPM-v4.6-Thinking": "MiniCPMv46ChatHandler",
+            "MiniCPM-O-4.5": "MiniCPMv45ChatHandler",
+            "MiniCPM-O-4.6": "MiniCPMv46ChatHandler",
+            "Gemma3": "Gemma3ChatHandler",
+            "Gemma4": "Gemma4ChatHandler",
+            "GLM-4.6V": "GLM46VChatHandler",
+            "GLM-4.1V-Thinking": "GLM41VChatHandler",
+            "Lfm-2-VL": "LFM2VLChatHandler",
+            "LFM2-VL": "LFM2VLChatHandler",
+            "LFM2.5-VL": "LFM25VLChatHandler",
+            "Granite-Docling": "GraniteDoclingChatHandler",
         }
 
-        handler = handler_map.get(chat_handler_name)
-        if handler:
-            return handler
+        handler_name = display_name_to_handler.get(chat_handler_name)
+        if handler_name:
+            return chat_handler_manager.get_handler(handler_name)
         
         if chat_handler_name.startswith("Qwen2.5-Omni-"):
-            return Qwen25VLChatHandler
+            return chat_handler_manager.get_handler("Qwen25VLChatHandler")
         if chat_handler_name.startswith("Qwen3.5"):
-            return Qwen35ChatHandler
+            return chat_handler_manager.get_handler("Qwen35ChatHandler")
         if chat_handler_name.startswith("Qwen3.6"):
-            # Qwen3.6-VL系列使用Qwen3VLChatHandler，其他Qwen3.6使用Qwen35ChatHandler兼容
             if "VL" in chat_handler_name or "vl" in chat_handler_name:
-                return Qwen3VLChatHandler
-            return Qwen35ChatHandler  # Qwen3.6使用Qwen35ChatHandler兼容
+                return chat_handler_manager.get_handler("Qwen3VLChatHandler")
+            return chat_handler_manager.get_handler("Qwen35ChatHandler")
         if chat_handler_name.startswith("Qwen3-VL"):
-            return Qwen3VLChatHandler
+            return chat_handler_manager.get_handler("Qwen3VLChatHandler")
         if chat_handler_name.startswith("MiniCPM-v4.6") or chat_handler_name.startswith("MiniCPM-O-4.6"):
-            return MiniCPMv46ChatHandler
+            return chat_handler_manager.get_handler("MiniCPMv46ChatHandler")
         if chat_handler_name.startswith("MiniCPM-v4.5") or chat_handler_name.startswith("MiniCPM-v2.6") or chat_handler_name.startswith("MiniCPM-O-"):
-            return MiniCPMv26ChatHandler
+            return chat_handler_manager.get_handler("MiniCPMv45ChatHandler")
         if "Llama3" in chat_handler_name and "MiniCPM" in chat_handler_name:
-            return MiniCPMv26ChatHandler
+            return chat_handler_manager.get_handler("MiniCPMv26ChatHandler")
         if chat_handler_name.startswith("GLM-4.6V"):
-            return GLM46VChatHandler
+            return chat_handler_manager.get_handler("GLM46VChatHandler")
+        if chat_handler_name.startswith("MiMo-VL"):
+            return chat_handler_manager.get_handler("Qwen25VLChatHandler")
         if chat_handler_name in ["InternVL-1.5", "InternVL-2.0", "InternLM-XComposer2-VL"]:
             return None
 
@@ -2025,7 +1779,7 @@ class LLAMA_CPP_STORAGE:
             handler_name = handler_cls.__name__
             print(f"【ChatHandler初始化】开始初始化：{handler_name}")
             
-            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni", "Qwen3.6-VL", "Qwen3.6-VL-Thinking"]
+            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "MiMo-VL"]
             
             if mmproj_path and chat_handler_name in vl_handlers:
                 init_params["clip_model_path"] = mmproj_path
@@ -2041,20 +1795,18 @@ class LLAMA_CPP_STORAGE:
             if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
                 init_params["enable_thinking"] = think_mode
             
-            # Qwen3.5/Qwen3.6 需要特殊处理 - 它可能继承自 MTMDChatHandler
+            # Qwen3.5/Qwen3.6 需要特殊处理 - 参考 llama-cpp-vlm 项目
             if chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking"]:
                 init_params["enable_thinking"] = think_mode
-                # Qwen35ChatHandler继承自MTMDChatHandler，需要clip_model_path参数
+                # Qwen35ChatHandler可以在没有mmproj的情况下运行（文本模式）
                 if mmproj_path:
                     init_params["clip_model_path"] = mmproj_path
-                    # 为Qwen3.5/Qwen3.6添加视觉token参数，确保推理成功
                     if image_max_tokens > 0:
                         init_params["image_max_tokens"] = image_max_tokens
                     if image_min_tokens > 0:
                         init_params["image_min_tokens"] = image_min_tokens
                 else:
-                    print(f"【ChatHandler初始化错误】Qwen3.5/Qwen3.6需要clip_model_path，但mmproj_path为空")
-                    return None
+                    print(f"【ChatHandler初始化】Qwen3.5/Qwen3.6 无mmproj，以纯文本模式运行")
             
             if _has_mtmd:
                 if image_max_tokens > 0:
