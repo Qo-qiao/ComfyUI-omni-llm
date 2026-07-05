@@ -39,21 +39,36 @@
     }
   },
   "llama_cpp_clean_states": {
-    "title": "Llama-cpp 清理状态",
+    "title": "Llama-cpp 模型清理",
     "inputs": {
       "any": "任意输入",
-      "state_uid": "对话状态ID"
+      "state_uid": "对话状态ID",
+      "clean_llm": "清理LLM",
+      "clean_asr": "清理ASR",
+      "clean_tts": "清理TTS",
+      "clean_aligner": "清理对齐器",
+      "unload_all_comfyui_models": "卸载所有模型"
     },
     "widgets": {
       "any": "任意输入",
-      "state_uid": "对话状态ID"
+      "state_uid": "对话状态ID",
+      "clean_llm": "清理LLM",
+      "clean_asr": "清理ASR",
+      "clean_tts": "清理TTS",
+      "clean_aligner": "清理对齐器",
+      "unload_all_comfyui_models": "卸载所有模型"
     },
     "outputs": {
       "any": "任意输出"
     },
     "tooltips": {
       "any": "任意类型的输入",
-      "state_uid": "要清理的对话状态ID"
+      "state_uid": "要清理的对话状态ID",
+      "clean_llm": "清理LLM模型",
+      "clean_asr": "清理ASR模型",
+      "clean_tts": "清理TTS模型",
+      "clean_aligner": "清理强制对齐模型",
+      "unload_all_comfyui_models": "卸载所有模型"
     }
   },
   "forced_aligner_inference": {
@@ -130,10 +145,8 @@
       "n_ctx": "上下文长度",
       "n_gpu_layers": "GPU模型层数",
       "vram_limit": "显存限制（GB）",
-      "image_min_tokens": "图片最小编码token数",
       "image_max_tokens": "图片最大编码token数",
-      "attention_type": "注意力类型",
-      "cache_prompt": "缓存提示词"
+      "attention_type": "注意力类型"
     },
     "widgets": {
       "model": "模型文件",
@@ -144,10 +157,8 @@
       "n_ctx": "上下文长度",
       "n_gpu_layers": "GPU模型层数",
       "vram_limit": "显存限制（GB）",
-      "image_min_tokens": "图片最小编码token数",
       "image_max_tokens": "图片最大编码token数",
       "attention_type": "注意力类型",
-      "cache_prompt": "缓存提示词",
       "tensor_split": "Tensor分割比例"
     },
     "optional": {
@@ -316,7 +327,7 @@
       "force_offload": "强制卸载",
       "save_states": "保存状态",
       "parameters": "参数",
-      "images": "images",
+      "images": "图像",
       "video": "视频",
       "audio": "音频",
       "asr_model": "ASR模型",
@@ -342,7 +353,7 @@
       "force_offload": "强制卸载",
       "save_states": "保存状态",
       "parameters": "参数",
-      "images": "images",
+      "images": "图像",
       "video": "视频",
       "audio": "音频",
       "asr_model": "ASR模型",
@@ -375,7 +386,7 @@
       "force_offload": "推理完成后强制卸载模型",
       "save_states": "保存对话状态",
       "parameters": "选择参数设置节点",
-      "images": "images",
+      "images": "图像",
       "video": "输入视频",
       "asr_model": "ASR模型输入",
       "tts_model": "TTS模型输入",
@@ -385,21 +396,6 @@
       "state_uid": "对话状态ID",
       "audio": "生成的音频输出",
       "example_output": "当前预设模板的示例内容，便于提示词书写参考"
-    }
-  },
-  "llama_cpp_unload_model": {
-    "title": "Llama-cpp 卸载模型",
-    "inputs": {
-      "any": "任意输入"
-    },
-    "widgets": {
-      "any": "任意输入"
-    },
-    "outputs": {
-      "any": "任意输出"
-    },
-    "tooltips": {
-      "any": "任意类型的输入"
     }
   },
   "multi_model_tts": {
@@ -539,7 +535,7 @@
       "format": "输出格式"
     },
     "outputs": {
-      "images": "images",
+      "images": "图像",
       "video": "视频",
       "audio": "音频"
     },
@@ -551,7 +547,7 @@
       "skip_first_frames": "跳过前几帧",
       "select_every_nth": "间隔采样",
       "format": "输出格式",
-      "images": "images",
+      "images": "帧图像",
       "video": "处理后的视频对象",
       "audio": "提取的音频"
     }
