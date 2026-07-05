@@ -40,84 +40,65 @@ Load and initialize LLM (Large Language Model)/VLM (Vision Language Model) model
 - Function: Select the corresponding visual encoding model file
 - Recommended Setting: Select matching model when multimodal is enabled
 - Supported Format: .gguf
-- Notes:
-  - Different models require corresponding mmproj files, ensure version compatibility
+- Notes: Different models require corresponding mmproj files, ensure version compatibility
 
 **Parameter Name: Enable ASR (enable_asr)**
 - Function: Enable ASR speech recognition functionality
 - Recommended Setting: Set to True when speech recognition is needed
-- Prerequisite: Must be used with ASR model loader
 
 **Parameter Name: Enable TTS (enable_tts)**
 - Function: Enable TTS text-to-speech functionality
 - Recommended Setting: Set to True when speech synthesis is needed
-- Prerequisite: Must be used with TTS model loader
 
 #### Runtime Mode Parameters
 
 **Parameter Name: Context Length (n_ctx)**
 - Range: 1024-327680
-- Function: Context length, affecting the length of text that can be processed
+- Function: Context length, affecting the length of text that can be processed and preset template completeness
 - Recommended Setting:
   - 24GB+ VRAM (5090/4090): 16384
   - 16GB VRAM (4080): 8192
   - 12GB VRAM (4070 Ti/3080): 6144
   - 8GB VRAM (3070/3060): 4096
   - 4-6GB VRAM: 2048
-- Special Model Requirements:
-  - Qwen3 series: GPU mode recommended ≤4096, Qwen3.5 recommended ≤2048
-- Rule of Thumb: Context length is proportional to task complexity and inversely proportional to hardware performance
+- **Important Note**: Qwen3 series recommended ≤4096, Qwen3.5 recommended ≤2048
+- **Key Impact**: Insufficient context length will truncate preset templates, affecting prompt generation quality
 
 **Parameter Name: GPU Model Layers (n_gpu_layers)**
 - Range: -1-1000
 - Function: Number of model layers loaded to GPU, -1=all layers (GPU mode only)
 - Recommended Setting:
-  - GPU Mode:
-    - 24GB+ VRAM (5090/4090): -1 (all layers)
-    - 16GB VRAM (4080): -1 (all layers)
-    - 12GB VRAM (4070 Ti/3080): -1 (all layers)
-    - 8GB VRAM (3070/3060): 30 (partial loading)
+  - 24GB+ VRAM: -1 (all layers)
+  - 16GB VRAM: -1 (all layers)
+  - 12GB VRAM: -1 (all layers)
+  - 8GB VRAM: 30 (partial loading)
 
 **Parameter Name: VRAM Limit (vram_limit)**
 - Range: -1-24
 - Function: VRAM limit (GB), -1=no limit (GPU mode only)
-- Recommended Setting:
-  - GPU Mode: Usually set to -1 or actual VRAM minus 1 (e.g., set 15 for 16GB)
+- Recommended Setting: Usually set to -1 or actual VRAM minus 1
 
 #### Image Processing Parameters
-
-**Parameter Name: Minimum Image Encoding Tokens (image_min_tokens)**
-- Range: 0-4096
-- Function: Minimum number of tokens for image encoding
-- Recommended Setting:
-  - Default: 0 (auto)
-  - Qwen3 series: ≥1024 (auto-adjusted)
-  - MiniCPM-o-4.5: ≥768 (auto-adjusted)
-- Notes: Some models require minimum tokens for proper image processing
 
 **Parameter Name: Maximum Image Encoding Tokens (image_max_tokens)**
 - Range: 0-4096
 - Function: Maximum number of tokens for image encoding
 - Recommended Setting: Keep default 0 (auto)
-- Notes: If set, must be ≥ image_min_tokens
+- **Auto Optimization**: MiMo-VL models automatically set to 256
 
 #### Advanced Parameters
 
 **Parameter Name: Attention Type (attention_type)**
 - Range: Auto/Standard/Flash/XFormers
 - Function: Select attention mechanism type for the model, affecting inference speed and memory usage
-- Recommended Setting: Auto (default)
-- Options:
-  - Auto: Automatic selection (recommended, Flash Attention automatically enabled for NVIDIA GPU)
-  - Flash: Flash Attention (NVIDIA GPU optimization, fastest inference)
-  - XFormers: XFormers optimization (AMD, Intel GPU optimization, more memory efficient)
-- Use Case: Manually adjust when encountering attention mechanism compatibility issues or needing performance optimization
+- Recommended Setting: Flash (default, Flash Attention automatically enabled for NVIDIA GPU)
 
 ### Smart Recommendations
 - The system automatically recommends default values for device_mode, n_ctx, and n_gpu_layers based on hardware performance
 - Low-performance devices automatically reduce default parameters to ensure smooth operation
 - CPU mode automatically ignores GPU-related parameters, no manual adjustment needed
 - Batch parameters (n_batch, n_ubatch, n_threads, n_threads_batch) are now automatically adjusted based on hardware performance
+- **Auto Optimization Items**: image_min_tokens, cache_prompt are now automatically determined in the background, no manual setting needed
 
 ## 2. Llama-cpp Unified Inference Node (llama_cpp_unified_inference)
 
@@ -136,126 +117,74 @@ Performs LLM/VLM/Omni model inference, supporting text-only, single image, multi
 #### Inference Mode
 
 **Parameter Name: Inference Mode (inference_mode)**
+- **Impact Level: High**
 - Function: Select inference mode to determine input type and task type
 - Options:
-  - `[Basic] Text Generation`: Text-only mode, processes text input only
-  - `[Basic] Image Understanding`: Image processing mode, processes single or multiple images
+  - `[Basic] Text Generation`: Text-only mode, processes text input only, generates prompts
+  - `[Basic] Image Understanding`: Image processing mode, processes single or multiple images, reverse-engineers prompts
+  - `[Basic] Batch Image Understanding`: Processes multiple images at once, reduces inference calls
   - `[Basic] Audio to Text`: Uses ASR model to convert audio to text
   - `[Basic] Text to Audio`: Generates text then converts to speech using TTS model
   - `[Advanced] Video Understanding`: Processes video files, extracts frames for analysis
+
+#### Prompt Configuration (Core Parameters)
+
+**Parameter Name: Preset Prompt Template (preset_prompt)**
+- **Impact Level: Very High**
+- Function: Select preset prompt template, determines the structure and style of prompt generation
+- **Detailed Description**:
+  - **[Reverse] Tags**: Reverse-engineer XL tag format prompts, ideal for image reverse engineering
+  - **[Reverse] Describe**: General image reverse engineering prompts, generates natural descriptions
+  - **[Normal] Expand**: General prompt text optimization, expands input content
+  - **[Anime] Expand Tags**: Anime character style text optimization
+  - **[Anime] Prompt Expand**: Anime content text optimization
+  - **[Portrait] Asian Female/Male**: Realistic Asian portrait text optimization
+  - **[Portrait] Western Female/Male**: Realistic Western portrait text optimization
+  - **[Design] Art Illustration**: Art illustration text optimization
+  - **[Design] Poster Design**: Poster design text optimization
+  - **[Design] Scene Design**: Scene design text optimization
+  - **[Design] Interior Design**: Interior design text optimization
+  - **[Design] Ecommerce Product**: E-commerce product text optimization
+  - **[Edit] Combined**: Image editing text optimization
+  - **[Text to Video] Universal**: Expands video text content
+  - **[Design] Ideogram-4**: JSON structured prompts
+
+**Parameter Name: System Prompt (system_prompt)**
+- **Impact Level: High**
+- Function: Define AI assistant role and behavior, may include preset template placeholders
+- Default: "You are an excellent AI prompt processing expert."
+- **Key Impact**: System prompt guides the model's behavioral patterns, affecting output style
+
+**Parameter Name: User Input Text (text_input)**
+- **Impact Level: High**
+- Function: User input text, serves as the user message content in the conversation
+- **Optimization Tips**:
+  - Image reverse engineering: Provide detailed visual element descriptions (character, environment, lighting, composition)
+  - Prompt expansion: Provide core creative ideas and scene descriptions, including emotional tone
+  - Multi-domain design: Clearly specify design type (keywords like poster, UI, portrait)
 
 #### Language Settings
 
 **Parameter Name: Preset Template Language (prompt_language)**
 - Function: Call preset template in corresponding language
 - Options: Chinese / English
-- Recommended Setting: Select as needed
 
 **Parameter Name: Response Language (response_language)**
 - Function: Select output text language
 - Options: Chinese / English
-- Recommended Setting: Select as needed
 
 **Parameter Name: ASR Language (asr_language)**
 - Function: Target language for ASR speech recognition
 - Options: Auto Detect / Chinese / English / Japanese / Korean / French / German / Spanish
-- Recommended Setting: Select based on audio content
 
+#### Output Format Settings
 
-##### ✅ Correct Input Approach
-
-**Principle: Clearly describe visual content to give the model enough material for structured output**
-
-**Example 1: Image Reverse Description ([Reverse] Describe)**
-```
-✅ Good Input:
-A 25-year-old Asian woman, long hair flowing, wearing a white dress,
-standing under a cherry blossom tree, sunlight from the side, background
-is blurred flower sea, portrait photography style, soft lighting effects
-
-❌ Poor Input:
-Beautiful woman photo
-```
-
-**Example 2: Prompt Expander ([Normal] Expand)**
-```
-✅ Good Input:
-A girl walking in a spring garden, wearing a white dress, surrounded by
-falling cherry blossoms, soft lighting, cinematic atmosphere
-
-❌ Poor Input:
-Spring girl
-```
-
-**Example 3: Commercial Poster Design ([Multi-domain] ERNIE Image)**
-```
-✅ Good Input:
-Movie poster, sci-fi theme, astronaut in space, Earth in background,
-neon light effects, futuristic design, space reserved at top for title
-
-❌ Poor Input:
-Sci-fi poster
-```
-
-##### 📋 Input Points for Different Presets
-
-**1. Image Reverse Description Presets ([Reverse] Describe, [Reverse] Tags)**
-- ✅ Provide detailed visual element descriptions (character, environment, lighting, composition)
-- ✅ Include style and quality requirements (e.g., "portrait photography", "cinematic feel")
-- ❌ Avoid overly brief or abstract descriptions
-
-**2. Prompt Expander Presets ([Normal] Expand)**
-- ✅ Provide core creative idea and scene description
-- ✅ Include emotional tone or atmosphere requirements
-- ❌ Avoid single words or context-lacking input
-
-**3. Multi-domain Design Presets ([Multi-domain] ERNIE Image, [Poster] Qwen Image)**
-- ✅ Clearly specify design type (keywords: poster, UI, portrait, etc.)
-- ✅ Describe subject, composition, color, atmosphere
-- ❌ Avoid missing key design type identifiers
-
-**4. Anime Character Presets ([Illustration] Illustrious, [Japanese] Anima)**
-- ✅ Provide character features (hairstyle, outfit, expression, pose)
-- ✅ Include background and style descriptions
-- ❌ Avoid overly simple character descriptions
-
-
-##### 💡 Input Quality Optimization Tips
-
-**1. Multi-dimensional Description**
-```
-✅ Good Input (multiple dimensions):
-Subject: Young woman, around 20 years old, long hair
-Outfit: White dress, minimalist design
-Environment: Inside a café, street view visible through window
-Lighting: Natural light from window, forming side light effect
-Composition: Medium shot, eye-level angle
-Atmosphere: Quiet, cozy afternoon tea time
-
-❌ Poor Input (single dimension):
-Girl in café
-```
-
-**2. Use Clear Keywords**
-```
-✅ Good Input:
-Commercial poster design, product is smartwatch, tech style,
-blue color scheme, minimalist composition, highlight product close-up
-
-❌ Poor Input:
-Design a poster
-```
-
-**3. Provide Context and Details**
-```
-✅ Good Input:
-Anime character design, female character, silver long hair, blue eyes,
-wearing futuristic combat outfit, standing pose, background is
-cyberpunk city night scene, neon light effects
-
-❌ Poor Input:
-Silver-haired girl
-```
+**Parameter Name: Output Format (output_format)**
+- **Impact Level: Medium**
+- Function: Control output text format
+- Options:
+  - `natural`: Output pure text content in natural paragraph format
+  - `structured`: Output JSON structured text content
 
 #### Video Processing Parameters
 
@@ -475,79 +404,82 @@ Set detailed parameters for LLM inference to control the quality and style of ge
 
 ### Parameter Description
 
+#### Core Parameters (Highly Recommended to Understand)
+
 **Parameter Name: Maximum Tokens (max_tokens)**
+- **Impact Level: Very High**
 - Range: 0-4096
-- Function: Maximum number of generated tokens, affecting output text length
-- Recommended Setting: Low-performance devices: 512-1024, High-performance devices: 1024-2048
-- Practical Tips:
+- Function: Maximum number of generated tokens, directly affecting output text length
+- Recommended Setting:
   - Short answers: 256-512
   - Detailed descriptions: 768-1024
   - Long text generation: 1024-2048
+- **Key Impact**: Too small will truncate prompts, too large increases inference time
 
-**Parameter Name: Top-K Sampling (top_k)**
-- Range: 0-1000
-- Function: Number of sampling candidates, smaller values produce more focused generation
-- Recommended Setting: Low-performance devices: 20, High-performance devices: 30
-- Impact Analysis:
-  - Low top_k (<20): More deterministic generation, suitable for factual tasks
-  - High top_k (>50): More diverse generation, suitable for creative tasks
+**Parameter Name: Temperature**
+- **Impact Level: Very High**
+- Range: 0.0-2.0
+- Function: Generation temperature, higher values are more random, lower values are more deterministic
+- Recommended Setting: 0.6-0.8
+- **Detailed Guide**:
+  - Low temperature (0.1-0.4): Suitable for scenarios requiring accurate answers, e.g., QA, code generation
+  - Medium temperature (0.5-0.8): Suitable for most scenarios, balances accuracy and creativity
+  - High temperature (0.9-1.5): Suitable for creative tasks, e.g., story generation, poetry
 
 **Parameter Name: Top-P Sampling (top_p)**
+- **Impact Level: High**
 - Range: 0.0-1.0
 - Function: Nucleus sampling threshold, controls generation diversity
 - Recommended Setting: 0.85-0.9
-- Effect Comparison:
+- **Effect Comparison**:
   - Low top_p (<0.8): More conservative generation, higher accuracy
   - High top_p (>0.9): More open generation, stronger diversity
+
+**Parameter Name: Top-K Sampling (top_k)**
+- **Impact Level: High**
+- Range: 0-1000
+- Function: Number of sampling candidates, smaller values produce more focused generation
+- Recommended Setting: High-performance devices: 30, Low-performance devices: 20
+- **Impact Analysis**:
+  - Low top_k (<20): More deterministic generation, suitable for factual tasks
+  - High top_k (>50): More diverse generation, suitable for creative tasks
+
+#### Secondary Parameters (Adjust as Needed)
+
+**Parameter Name: Repeat Penalty (repeat_penalty)**
+- Range: 0.0-10.0
+- Function: Repeat penalty, prevents repetitive content generation
+- Recommended Setting: 1.0
+- Use Case: When repetitive content occurs, gradually increase to 1.1-1.3
+
+**Parameter Name: Presence Penalty (presence_penalty)**
+- Range: 0.0-2.0
+- Function: Presence penalty, encourages new content generation
+- Recommended Setting: 1.0
+- Use Case: Avoid topic drift in long text generation
 
 **Parameter Name: Minimum Probability (min_p)**
 - Range: 0.0-1.0
 - Function: Minimum sampling probability, prevents complete neglect of low-probability tokens
 - Recommended Setting: 0.05
-- Use Case: Use when increased generation diversity is needed
+
+**Parameter Name: Frequency Penalty (frequency_penalty)**
+- Range: 0.0-1.0
+- Function: Frequency penalty, reduces high-frequency token occurrence
+- Recommended Setting: 0.0
 
 **Parameter Name: Typical Sampling (typical_p)**
 - Range: 0.0-1.0
 - Function: Typical sampling threshold, controls generation typicality
 - Recommended Setting: 1.0
 
-**Parameter Name: Temperature**
-- Range: 0.0-2.0
-- Function: Generation temperature, higher values are more random
-- Recommended Setting: 0.6-0.8
-- Temperature Guide:
-  - Low temperature (0.1-0.4): Suitable for scenarios requiring accurate answers, e.g., QA, code generation
-  - Medium temperature (0.5-0.8): Suitable for most scenarios, balances accuracy and creativity
-  - High temperature (0.9-1.5): Suitable for creative tasks, e.g., story generation, poetry
-
-**Parameter Name: Repeat Penalty (repeat_penalty)**
-- Range: 0.0-10.0
-- Function: Repeat penalty, prevents repetitive content generation
-- Recommended Setting: 1.0
-- Adjustment Tips:
-  - When repetitive content occurs, gradually increase to 1.1-1.3
-  -不宜过高，否则可能导致生成内容不连贯
-  - Avoid setting too high, may cause incoherent generation
-
-**Parameter Name: Frequency Penalty (frequency_penalty)**
-- Range: 0.0-1.0
-- Function: Frequency penalty, reduces high-frequency token occurrence
-- Recommended Setting: 0.0
-- Use Case: Use when needing to reduce high-frequency word repetition
-
-**Parameter Name: Presence Penalty (presence_penalty)**
-- Range: 0.0-2.0
-- Function: Presence penalty, encourages new content generation
-- Recommended Setting: 1.0
-- Use Case:
-  - Avoid topic drift in long text generation
-  - Encourage new viewpoints in conversations
+#### Advanced Parameters (For Advanced Users)
 
 **Parameter Name: Mirostat Mode (mirostat_mode)**
 - Range: 0-2
 - Function: Mirostat sampling mode: 0=off, 1=basic, 2=version 2
-- Recommended Setting: 0
-- Advanced User Tip: Try mode 1 or 2 for more consistent generation quality
+- Recommended Setting: 0 (off)
+- Use Case: Try mode 1 or 2 for more consistent generation quality
 
 **Parameter Name: Mirostat Eta (mirostat_eta)**
 - Range: 0.0-1.0
@@ -559,39 +491,68 @@ Set detailed parameters for LLM inference to control the quality and style of ge
 - Function: Mirostat target perplexity
 - Recommended Setting: 5.0
 
+#### Session Management Parameters
+
 **Parameter Name: Conversation State ID (state_uid)**
 - Range: -1-999999
 - Function: Conversation state ID, -1=use node unique ID
 - Recommended Setting: -1
-- Session Management:
-  - Use different state_uid to maintain multiple independent sessions simultaneously
-  - Keep same state_uid for continuous conversations to maintain context
+- Session Management: Use different state_uid to maintain multiple independent sessions
+
+**Parameter Name: Reasoning Budget (reasoning_budget)**
+- Range: -1-1024
+- Function: Reasoning budget (for Qwen3.5-Thinking and other thinking-mode supported models)
+- Recommended Setting: -1 (unlimited)
+- Use Case: 0=disable thinking mode, N=limit to N thinking tokens
 
 ### Parameter Adjustment Tips
 
-1. **Control Output Length**: Adjust `max_tokens`. Larger values produce longer output but consume more resources. Set according to actual needs, avoid setting too large to prevent performance issues
-
-2. **Control Randomness**: `temperature` is one of the most commonly used parameters. Lower values are more deterministic (suitable for accurate answers), higher values are more creative (suitable for story/poetry generation)
-
-3. **Balance Diversity and Accuracy**:
-   - `top_p` and `top_k` are usually used together
-   - Decreasing `top_k` while increasing `top_p` improves accuracy while maintaining diversity
-   - Increasing `top_k` while decreasing `top_p` increases generation diversity
-
-4. **Avoid Repetitive Content**:
-   - Increase `repeat_penalty` to reduce repetition
-   - Combine with `presence_penalty` to encourage new content generation
-
+1. **Control Output Length**: Adjust `max_tokens`. Larger values produce longer output but consume more resources
+2. **Control Randomness**: `temperature` is the most commonly used parameter. Lower = more deterministic, higher = more creative
+3. **Balance Diversity and Accuracy**: `top_p` and `top_k` are usually used together
+4. **Avoid Repetitive Content**: Increase `repeat_penalty` to reduce repetition
 5. **Parameter Priority Recommendations**:
    - Primary adjustment: `temperature`, `max_tokens`, `top_p`/`top_k`
    - Secondary adjustment: `repeat_penalty`, `presence_penalty`
    - Advanced users: `min_p`, `mirostat` related parameters
-
 6. **Common Scenario Settings**:
    - **Factual QA**: temperature=0.1-0.3, top_k=10, top_p=0.7
    - **Creative Writing**: temperature=0.8-1.2, top_k=50, top_p=0.95
    - **Code Generation**: temperature=0.2-0.4, top_k=20, top_p=0.8
    - **Dialogue**: temperature=0.6-0.8, top_k=30, top_p=0.9
+
+## 3.5 Llama-cpp Model Cleanup Node (llama_cpp_clean_states)
+
+### Function
+Clean up model states and VRAM resources, combining the original cleanup states and unload model functionality.
+
+### Parameter Description
+
+**Parameter Name: State UID (state_uid)**
+- Range: -1-999999
+- Function: Clean up specific session state, -1=clean all states
+- Recommended Setting: -1
+
+**Parameter Name: Clean LLM (clean_llm)**
+- Function: Clean up LLM model
+- Recommended Setting: True
+
+**Parameter Name: Clean ASR (clean_asr)**
+- Function: Clean up ASR model
+- Recommended Setting: True
+
+**Parameter Name: Clean TTS (clean_tts)**
+- Function: Clean up TTS model
+- Recommended Setting: True
+
+**Parameter Name: Clean Aligner (clean_aligner)**
+- Function: Clean up forced aligner model
+- Recommended Setting: True
+
+**Parameter Name: Unload All ComfyUI Models (unload_all_comfyui_models)**
+- Function: Unload all ComfyUI models (not just omni-llm models)
+- Recommended Setting: False
+- **Note**: When enabled, calls ComfyUI's mm.unload_all_models(), releasing more VRAM
 
 ## 4. API Model Nodes
 
