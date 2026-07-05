@@ -31,8 +31,8 @@ class llama_cpp_parameters:
                 "frequency_penalty": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "频率惩罚，减少高频词汇出现"}),
                 "presence_penalty": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01, "tooltip": "存在惩罚，鼓励生成新内容"}),
                 "mirostat_mode": ("INT", {"default": 0, "min": 0, "max": 2, "step": 1, "tooltip": "Mirostat采样模式：0=关闭，1=基础版，2=版本2"}),
-                "mirostat_eta": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Mirostat学习率"}),
-                "mirostat_tau": ("FLOAT", {"default": 5.0, "min": 0.0, "max": 10.0, "step": 0.01, "tooltip": "Mirostat目标困惑度"}),
+                "mirostat_eta": ("FLOAT", {"default": 0.1, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "Mirostat学习率，影响生成多样性"}),
+                "mirostat_tau": ("FLOAT", {"default": 5.0, "min": 0.0, "max": 10.0, "step": 0.01, "tooltip": "Mirostat目标困惑度，影响生成多样性"}),
                 "state_uid": ("INT", {"default": -1, "min": -1, "max": 999999, "step": 1, "tooltip": "对话状态ID，-1=使用节点唯一ID"}),
             },
             "optional": {

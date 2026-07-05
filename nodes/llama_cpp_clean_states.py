@@ -2,8 +2,8 @@
 """
 ComfyUI-omni-llm Clean States Node
 
-状态清理节点，用于清理模型缓存和状态，释放内存资源
-支持LLM、ASR、TTS和强制对齐模型的卸载
+模型清理节点，用于清理模型缓存和状态，释放内存和显存资源
+支持LLM、ASR、TTS和强制对齐模型的卸载，以及卸载所有ComfyUI模型
 
 Author: 亲卿于情 (@Qo-qiao)
 GitHub: https://github.com/Qo-qiao
@@ -30,6 +30,7 @@ class llama_cpp_clean_states:
                 "clean_asr": ("BOOLEAN", {"default": True, "tooltip": "清理ASR模型"}),
                 "clean_tts": ("BOOLEAN", {"default": True, "tooltip": "清理TTS模型"}),
                 "clean_aligner": ("BOOLEAN", {"default": True, "tooltip": "清理强制对齐模型"}),
+                "unload_all_comfyui_models": ("BOOLEAN", {"default": False, "tooltip": "卸载所有ComfyUI模型"}),
             }
         }
 
@@ -38,7 +39,7 @@ class llama_cpp_clean_states:
     FUNCTION = "process"
     CATEGORY = "omni-llm"
 
-    def process(self, any, state_uid, clean_llm=True, clean_asr=True, clean_tts=True, clean_aligner=True):
+    def process(self, any, state_uid, clean_llm=True, clean_asr=True, clean_tts=True, clean_aligner=True, unload_all_comfyui_models=False):
         print("【资源释放】开始清理模型资源...")
         
         # 记录清理前的显存使用
@@ -78,8 +79,8 @@ class llama_cpp_clean_states:
         # 强制垃圾回收
         gc.collect()
         
-        # 清理GPU显存
-        self._clean_gpu_memory()
+        # 清理GPU显存（根据选项决定是否卸载所有ComfyUI模型）
+        self._clean_gpu_memory(unload_all_comfyui_models)
         
         # 记录清理后的显存使用
         try:
@@ -268,7 +269,7 @@ class llama_cpp_clean_states:
         except Exception as e:
             print(f"【资源释放】释放模型时出错: {e}")
     
-    def _clean_gpu_memory(self):
+    def _clean_gpu_memory(self, unload_all_comfyui_models=False):
         """清理GPU显存"""
         try:
             import torch
@@ -278,14 +279,21 @@ class llama_cpp_clean_states:
             if torch.cuda.is_available():
                 torch.cuda.synchronize()
             
+            # 根据选项决定是否卸载所有ComfyUI模型
+            if unload_all_comfyui_models:
+                print("【显存清理】卸载所有ComfyUI模型...")
+                mm.unload_all_models()
+                print("【显存清理】已调用mm.unload_all_models()")
+            
             # 使用ComfyUI内置的模型管理功能
-            mm.unload_all_models()
             mm.soft_empty_cache()
+            print("【显存清理】已调用mm.soft_empty_cache()")
             
             # 清空GPU缓存
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
                 torch.cuda.ipc_collect()
+                print("【显存清理】已调用torch.cuda.empty_cache()和ipc_collect()")
             
             print("【显存清理】GPU缓存清理完成")
             

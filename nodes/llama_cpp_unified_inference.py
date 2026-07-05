@@ -1482,6 +1482,20 @@ class llama_cpp_unified_inference:
             elif output_language == "English":
                 final_prompt += "\n\nPlease answer in English."
             
+            # MiMo-VL模型在文本生成模式下需要特殊指令，避免输出思考过程
+            try:
+                from common import LLAMA_CPP_STORAGE
+                if LLAMA_CPP_STORAGE.current_config:
+                    chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
+                    is_mimo_vl = chat_handler in ["MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]
+                    if is_mimo_vl and mode == "text":
+                        if output_language == "中文":
+                            final_prompt += "\n\n**【重要】**请直接输出最终结果，不要输出分析过程、思考步骤或解释说明。"
+                        else:
+                            final_prompt += "\n\n**【Important】**Please output only the final result directly, without analysis process, thinking steps, or explanations."
+            except Exception as e:
+                pass
+            
             # 执行ASR语音识别（如果启用）
             asr_text = ""
             if enable_asr and has_audio_input:
@@ -1642,7 +1656,11 @@ class llama_cpp_unified_inference:
                 from common import LLAMA_CPP_STORAGE
                 if LLAMA_CPP_STORAGE.current_config:
                     chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                    is_qwen3_series = chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]
+                    is_mimo_vl = chat_handler in ["MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]
+                    has_visual = video_input or has_images
+                    
+                    if is_qwen3_series or (is_mimo_vl and has_visual):
                         # 视频模式需要更激进的参数调整以避免KV缓存耗尽
                         if video_input and has_video:
                             # 视频模式下大幅降低批处理大小以避免KV缓存耗尽
@@ -1710,7 +1728,7 @@ class llama_cpp_unified_inference:
                 # Qwen3-VL视频模式：在推理前清理KV缓存以避免内存不足
                 try:
                     from common import LLAMA_CPP_STORAGE
-                    if LLAMA_CPP_STORAGE.llm and current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                    if LLAMA_CPP_STORAGE.llm and current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
                         # 清理KV缓存以腾出空间给视频帧
                         if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
                             LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
@@ -1725,7 +1743,7 @@ class llama_cpp_unified_inference:
                 qwen3_image_size = image_max_size
                 qwen3_frame_limit = len(video_frames)
                 
-                if current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                if current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
                     # 限制帧数以避免内存不足（每帧大约需要256-512 tokens）
                     qwen3_frame_limit = min(len(video_frames), 8)
                     # 降低图像大小以减少内存使用
@@ -1761,7 +1779,7 @@ class llama_cpp_unified_inference:
                 
                 # Qwen3系列模型特殊图像大小优化
                 qwen3_image_size = image_max_size
-                if current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                if current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
                     qwen3_image_size = min(image_max_size, 256)
                     if qwen3_image_size < 128:
                         qwen3_image_size = 128
@@ -1868,7 +1886,7 @@ class llama_cpp_unified_inference:
                                 from common import LLAMA_CPP_STORAGE
                                 if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
                                     chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
                                         if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
                                             LLAMA_CPP_STORAGE.llm.n_tokens = 0
                                         if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
@@ -1981,7 +1999,7 @@ class llama_cpp_unified_inference:
                 from common import LLAMA_CPP_STORAGE
                 if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
                     chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL"]:
+                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
                         if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
                             LLAMA_CPP_STORAGE.llm.n_tokens = 0
                         if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):

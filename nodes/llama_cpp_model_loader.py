@@ -135,10 +135,8 @@ class llama_cpp_model_loader:
                 "n_ctx": ("INT", {"default": default_n_ctx, "min": 1024, "max": 327680, "step": 128, "tooltip": "上下文长度，影响可处理的文本长度"}),
                 "n_gpu_layers": ("INT", {"default": default_n_gpu_layers, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载（GPU模式有效）"}),
                 "vram_limit": ("INT", {"default": default_vram_limit, "min": -1, "max": 24, "step": 1, "tooltip": "显存限制（GB），-1=无限制（GPU模式有效）"}),
-                "image_min_tokens": ("INT", {"default": 0, "min": 0, "max": 4096, "step": 32, "tooltip": "图片最小编码token数"}),
                 "image_max_tokens": ("INT", {"default": 0, "min": 0, "max": 4096, "step": 32, "tooltip": "图片最大编码token数"}),
                 "attention_type": (["Auto", "Standard", "Flash", "XFormers"], {"default": default_attention_type, "tooltip": "注意力类型：Auto=自动选择，Standard=标准，Flash=Flash Attention（NVIDIA GPU推荐），XFormers=XFormers（实验性）"}),
-                "cache_prompt": ("BOOLEAN", {"default": False, "tooltip": "启用Prompt缓存，相同前缀的请求可复用KV Cache，提升批量推理速度"}),
             },
             "optional": {
                 "tensor_split": ("STRING", {"default": "", "tooltip": "多GPU tensor分割比例，格式：0.5,0.5（单GPU留空）"}),
@@ -176,7 +174,7 @@ class llama_cpp_model_loader:
         return None
     
     @classmethod
-    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False, tensor_split=""):
+    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split=""):
         if LLAMA_CPP_STORAGE.llm is None:
             return float("NaN") 
         
@@ -219,15 +217,13 @@ class llama_cpp_model_loader:
             "n_ctx": n_ctx,
             "n_gpu_layers": n_gpu_layers,
             "vram_limit": vram_limit,
-            "image_min_tokens": image_min_tokens,
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
-            "cache_prompt": cache_prompt,
             "tensor_split": tensor_split,
         }
         return json.dumps(custom_config, sort_keys=True, ensure_ascii=False)
     
-    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_min_tokens, image_max_tokens, attention_type="Auto", cache_prompt=False, tensor_split="", **kwargs):
+    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, enable_tts, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split="", **kwargs):
         # 解析完整模型路径，避免同名冲突
         resolved_model_path = self._resolve_llm_model_path(model)
         if resolved_model_path:
@@ -284,10 +280,11 @@ class llama_cpp_model_loader:
         is_qwen36 = "qwen36" in model.lower() or "qwen3.6" in model.lower()
         is_qwen3vl = "qwen3-vl" in model.lower() or "qwen3vl" in model.lower()
         is_qwen36vl = "qwen36-vl" in model.lower() or "qwen3.6-vl" in model.lower()
+        is_mimo_vl = "mimo-vl" in model.lower()
         
+        # 初始化 image_min_tokens，将在后续根据模型类型自动设置
+        image_min_tokens = 0
         
-
-
         # GPU模式下针对Qwen3系列模型的优化
         if is_qwen3:
             # Qwen3系列在GPU模式下需要合理的上下文长度（至少4096）
@@ -300,8 +297,8 @@ class llama_cpp_model_loader:
                 print(f"【GPU模式优化】Qwen3.5模型启用特殊GPU参数配置")
                 # 确保使用正确的ChatHandler
                 print(f"【提示】Qwen3.5模型将使用Qwen35ChatHandler")
-                # Qwen3.5模型需要合理的image tokens（仅当用户未设置时自动调整）
-                if enable_mmproj and image_min_tokens == 0:
+                # Qwen3.5模型需要合理的image tokens（自动设置）
+                if enable_mmproj:
                     image_min_tokens = 256
                     print(f"【GPU模式优化】Qwen3.5模型自动设置image_min_tokens为256")
                 # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
@@ -321,8 +318,8 @@ class llama_cpp_model_loader:
                     print(f"【提示】Qwen3.6-VL模型将使用Qwen3VLChatHandler")
                 else:
                     print(f"【提示】Qwen3.6模型将使用Qwen35ChatHandler（兼容模式）")
-                # Qwen3.6模型需要合理的image tokens（仅当用户未设置时自动调整）
-                if enable_mmproj and image_min_tokens == 0:
+                # Qwen3.6模型需要合理的image tokens（自动设置）
+                if enable_mmproj:
                     image_min_tokens = 256
                     print(f"【GPU模式优化】Qwen3.6模型自动设置image_min_tokens为256")
                 # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
@@ -338,14 +335,26 @@ class llama_cpp_model_loader:
                 if n_ctx < 16384:
                     print(f"【GPU模式优化】Qwen3-VL模型需要至少16384的上下文长度以支持视频处理，自动调整从{n_ctx}到16384")
                     n_ctx = 16384
-                # Qwen3-VL模型需要合理的image tokens（仅当用户未设置时自动调整）
-                if enable_mmproj and image_min_tokens == 0:
+                # Qwen3-VL模型需要合理的image tokens（自动设置）
+                if enable_mmproj:
                     image_min_tokens = 1024  # 提高到1024以支持视频帧
                     print(f"【GPU模式优化】Qwen3-VL模型自动设置image_min_tokens为1024")
                 # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
                 if enable_mmproj and image_max_tokens < image_min_tokens:
                     image_max_tokens = image_min_tokens
                     print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
+        
+        # 针对MiMo-VL模型的特殊优化（基于Qwen2.5-VL架构）
+        if is_mimo_vl:
+            print(f"【GPU模式优化】MiMo-VL模型启用特殊GPU参数配置")
+            # MiMo-VL模型需要合理的image tokens（自动设置）
+            if enable_mmproj:
+                image_min_tokens = 256
+                print(f"【GPU模式优化】MiMo-VL模型自动设置image_min_tokens为256")
+            # 自动设置image_max_tokens（如果未设置或小于image_min_tokens）
+            if enable_mmproj and image_max_tokens < image_min_tokens:
+                image_max_tokens = image_min_tokens
+                print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
         
         # 根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）
         def get_auto_chat_handler(model_name):
@@ -387,10 +396,8 @@ class llama_cpp_model_loader:
             "n_ctx": n_ctx,
             "n_gpu_layers": n_gpu_layers,
             "vram_limit": vram_limit,
-            "image_min_tokens": image_min_tokens,
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
-            "cache_prompt": cache_prompt,
             "tensor_split": tensor_split,
         }
         
@@ -403,7 +410,7 @@ class llama_cpp_model_loader:
             "image_min_tokens": image_min_tokens, "image_max_tokens": image_max_tokens,
             "n_batch": n_batch, "n_ubatch": n_ubatch, "n_threads": n_threads,
             "n_threads_batch": n_threads_batch, "attention_type": attention_type,
-            "cache_prompt": cache_prompt,
+            "cache_prompt": False,
             "tensor_split": tensor_split,
         }
         
