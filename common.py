@@ -1465,7 +1465,7 @@ MODEL_REGISTRY = [
     ('lfm-2-vl', 'LFM2VLChatHandler', 'Lfm-2-VL', 20),
     ('granite-docling', 'GraniteDoclingChatHandler', 'Granite-DocLing', 20),
     
-    # ===== OCR/ASR 模型 =====
+    # ===== OCR 模型 =====
     ('joycaption', 'Llava15ChatHandler', 'llama-joycaption', 15),
     ('llama-joycaption', 'Llava15ChatHandler', 'llama-joycaption', 15),
     ('olmocr', 'ObsidianChatHandler', 'olmOCR-2', 15),
@@ -1779,7 +1779,7 @@ class LLAMA_CPP_STORAGE:
             handler_name = handler_cls.__name__
             print(f"【ChatHandler初始化】开始初始化：{handler_name}")
             
-            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "MiMo-VL"]
+            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "MiMo-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]
             
             if mmproj_path and chat_handler_name in vl_handlers:
                 init_params["clip_model_path"] = mmproj_path
@@ -1795,7 +1795,7 @@ class LLAMA_CPP_STORAGE:
             if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
                 init_params["enable_thinking"] = think_mode
             
-            # Qwen3.5/Qwen3.6 需要特殊处理 - 参考 llama-cpp-vlm 项目
+            # Qwen3.5/Qwen3.6 需要特殊处理
             if chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking"]:
                 init_params["enable_thinking"] = think_mode
                 # Qwen35ChatHandler可以在没有mmproj的情况下运行（文本模式）
@@ -2031,7 +2031,9 @@ class LLAMA_CPP_STORAGE:
 
             # 计算推荐的最大GPU层数（仅在 GPU 模式下）
             recommended_gpu_layers = n_gpu_layers
-            is_qwen35 = "qwen35" in model.lower() or "qwen3.5" in model.lower()
+            # 检测是否为Qwen3.5/MiMo-VL模型（需要特殊内存优化）
+            is_qwen35 = "qwen35" in model_lower or "qwen3.5" in model_lower
+            is_mimo_vl = "mimo-vl" in model_lower
 
             if device_mode == "GPU" and (HARDWARE_INFO["has_cuda"] or HARDWARE_INFO["has_rocm"]) and n_gpu_layers > 0:
                 gpu_vram = HARDWARE_INFO["gpu_vram_total"]
@@ -2045,9 +2047,10 @@ class LLAMA_CPP_STORAGE:
                     recommended_gpu_layers = calculate_vram_layers(model_path, gpu_vram, mmproj_size_gb)
                     print(f"【VRAM计算】推荐GPU层数={recommended_gpu_layers}")
                     
-                    # Qwen3.5/Qwen3.6模型特殊内存优化：降低GPU层数以确保推理成功
-                    is_qwen35_model = "qwen35" in model.lower() or "qwen3.5" in model.lower()
-                    is_qwen36_model = "qwen36" in model.lower() or "qwen3.6" in model.lower()
+                    # Qwen3.5/MiMo-VL/Qwen3.6模型特殊内存优化：降低GPU层数以确保推理成功
+                    is_qwen35_model = "qwen35" in model_lower or "qwen3.5" in model_lower or \
+                                      "mimo-vl" in model_lower
+                    is_qwen36_model = "qwen36" in model_lower or "qwen3.6" in model_lower
                     if (is_qwen35_model or is_qwen36_model) and recommended_gpu_layers > 16:
                         original_layers = recommended_gpu_layers
                         recommended_gpu_layers = min(recommended_gpu_layers, 16)

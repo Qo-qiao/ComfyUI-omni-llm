@@ -27,7 +27,6 @@ from llama_cpp_model_loader import llama_cpp_model_loader
 from llama_cpp_unified_inference import llama_cpp_unified_inference
 from llama_cpp_parameters import llama_cpp_parameters
 from llama_cpp_clean_states import llama_cpp_clean_states
-from llama_cpp_unload_model import llama_cpp_unload_model
 from llama_cpp_tts_loader import llama_cpp_tts_loader
 from multi_model_tts import multi_model_tts
 from llama_cpp_asr_loader import llama_cpp_asr_loader
@@ -42,7 +41,6 @@ NODE_CLASS_MAPPINGS = {
     "llama_cpp_model_loader": llama_cpp_model_loader,
     "llama_cpp_parameters": llama_cpp_parameters,
     "llama_cpp_clean_states": llama_cpp_clean_states,
-    "llama_cpp_unload_model": llama_cpp_unload_model,
     "llama_cpp_tts_loader": llama_cpp_tts_loader,
     "multi_model_tts": multi_model_tts,
     "llama_cpp_asr_loader": llama_cpp_asr_loader,
@@ -59,7 +57,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "llama_cpp_model_loader": "Llama-cpp Model Loader",
     "llama_cpp_parameters": "Llama-cpp Parameters",
     "llama_cpp_clean_states": "Llama-cpp Clean States",
-    "llama_cpp_unload_model": "Llama-cpp Unload Model",
     "llama_cpp_tts_loader": "TTS Model Loader",
     "multi_model_tts": "Multi-Model TTS",
     "llama_cpp_asr_loader": "Llama-cpp ASR Model Loader",
@@ -75,4 +72,4 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
 
 # 版本信息
-VERSION = "3.2.0"
+VERSION = "3.2.1"

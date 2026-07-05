@@ -111,11 +111,16 @@ If you are not familiar with installing dependencies, it is recommended to use t
 
 ## Documentation (For reference only)
 
-Please check [Model Download Links](./doc/Model_Download_Links.md)
+Please check [Model Download Links](./doc/模型链接Model_Download_Links.md)
 Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 
 ## Changelog
+
+#### v3.2.1 (2026-07-05)
+
+- **Node Optimization Adjustments**：Integrate cleanup, uninstall nodes, and simplify some parameter options by setting them to auto in the background
+- **Model Optimization Adjustments**：Add MiMo-VL series model support (due to preset templates adding thinking prompts, MiMo-VL models require custom templates, as built-in templates generate undesirable content)
 
 #### v3.2.0 (2026-07-04)
 
