@@ -282,6 +282,14 @@ class llama_cpp_model_loader:
         is_qwen36vl = "qwen36-vl" in model.lower() or "qwen3.6-vl" in model.lower()
         is_mimo_vl = "mimo-vl" in model.lower()
         
+        # 特殊模型检测：Qwen3.5-9B-MTP、Qwen3.6-MTP和Qwen3.5-9B-DeepSeek-V4-Flash
+        # DeepSeek-V4-Flash支持1M上下文长度，需要特殊处理
+        is_deepseek_v4_flash = "deepseek-v4-flash" in model.lower() or "deepseek_v4_flash" in model.lower()
+        # Qwen3.5-9B-MTP支持MTP推测解码，也需要较大的上下文
+        is_qwen35_mtp = is_qwen35 and ("mtp" in model.lower() or "multitoken" in model.lower())
+        # Qwen3.6-MTP支持MTP推测解码，也需要较大的上下文
+        is_qwen36_mtp = is_qwen36 and ("mtp" in model.lower() or "multitoken" in model.lower())
+        
         # 初始化 image_min_tokens，将在后续根据模型类型自动设置
         image_min_tokens = 0
         
@@ -343,6 +351,35 @@ class llama_cpp_model_loader:
                 if enable_mmproj and image_max_tokens < image_min_tokens:
                     image_max_tokens = image_min_tokens
                     print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
+            
+            # 针对DeepSeek-V4-Flash模型的特殊优化（支持1M上下文长度）
+            if is_deepseek_v4_flash:
+                print(f"【GPU模式优化】DeepSeek-V4-Flash模型启用特殊GPU参数配置")
+                # DeepSeek-V4-Flash原生支持1M上下文长度(n_ctx_train=262144)
+                # 当前设备显存有限，设置为训练上下文长度的一半以确保推理成功
+                target_ctx = 131072  # 128K上下文长度
+                if n_ctx < target_ctx:
+                    print(f"【GPU模式优化】DeepSeek-V4-Flash模型需要至少{target_ctx}的上下文长度，自动调整从{n_ctx}到{target_ctx}")
+                    n_ctx = target_ctx
+                # DeepSeek-V4-Flash是MoE模型，需要降低n_batch以确保推理稳定
+                n_batch = min(n_batch, 256)
+                print(f"【GPU模式优化】DeepSeek-V4-Flash模型设置n_batch={n_batch}")
+            
+            # 针对Qwen3.5-MTP模型的特殊优化（支持MTP推测解码）
+            if is_qwen35_mtp:
+                print(f"【GPU模式优化】Qwen3.5-MTP模型启用特殊GPU参数配置")
+                # MTP模型需要较大的上下文长度以支持推测解码
+                if n_ctx < 32768:
+                    print(f"【GPU模式优化】Qwen3.5-MTP模型需要至少32768的上下文长度，自动调整从{n_ctx}到32768")
+                    n_ctx = 32768
+            
+            # 针对Qwen3.6-MTP模型的特殊优化（支持MTP推测解码）
+            if is_qwen36_mtp:
+                print(f"【GPU模式优化】Qwen3.6-MTP模型启用特殊GPU参数配置")
+                # MTP模型需要较大的上下文长度以支持推测解码
+                if n_ctx < 32768:
+                    print(f"【GPU模式优化】Qwen3.6-MTP模型需要至少32768的上下文长度，自动调整从{n_ctx}到32768")
+                    n_ctx = 32768
         
         # 针对MiMo-VL模型的特殊优化（基于Qwen2.5-VL架构）
         if is_mimo_vl:

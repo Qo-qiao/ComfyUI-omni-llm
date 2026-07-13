@@ -211,21 +211,31 @@ from support.preset_anime import (
     ILLUSTRIOUS_EN,
     ANIME_PROMPT_ZH,
     ANIME_PROMPT_EN,
+    THICKPAINT_ROLE_ZH,
+    THICKPAINT_ROLE_EN,
 )
 
-from support.preset_portrait import (
+from support.preset_asia_portrait import (
     REALISTIC_FEMALE_ZH,
     REALISTIC_FEMALE_EN,
     REALISTIC_MALE_ZH,
     REALISTIC_MALE_EN,
+)
+from support.preset_western_portrait import (
     WESTERN_FEMALE_ZH,
     WESTERN_FEMALE_EN,
     WESTERN_MALE_ZH,
     WESTERN_MALE_EN,
-    INFLUENCER_PORTRAIT_ZH,
-    INFLUENCER_PORTRAIT_EN,
-    MALE_PORTRAIT_ZH,
-    MALE_PORTRAIT_EN,
+)
+
+from support.preset_hyper_realistic import (
+    HYPER_REALISTIC_FEMALE_ZH,
+    HYPER_REALISTIC_FEMALE_EN,
+    HYPER_REALISTIC_MALE_ZH,
+    HYPER_REALISTIC_MALE_EN, 
+)
+
+from support.preset_elderly_portrait import (
     YOUNG_BOY_PORTRAIT_ZH,
     YOUNG_BOY_PORTRAIT_EN,
     MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
@@ -234,25 +244,27 @@ from support.preset_portrait import (
     MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
 )
 
-from support.preset_design import (
-    ART_ILLUSTRATION_ZH,
-    ART_ILLUSTRATION_EN,
-    POSTER_DESIGN_ZH,
-    POSTER_DESIGN_EN,
+from support.preset_building import (
     SCENE_DESIGN_ZH,
     SCENE_DESIGN_EN,
     INTERIOR_DESIGN_ZH,
     INTERIOR_DESIGN_EN,
     ARCHITECTURE_RENDERING_ZH,
     ARCHITECTURE_RENDERING_EN,
+)
+
+from support.preset_design import (
+    ART_ILLUSTRATION_ZH,
+    ART_ILLUSTRATION_EN,
+    POSTER_DESIGN_ZH,
+    POSTER_DESIGN_EN,
     ECOMMERCE_ZH,
     ECOMMERCE_EN,
     FOOD_PHOTOGRAPHY_ZH,
     FOOD_PHOTOGRAPHY_EN,
-
 )
 
-from support.preset_video_audio import (
+from support.preset_video import (
     UNIVERSAL_VIDEO_ZH,
     UNIVERSAL_VIDEO_EN,
     CONTINUING_I2V_ZH,
@@ -261,6 +273,9 @@ from support.preset_video_audio import (
     CONTINUING_FLF2V_EN,
     CONTINUING_MULTI_STORYBOARD_ZH,
     CONTINUING_MULTI_STORYBOARD_EN,
+)
+
+from support.preset_video_reverse import (
     VIDEO_FRAME_SEQUENCE_ZH,
     VIDEO_FRAME_SEQUENCE_EN,
     VIDEO_TO_PROMPT_ZH,
@@ -269,13 +284,14 @@ from support.preset_video_audio import (
     VIDEO_SCENE_BREAKDOWN_EN,
     VIDEO_SUBTITLE_FORMAT_ZH,
     VIDEO_SUBTITLE_FORMAT_EN,
+)
+
+from support.preset_audio import (
     MULTI_SPEAKER_DIALOGUE_ZH,
     MULTI_SPEAKER_DIALOGUE_EN,
     LYRICS_CREATION_ZH,
     LYRICS_CREATION_EN,
-
 )
-
 
 class VideoProcessor:
     """视频处理器 - 处理视频输入、视频帧提取和视频理解功能"""
@@ -635,6 +651,7 @@ class llama_cpp_unified_inference:
     preset_prompts["[Normal] Expand"] = "PROMPT_EXPANDER"
     preset_prompts["[Anime] Expand Tags"] = "ILLUSTRIOUS"
     preset_prompts["[Anime] Prompt Expand"] = "ANIME_PROMPT"
+    preset_prompts["[Anime] Thick Paint Role"] = "THICKPAINT_ROLE"
     preset_prompts["[Portrait] Asian Female"] = "REALISTIC_FEMALE"
     preset_prompts["[Portrait] Asian Male"] = "REALISTIC_MALE"
     preset_prompts["[Portrait] Western Female"] = "WESTERN_FEMALE"
@@ -687,7 +704,7 @@ class llama_cpp_unified_inference:
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推XL标签格式提示词\n• [Reverse] Describe：通用图片反推提示词\n• [Normal] Expand：通用提示词文本优化\n• [Anime] Expand Tags：二次元角色风格文本优化\n• [Anime] Prompt Expand：二次元内容文本优化\n• [Portrait] Asian Female：真实亚洲女性人像文本优化\n• [Portrait] Asian Male：真实亚洲男性人像文本优化\n• [Portrait] Western Female：真实欧美女性人像文本优化\n• [Portrait] Western Male：真实欧美男性人像文本优化\n• [Portrait] Influencer：完美女性人像文本优化\n• [Portrait] Male Portrait：完美男性人像文本优化\n• [Portrait] Young Boy：儿童人像文本优化\n• [Portrait] Middle Elderly Female：中老年女性人像文本优化\n• [Portrait] Middle Elderly Male：中老年男性人像文本优化\n• [Design] Art Illustration：艺术插画文本优化\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计文本优化\n• [Design] Interior Design：室内设计文本优化\n• [Design] Architecture Rendering：建筑外观与园林渲染\n• [Design] Ecommerce Product：电商产品文本优化\n• [Design] Food Photography：美食摄影文本优化\n• [Edit] Combined：图像编辑文本优化\n• [Text to Video] Universal：扩写视频文本内容\n• [Image to Video] I2V：根据图片扩写视频文本内容\n• [Image to Video] FLF2V：根据首尾帧图片扩写视频文本内容\n• [Image to Video] Multi Storyboard:根据多张图片与文本扩写视频文本内容\n• [Video Analysis] Frame Sequence：帧分析视频内容\n• [Video Analysis] Reverse Prompt：通用视频反推提示词\n• [Video Analysis] Scene Breakdown：反推各分镜场景内容\n• [Video Analysis] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化\n• [Music] Lyrics Creation：歌词创作文本优化\n• [Design] Ideogram-4：json结构化提示词"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：反推XL标签格式提示词\n• [Reverse] Describe：通用图片反推提示词\n• [Normal] Expand：通用提示词文本优化\n• [Anime] Expand Tags：二次元角色风格文本优化\n• [Anime] Prompt Expand：二次元内容文本优化\n• [Anime] Thick Paint Role：角色厚涂CG文本优化\n• [Portrait] Asian Female：真实亚洲女性人像文本优化\n• [Portrait] Asian Male：真实亚洲男性人像文本优化\n• [Portrait] Western Female：真实欧美女性人像文本优化\n• [Portrait] Western Male：真实欧美男性人像文本优化\n• [Portrait] Influencer：超写实女性人像文本优化\n• [Portrait] Male Portrait：超写实男性人像文本优化\n• [Portrait] Young Boy：儿童人像文本优化\n• [Portrait] Middle Elderly Female：中老年女性人像文本优化\n• [Portrait] Middle Elderly Male：中老年男性人像文本优化\n• [Design] Art Illustration：艺术插画文本优化\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计文本优化\n• [Design] Interior Design：室内设计文本优化\n• [Design] Architecture Rendering：建筑外观与园林渲染\n• [Design] Ecommerce Product：电商产品文本优化\n• [Design] Food Photography：美食摄影文本优化\n• [Edit] Combined：图像编辑文本优化\n• [Text to Video] Universal：扩写视频文本内容\n• [Image to Video] I2V：根据图片扩写视频文本内容\n• [Image to Video] FLF2V：根据首尾帧图片扩写视频文本内容\n• [Image to Video] Multi Storyboard:根据图片与文本扩写视频文本内容\n• [Video Analysis] Frame Sequence：帧分析视频内容\n• [Video Analysis] Reverse Prompt：通用视频反推提示词\n• [Video Analysis] Scene Breakdown：反推各分镜场景内容\n• [Video Analysis] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化\n• [Music] Lyrics Creation：歌词创作文本优化\n• [Design] Ideogram-4：json结构化提示词"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "你是一位优秀的AI提示词处理专家。", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
@@ -698,8 +715,10 @@ class llama_cpp_unified_inference:
                 # ========== 输出格式设置 ==========
                 "output_format": (["natural", "structured"], {
                     "default": "natural",
-                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容\n• structured：输出json结构化文本内容"
+                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容\n• structured：输出结构化文本内容"
                 }),
+                "enable_constraints": ("BOOLEAN", {"default": False, "tooltip": "启用预设模板中的正向约束：\n• 正向约束：会添加到提示词最前面，引导模型生成更符合要求的内容"}),
+                "enable_negative_prompts": ("BOOLEAN", {"default": False, "tooltip": "启用预设模板中的负向提示词：\n• 负向提示词：会追加到提示词末尾，避免模型生成不想要的内容"}),
                 
                 # ========== 视频处理参数 ==========
                 "video_max_frames": ("INT", {"default": 16, "min": 2, "max": 1024, "step": 1, 
@@ -809,12 +828,13 @@ class llama_cpp_unified_inference:
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
                 "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
                 "ANIME_PROMPT": ANIME_PROMPT_ZH,
+                "THICKPAINT_ROLE": THICKPAINT_ROLE_ZH,                
                 "REALISTIC_FEMALE": REALISTIC_FEMALE_ZH,
                 "REALISTIC_MALE": REALISTIC_MALE_ZH,
                 "WESTERN_FEMALE": WESTERN_FEMALE_ZH,
                 "WESTERN_MALE": WESTERN_MALE_ZH,
-                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_ZH,
-                "MALE_PORTRAIT": MALE_PORTRAIT_ZH,
+                "HYPER_REALISTIC_FEMALE": HYPER_REALISTIC_FEMALE_ZH,
+                "HYPER_REALISTIC_MALE": HYPER_REALISTIC_MALE_ZH,
                 "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_ZH,
                 "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
                 "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
@@ -845,12 +865,13 @@ class llama_cpp_unified_inference:
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
                 "ILLUSTRIOUS": ILLUSTRIOUS_EN,
                 "ANIME_PROMPT": ANIME_PROMPT_EN,
+                "THICKPAINT_ROLE": THICKPAINT_ROLE_EN,
                 "REALISTIC_FEMALE": REALISTIC_FEMALE_EN,
                 "REALISTIC_MALE": REALISTIC_MALE_EN,
                 "WESTERN_FEMALE": WESTERN_FEMALE_EN,
                 "WESTERN_MALE": WESTERN_MALE_EN,
-                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_EN,
-                "MALE_PORTRAIT": MALE_PORTRAIT_EN,
+                "HYPER_REALISTIC_FEMALE": HYPER_REALISTIC_FEMALE_EN,
+                "HYPER_REALISTIC_MALE": HYPER_REALISTIC_MALE_EN,
                 "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_EN,
                 "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
                 "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
@@ -972,7 +993,7 @@ class llama_cpp_unified_inference:
 
         return base_template
     
-    def get_preset_examples(self, preset_key, language, output_format="natural"):
+    def get_preset_examples(self, preset_key, language, output_format="natural", custom_prompt=""):
         """
         获取预设模板的示例内容
         
@@ -980,10 +1001,13 @@ class llama_cpp_unified_inference:
             preset_key: 预设键名
             language: 语言（"中文" 或 "English"）
             output_format: 输出格式（"natural" 或 "structured"）
+            custom_prompt: 用户输入的自定义提示词，用于匹配示例类别
             
         Returns:
-            str: 格式化后的示例内容，多条示例之间用分段分隔
+            str: 格式化后的示例内容，随机显示一条；如果匹配到相同类型，显示对应示例
         """
+        import random
+        
         if language == "中文":
             preset_map = {
                 "IMAGE_REVERSE_TAGS": IMAGE_REVERSE_TAGS_ZH,
@@ -991,19 +1015,19 @@ class llama_cpp_unified_inference:
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
                 "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
                 "ANIME_PROMPT": ANIME_PROMPT_ZH,
+                "THICKPAINT_ROLE": THICKPAINT_ROLE_ZH,
                 "REALISTIC_FEMALE": REALISTIC_FEMALE_ZH,
                 "REALISTIC_MALE": REALISTIC_MALE_ZH,
                 "WESTERN_FEMALE": WESTERN_FEMALE_ZH,
                 "WESTERN_MALE": WESTERN_MALE_ZH,
-                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_ZH,
-                "MALE_PORTRAIT": MALE_PORTRAIT_ZH,
+                "HYPER_REALISTIC_FEMALE": HYPER_REALISTIC_FEMALE_ZH,
+                "HYPER_REALISTIC_MALE": HYPER_REALISTIC_MALE_ZH,
                 "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_ZH,
                 "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
                 "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
                 "ART_ILLUSTRATION": ART_ILLUSTRATION_ZH,
                 "POSTER_DESIGN": POSTER_DESIGN_ZH,
-        """_summary_
-        """                "SCENE_DESIGN": SCENE_DESIGN_ZH,
+                "SCENE_DESIGN": SCENE_DESIGN_ZH,
                 "INTERIOR_DESIGN": INTERIOR_DESIGN_ZH,
                 "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_ZH,
                 "ECOMMERCE": ECOMMERCE_ZH,
@@ -1028,12 +1052,13 @@ class llama_cpp_unified_inference:
                 "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
                 "ILLUSTRIOUS": ILLUSTRIOUS_EN,
                 "ANIME_PROMPT": ANIME_PROMPT_EN,
+                "THICKPAINT_ROLE": THICKPAINT_ROLE_EN,
                 "REALISTIC_FEMALE": REALISTIC_FEMALE_EN,
                 "REALISTIC_MALE": REALISTIC_MALE_EN,
                 "WESTERN_FEMALE": WESTERN_FEMALE_EN,
                 "WESTERN_MALE": WESTERN_MALE_EN,
-                "INFLUENCER_PORTRAIT": INFLUENCER_PORTRAIT_EN,
-                "MALE_PORTRAIT": MALE_PORTRAIT_EN,
+                "HYPER_REALISTIC_FEMALE": HYPER_REALISTIC_FEMALE_EN,
+                "HYPER_REALISTIC_MALE": HYPER_REALISTIC_MALE_EN,
                 "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_EN,
                 "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
                 "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
@@ -1066,29 +1091,115 @@ class llama_cpp_unified_inference:
         if not examples:
             return ""
         
-        result_parts = []
-        for i, example in enumerate(examples):
-            # 如果示例是字符串格式，直接使用（兼容旧格式）
+        filtered_examples = []
+        for example in examples:
             if isinstance(example, str):
                 content = example
-            # 如果示例是字典格式，根据输出格式选择对应内容
+                category = ""
             elif isinstance(example, dict):
                 if output_format == "natural" and "natural" in example:
                     content = example.get("natural", "")
                 elif output_format == "structured" and "structured" in example:
                     content = example.get("structured", "")
                 else:
-                    # 如果指定格式不存在，尝试获取另一种格式，最后返回空字符串
                     content = example.get("natural", example.get("structured", ""))
+                category = example.get("category", "")
             else:
                 content = ""
+                category = ""
             
             if content:
-                result_parts.append(f"【示例 {i+1}】\n{content}")
+                filtered_examples.append({"content": content, "category": category})
         
-        return "\n\n".join(result_parts) if result_parts else ""
+        if not filtered_examples:
+            return ""
+        
+        if custom_prompt:
+            custom_prompt_lower = custom_prompt.lower()
+            for example in filtered_examples:
+                if example["category"] and example["category"].lower() in custom_prompt_lower:
+                    return f"【示例】\n{example['content']}"
+        
+        random_example = random.choice(filtered_examples)
+        return f"【示例】\n{random_example['content']}"
     
-
+    def get_preset_constraints(self, preset_key, language):
+        """
+        获取预设模板中的正向约束和负向提示词
+        
+        Args:
+            preset_key: 预设键名
+            language: 语言（"中文" 或 "English"）
+            
+        Returns:
+            tuple: (positive_constraints, negative_prompts)
+        """
+        if language == "中文":
+            preset_map = {
+                "PROMPT_EXPANDER": PROMPT_EXPANDER_ZH,
+                "ILLUSTRIOUS": ILLUSTRIOUS_ZH,
+                "ANIME_PROMPT": ANIME_PROMPT_ZH,
+                "THICKPAINT_ROLE": THICKPAINT_ROLE_ZH,
+                "REALISTIC_FEMALE": REALISTIC_FEMALE_ZH,
+                "REALISTIC_MALE": REALISTIC_MALE_ZH,
+                "WESTERN_FEMALE": WESTERN_FEMALE_ZH,
+                "WESTERN_MALE": WESTERN_MALE_ZH,
+                "HYPER_REALISTIC_FEMALE": HYPER_REALISTIC_FEMALE_ZH,
+                "HYPER_REALISTIC_MALE": HYPER_REALISTIC_MALE_ZH,
+                "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_ZH,
+                "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_ZH,
+                "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_ZH,
+                "ART_ILLUSTRATION": ART_ILLUSTRATION_ZH,
+                "POSTER_DESIGN": POSTER_DESIGN_ZH,
+                "SCENE_DESIGN": SCENE_DESIGN_ZH,
+                "INTERIOR_DESIGN": INTERIOR_DESIGN_ZH,
+                "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_ZH,
+                "ECOMMERCE": ECOMMERCE_ZH,
+                "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_ZH,
+                "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_ZH,
+                "CONTINUING_I2V": CONTINUING_I2V_ZH,
+                "CONTINUING_FLF2V": CONTINUING_FLF2V_ZH,
+                "CONTINUING_MULTI_STORYBOARD": CONTINUING_MULTI_STORYBOARD_ZH,
+                "IDEOGRAM4": IDEOGRAM4_ZH,
+            }
+        else:
+            preset_map = {
+                "PROMPT_EXPANDER": PROMPT_EXPANDER_EN,
+                "ILLUSTRIOUS": ILLUSTRIOUS_EN,
+                "ANIME_PROMPT": ANIME_PROMPT_EN,
+                "THICKPAINT_ROLE": THICKPAINT_ROLE_EN,
+                "REALISTIC_FEMALE": REALISTIC_FEMALE_EN,
+                "REALISTIC_MALE": REALISTIC_MALE_EN,
+                "WESTERN_FEMALE": WESTERN_FEMALE_EN,
+                "WESTERN_MALE": WESTERN_MALE_EN,
+                "HYPER_REALISTIC_FEMALE": HYPER_REALISTIC_FEMALE_EN,
+                "HYPER_REALISTIC_MALE": HYPER_REALISTIC_MALE_EN,
+                "YOUNG_BOY_PORTRAIT": YOUNG_BOY_PORTRAIT_EN,
+                "MIDDLE_ELDERLY_FEMALE_PORTRAIT": MIDDLE_ELDERLY_FEMALE_PORTRAIT_EN,
+                "MIDDLE_ELDERLY_MALE_PORTRAIT": MIDDLE_ELDERLY_MALE_PORTRAIT_EN,
+                "ART_ILLUSTRATION": ART_ILLUSTRATION_EN,
+                "POSTER_DESIGN": POSTER_DESIGN_EN,
+                "SCENE_DESIGN": SCENE_DESIGN_EN,
+                "INTERIOR_DESIGN": INTERIOR_DESIGN_EN,
+                "ARCHITECTURE_RENDERING": ARCHITECTURE_RENDERING_EN,
+                "ECOMMERCE": ECOMMERCE_EN,
+                "FOOD_PHOTOGRAPHY": FOOD_PHOTOGRAPHY_EN,
+                "UNIVERSAL_VIDEO": UNIVERSAL_VIDEO_EN,
+                "CONTINUING_I2V": CONTINUING_I2V_EN,
+                "CONTINUING_FLF2V": CONTINUING_FLF2V_EN,
+                "CONTINUING_MULTI_STORYBOARD": CONTINUING_MULTI_STORYBOARD_EN,
+                "IDEOGRAM4": IDEOGRAM4_EN,
+            }
+        
+        preset = preset_map.get(preset_key, None)
+        if preset is None:
+            return "", ""
+        
+        positive_constraints = preset.get("positive_constraints", "")
+        negative_prompts = preset.get("negative_prompts", "")
+        
+        return positive_constraints, negative_prompts
+    
     def _process_batch_inference(self, llama_model, images, system_prompt, final_prompt,
                                   image_max_size, batch_combination, gen_params,
                                   engine, model_info, mode):
@@ -1295,7 +1406,7 @@ class llama_cpp_unified_inference:
         # 检查是否是MTP模型
         is_mtp_model = False
         if model_path:
-            is_mtp_model = "-mtp-" in model_path.lower() or "_mtp_" in model_path.lower()
+            is_mtp_model = "mtp" in model_path.lower() or "multitoken" in model_path.lower()
         
         while retry_count < max_retries and not success:
             try:
@@ -1394,8 +1505,9 @@ class llama_cpp_unified_inference:
         return generated_text, audio_output
     
     def process(self, llama_model, inference_mode, preset_prompt, system_prompt, text_input,
-                prompt_language, response_language, output_format, video_max_frames,
-                video_sampling, video_manual_indices, image_max_size, batch_combination,
+                prompt_language, response_language, output_format, enable_constraints,
+                enable_negative_prompts,
+                video_max_frames, video_sampling, video_manual_indices, image_max_size, batch_combination,
                 seed, force_offload,
                 parameters=None, images=None, video=None, audio=None,
                 tts_model=None, asr_model=None, queue_handler=None, unique_id=None):
@@ -1449,7 +1561,7 @@ class llama_cpp_unified_inference:
             preset_text = self.get_preset_text_by_language(preset_key, preset_prompts_language, output_format, mode)
             
             # 获取预设模板的示例内容
-            example_output = self.get_preset_examples(preset_key, preset_prompts_language, output_format)
+            example_output = self.get_preset_examples(preset_key, preset_prompts_language, output_format, custom_prompt)
             
             # 构建最终提示词
             if preset_prompt == "Empty - Nothing":
@@ -1898,6 +2010,27 @@ class llama_cpp_unified_inference:
                             except Exception as e:
                                 print(f"【Qwen3优化】内存清理时出错（忽略）: {e}")
 
+                            # 添加预设模板中的正向约束和负向提示词到输出文本
+                            positive_constraints, negative_prompts = "", ""
+                            if (enable_constraints or enable_negative_prompts) and preset_key:
+                                positive_constraints, negative_prompts = self.get_preset_constraints(preset_key, preset_prompts_language)
+                            
+                            if enable_constraints and positive_constraints:
+                                generated_text = f"【正向约束】{positive_constraints}\n\n{generated_text}"
+                            
+                            if enable_negative_prompts and negative_prompts:
+                                generated_text += f"\n\n【负向提示词】{negative_prompts}"
+                            
+                            if enable_constraints or enable_negative_prompts:
+                                output_list = []
+                                for item in output_list:
+                                    new_item = item
+                                    if enable_constraints and positive_constraints:
+                                        new_item = f"【正向约束】{positive_constraints}\n\n{new_item}"
+                                    if enable_negative_prompts and negative_prompts:
+                                        new_item += f"\n\n【负向提示词】{negative_prompts}"
+                                    output_list.append(new_item)
+                            
                             # 直接返回结果
                             _uid = parameters.get("state_uid", None) if parameters else None
                             uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
@@ -2019,6 +2152,17 @@ class llama_cpp_unified_inference:
 
             # 过滤思考内容
             generated_text = self._filter_thinking_content(generated_text)
+
+            # 添加预设模板中的正向约束和负向提示词到输出文本
+            positive_constraints, negative_prompts = "", ""
+            if (enable_constraints or enable_negative_prompts) and preset_key:
+                positive_constraints, negative_prompts = self.get_preset_constraints(preset_key, preset_prompts_language)
+            
+            if enable_constraints and positive_constraints:
+                generated_text = f"【正向约束】{positive_constraints}\n\n{generated_text}"
+            
+            if enable_negative_prompts and negative_prompts:
+                generated_text += f"\n\n【负向提示词】{negative_prompts}"
 
             # 处理UID
             _uid = parameters.get("state_uid", None) if parameters else None
