@@ -175,22 +175,30 @@
 **备用链接**：https://huggingface.co/mradermacher/Qwen3-VL-8B-maid-GGUF（含mmproj模型）
 **魔搭链接**：https://www.modelscope.cn/models/Zyi4082/Qwen3-VL-8B-Maid-GGUF（含mmproj模型）
 
-### qwen3.5、qwen3.6等思考类模型使用文本生成模式必须启用加载mmproj模型，部分预设模板可能无法使用，请自测调整或使用非思考类模型
+### qwen3.5、qwen3.6等思考类模型使用文本生成模式必须启用加载mmproj模型
 
-**具体型号**：Qwen3.5-4B（反推）
+**具体型号**：Qwen3.5-4B
 **核心特点**：Qwen3.5系列的轻量版本，参数量适中，兼顾推理能力与资源消耗，支持多模态输入和工具调用，响应速度快，适合低显存设备使用。
 **适配场景**：低显存设备部署、快速推理、移动端应用、轻量级对话、基础多模态任务、实时交互
 **下载链接（nsfw）**：https://huggingface.co/mradermacher/Qwen3.5-4B_Abliterated-GGUF（含mmproj模型）
 **备用链接（nsfw）**：https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive（含mmproj模型）
-**下载链接（mtp）**：https://huggingface.co/mradermacher/Qwen3.5-4B-MiniFantasy-MTP-GGUF（含mmproj模型）
-**魔搭链接**：https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF（含mmproj模型）
 
 
-**具体型号**：Qwen3.5-9B（反推）
+**具体型号**：Qwen3.5-9B
 **核心特点**：Qwen3.5系列的平衡版本，参数量适中，兼顾推理能力与资源消耗，支持多模态输入和工具调用，适合中等显存设备。
 **适配场景**：中等显存设备部署、高质量多模态推理、复杂图文对话、图像理解分析、视频帧内容识别
 **下载链接（nsfw）**：https://huggingface.co/mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF（含mmproj模型）
+**备用链接（nsfw）**：https://huggingface.co/llmfan46/Qwen3.5-9B-ultra-uncensored-heretic-v2-GGUF（含mmproj模型）
 
+### Qwen3.5变体系列
+
+**具体型号**：Qwen3.5-9B-DeepSeek-V4-Flash
+**核心特点**：Qwen3.5系列的平衡版本，参数量适中，兼顾推理能力与资源消耗，支持多模态输入和工具调用，适合中等显存设备。
+**适配场景**：中等显存设备部署、高质量多模态推理、复杂图文对话、图像理解分析、视频帧内容识别
+**下载链接**：https://huggingface.co/Jackrong/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF（含mmproj模型）
+
+
+### Qwen3.6系列
 
 **具体型号**：Qwen3.6-27B（大显存专用）
 **核心特点**：Qwen3.6系列的高性能版本，参数量大、推理能力强，支持复杂多模态任务和长上下文处理，适合大显存设备部署。
@@ -202,6 +210,7 @@
 **核心特点**：Qwen3.6系列的MoE版本，总参数量35B但仅3B活跃参数参与推理，兼顾高性能与推理效率，A3B架构优化了显存使用效率，支持复杂多模态任务。
 **适配场景**：中等显存设备部署、高质量多模态推理、复杂图文分析、长文本理解、视频内容深度分析
 **下载链接（nsfw）**：https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive（含mmproj模型）
+
 
 
 ### OCR专项系列
@@ -480,21 +489,27 @@
 **Alternative Link**: https://huggingface.co/mradermacher/Qwen3-VL-8B-maid-GGUF (includes mmproj model)
 **ModelScope Link**: https://www.modelscope.cn/models/Zyi4082/Qwen3-VL-8B-Maid-GGUF (includes mmproj model)
 
-### For Qwen3.5, Qwen3.6 and other thinking models using text generation mode, mmproj model must be enabled. Some preset templates may not work, please test and adjust or use non-thinking models
+### For Qwen3.5, Qwen3.6 and other thinking models using text generation mode, mmproj model must be enabled. 
 
 **Specific Model**: Qwen3.5-4B (Reverse Prompting)
 **Key Features**: Lightweight version of Qwen3.5 series, moderate parameter count, balances reasoning capability with resource consumption, supports multimodal input and tool calling, fast response, suitable for low VRAM devices.
 **Applicable Scenarios**: Low VRAM device deployment, fast reasoning, mobile applications, lightweight dialogue, basic multimodal tasks, real-time interaction
 **Download Link (nsfw)**: https://huggingface.co/mradermacher/Qwen3.5-4B_Abliterated-GGUF (includes mmproj model)
 **Alternative Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-**Download Link (mtp)**: https://huggingface.co/mradermacher/Qwen3.5-4B-MiniFantasy-MTP-GGUF (includes mmproj model)
-**ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen3.5-4B-GGUF (includes mmproj model)
 
 
 **Specific Model**: Qwen3.5-9B (Reverse Prompting)
 **Key Features**: Balanced version of Qwen3.5 series, moderate parameter count, balances reasoning capability with resource consumption, supports multimodal input and tool calling, suitable for medium VRAM devices.
 **Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text dialogue, image understanding analysis, video frame content recognition
 **Download Link (nsfw)**: https://huggingface.co/mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF (includes mmproj model)
+
+
+### Qwen3.5 Variant Series
+
+**Specific Model**: Qwen3.5-9B-DeepSeek-V4-Flash
+**Key Features**: Distilled from DeepSeek-V4-Flash, inherits advanced structured reasoning and multi-step problem-solving capabilities. It successfully transfers the high-quality reasoning abilities of DeepSeek-V4 to the efficient Qwen3.5-9B parameter space, providing excellent AI reasoning experience with token efficiency and speed.
+**Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text dialogue, image understanding analysis, video frame content recognition, structured reasoning tasks, tool-enhanced workflows
+**Download Link**: https://huggingface.co/Jackrong/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF (includes mmproj model)
 
 
 **Specific Model**: Qwen3.6-27B (Large VRAM Required)
