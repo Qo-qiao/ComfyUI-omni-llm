@@ -117,6 +117,22 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
+The following updates are based on llama-cpp-python version 0.3.41, so please install this version first
+
+#### v3.2.2 （2026-07-13）
+
+- **Node Optimization & Adjustment**: Add pre-constraint options and negative prompt options (built-in fixed content that does not participate in model inference and only applies to text generation preset templates) to enhance controllability of generated content. Example outputs are adjusted to display randomly, and example information for corresponding categories will pop up when key categories are triggered. (If unified inference nodes report errors, re-add them to the interface for execution)
+- **Model Optimization & Adjustment**: Add support for the variant model Qwen3.5-DeepSeek-V4-Flash, which delivers stronger context comprehension; adjust parameters according to actual usage scenarios.
+- temperature (temperature parameter): 0.7-1.0 (lower values for coding tasks, higher values for creative reasoning)
+- top_p (core sampling threshold): 0.95
+- For complex reasoning tasks, it is recommended to increase the value of the max_tokens parameter to obtain more detailed generated content
+- **Preset Template Optimization**: Rename the all-round portrait template to ultra-realistic portrait template, and add thick painting and CG character templates.
+
+
+
+<details>
+<summary>📋 Older Versions</summary>
+
 #### v3.2.1 (2026-07-05)
 
 - **Node Optimization Adjustments**：Integrate cleanup, uninstall nodes, and simplify some parameter options by setting them to auto in the background
@@ -124,7 +140,6 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 #### v3.2.0 (2026-07-04)
 
-The following updates are based on llama-cpp-python version 0.3.40, so please install this version first
 - **Code Optimization**: Removed redundant processing code and streamlined the inference logic (please re-add any nodes that throw errors and run them in the interface, otherwise they won't work properly).
 - **Node Optimization Adjustments**:
   1. ASR: Removed unnecessary code, keeping only Qwen ASR support.
@@ -138,10 +153,6 @@ The following updates are based on llama-cpp-python version 0.3.40, so please in
   5. Strengthened breathing sense in audio.
   6. Optimized prompt professional descriptions to better match open-source model understanding, allowing for better content control {generated content may include some irrelevant information {uncontrollable}, please selectively refine it yourself}.
   7. To improve content quality, generated texts will be lengthy, increasing inference time and memory usage. Please adjust based on actual needs to avoid program crashes from excessively long text. Larger models also provide higher-quality text generation.
-
-
-<details>
-<summary>📋 Older Versions</summary>
 
 #### v3.1.6 (2026-06-27)
 

@@ -1420,6 +1420,9 @@ MODEL_REGISTRY = [
     ('qwen35', 'Qwen35ChatHandler', 'Qwen3.5', 15),
     ('qwen3.6', 'Qwen35ChatHandler', 'Qwen3.6', 15),
     ('qwen36', 'Qwen35ChatHandler', 'Qwen3.6', 15),
+    ('deepseek-v4-flash', 'Qwen35ChatHandler', 'Qwen3.5-DeepSeek-V4-Flash', 15),
+    ('qwen3.5-mtp', 'Qwen35ChatHandler', 'Qwen3.5-MTP', 15),
+    ('qwen35-mtp', 'Qwen35ChatHandler', 'Qwen3.5-MTP', 15),
     ('toriigate', 'Qwen25VLChatHandler', 'ToriiGate', 15),
     
     # ===== MiniCPM 系列 =====
@@ -1879,8 +1882,9 @@ class LLAMA_CPP_STORAGE:
                 print(f"【MoE检测】非MoE模型，跳过MoE优化：{model}")
             
             # MTP (Multi-Token Prediction) 模型检测
-            # MTP模型文件名通常包含"-mtp-"或"_mtp_"
-            is_mtp_model = "-mtp-" in model.lower() or "_mtp_" in model.lower()
+            # MTP模型文件名可能包含"mtp"，或者文件夹名包含"mtp"
+            # 例如：Qwen3.5-9B-MTP, Qwen3.5-9B-Q6_K.gguf（在Qwen3.5-9B-MTP文件夹中）
+            is_mtp_model = "mtp" in model.lower() or "multitoken" in model.lower()
             
             if is_mtp_model:
                 print(f"【MTP检测】检测到MTP（Multi-Token Prediction）模型：{model}")
@@ -2098,6 +2102,35 @@ class LLAMA_CPP_STORAGE:
                 if n_ctx < 4096:
                     print(f"【Qwen3.5优化】提高n_ctx从{n_ctx}到4096以满足模型最小要求")
                     n_ctx = 4096
+            
+            # DeepSeek-V4-Flash模型特殊优化（支持1M上下文长度）
+            is_deepseek_v4_flash = "deepseek-v4-flash" in model.lower() or "deepseek_v4_flash" in model.lower()
+            if is_deepseek_v4_flash and device_mode == "GPU":
+                original_batch = n_batch
+                n_batch = min(n_batch, 256)
+                if original_batch > n_batch:
+                    print(f"【DeepSeek-V4-Flash优化】降低n_batch从{original_batch}到{n_batch}以确保推理成功")
+                # DeepSeek-V4-Flash原生支持1M上下文长度，需要足够大的n_ctx
+                if n_ctx < 131072:
+                    print(f"【DeepSeek-V4-Flash优化】提高n_ctx从{n_ctx}到131072以支持长上下文推理")
+                    n_ctx = 131072
+            
+            # Qwen3.5-MTP模型特殊优化（支持MTP推测解码）
+            is_qwen35_mtp = is_qwen35 and ("mtp" in model.lower() or "multitoken" in model.lower())
+            if is_qwen35_mtp and device_mode == "GPU":
+                # MTP模型需要较大的上下文长度以支持推测解码
+                if n_ctx < 32768:
+                    print(f"【Qwen3.5-MTP优化】提高n_ctx从{n_ctx}到32768以支持MTP推测解码")
+                    n_ctx = 32768
+            
+            # Qwen3.6-MTP模型特殊优化（支持MTP推测解码）
+            is_qwen36 = "qwen36" in model.lower() or "qwen3.6" in model.lower()
+            is_qwen36_mtp = is_qwen36 and ("mtp" in model.lower() or "multitoken" in model.lower())
+            if is_qwen36_mtp and device_mode == "GPU":
+                # MTP模型需要较大的上下文长度以支持推测解码
+                if n_ctx < 32768:
+                    print(f"【Qwen3.6-MTP优化】提高n_ctx从{n_ctx}到32768以支持MTP推测解码")
+                    n_ctx = 32768
 
             llama_kwargs = {
                 "model_path": model_path,
