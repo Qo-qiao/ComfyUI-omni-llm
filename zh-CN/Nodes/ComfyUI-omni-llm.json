@@ -146,7 +146,8 @@
       "n_gpu_layers": "GPU模型层数",
       "vram_limit": "显存限制（GB）",
       "image_max_tokens": "图片最大编码token数",
-      "attention_type": "注意力类型"
+      "attention_type": "注意力类型",
+      "tensor_split": "Tensor分割比例"
     },
     "widgets": {
       "model": "模型文件",
@@ -159,9 +160,6 @@
       "vram_limit": "显存限制（GB）",
       "image_max_tokens": "图片最大编码token数",
       "attention_type": "注意力类型",
-      "tensor_split": "Tensor分割比例"
-    },
-    "optional": {
       "tensor_split": "Tensor分割比例"
     },
     "outputs": {
