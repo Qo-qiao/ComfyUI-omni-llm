@@ -35,6 +35,27 @@ if os.path.exists(site_packages_path):
 LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
 MIN_LLAMA_CPP_VERSION = "0.3.40"
 
+LLAMA_CPP_WHEEL_CONFIG = {
+    "Windows": {
+        "date_suffix": "20260608",
+        "variant": "cu128",
+        "filename_pattern": "llama_cpp_python-{version}+{variant}-{py_tag}-{py_tag}-win_amd64.whl",
+        "url_pattern": "https://github.com/JamePeng/llama-cpp-python/releases/download/v{version}-{variant}-win-{date_suffix}/{filename}"
+    },
+    "Linux": {
+        "date_suffix": "20260607",
+        "variant": "cu128",
+        "filename_pattern": "llama_cpp_python-{version}+{variant}-{py_tag}-{py_tag}-linux_x86_64.whl",
+        "url_pattern": "https://github.com/JamePeng/llama-cpp-python/releases/download/v{version}-{variant}-linux-{date_suffix}/{filename}"
+    },
+    "Darwin": {
+        "date_suffix": "20260607",
+        "variant": "Metal",
+        "filename_pattern": "llama_cpp_python-{version}-{py_tag}-{py_tag}-macosx_11_0_arm64.whl",
+        "url_pattern": "https://github.com/JamePeng/llama-cpp-python/releases/download/v{version}-{variant}-macos-{date_suffix}/{filename}"
+    }
+}
+
 class LlamaCppDependencyError(Exception):
     """llama-cpp-python 依赖错误异常"""
     pass
@@ -52,13 +73,19 @@ def _get_platform_wheel_url():
     arch = platform.machine()
     
     # 根据平台选择合适的wheel（与 requirements.txt 保持一致）
-    if system == "Windows":
-        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-win-20260608/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128-{py_tag}-{py_tag}-win_amd64.whl"
-    elif system == "Linux":
-        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-cu128-linux-20260607/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}+cu128-{py_tag}-{py_tag}-linux_x86_64.whl"
-    elif system == "Darwin":
-        # macOS 使用 Metal 版本
-        base_url = f"https://github.com/JamePeng/llama-cpp-python/releases/download/v{MIN_LLAMA_CPP_VERSION}-Metal-macos-20260607/llama_cpp_python-{MIN_LLAMA_CPP_VERSION}-{py_tag}-{py_tag}-macosx_11_0_arm64.whl"
+    config = LLAMA_CPP_WHEEL_CONFIG.get(system)
+    if config:
+        filename = config["filename_pattern"].format(
+            version=MIN_LLAMA_CPP_VERSION,
+            variant=config["variant"],
+            py_tag=py_tag
+        )
+        base_url = config["url_pattern"].format(
+            version=MIN_LLAMA_CPP_VERSION,
+            variant=config["variant"],
+            date_suffix=config["date_suffix"],
+            filename=filename
+        )
     else:
         base_url = None
     
@@ -84,8 +111,98 @@ def _check_llama_cpp_version(min_version=MIN_LLAMA_CPP_VERSION):
         print(f"【错误】版本检查失败: {e}")
         return False, None
 
+def _validate_requirements_sync():
+    """验证common.py中的wheel配置与requirements.txt是否同步"""
+    import re
+    
+    requirements_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "requirements.txt")
+    if not os.path.exists(requirements_path):
+        return
+    
+    try:
+        with open(requirements_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        
+        version_pattern = r"v(\d+\.\d+\.\d+)-"
+        date_pattern = r"-(\d{8})/"
+        
+        matches = re.findall(r"llama-cpp-python.*https://.*releases/download/v(\d+\.\d+\.\d+)-(\w+)-(\w+)-(\d{8})/", content)
+        
+        if matches:
+            req_version = matches[0][0]
+            if req_version != MIN_LLAMA_CPP_VERSION:
+                print(f"【警告】requirements.txt中的版本({req_version})与common.py中的版本({MIN_LLAMA_CPP_VERSION})不一致")
+            
+            for match in matches:
+                version, variant, platform, date = match
+                config = LLAMA_CPP_WHEEL_CONFIG.get(platform.capitalize())
+                if config:
+                    if config["date_suffix"] != date:
+                        print(f"【警告】{platform}平台的日期后缀不一致: requirements.txt({date}) vs common.py({config['date_suffix']})")
+                    if config["variant"] != variant:
+                        print(f"【警告】{platform}平台的变体不一致: requirements.txt({variant}) vs common.py({config['variant']})")
+    
+    except Exception as e:
+        print(f"【错误】验证requirements.txt同步失败: {e}")
+
+def _check_build_tools():
+    """检查系统是否具备C/C++构建工具链"""
+    system = platform.system()
+    
+    if system == "Windows":
+        for tool in ["nmake", "cl"]:
+            try:
+                result = subprocess.run(
+                    [tool, "/?"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                if result.returncode == 0 or result.returncode == 1:
+                    continue
+                else:
+                    return False
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                return False
+        return True
+        
+    elif system == "Linux":
+        for tool in ["gcc", "g++", "cmake"]:
+            try:
+                result = subprocess.run(
+                    [tool, "--version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                if result.returncode != 0:
+                    return False
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                return False
+        return True
+        
+    elif system == "Darwin":
+        try:
+            result = subprocess.run(
+                ["xcode-select", "--print-path"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if result.returncode == 0:
+                return True
+            else:
+                return False
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            return False
+            
+    else:
+        return False
+
 def _check_and_install_llama_cpp_python():
     """检查并尝试安装llama-cpp-python，如果已安装则检查版本"""
+    _validate_requirements_sync()
+    
     try:
         import llama_cpp
         current_version = getattr(llama_cpp, '__version__', '未知版本')
@@ -136,8 +253,18 @@ def _check_and_install_llama_cpp_python():
             except Exception as e:
                 print(f"【自动安装】预编译版本安装出错: {e}，尝试通用版本...")
         
-        # Fallback: 安装通用版本
+        # Fallback: 安装通用版本（需要C/C++构建工具链）
         print(f"【自动安装】正在尝试安装通用版本...")
+        
+        if not _check_build_tools():
+            print(f"【自动安装】检测到系统缺少C/C++构建工具链")
+            print(f"【手动安装】请从 {LLAMA_CPP_PYTHON_RELEASES_URL} 手动下载适合您环境的wheel")
+            print(f"【手动安装】或先安装构建工具:")
+            print(f"【手动安装】  Windows: 安装 Visual Studio Build Tools (包含MSVC、NMake)")
+            print(f"【手动安装】  Linux: sudo apt-get install build-essential cmake")
+            print(f"【手动安装】  macOS: xcode-select --install")
+            return False
+            
         try:
             result = subprocess.run(
                 [sys.executable, "-m", "pip", "install", f"llama-cpp-python>={MIN_LLAMA_CPP_VERSION}", "--quiet"],

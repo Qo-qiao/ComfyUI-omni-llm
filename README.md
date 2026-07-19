@@ -54,7 +54,7 @@ If you are not familiar with installing dependencies, it is recommended to use t
      ```
 
 3. **Install llama-cpp-python** (Required):
-   - Download the latest version 0.3.35 manually from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases) or directly download the zip package
+   - Download the latest version 0.3.40 manually from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases) or directly download the zip package
 
    **Wheel Selection Guide:**
    - **Python Version Match**: `cp312` in the filename indicates Python 3.12, select the file matching your Python version
@@ -119,6 +119,15 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 The following updates are based on llama-cpp-python version 0.3.41, so please install this version first
 
+#### v3.2.3 （2026-07-19）
+
+- **Preset Template Optimization**: Optimized and adjusted image backtracking preset templates, added more backtracking dimensions, added prompt word weighting to improve backtracking results, and optimized and adjusted preset templates for 2D anime (preset templates will be updated and optimized from time to time, so frequent updates may occur during certain periods)
+- **Dependency Detection Optimization**: Optimized the dependency check logic for llama-cpp-python, mainly for the first time setting up this plugin environment
+
+
+<details>
+<summary>📋 Older Versions</summary>
+
 #### v3.2.2 （2026-07-13）
 
 - **Node Optimization & Adjustment**: Add pre-constraint options and negative prompt options (built-in fixed content that does not participate in model inference and only applies to text generation preset templates) to enhance controllability of generated content. Example outputs are adjusted to display randomly, and example information for corresponding categories will pop up when key categories are triggered. (If unified inference nodes report errors, re-add them to the interface for execution)
@@ -127,11 +136,6 @@ The following updates are based on llama-cpp-python version 0.3.41, so please in
 - top_p (core sampling threshold): 0.95
 - For complex reasoning tasks, it is recommended to increase the value of the max_tokens parameter to obtain more detailed generated content
 - **Preset Template Optimization**: Rename the all-round portrait template to ultra-realistic portrait template, and add thick painting and CG character templates.
-
-
-
-<details>
-<summary>📋 Older Versions</summary>
 
 #### v3.2.1 (2026-07-05)
 
