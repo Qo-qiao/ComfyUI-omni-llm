@@ -219,5 +219,11 @@
   "translate": "翻译成英文",
   "transcribe": "语音识别",
   "inference": "推理",
-  "General Video": "通用视频"
+  "General Video": "通用视频",
+  "save_conversation": "保存对话",
+  "session_id": "会话ID",
+  "native_video": "原生视频模式",
+  "max_history_rounds": "最大历史轮数",
+  "max_edge": "图片最大边长",
+  "preserve_thinking": "保留思考过程"
 }
