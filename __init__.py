@@ -16,6 +16,8 @@ plugin_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, plugin_dir)
 nodes_dir = os.path.join(plugin_dir, "nodes")
 sys.path.insert(0, nodes_dir)
+api_dir = os.path.join(plugin_dir, "api")
+sys.path.insert(0, api_dir)
 
 # 添加插件自带的site-packages目录到路径（优先使用插件自带的依赖，避免版本冲突）
 site_packages_dir = os.path.join(plugin_dir, "site-packages")
@@ -30,6 +32,9 @@ from clean_states import omni_llm_clean_states
 from asr_loader import omni_llm_asr_loader
 from multi_image_input import omni_llm_multi_image_input
 from video_loader import omni_llm_video_loader
+from skill_loader import omni_llm_skill_loader
+from realtime_chat import omni_llm_realtime_chat
+from api_config import omni_llm_api_config
 
 # 节点映射关系，Comfy通过这个字典识别节点
 NODE_CLASS_MAPPINGS = {
@@ -40,6 +45,9 @@ NODE_CLASS_MAPPINGS = {
     "omni_llm_multi_image_input": omni_llm_multi_image_input,
     "omni_llm_unified_inference": omni_llm_unified_inference,
     "omni_llm_video_loader": omni_llm_video_loader,
+    "omni_llm_realtime_chat": omni_llm_realtime_chat,
+    "omni_llm_skill_loader": omni_llm_skill_loader,
+    "omni_llm_api_config": omni_llm_api_config,
 }
 
 # 节点显示名称映射，在ComfyUI界面中显示的名称
@@ -51,10 +59,16 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "omni_llm_multi_image_input": "Omni LLM Multi-Image Input (Story Creation)",
     "omni_llm_unified_inference": "Omni LLM Unified Inference",
     "omni_llm_video_loader": "Omni LLM Video Loader",
+    "omni_llm_realtime_chat": "Omni LLM Multi-Turn Chat",
+    "omni_llm_skill_loader": "Omni LLM Skill Loader",
+    "omni_llm_api_config": "Omni LLM API Config",
 }
 
+# 前端扩展目录（实时对话内嵌聊天界面）
+WEB_DIRECTORY = "./web"
+
 # 导出所有映射关系
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
 
 # 版本信息
-VERSION = "3.3.4"
+VERSION = "3.4.0"

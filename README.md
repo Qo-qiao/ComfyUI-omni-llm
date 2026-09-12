@@ -16,8 +16,9 @@ ComfyUI-omni-llm is a fully-featured ComfyUI plugin, deeply rebuilt and enhanced
 - **Efficient Inference Performance**: Introduces parallel processing and caching mechanisms, significantly improving runtime efficiency
 - **Professional Prompt System**: Built-in rich scenario-based preset templates, supports custom prompts
 - **Content Optimization Expansion**: Provides content optimization expansion features, supporting optimization and expansion of multimodal content
-
-[Tip] Models with thinking mode cannot provide accurate thought content filtering. It is recommended to use non-thinking mode models. All generated prompt content is for reference only and cannot guarantee perfect image generation. Please verify and optimize content based on your actual needs.
+- **Multi-Turn Chat**: Supports multi-turn chat, providing more choices for text generation
+- **Skill Loading**: Supports skill loading, providing more choices for text generation
+- **API Support**: Supports calling external APIs, providing more choices for text generation
 
 
 ## Recommended Companion Plugins
@@ -81,14 +82,17 @@ If you are not familiar with installing dependencies, it is recommended to use t
 ## Workflow Examples (Reference examples, please modify parameters according to actual situation)
 
 ### Workflow Files
-- [Audio Mode Workflow](./workflows/omni-llm(audio).json)
 - [Text or Image Mode Workflow](./workflows/omni-llm(text_or_image).json)
 - [Video Mode Workflow](./workflows/omni-llm(video).json)
+- [Audio Mode Workflow](./workflows/omni-llm(audio).json)
 
 ### Workflow Example Images
 
 #### Text Generation
 ![Text Generation Workflow Example](./workflows/文本生成（Text_Generation）.png)
+
+#### Multi-Turn Chat
+![Multi-Turn Chat Workflow Example](./workflows/多轮对话（Multi-Turn_Chat）.png)
 
 #### Image Processing
 ![Image Reverse Engineering Workflow Example](./workflows/图像反推（Image_reverse_engineering）.png)
@@ -108,7 +112,16 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-The following updates are based on llama-cpp-python version 0.3.46, so please install this version first
+The following updates are based on llama-cpp-python version 0.3.49, so please install this version first
+
+#### v3.4.0 (2026-09-12)
+- **Node Optimization and Adjustments**: Added API loading nodes (expanding model support types to meet different user scenario needs), added multi-turn conversation nodes (for skill usage, making it easier to generate more professional prompt content), added skill loading nodes (expanding text generation capabilities, providing more options for prompt generation), optimized and adjusted parameter node options, adapted for multi-turn conversation node usage. 
+- **Preset Template Optimization**: Optimized and adjusted preset template content, added Skill-related files.
+
+
+<details>
+<summary>📋 Older Versions</summary>
+
 
 #### v3.3.4 (2026-08-22)
 
@@ -119,11 +132,6 @@ The following updates are based on llama-cpp-python version 0.3.46, so please in
 
 - **Node Optimization Adjustments**: Added support for more raw image models to meet a wider range of user needs, and fixed the issue where model labels wouldn’t show when forward constraint options were not enabled.
 - **Preset Template Optimization**: Optimized raw image preset templates. Natural Paragraph: doesn’t output camera parameter info. Structured: outputs camera parameter info. You can choose based on your own needs (it’s recommended to add a facial optimization node when generating real natural portraits to enhance the effect).
-
-
-<details>
-<summary>📋 Older Versions</summary>
-
 
 #### v3.3.2 （2026-08-15）
 

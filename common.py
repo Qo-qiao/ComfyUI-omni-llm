@@ -1849,6 +1849,10 @@ class LLAMA_CPP_STORAGE:
         cls.model_path = None
         cls.model_name = None
         
+        # 强制垃圾回收，释放内存
+        gc.collect()
+        print(f"【资源释放】已触发垃圾回收(gc.collect)")
+        
         if all:
             cls.clean_state()
     

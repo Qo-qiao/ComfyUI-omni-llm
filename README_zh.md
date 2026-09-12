@@ -16,8 +16,10 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 - **高效推理性能**：引入并行处理和缓存机制，显著提升运行效率
 - **专业提示词系统**：内置丰富的场景化预设模板，支持自定义提示词
 - **内容优化扩写**：提供内容优化扩写功能，支持多模态内容的优化和扩展
+- **多轮对话**：支持多轮对话，为文本生成提供更多选择
+- **技能加载**：支持skill技能加载，为文本生成提供更多选择
+- **API支持**：支持调用外部API，为文本生成提供更多选择，如调用OpenAI api、调用其他模型等。
 
-【提示】带有thinking模式的模型无法提供准确的思考内容过滤功能，建议使用非thinking模式的模型，所有生成的提示词内容仅供参考，并不能确保生成完美图像内容，请根据个人实际需求做内容核对二次优化。
 
 ## 中文翻译
 
@@ -84,14 +86,17 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 ## 工作流示例（参考示例，请根据实际情况进行参数修改）
 
 ### 工作流文件
-- [音频模式工作流](./workflows/omni-llm(audio).json)
 - [文本或图像模式工作流](./workflows/omni-llm(text_or_image).json)
 - [视频模式工作流](./workflows/omni-llm(video).json)
+- [音频模式工作流](./workflows/omni-llm(audio).json)
 
 ### 工作流示例图片
 
 #### 文本生成
 ![文本生成工作流示例](./workflows/文本生成（Text_Generation）.png)
+
+#### 多轮对话
+![多轮对话工作流示例](./workflows/多轮对话（Multi_turn_chat）.png)
 
 #### 图像处理
 ![图像反推工作流示例](./workflows/图像反推（Image_reverse_engineering）.png)
@@ -111,7 +116,17 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
 ## 更新日志
 
-以下更新基于llama-cpp-python 0.3.46版本，请先安装该版本的llama-cpp-python
+以下更新基于llama-cpp-python 0.3.49版本，请先安装该版本的llama-cpp-python
+
+#### v3.4.0 （2026-09-12）
+
+- **节点优化调整**：新增API加载节点（拓宽模型支持类型，满足不同用户场景需求），新增多轮对话节点（满足skill技能使用，便于生成更加专业的提示词内容），新增skill加载节点（拓宽文本生成能力，为提示词生成提供更多选择），优化调整参数节点选项，适配多轮对话节点使用
+- **预设模板优化**：优化调整预设模板内容，添加Skill相关文件
+
+
+<details>
+<summary>📋 历史版本</summary>
+
 
 #### v3.3.4 （2026-08-22）
 
@@ -122,11 +137,6 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
 - **节点优化调整**：添加更多生图模型支持，满足更多用户需求，修改不启用正向约束选项，不显示输出模型标签的问题
 - **预设模板优化**：优化调整生图类预设模板，自然段落：不输出镜头参数信息，结构化：输出镜头参数信息，根据自身需求选择（生成真实自然感人像建议添加面部优化节点做效果强化）
-
-
-<details>
-<summary>📋 历史版本</summary>
-
 
 #### v3.3.2 （2026-08-15）
 
@@ -383,5 +393,6 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
 ## 致谢
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
+* [comfyUI-llama-TE](https://github.com/lihaoyun6/comfyUI-llama-TE) @lihaoyun6
 * [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) @comfyanonymous
