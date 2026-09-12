@@ -46,8 +46,8 @@ class FoodPhotography:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全局食欲光影基调 → 食物诱人特质 → 食材肌理细节 → 碗盘面料 → 极简布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: global appetite lighting tone → appetizing food qualities → ingredient texture details → tableware and fabric → minimalist set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全局食欲光影基调 → 食物诱人特质 → 食材肌理细节 → 碗盘面料 → 极简布景（密集关键词，中英术语并列），食材质感高度细致，色泽诱人细节丰富",
+                "formula_en": "Content order: global appetite lighting tone → appetizing food qualities → ingredient texture details → tableware and fabric → minimalist set (dense keywords, Chinese-English terms in parallel), highly detailed food texture, rich color and appetizing details"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -157,61 +157,71 @@ All themes: user demand highest priority, only add food/light/tableware details 
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.美食品类与全局正向约束
-2.画面构图、视觉引导、食物70%占比、画幅比例、精简约束
-3.三维拍摄视角：距离、水平朝向、垂直俯仰、景深虚实
-4.核心食欲焦点与情感触发点
-5.食材外观、酥脆/绵密肌理、手工真实痕迹
-6.光源色温、高光阴影、整体场景氛围
-7.70/25/5分层色彩饱和度调性
-8.餐具材质、桌面搭配逻辑
-9.拍摄角度细化
-   - 平视：展现食物高度与层次
-   - 45°俯拍：最常用，展现摆盘全貌
-   - 90°俯拍：完全俯视，展现图案与布局
-10.食材质感细化
-   - 酥脆：表面裂纹/碎屑/金黄色泽
-   - 绵密：奶油顺滑/慕斯细腻/气泡细小
-   - 油亮：油脂反光/酱汁流淌/光泽诱人
-   - 通透：果冻晶莹/冰块透明/汁液清澈
-11.蒸汽与热气
-   - 热气形态：轻柔上升/缭绕弥漫/蒸汽腾腾
-   - 热气密度：淡淡薄雾/明显可见/浓密升腾
-12.布光质感定性建议、全局禁止参数清单
-10.3-5个概括美食食欲风格标签
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 甜点烘焙：50mm-85mm，摄影机与主体保持常规距离或远离主体，侧光突出绵密肌理
-   - 中式料理/西餐炭烤：85mm-100mm长焦，摄影机远离主体，逆光突出蒸汽与油脂光泽
-   - 饮品咖啡：50mm标准中焦，摄影机与主体保持常规距离，平视柔光通透
-   - 45°俯拍展示摆盘：50mm标准中焦，自然透视""",
+1.美食品类与食材形态
+2.风格与拍摄定位
+3.食物主体与核心食欲焦点
+4.三维度镜头视角与构图
+   - 画面比例：竖版美食图（4:5/3:4）/ 横版场景图（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：微距食材 / 标准美食 / 餐桌全景 / 烹饪过程，对应美食叙事重心
+   - 水平视角维度：俯拍（90°）/ 45°角 / 平视，标注美食展现效果
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角，对应美食视觉张力
+   - 景深氛围：浅景深主体突出 / 中景深环境兼顾 / 深景深全景清晰，标注虚实层次
+5.食材细节与手工肌理
+   - 酥脆/绵密/流心/拉丝等质感表现
+   - 手工不完美肌理：不规则边缘/自然裂纹/手工痕迹
+   - 色彩分层：主色70% / 辅助色25% / 点缀色5%
+6.餐具搭配与摆盘
+   - 碗盘材质：陶瓷/玻璃/木质/金属/石板
+   - 餐具摆放：位置关系/高低层次/疏密节奏
+   - 色彩呼应：餐具与食物色调协调
+7.光影氛围与专业布光
+   - 主光类型：侧光/逆光/顶光/柔光箱
+   - 光源方向：正侧光45°/90°侧光/逆光轮廓/窗光
+   - 光质软硬：硬光（清晰边缘阴影）/柔光（渐变过渡阴影）
+   - 光影特效：暖调食欲光/柔化光晕/光影斑驳/动态光斑/边缘发光/胶片颗粒感/明暗渐变过渡
+8.场景氛围与食欲感受
+   - 用餐场景：餐厅/厨房/户外/咖啡厅
+   - 整体色调：暖调/冷调，与美食风格统一
+   - 食欲感受：治愈/温馨/精致/日常
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述镜头空间效果，禁用数值参数：
+- 微距食材特写：微距镜头，极浅景深，突出食材纹理与手工肌理
+- 45°角标准美食：85mm中长焦，f/2.8-f/4光圈，经典美食角度
+- 俯拍餐桌全景：50mm标准镜头，f/4-f/5.6光圈，桌面全景展示
+- 平视美食场景：50mm标准镜头，平视角度，环境氛围融入""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Food category & global constraints
-2. Composition, visual guide, 70% food ratio, aspect ratio, simplification rule
-3. 3D shooting: distance, horizontal, pitch, depth blur
-4. Core appetite focus & emotional trigger
-5. Food shape, crispy/creamy texture, handmade marks
-6. Light source, highlight shadow, scene atmosphere
-7. 70/25/5 layered color saturation
-8. Tableware material & matching logic
-9. Shooting angle refinement
-   - Eye-level: show food height and layers
-   - 45° overhead: most common, show full plating
-   - 90° top-down: completely overhead, show pattern and layout
-10. Food texture refinement
-    - Crispy: surface cracks/crumbs/golden color
-    - Creamy: smooth cream/fine mousse/tiny bubbles
-    - Oily: grease reflection/sauce flowing/lustrous sheen
-    - Translucent: crystal jelly/transparent ice/clear juice
-11. Steam & hot air
-    - Steam form: gently rising/curling弥漫/steaming
-    - Steam density: light mist/visible/dense rising
-12. Qualitative lighting suggestion, forbidden param list
-10. 3-5 appetite style tags
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Dessert baking: 50mm-85mm, camera normal distance or far from subject, side light highlights dense texture
-   - Chinese cuisine/Western roast: 85mm-100mm telephoto, camera far from subject, backlight highlights steam and grease sheen
-   - Coffee drinks: 50mm standard mid-telephoto, camera normal distance from subject, eye-level soft light transparent
-   - 45° top-down plating display: 50mm standard mid-telephoto, natural perspective"""
+1. Food category and ingredient form
+2. Style and shooting positioning
+3. Food subject and core appetite focus
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical food (4:5/3:4) / horizontal scene (16:9/3:2) / square (1:1)
+   - Distance (shot type): macro ingredient / standard food / table panorama / cooking process, mark narrative focus
+   - Horizontal view: overhead (90°) / 45° angle / eye-level, describe food display effect
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle, describe food visual tension
+   - Depth of field: shallow DOF subject focus / medium DOF environment balanced / deep DOF full sharpness
+5. Ingredient details and handmade texture
+   - Crispy/creamy/flowing/pulling texture expression
+   - Handmade imperfections: irregular edges/natural cracks/handcraft traces
+   - Color layering: 70% main / 25% auxiliary / 5% accent
+6. Tableware matching and plating
+   - Tableware material: ceramic/glass/wood/metal/slate
+   - Tableware placement: position relationship/height layers/density rhythm
+   - Color echo: tableware and food tone coordination
+7. Lighting atmosphere and professional lighting
+   - Key light type: side light/backlight/top light/softbox
+   - Light direction: 45° side / 90° side / backlit outline / window light
+   - Light quality: hard (clear edge shadow) / soft (gradual transition)
+   - Lighting effects: warm appetite light / highlight bloom / soft haze / dappled light / dynamic light spots / rim glow / film grain / particles / gradient transition
+8. Scene atmosphere and appetite feeling
+   - Dining scene: restaurant/kitchen/outdoor/café
+   - Overall tone: warm/cool, unified with food style
+   - Appetite feeling: healing/warm/exquisite/daily
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of lens spatial effects, no numeric parameters:
+- Macro ingredient close-up: macro lens, extreme shallow DOF, highlighting ingredient texture and handmade details
+- 45° standard food shot: 85mm medium telephoto, f/2.8-f/4 aperture, classic food angle
+- Overhead table panorama: 50mm standard lens, f/4-f/5.6 aperture, full table display
+- Eye-level food scene: 50mm standard lens, eye-level angle, environment atmosphere integration"""
             }
         }
 

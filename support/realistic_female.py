@@ -22,68 +22,68 @@ class RealisticFemale:
             "Flux1": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：整体画面氛围光影 → 人物气质姿态 → 肌肤发丝质感 → 背景留白。侧重氛围叙事，弱化细碎关键词堆砌，画面柔和高级。",
-                "formula_en": "Content order: overall atmosphere lighting → character pose → skin hair texture → negative space. Focus on atmospheric narration."
+"formula_zh": "内容组织顺序：整体画面氛围光影 → 人物气质姿态 → 肌肤发丝质感 → 背景留白。侧重氛围叙事，弱化细碎关键词堆砌，画面柔和高级，写实肤质发丝高度细致，纹理清晰可见。",
+                 "formula_en": "Content order: overall atmosphere lighting → character pose → skin hair texture → negative space. Focus on atmospheric narration, realistic skin and hair highly detailed with clear texture."
             },
             "Flux2_klein": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：真实亚洲女性（脸型、黑发、淡妆、穿搭）→ 自然写实肤色与发质 → 窗光柔和、温润氛围 → 近景肖像、背景虚化",
-                "formula_en": "Content order: realistic Asian female (face shape, black hair, light makeup, outfit) → natural realistic skin tone and hair → soft window light, warm atmosphere → close portrait, blurred background"
+                "formula_zh": "内容组织顺序：一位超写实女性（年龄、发型、妆容、服饰与神态）→ 照片级写实与皮肤质感 → 自然光或棚拍布光、清新氛围 → 半身特写、浅景深，逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: a photorealistic female (age, hairstyle, makeup, outfit and expression) → photo-level realism and skin texture → natural or studio lighting, fresh atmosphere → half-body close-up, shallow depth of field, realistic, highly detailed skin and hair texture"
             },
             "Z_image": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：真实亚洲女性主体（脸型、黑发、淡妆、穿搭）→ 自然写实肤色与发质 → 窗光或柔和日光、温润氛围 → 近距离肖像、背景虚化（需渲染文字直接写入，支持中英双语）。",
-                "formula_en": "Content order: realistic Asian female subject (face shape, black hair, light makeup, outfit) → natural realistic skin tone and hair → window or soft daylight, warm atmosphere → close-up portrait, blurred background (write any rendered text directly, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：一位超写实女性主体（年龄、发型、妆容、服饰）→ 照片级写实与皮肤质感 → 柔和自然光或棚拍布光、清新氛围 → 半身或特写、浅景深；建议描述她的神态与目光（需渲染文字直接写入，支持中英双语），逼真，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: a photorealistic female subject (age, hairstyle, makeup, outfit) → photo-level realism with skin texture → soft natural or studio lighting, fresh atmosphere → half-body or close-up, shallow depth of field; describe her expression and gaze (write any rendered text directly, supports Chinese and English), realistic, highly detailed skin and hair texture."
             },
             "Qwen_Image2512": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：亚洲女性特征、自然妆容与温婉神态 → 风格与画质（贴近真实的肌肤与毛发表现） → 柔和日光线条与淡雅氛围 → 正面或三分法构图、轻微虚化 →（需渲染文字直接写入提示词，支持中英双语）",
-                "formula_en": "Content order: Asian female features, natural makeup and gentle expression → style and quality (true-to-life skin and hair) → soft daylight lines and elegant atmosphere → front or rule-of-thirds composition, slight blur → (write any rendered text directly into the prompt, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：女性身份、年龄与神态表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然光或窗光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: female identity, age and expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural or window light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
             },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：电影级光影氛围、柔和漫射清新光 → 人物体态情绪、温婉神情 → 胶片质感细节、自然肤调发质 → 服饰面料材质 → 极简布景、street style（密集关键词，中英术语并列）",
-                "formula_en": "Content order: cinematic lighting atmosphere with soft diffused fresh light → body pose and mood, gentle expression → film grain texture details, natural skin tone and hair → fabric material → minimalist set, street style (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：景别构图（特写/半身/全身）→ 人物主体（发型发色、五官特征、妆容风格、神情表情、姿态动作）→ 服饰配件（衣款面料、配饰道具）→ 光影氛围（光源类型、光影视觉效果）→ 环境场景（所处空间、远景元素）→ 风格（画面风格定位）→ 画质（浅景深虚化/柔焦/锐化）→ 极简布景（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: shot composition (close-up/half-body/full-body) → subject (hairstyle, facial features, makeup, expression, pose) → outfit & accessories (clothing, props) → lighting atmosphere (source type, visual effects) → environment (space, background elements) → style (image style) → quality (shallow DOF/soft focus/sharpness) → minimalist set (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
             },
             "Boogu": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：整体画面基调（清新淡雅氛围）→ 人物松弛姿态与温婉神情 → 自然肌肤妆发质感 → 简约留白环境",
-                "formula_en": "Content order: overall image tone (fresh elegant atmosphere) → relaxed pose with gentle expression → natural skin, makeup and hair texture → simple negative-space environment"
+"formula_zh": "内容组织顺序：整体画面基调（温暖柔和氛围）→ 人物松弛姿态与神情 → 自然肌肤质感与细节 → 简约留白环境，写实风格，肤质发丝高度细致，纹理清晰。",
+                 "formula_en": "Content order: overall image tone (warm and soft atmosphere) → relaxed pose with expression → natural skin texture and details → simple negative-space environment, realistic style, highly detailed skin and hair with clear texture."
             },
             "Mage_Flow": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：东亚女性五官肤质、自然妆容 → 体态姿态、温婉神情 → 光影层次、柔和漫射光 → 服饰细节、穿搭材质 → 轻量环境（密集关键词，中英术语并列）",
-                "formula_en": "Content order: East Asian female facial features and skin, natural makeup → body pose, gentle expression → lighting layers, soft diffused light → clothing details, outfit material → lightweight environment (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：面部五官肤质、年龄气质 → 体态姿态、松弛神情 → 光影层次、柔光窗光 → 服饰细节、面料质感 → 轻量环境、minimal background（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: facial features and skin, age and temperament → body pose, relaxed expression → lighting layers, soft window light → clothing details, fabric texture → lightweight environment, minimal background (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
             },
             "ERNIE_Image": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：亚洲女性特征、自然妆容与温婉神态 → 风格与画质（贴近真实肌肤与毛发） → 柔日和日光线条、淡雅氛围 → 正面或三分法、轻微虚化 →（需渲染文字直接写入提示词，支持中英双语）",
-                "formula_en": "Content order: Asian female features, natural makeup and gentle expression → style and quality (true-to-life skin and hair) → soft daylight lines, elegant atmosphere → front or rule-of-thirds, slight blur → (write any rendered text directly into the prompt, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：女性身份、年龄与神态、超写实电影质感 → 风格与画质（真实肤质、发丝与微表情） → 自然光或窗光勾勒轮廓氛围 → 半身或特写、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: female identity, age and expression, photorealistic cinematic texture → style and quality (real skin, hair strands and micro-expressions) → natural or window light outlining silhouette and atmosphere → half-body or close-up, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
             },
             "GLM_Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：东亚女性自然面容 → 纪实摄影风格、原生肤质与黑发 → 自然光漫射、清淡通透 → 半身平视、生活化姿态 → 强调本真不修饰、避免西化五官与滤镜。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词。",
-                "formula_en": "Content order: East Asian female natural face → documentary photography style, natural skin and black hair → diffused natural light, clean and transparent → half-body eye level, casual living pose → emphasize authentic unadorned look, avoid westernized features and filters. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt."
+                "formula_zh": "内容组织顺序：超写实女性面部与半身肖像 → 高清写实摄影风格、皮肤肌理与发丝质感 → 柔和窗光与暖调氛围 → 浅景深特写、眼神平视 → 强调真实无磨皮、避免卡通与畸变。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词，肤质发丝高度细致。",
+                "formula_en": "Content order: photorealistic female face and half-body portrait → high-definition realistic photography style, skin texture and hair details → soft window light and warm tone → shallow depth close-up, eye-level gaze → emphasize real un-retouched skin, avoid cartoon and distortion. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt, highly detailed skin and hair texture."
             },
             "LongCat_Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹。",
-                "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks."
+"formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹，肤质发丝高度细致，纹理清晰可见。",
+                 "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks, highly detailed skin and hair with clear texture."
             },
             "HiDream-O1-Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：东亚女性主体与自然神态 → 场景与构图（半身平视生活化）→ 光影与氛围（自然光漫射清淡）→ 画种/摄影风格（纪实摄影）→ 需渲染文字用引号包裹。",
-                "formula_en": "Content order: East Asian female subject & natural expression → scene & composition (half-body eye level, casual) → light & atmosphere (diffused natural light) → art/photography style (documentary photography) → wrap rendered text in quotes."
+                "formula_zh": "内容组织顺序：超写实女性主体与神态表情 → 场景与构图（浅景深特写）→ 光影与氛围（柔和窗光暖调）→ 画种/摄影风格（高清写实摄影）→ 需渲染文字用引号包裹，肤质发丝高度细致。",
+                "formula_en": "Content order: photorealistic female subject & expression → scene & composition (shallow depth close-up) → light & atmosphere (soft window light, warm tone) → art/photography style (high-definition realistic photography) → wrap rendered text in quotes, highly detailed skin and hair texture."
             }
         }
 
@@ -167,14 +167,24 @@ All themes: User specified shot, pitch, horizontal angle take priority; no auto 
         # 双输出格式指引，严格对齐素材output_format_suffix规范
         self.format_guide = {
             "natural": {
-                "zh": "【自然段落模式】2-3段连贯文字：首段实体场景与具象光源氛围；次段完整动态+细微情绪神态；末段肤色、雀斑、面料色彩细节，300-600字，全程禁用mm/f/光圈焦距等数字光学参数。",
-                "en": "[Natural Paragraph Mode] 2-3 coherent paragraphs: scene & light atmosphere; full body movement & subtle expression; skin spot fabric color details, 300-600 words, no optical digital parameters at all."
+                "zh": """【自然段落模式】4-5段连贯文字，严格按以下顺序组织，全程禁用mm/f/光圈/焦距/ISO等数字光学参数，300-800字纯画面描写：
+
+第一段·景别与构图：明确拍摄类型（日常生活快照/街头抓拍/室内生活/户外纪实等）与视角构图方式（非常规视角/平视/俯拍/仰拍/随手一拍等），交代画面整体取景范围与空间感。
+
+第二段·光影氛围：具体描述实体光源类型与方向（强烈斜阳/柔和窗光/阴天漫射/霓虹灯光/混合光源等），以及光线在人物头发、肌肤、衣物上的视觉效果（光影斑驳/动态光斑/边缘发光/柔化光晕/高光溢出/胶片颗粒感/粒子散落/动态模糊边缘/明暗渐变过渡/HDR高动态/高饱和强对比等），用定性光影语汇替代光学数值。
+
+第三段·人物姿态与神情：完整描述头部、躯干、四肢的具体姿态（站/坐/蹲/倚靠/行走/手持道具等），视线方向与镜头关系，面部表情神态（恬静/灵动/俏皮/沉思/微笑等），以及风吹发丝飘动等动态细节。
+
+第四段·面部细节与发型妆造：精细刻画面部五官特征（脸型/眼型/唇色/肤质），皮肤质感（白皙细腻/毛孔/雀斑/光泽），妆容风格（清新淡妆/裸妆等），发型发色与固定方式（马尾/披散/发夹/编发等）。
+
+第五段·服饰配件与环境：描述穿搭细节（衣款/面料/颜色/花纹/配饰如项链耳环等），互动道具（饮品/玩偶/书籍等），以及所处环境场景（室内/户外/水边/街景等），含远景元素（树木/山丘/建筑等），最后以画面整体色调氛围收尾。""",
+                "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, no optical numeric parameters, 300-800 words pure visual: 1) Shot type & composition (snapshot/street candid/indoor daily/outdoor documentary, angle/framing); 2) Lighting atmosphere (physical source type, direction, effects on hair/skin/clothing: dappled light, dynamic spots, rim glow, soft haze, highlight bloom, film grain, particles, motion blur edges, HDR, high saturation contrast); 3) Full pose & expression (head/torso/limbs position, gaze direction, facial emotion, dynamic details like wind-blown hair); 4) Face details & styling (facial features, skin texture, makeup style, hairstyle with accessories); 5) Outfit accessories & environment (clothing details, props, scene setting with background elements, overall color tone)."
             },
             "structured": {
-                "zh": """【结构化模式】固定输出顺序：
-1.类别风格定位
-2.全局强制肤质约束（面部基础/皮肤肌理/毛发细节）
-3.画面构图（视觉引导/主体占比/画幅/精简约束）
+                "zh": """【结构化模式】严格顺序输出：
+1.人种五官轮廓特征
+2.风格与服饰造型定位
+3.肤质与毛发原生细节
 4.三维度镜头视角与构图
    - 画面比例：竖版人像（4:5/3:4）/ 横版环境人像（16:9/3:2）/ 方形（1:1）
    - 距离维度（景别）：微距特写 / 标准特写 / 肩特写 / 七分人像 / 九分人像 / 全景人像，对应叙事重心与细节展现层级
@@ -204,22 +214,22 @@ All themes: User specified shot, pitch, horizontal angle take priority; no auto 
    - 光源方向：正侧光45°/90°侧光/逆光轮廓/顶光戏剧/底光诡异/窗光网格投影
    - 光质软硬：硬光（清晰边缘阴影）/柔光（渐变过渡阴影）/散射光（均匀无影）
    - 环境光：补光比例、反光板效果、环境反射色调
+   - 光影特效：光影斑驳/动态光斑/边缘发光/柔化光晕/胶片颗粒感/明暗渐变过渡/HDR高动态/高饱和强对比
 8.背景与环境
    - 虚化程度：奶油般化开（f/1.4-1.8极致虚化）/ 柔美光斑（f/2.8光斑）/ 环境可辨（f/4-5.6）
    - 环境呼应：色彩呼应（背景与服装色调统一）/ 光影呼应（环境光与主光协调）
    - 负空间：眼神方向留白（看向处留空间）/ 呼吸空间（头顶/两侧留白）
-9.【技术参数建议】仅structured模式可输出，natural模式禁用；允许完整相机参数描述（焦距、光圈、快门速度、ISO、白平衡），附带空间效果释义：
-- 古风汉服/婚纱礼服：85mm中长焦，f/2.8-f/4光圈，1/125s-1/250s快门，ISO200-800，摄影机远离主体，背景相对放大并靠近主体，柔化背景突出服饰质感
-- 日系校园/街头潮牌：35mm小广角，f/2.8-f/4光圈，1/250s-1/500s快门，ISO100-400，摄影机较近靠近主体，适度强化近大远小，背景层次丰富，近距离临场抓拍
-- 职场通勤/运动健身：50mm标准中焦，f/4-f/5.6光圈，1/125s-1/250s快门，ISO200-800，摄影机与主体保持常规距离，近大远小效果自然，背景与主体比例协调
-- 泳装/艺术人体：50mm-85mm，f/2.8-f/4光圈，1/200s-1/500s快门，ISO100-400，自然透视或优雅压缩
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许完整相机参数描述（焦距、光圈、快门速度、ISO、白平衡），附带空间效果释义：
+- 特写面部肤质毛孔：85mm-100mm中长焦，f/1.4-f/2.8大光圈，1/200s-1/500s快门，ISO100-400，背景虚化柔和，突出面部细节
+- 半身杂志感人像：85mm中长焦，f/2.8-f/4光圈，1/125s-1/250s快门，ISO200-800，压缩空间突出人物主体
+- 全身环境人像：50mm标准中焦，f/4-f/5.6光圈，1/60s-1/125s快门，ISO100-200，与主体保持常规距离，背景与主体比例协调
 - 动态抓拍：200mm长焦，f/2.8-f/4光圈，1/1000s-1/4000s高速快门，ISO400-1600，冻结高速运动瞬间
-- 蓝调时刻/夜景：35mm-50mm，f/1.4-f/2大光圈，1/30s-1/60s慢速快门，ISO800-3200，捕捉低光环境氛围
-10.风格标签+画面收尾精简约束""",
-                "en": """[Structured Mode] Fixed output order:
-1. Category positioning
-2. Global mandatory skin constraints (face base / skin texture / hair details)
-3. Composition (visual guide / subject ratio / aspect ratio / cleanup limit)
+- 蓝调时刻/夜景：35mm-50mm，f/1.4-f/2大光圈，1/30s-1/60s慢速快门，ISO800-3200，捕捉低光环境氛围""",
+                "en": """[Structured Mode] Output strictly in this order:
+1. Ethnic facial features
+2. Style and clothing positioning
+3. Skin and hair natural details
 4. Three-dimensional camera view and composition
    - Aspect ratio: vertical portrait (4:5/3:4) / horizontal environmental (16:9/3:2) / square (1:1)
    - Distance (shot type): macro close-up / standard close-up / shoulder shot / three-quarter portrait / nine-tenth portrait / full-scene portrait, mark narrative focus
@@ -249,16 +259,16 @@ All themes: User specified shot, pitch, horizontal angle take priority; no auto 
    - Light direction: 45° side / 90° side / backlit outline / top dramatic / bottom eerie / window grid projection
    - Light quality: hard (clear edge shadow) / soft (gradual transition) / diffused (even shadowless)
    - Ambient light: fill light ratio, reflector effect, environmental reflection tone
+   - Lighting effects: dappled light / dynamic light spots / rim glow / soft haze / highlight bloom / film grain / particles / motion blur edges / gradient transition / HDR / high saturation contrast
 8. Background & Environment
    - Bokeh: creamy smooth (f/1.4-1.8 extreme blur) / beautiful light orbs (f/2.8 bokeh) / environment discernible (f/4-5.6)
    - Environment echo: color echo (background-clothing tone unity) / lighting echo (ambient light-key light coordination)
    - Negative space: gaze direction留白 (space where looking) / breathing room (headroom/sides margin)
-9. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative focal length/aperture description with spatial effect explanation, shutter/ISO/white balance numerical parameters forbidden:
-- Ancient Hanfu/wedding dress: 85mm medium telephoto, camera away from subject, background enlarged and closer to subject, softening background to highlight clothing texture
-- Japanese campus/street fashion: 35mm small wide-angle, camera closer to subject, moderate near-far perspective, rich background layers, close-up immersive capture
-- Workplace commute/sports fitness: 50mm standard mid-range, natural distance from subject, natural near-far effect, balanced subject-background ratio
-- Swimwear/artistic nude: 50mm-85mm, natural perspective or elegant compression
-10. Style tags + frame cleanup rules"""
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative focal length/aperture description with spatial effect explanation, shutter/ISO/white balance numerical parameters forbidden:
+- Close-up facial skin pores: 85mm-100mm medium telephoto, camera away from subject, soft background blur, highlighting facial details
+- Half-body magazine portrait: 85mm medium telephoto, compressed space highlighting subject
+- Full-body environmental portrait: 50mm standard mid-range, natural distance from subject, balanced subject-background ratio"""
             }
         }
 

@@ -21,68 +21,68 @@ class ThickPaintRole:
             "Flux1": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：整体画面构图景别 → 角色姿态表情 → 风格质感与光影 → 场景氛围。侧重手绘/3D材质叙事，弱化细碎关键词堆砌，画面层次完整。",
-                "formula_en": "Content order: overall composition & shot → character pose & expression → texture and lighting → scene atmosphere. Focus on hand-painted/3D material narration."
+                "formula_zh": "内容组织顺序：整体画面构图景别 → 角色姿态表情 → 风格质感与光影 → 场景氛围。侧重手绘/3D材质叙事，弱化细碎关键词堆砌，画面层次完整，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: overall composition & shot → character pose & expression → texture and lighting → scene atmosphere. Focus on hand-painted/3D material narration, highly detailed skin and hair texture."
             },
             "Flux2_klein": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：3D 角色（装备、材质、五官）→ 次世代厚涂与 PBR 质感 → 戏剧化布光与特效 → 三分法或动态低角、强调体积",
-                "formula_en": "Content order: 3D character (equipment, material, facial features) → next-gen thick paint and PBR texture → dramatic lighting and effects → rule of thirds or dynamic low angle, emphasizing volume"
+                "formula_zh": "内容组织顺序：3D 角色（装备、材质、五官）→ 次世代厚涂与 PBR 质感 → 戏剧化布光与特效 → 三分法或动态低角、强调体积，逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: 3D character (equipment, material, facial features) → next-gen thick paint and PBR texture → dramatic lighting and effects → rule of thirds or dynamic low angle, emphasizing volume, realistic, highly detailed skin and hair texture"
             },
             "Z_image": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：3D 角色主体（装备、材质、五官）→ 次世代厚涂与 PBR 质感 → 戏剧化布光与特效氛围 → 三分法或动态低角、强调体积（需渲染文字直接写入，支持中英双语）。",
-                "formula_en": "Content order: 3D character subject (equipment, material, facial features) → next-gen thick paint and PBR texture → dramatic lighting and effects atmosphere → rule of thirds or dynamic low angle, emphasizing volume (write any rendered text directly, supports Chinese and English). Negative prompt provided by preset template."
+                "formula_zh": "内容组织顺序：3D 角色主体（装备、材质、五官）→ 次世代厚涂与 PBR 质感 → 戏剧化布光与特效氛围 → 三分法或动态低角、强调体积（需渲染文字直接写入，支持中英双语），逼真，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: 3D character subject (equipment, material, facial features) → next-gen thick paint and PBR texture → dramatic lighting and effects atmosphere → rule of thirds or dynamic low angle, emphasizing volume (write any rendered text directly, supports Chinese and English), realistic, highly detailed skin and hair texture."
             },
             "Qwen_Image2512": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：角色身份、装备与厚涂笔触特征 → 风格与画质（次世代 CG、立体笔触与材质） → 戏剧性光效塑造体积与金属/布料质感 → 三分法或动态构图、景深突出角色 →（需渲染文字直接写入提示词，支持中英双语）",
-                "formula_en": "Content order: character identity, equipment and thick paint brushwork features → style & quality (next-gen CG, three-dimensional brushwork and material) → dramatic lighting shaping volume and metal/fabric texture → rule of thirds or dynamic composition, depth of field highlighting character → (write any rendered text directly into the prompt, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：角色身份、装备与厚涂笔触特征 → 风格与画质（次世代 CG、立体笔触与材质） → 戏剧性光效塑造体积与金属/布料质感 → 三分法或动态构图、景深突出角色 →（需渲染文字直接写入提示词，支持中英双语），皮肤和头发纹理高度细致",
+                "formula_en": "Content order: character identity, equipment and thick paint brushwork features → style & quality (next-gen CG, three-dimensional brushwork and material) → dramatic lighting shaping volume and metal/fabric texture → rule of thirds or dynamic composition, depth of field highlighting character → (write any rendered text directly into the prompt, supports Chinese and English), highly detailed skin and hair texture"
             },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：情绪光影氛围 → 人物体态情绪 → 风格质感细节 → 服饰面料 → 极简布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: emotional lighting atmosphere → body pose and emotion → style texture details → clothing fabric → minimalist set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：景别构图（特写/半身/全身）→ 人物主体（发型发色、五官特征、神情表情、姿态动作）→ 服饰配件（衣款面料、配饰道具）→ 光影氛围（情绪光影、艺术光效）→ 环境场景（所处空间、远景元素）→ 风格（画面风格定位）→ 画质（浅景深虚化/柔焦/锐化）→ 极简布景（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: shot composition (close-up/half-body/full-body) → subject (hairstyle, facial features, expression, pose) → outfit & accessories (clothing, props) → lighting atmosphere (emotional lighting, artistic effects) → environment (space, background elements) → style (image style) → quality (shallow DOF/soft focus/sharpness) → minimalist set (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
             },
             "Boogu": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：整体画面基调 → 人物松弛姿态 → 专属质感表现 → 简约留白环境",
-                "formula_en": "Content order: overall image tone → relaxed character pose → exclusive texture performance → simple blank environment"
+                "formula_zh": "内容组织顺序：整体画面基调 → 人物松弛姿态 → 专属质感表现 → 简约留白环境，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: overall image tone → relaxed character pose → exclusive texture performance → simple blank environment, highly detailed skin and hair texture"
             },
             "Mage_Flow": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：面部五官人体结构、装备造型 → 体态姿态 → 光影层次、戏剧光效 → 服饰材质细节 → 轻量环境（密集关键词，中英术语并列）",
-                "formula_en": "Content order: facial features and body structure, equipment design → body pose → lighting layers, dramatic light effects → clothing material details → lightweight environment (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：面部五官人体结构、装备造型 → 体态姿态 → 光影层次、戏剧光效 → 服饰材质细节 → 轻量环境（密集关键词，中英术语并列），皮肤和头发纹理高度细致",
+                "formula_en": "Content order: facial features and body structure, equipment design → body pose → lighting layers, dramatic light effects → clothing material details → lightweight environment (dense keywords, Chinese-English terms in parallel), highly detailed skin and hair texture"
             },
             "ERNIE_Image": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：角色身份、装备与厚涂笔触特征 → 风格与画质（次世代 CG、立体笔触与材质） → 戏剧性光效塑造体积与金属/布料质感 → 三分法或动态构图、景深突出角色 →（需渲染文字直接写入提示词，支持中英双语）",
-                "formula_en": "Content order: character identity, equipment and thick-paint brush features → style & quality (next-gen CG, three-dimensional brush and material) → dramatic lighting sculpting volume with metal/fabric texture → rule-of-thirds or dynamic composition, depth of field highlighting character → (write any rendered text directly into the prompt, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：角色身份、装备与厚涂笔触特征 → 风格与画质（次世代 CG、立体笔触与材质） → 戏剧性光效塑造体积与金属/布料质感 → 三分法或动态构图、景深突出角色 →（需渲染文字直接写入提示词，支持中英双语），皮肤和头发纹理高度细致",
+                "formula_en": "Content order: character identity, equipment and thick-paint brush features → style & quality (next-gen CG, three-dimensional brush and material) → dramatic lighting sculpting volume with metal/fabric texture → rule-of-thirds or dynamic composition, depth of field highlighting character → (write any rendered text directly into the prompt, supports Chinese and English), highly detailed skin and hair texture"
             },
             "GLM_Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：3D 角色头部与半身 → 次世代厚涂风格、PBR 材质与雕刻细节 → 三光源戏剧光、史诗氛围 → 近景特写、动态角度 → 强调高完成度无破面、避免低模感。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词。",
-                "formula_en": "Content order: 3D character head and half body → next-gen thick paint style, PBR material and sculpting detail → three-light dramatic lighting, epic atmosphere → close-up shot, dynamic angle → emphasize high completion without broken surfaces, avoid low-poly feel. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt."
+                "formula_zh": "内容组织顺序：3D 角色头部与半身 → 次世代厚涂风格、PBR 材质与雕刻细节 → 三光源戏剧光、史诗氛围 → 近景特写、动态角度 → 强调高完成度无破面、避免低模感。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: 3D character head and half body → next-gen thick paint style, PBR material and sculpting detail → three-light dramatic lighting, epic atmosphere → close-up shot, dynamic angle → emphasize high completion without broken surfaces, avoid low-poly feel. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt, highly detailed skin and hair texture."
             },
             "LongCat_Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹。",
-                "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks."
+                "formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks, highly detailed skin and hair texture."
             },
             "HiDream-O1-Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：3D 角色主体与五官装备 → 场景与构图（近景特写动态角度）→ 光影与氛围（三光源戏剧光史诗）→ 画种/摄影风格（次世代厚涂PBR材质）→ 需渲染文字用引号包裹。",
-                "formula_en": "Content order: 3D character subject & facial equipment → scene & composition (close-up, dynamic angle) → light & atmosphere (three-light dramatic, epic) → art/photography style (next-gen thick paint PBR material) → wrap rendered text in quotes."
+                "formula_zh": "内容组织顺序：3D 角色主体与五官装备 → 场景与构图（近景特写动态角度）→ 光影与氛围（三光源戏剧光史诗）→ 画种/摄影风格（次世代厚涂PBR材质）→ 需渲染文字用引号包裹，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: 3D character subject & facial equipment → scene & composition (close-up, dynamic angle) → light & atmosphere (three-light dramatic, epic) → art/photography style (next-gen thick paint PBR material) → wrap rendered text in quotes, highly detailed skin and hair texture."
             }
         }
 
@@ -151,77 +151,107 @@ All themes strictly follow semantic weight priority: character structure & mater
 
         self.format_guide = {
             "natural": {
-                "zh": "【自然段落模式】2-4段连贯文字：首段总述构图与景别；次段详述角色姿态与表情；第三段描写风格化质感与光影（厚涂强调笔触色彩，3DCG强调材质光影）；末段补充场景氛围；总字数300-600字，语言富有画面感文学性，无额外解释。",
-                "en": "[Natural Paragraph Mode] 2-4 coherent paragraphs: first paragraph composition & shot; second paragraph character pose & expression; third paragraph stylized texture & lighting (stroke & color for thick paint, material & physical light for 3DCG); final paragraph scene atmosphere; 300-600 words, literary visual language without extra explanation."
+                "zh": """【自然段落模式】4-5段连贯文字，严格按以下顺序组织，300-800字纯画面描写：
+
+第一段·景别与构图：明确拍摄类型（电影海报/游戏原画/角色立绘/场景插画等）与视角构图方式（低角度仰拍/平视/俯拍/动态斜侧等），交代画面整体取景范围与空间感。
+
+第二段·光影氛围：具体描述光源类型与方向（戏剧性侧光/逆光轮廓/霓虹光效/魔法光效/自然光等），以及光影在角色、材质、环境上的视觉效果（体积光影/边缘发光/高光溢出/粒子特效/光斑流动等），用定性光影语汇替代光学数值。
+
+第三段·角色姿态与神情：完整描述头部、躯干、四肢的具体姿态（战斗/站立/施法/持武器等），视线方向，面部表情神态（威严/冷峻/温柔/狂野等），以及衣袂发丝飘动等动态细节。
+
+第四段·角色细节与材质：精细刻画角色五官特征、发型发色，风格化质感细节（厚涂笔触/3DCG材质/PBR金属度/次表面散射皮肤等），服饰装备细节（盔甲/法袍/饰品/纹理等）。
+
+第五段·环境场景与氛围：描述所处环境场景（奇幻战场/赛博都市/古风仙境/科幻空间等），远景元素（山脉/建筑/天空/特效等），以及画面整体色调氛围（史诗感/梦幻/暗黑/高饱和等）收尾。""",
+                "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, 300-800 words pure visual: 1) Shot & composition (movie poster/game art/character illustration, low angle/eye-level/dynamic tilt); 2) Lighting atmosphere (dramatic side light/rim backlight/neon/magic effects, volume lighting, edge glow, particles); 3) Character pose & expression (combat/stand/cast spell, gaze, facial emotion, robes/hair flowing); 4) Character details & material (facial features, hairstyle, stylized texture: thick paint brush/PBR/SSS skin, costume equipment details); 5) Environment & atmosphere (fantasy battlefield/cyber city/immortal realm, background elements, overall color tone)."
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1. 类别：厚涂/3DCG写实人像
-2. 风格模式：次世代写实/厚涂插画/二次元厚涂/奇幻史诗/古风仙侠/赛博朋克/科幻未来
-   - 次世代写实：PBR材质物理光照，超写实毛孔毛发，电影级景深与色彩科学
-   - 厚涂插画：可见笔触肌理，色彩饱和浓郁，体积感强调，非写实光影逻辑
-   - 二次元厚涂：大眼睛精致五官，日系赛璐璐上色+厚涂体积感，高饱和动漫配色
-   - 半写实二次元：保留二次元大眼睛精致五官，但皮肤质感真实通透，光影符合物理逻辑，介于二次元与写实之间，兼具动漫美感与真实质感
-   - 奇幻史诗：史诗感大场景，奇幻生物/盔甲/魔法特效，暗调戏剧性光影
-   - 古风仙侠：水墨留白意境，飘逸衣袂发丝，东方色彩体系（朱砂/石青/藤黄）
-   - 赛博朋克：霓虹光污染，潮湿反光表面，机械义体改造，暗色调+高饱和霓虹
-   - 科幻未来：极简流线造型，全息投影界面，冷调金属质感，未来科技光效
-3. 三维度镜头视角与构图
-   - 距离维度（景别）：微距特写 / 标准特写 / 肩特写 / 七分人像 / 九分人像 / 全景人像，对应叙事重心与细节展现层级
-   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注主体展现效果与叙事特点
-   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角，对应心理感受与画面张力
-   - 景深氛围：浅景深柔焦虚化 / 中景深环境兼顾 / 深景深全景清晰，标注虚实层次对应的主次关系
-4. 角色信息：外貌、姿态、表情、服装
+1.角色种族轮廓特征
+2.风格化角色身份定位
+3.风格化材质与毛发细节
+4.三维度镜头视角与构图
+   - 画面比例：竖版角色立绘（4:5/3:4）/ 横版场景插画（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：面部特写 / 半身立绘 / 九分人像 / 全身动态 / 场景全景，对应角色叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注角色展现效果与叙事特点
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角 / 强仰视角（低角度延伸），对应角色气势与画面张力
+   - 景深氛围：浅景深角色突出 / 中景深环境兼顾 / 深景深全景清晰，标注虚实层次对应的主次关系
+5.姿态体态与表情神态
    - 头部姿态：微侧/仰头/低头/回眸，颈部线条与视线方向
-   - 躯干姿态：挺直/放松/前倾/后仰，肩线角度与身体重心
-   - 上肢姿态：手臂弯曲角度、手部摆放位置（叉腰/托腮/自然下垂/手持武器道具）
-   - 下肢姿态：站姿重心分配、坐姿腿部交叠、动态战斗/静止站立
+   - 躯干姿态：挺直/放松/战斗姿态/施法姿势，肩线角度与身体重心
+   - 上肢姿态：手臂弯曲角度、手部摆放位置（持武器/施法手势/自然下垂）
+   - 下肢姿态：站姿重心分配、战斗步伐、腾空姿态、静止支撑
    - 表情神态：眼神聚焦方向、嘴角弧度、眉宇情绪（威严/冷峻/温柔/狂野）
-5. 风格化质感：厚涂笔触/3DCG材质细节
-   - 厚涂笔触：可见笔触方向、色彩叠加层次、边缘虚实过渡
-   - 3DCG材质：PBR金属度/粗糙度、次表面散射皮肤、各向异性高光
-6. 光影与氛围：主光、边缘光、环境光、特效光
-7. 艺术风格：画风标签、氛围关键词
-8. 风格标签：3-5个关键词概括整体视觉气质
-9.【技术参数建议】仅structured模式可输出，natural模式禁用；允许完整相机参数描述（焦距、光圈、快门速度、ISO、白平衡），附带空间效果释义：
-   - 奇幻史诗/科幻：50mm标准中焦，f/4-f/5.6光圈，1/125s-1/250s快门，ISO400-1600，与主体保持常规距离，展示完整装备与环境
-   - 古风仙侠/二次元厚涂：85mm中长焦，f/2.8-f/4光圈，1/125s-1/250s快门，ISO200-800，摄影机远离主体，背景虚化突出角色五官
-   - 特写面部细节：85mm-100mm中长焦，f/1.8-f/2.8光圈，1/160s-1/320s快门，ISO100-400，聚焦PBR材质与厚涂笔触细节
-   - 动态抓拍：200mm长焦，f/2.8-f/4光圈，1/1000s-1/4000s高速快门，ISO400-1600，冻结高速运动瞬间
-   - 蓝调时刻/夜景：35mm-50mm，f/1.4-f/2大光圈，1/30s-1/60s慢速快门，ISO800-3200，捕捉低光环境氛围""",
+5.1 角色专属细节（仅角色类使用）
+   - 眼神光：魔法光效（眼瞳发光）/ 自然反射（环境光映射）/ 战斗光芒（高亮聚焦）
+   - 材质质感：厚涂笔触（可见笔触方向/色彩叠加/边缘虚实）/ PBR金属度（粗糙度/反射率）/ 次表面散射皮肤（通透质感）
+   - 发丝质感：根根分明（发丝清晰可见）/ 动态飘逸（魔法飘动）/ 蓬松空气感（发量充盈）
+   - 面部光影：高光区（额头/鼻梁/颧骨提亮）/ 中间调（面颊/下巴自然过渡）/ 阴影区（鼻翼侧/脸颊侧立体）
+6.色彩配比与整体调性
+   - 主色调：占比70%，奠定整体基调（暖调/冷调/中性）
+   - 辅助色：占比25%，丰富层次与环境过渡
+   - 点缀色：占比5%，制造视觉焦点与细节提亮
+   - 色温情绪：暖调（3200K-4500K）=史诗/战斗/热烈；冷调（5500K-7000K）=暗黑/神秘/冷峻；中性（5000K-5500K）=自然/真实
+   - 饱和度：低饱和=高级/文艺/复古；中饱和=自然/真实；高饱和=活力/奇幻/冲击
+7.专业布光方式与光影层次
+   - 主光类型：伦勃朗光（鼻翼三角光影）/蝴蝶光（鼻下对称阴影）/侧光（明暗分割）/戏剧性侧光（体积光影）
+   - 光源方向：正侧光45°/90°侧光/逆光轮廓/顶光戏剧/魔法光效/霓虹灯光
+   - 光质软硬：硬光（清晰边缘阴影）/柔光（渐变过渡阴影）/散射光（均匀无影）
+   - 环境光：补光比例、魔法光效、环境反射色调
+   - 光影特效：体积光影/边缘发光/粒子特效/胶片颗粒感/明暗渐变过渡/HDR高动态/高饱和强对比
+8.背景与环境
+   - 虚化程度：奶油般化开（极致虚化）/ 柔美光斑（光斑效果）/ 环境可辨（环境清晰）
+   - 环境呼应：色彩呼应（背景与角色色调统一）/ 光影呼应（环境光与主光协调）
+   - 负空间：视线方向留白（看向处留空间）/ 呼吸空间（头顶/两侧留白）
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许完整相机参数描述（焦距、光圈、快门速度、ISO、白平衡），附带空间效果释义：
+- 特写面部材质细节：85mm-100mm中长焦，f/1.4-f/2.8大光圈，突出材质笔触与皮肤质感
+- 半身角色立绘：85mm中长焦，f/2.8-f/4光圈，压缩空间突出角色主体
+- 全身动态场景：35mm-50mm，f/4-f/5.6光圈，保持角色与环境比例协调
+- 史诗场景全景：24mm广角，f/8-f/11光圈，深景深全景清晰，展现宏大世界观""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Category: Thick paint / 3DCG realistic portrait
-2. Style Mode: Sub-era realism / thick illustration / anime thick paint / fantasy epic / ancient xianxia / cyberpunk / sci-fi future
-   - Sub-era realism: PBR material physical lighting, ultra-realistic pores & hair, cinematic DOF & color science
-   - Thick illustration: visible brush texture, saturated rich colors, volume emphasis, non-realistic lighting logic
-   - Anime thick paint: big eyes refined features, cel-shading + thick volume, high saturation anime palette
-   - Semi-realistic anime: retains anime big eyes refined features, but skin texture realistic and translucent, lighting follows physical logic, between anime and realistic, combining anime aesthetics with real texture
-   - Fantasy epic: epic grand scene, fantasy creatures/armor/magic effects, dark dramatic lighting
-   - Ancient xianxia: ink wash blank space, flowing robes & hair, eastern color system (vermillion/azurite/gamboge)
-   - Cyberpunk: neon light pollution, wet reflective surfaces, cybernetic implants, dark tone + high saturation neon
-   - Sci-fi future: minimalist streamlined design, holographic interface, cold metallic texture, futuristic light effects
-3. Three-dimensional camera view and composition
-   - Distance (shot type): macro close-up / standard close-up / shoulder shot / three-quarter portrait / nine-tenth portrait / full-scene portrait, mark narrative focus
+1. Character racial features
+2. Stylized character identity
+3. Stylized material and hair details
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical character art (4:5/3:4) / horizontal scene illustration (16:9/3:2) / square (1:1)
+   - Distance (shot type): facial close-up / half-body art / nine-tenth portrait / full-body dynamic / scene panorama, mark narrative focus
    - Horizontal view: front / three-quarter / profile, describe display effect & narrative feature
-   - Vertical pitch: slight high-angle / eye-level / slight low-angle, describe mental feeling & frame tension
-   - Depth of field: shallow DOF soft bokeh / medium DOF environment balanced / deep DOF full sharpness
-4. Character Info: Appearance, pose, expression, costume
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle / strong low-angle, describe character presence & frame tension
+   - Depth of field: shallow DOF character focus / medium DOF environment balanced / deep DOF full sharpness
+5. Pose body and expression
    - Head pose: slight tilt/up/down/turn back, neck line & gaze direction
-   - Torso pose: upright/relaxed/lean forward/back, shoulder angle & body weight
-   - Upper limb: arm bend angle, hand placement (on waist/under chin/hanging/holding weapons props)
-   - Lower limb: standing weight distribution/leg cross sitting/dynamic combat/static standing
+   - Torso pose: upright/relaxed/combat/casting, shoulder angle & body weight
+   - Upper limb: arm bend angle, hand placement (weapon/magic gesture/hanging)
+   - Lower limb: standing weight distribution/combat stance/floating/static support
    - Expression: eye focus direction, mouth curve, brow emotion (majestic/cold/gentle/wild)
-5. Stylized Texture: Brush stroke details for thick paint / material details for 3DCG
-   - Thick paint brush: visible brush direction, color layering, edge soft-hard transition
-   - 3DCG material: PBR metalness/roughness, subsurface scattering skin, anisotropic highlights
-6. Lighting & Atmosphere: Key light, rim light, ambient light, special effect light
-7. Art Style: Painting tag, atmosphere keywords
-8. Style Tags: 3-5 keywords to summarize overall visual temperament
-9.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Fantasy epic/Sci-fi: 50mm standard mid-telephoto, maintain normal distance from subject, show complete equipment and environment
-   - Ancient xianxia/Anime thick paint: 85mm mid-telephoto, camera far from subject, background blur highlights facial features
-   - Close-up facial details: 85mm-100mm mid-telephoto, focus on PBR material and thick paint brush details"""
-            }
+5.1 Character-specific details (character only)
+   - Eye glow: magic glow (eye pupil luminous) / natural reflection (environment mapping) / combat gleam (highlight focus)
+   - Material texture: thick paint brush (visible brush direction/color overlay/edge虚实) / PBR metallic (roughness/reflection) / subsurface scattering skin (translucent)
+   - Hair texture: strand-defined (individual hairs visible) / dynamic flowing (magic movement) / fluffy airy (voluminous)
+   - Facial lighting: highlight zone (forehead/nose bridge/cheekbone brightening) / midtone (cheek/chin natural transition) / shadow zone (nose side/cheek side dimension)
+6. Color ratio and overall tone
+   - Main Color: 70%, set overall tone (warm/cool/neutral)
+   - Auxiliary Color: 25%, enrich hierarchy & environment transition
+   - Accent Color: 5%, create visual focal point & detail highlight
+   - Color temperature mood: warm (3200K-4500K) = epic/combat/intense; cool (5500K-7000K) = dark/mysterious/cold; neutral (5000K-5500K) = natural/true
+   - Saturation: low saturation = high-end/artistic/retro; medium = natural/true; high = vibrant/fantasy/impact
+7. Professional lighting method
+   - Key light type: dramatic side light (volume lighting) / Rembrandt / butterfly / ring light
+   - Light direction: 45° side / 90° side / backlit outline / top dramatic / magic glow / neon
+   - Light quality: hard (clear edge shadow) / soft (gradual transition) / diffused (even shadowless)
+   - Ambient light: fill light ratio, magic light effects, environmental reflection tone
+   - Lighting effects: volume lighting / edge glow / particle effects / light spots / highlight bloom / film grain / motion blur edges / gradient transition / HDR / high saturation contrast
+8. Background & Environment
+   - Bokeh: creamy smooth (extreme blur) / beautiful light orbs / environment discernible
+   - Environment echo: color echo (background-character tone unity) / lighting echo (ambient light-key light coordination)
+   - Negative space: gaze direction留白 / breathing room (headroom/sides margin)
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative focal length/aperture description with spatial effect explanation, shutter/ISO/white balance numerical parameters forbidden:
+- Facial material close-up: 85mm-100mm medium telephoto, camera away from subject, highlighting brush texture and skin detail
+- Half-body character art: 85mm medium telephoto, compressed space highlighting character
+- Full-body dynamic scene: 35mm-50mm, balanced character-environment ratio
+- Epic scene panorama: 24mm wide-angle, deep DOF full sharpness, showcasing grand worldview"""
+            },
         }
 
     def detect_language(self, text: str) -> str:

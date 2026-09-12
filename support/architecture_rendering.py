@@ -46,8 +46,8 @@ class ArchitectureRendering:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全天光氛围基调 → 建筑尺度形体情绪 → 外立面材质景观细节 → 铺装植被肌理 → 极简远景布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: global daylight atmosphere tone → building scale and form emotion → facade material and landscape details → pavement and vegetation texture → minimalist distant set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全天光氛围基调 → 建筑尺度形体情绪 → 外立面材质景观细节 → 铺装植被肌理 → 极简远景布景（密集关键词，中英术语并列），建筑材质高度细致，材质肌理真实呈现",
+                "formula_en": "Content order: global daylight atmosphere tone → building scale and form emotion → facade material and landscape details → pavement and vegetation texture → minimalist distant set (dense keywords, Chinese-English terms in parallel), highly detailed architectural material, realistic texture presentation"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -157,65 +157,69 @@ All themes: User-specified content highest priority, only supplement volume, tex
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.建筑品类、设计风格与全局正向约束
-2.画面构图、视觉引导、建筑主体占比、画幅比例、精简约束
-3.三维观看景别视角：远近距离、水平朝向、垂直俯仰、景深虚实
-4.建筑整体体量、体块组合、屋顶形制与虚实关系
-5.外立面主材、肌理质感、不同材质对比过渡
-6.天光类型、光线色温方向、阴影特征、天空氛围
-7.庭院布局、铺装、水景、克制景观小品
-8.乔木/灌木/地被分层绿植配置、绿植与建筑互动关系
-9.70/25/5色彩分层配比
-10.建筑透视与视角
-   - 人视角度：1.5-1.7米高度平视，自然真实
-   - 鸟瞰角度：高处俯视，展现整体布局
-   - 仰视角度：强调建筑高度与气势
-11.材质质感细化
-   - 玻璃：透明/磨砂/反射/折射
-   - 石材：大理石/花岗岩/砂岩纹理
-   - 金属：拉丝/镜面/氧化/锈蚀
-   - 木材：年轮/纹理/风化/油漆
-12.光影效果细化
-   - 日照角度：正午/午后/黄昏/清晨
-   - 阴影特征：硬阴影/软阴影/环境光遮蔽
-   - 反射效果：玻璃反射/水面反射/金属反射
-13.质感补充定性建议、全局禁止参数清单
-11.3-5个概括建筑园林气质风格标签
-12.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 现代别墅/商务写字楼：24mm-35mm广角，摄影机靠近主体，强化近大远小，展现建筑体量与透视
-   - 中式古建/日式庭院：35mm-50mm标准中焦，摄影机与主体保持常规距离，人视角度自然空间感
-   - 欧式建筑/全景：50mm-85mm中长焦，摄影机远离主体，压缩建筑与天空层次
-   - 园林景观：35mm-50mm，自然大气透视""",
+1.建筑品类与体量特征
+2.风格与设计定位
+3.外立面主材肌理
+4.三维度镜头视角与构图
+   - 画面比例：竖版建筑图（4:5/3:4）/ 横版全景图（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：外观全景 / 局部特写 / 鸟瞰 / 人视透视，对应建筑叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注建筑展现效果
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角 / 强仰视角（仰望建筑），对应建筑气势
+   - 景深氛围：浅景深局部突出 / 中景深环境兼顾 / 深景深全景清晰，标注虚实层次
+5.景观环境与庭院布局
+   - 分层绿植：乔木/灌木/地被/草坪
+   - 铺装材质：石材/木材/砾石/透水砖
+   - 水景元素：喷泉/泳池/镜面水池/溪流
+6.天光与阴影细节
+   - 天光类型：晴天直射/阴天漫射/黄金时刻/蓝调时刻
+   - 阴影层次：投射阴影/自阴影/环境光遮蔽
+   - 材质反光：玻璃反射/金属光泽/石材漫射
+7.整体风格与色彩意境
+   - 设计风格定位：现代/古典/极简/有机/参数化
+   - 色彩意境：材质本色/环境融合/冷暖对比
+   - 光影特效：天光氛围/阴影细节/光影斑驳/动态光斑/边缘发光/柔化光晕/明暗渐变过渡/HDR高动态
+8.画面品质与建筑感
+   - 写实程度：照片级/渲染级/手绘感
+   - 质感细节：材质肌理/光影层次/空间纵深
+   - 整体建筑感：宏伟/精致/现代/历史
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述镜头空间效果，禁用数值参数：
+- 外观全景：24mm-35mm广角，f/8-f/11光圈，深景深全景清晰，展现建筑全貌
+- 局部特写：85mm-200mm长焦，f/2.8-f/4光圈，突出材质肌理与构造细节
+- 鸟瞰全景：超广角/无人机视角，f/8-f/11光圈，展现建筑与环境关系
+- 人视透视：35mm-50mm标准镜头，f/4-f/5.6光圈，模拟人眼视角的真实感受""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Building category, design style & global positive constraints
-2. Frame composition, visual guide, building proportion, aspect ratio, simplification rule
-3. 3D viewing shot: distance, horizontal orientation, vertical pitch, depth blur
-4. Overall building volume, block combination, roof form & virtual-real contrast
-5. Main facade material, texture, cross-material transition contrast
-6. Skylight type, light color temperature & direction, shadow feature, sky atmosphere
-7. Courtyard layout, pavement, water feature, restrained ornaments
-8. Layered arbor/shrub/ground plant layout, plant-building interaction
-9. 70/25/5 layered color ratio
-10. Building perspective & viewing angle
-    - Human-eye view: 1.5-1.7m height eye-level, natural and real
-    - Bird's eye view: elevated俯视, reveal overall layout
-    - Low angle仰视: emphasize building height and grandeur
-11. Material texture refinement
-    - Glass: transparent/frosted/reflected/refracted
-    - Stone: marble/granite/sandstone texture
-    - Metal: brushed/mirror/oxidized/rusted
-    - Wood: annual rings/grain/weathered/painted
-12. Lighting effect refinement
-    - Sun angle: noon/afternoon/dusk/dawn
-    - Shadow character: hard shadow/soft shadow/ambient occlusion
-    - Reflection effect: glass reflection/water reflection/metal reflection
-13. Qualitative texture supplement suggestion, global forbidden param list
-11. 3-5 style tags summarizing building & garden temperament
-12.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Modern villa/Business office: 24mm-35mm wide angle, camera close to subject, emphasize near-far contrast, reveal building volume and perspective
-   - Chinese ancient building/Japanese courtyard: 35mm-50mm standard mid-telephoto, camera normal distance from subject, human-eye natural spatial feel
-   - European building/Panorama: 50mm-85mm mid-telephoto, camera far from subject, compress building and sky layers
-   - Garden landscape: 35mm-50mm, natural atmospheric perspective"""
+1. Building category and volume features
+2. Style and design positioning
+3. Facade main material texture
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical building (4:5/3:4) / horizontal panorama (16:9/3:2) / square (1:1)
+   - Distance (shot type): exterior panorama / detail close-up / aerial / eye-level perspective, mark narrative focus
+   - Horizontal view: front / three-quarter / profile, describe building display effect
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle / strong low-angle (looking up), describe building presence
+   - Depth of field: shallow DOF detail focus / medium DOF environment balanced / deep DOF full sharpness
+5. Landscape and courtyard layout
+   - Layered plants: trees/shrubs/ground cover/lawn
+   - Paving material: stone/wood/gravel/permeable brick
+   - Water features: fountain/pool/mirror pond/stream
+6. Skylight and shadow details
+   - Skylight type: direct sun/overcast/golden hour/blue hour
+   - Shadow layers: cast shadow/self-shadow/ambient occlusion
+   - Material reflection: glass reflection/metallic gloss/stone diffuse
+7. Overall style and color artistic conception
+   - Design style positioning: modern/classical/minimalist/organic/parametric
+   - Color artistic conception: material natural color/environment integration/warm-cool contrast
+   - Lighting effects: skylight atmosphere / shadow details / dappled light / dynamic light spots / rim glow / soft haze / gradient transition / HDR
+8. Image quality and architectural feel
+   - Realism level: photo-real / rendering / hand-drawn feel
+   - Texture details: material texture / light layers / spatial depth
+   - Overall architectural feel: grand/exquisite/modern/historical
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of lens spatial effects, no numeric parameters:
+- Exterior panorama: 24mm-35mm wide-angle, f/8-f/11 aperture, deep DOF full sharpness, showcasing building full view
+- Detail close-up: 85mm-200mm telephoto, f/2.8-f/4 aperture, highlighting material texture and construction details
+- Aerial panorama: super wide-angle/drone view, f/8-f/11 aperture, showcasing building-environment relationship
+- Eye-level perspective: 35mm-50mm standard lens, f/4-f/5.6 aperture, simulating human eye perspective"""
             }
         }
 

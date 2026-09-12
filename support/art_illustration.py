@@ -46,8 +46,8 @@ class ArtIllustration:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全局情绪光影基调 → 主体形体情感表达 → 画种笔触质感细节 → 纸张肌理面料 → 极简布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: global emotional lighting tone → subject form and emotion expression → painting-style brush texture details → paper texture and fabric → minimalist set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全局情绪光影基调 → 主体形体情感表达 → 画种笔触质感细节 → 纸张肌理面料 → 极简布景（密集关键词，中英术语并列），画种笔触高度细致，画面质感丰富细腻",
+                "formula_en": "Content order: global emotional lighting tone → subject form and emotion expression → painting-style brush texture details → paper texture and fabric → minimalist set (dense keywords, Chinese-English terms in parallel), highly detailed brush texture, rich and delicate image quality"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -156,67 +156,95 @@ All themes: User-specified content highest priority, only supplement brush/paper
         # 双输出格式指引
         self.format_guide = {
             "natural": {
-                "zh": "【自然段落模式】2-3段连贯文字：首段插画构图、画幅与整体主题情感基调；第二段主体造型、专属笔触与色彩分层；第三段全局光影、纸面肌理与画面意境；总字数300-600字，全程规避分辨率、DPI、画布尺寸等数字参数，手绘艺术化叙事语言，无额外解释。",
-                "en": "[Natural Paragraph Mode] 2-3 coherent paragraphs: illustration composition frame & overall theme emotion; subject shape exclusive brush & color layers; global light paper grain & artistic conception; 300-600 words, avoid resolution/DPI/canvas numeric params, hand-painted artistic narration without extra explanation."
+                "zh": """【自然段落模式】4-5段连贯文字，严格按以下顺序组织，300-800字纯画面描写：
+
+第一段·景别与构图：明确画种类型（水彩/油画/国画/数字插画/扁平/国潮等）与视角构图方式（满版/焦点/散点/留白等），交代画面整体取景范围与空间感。
+
+第二段·光影氛围：具体描述光源类型与方向（主观光影/自然光/戏剧光/氛围光等），以及光影在主体、材质、背景上的视觉效果（冷暖过渡/明暗渐变/光斑流动/粒子散落等），用定性光影语汇替代光学数值。
+
+第三段·主体造型与动态：完整描述核心主体（人物/动物/意象）的造型特征、姿态动态，面部表情神态，以及衣饰发丝飘动等动态细节。
+
+第四段·笔触质感与色彩：精细描写画种专属笔触（水彩透明叠加/油画厚涂堆叠/国画勾线渲染/数字笔刷压感等），线条质感，70/25/5分层色彩配比（主色/辅助色/点缀色），整体饱和度调性。
+
+第五段·环境场景与意境：描述所处环境场景（室内/户外/幻想空间等），远景元素（山水/建筑/天空等），纸面或画布肌理质感，以及画面整体意境氛围（治愈/梦幻/忧郁/活力等）收尾。""",
+                "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, 300-800 words pure visual: 1) Shot & composition (painting type: watercolor/oil/Chinese/digital/flat/guochao, composition: full-bleed/focal/scattered/blank); 2) Lighting atmosphere (subjective light/natural/dramatic/ambient, warm-cold transition, gradient, light spots, particles); 3) Subject造型 & motion (core subject features, pose, expression, flowing details); 4) Brush texture & color (painting-specific brushwork, 70/25/5 color ratio, saturation tone); 5) Environment & artistic conception (scene setting, background elements, paper/canvas texture, overall mood)."
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.插画品类、画种风格与全局正向约束
-2.画面构图、视觉引导、主体70%占比、画幅比例、精简约束
-3.三维景别视角：距离、水平朝向、垂直俯仰、景深虚实
-4.核心主体造型、动态、辅助叙事次要元素
-   - 头部姿态：微侧/仰头/低头/回眸，颈部线条与视线方向
-   - 躯干姿态：挺直/放松/前倾/后仰，肩线角度与身体重心
-   - 上肢姿态：手臂弯曲角度、手部摆放位置（叉腰/托腮/自然下垂/手持画具道具）
-   - 下肢姿态：站姿重心分配、坐姿腿部交叠、动态舞姿/静止站立
-5.专属笔触、线条、材质肌理、画种技法表现
-   - 水彩：透明叠加、水渍边缘、湿画混色、干画叠加层次
-   - 油画：厚涂堆叠、刮刀肌理、罩染透明层、笔触方向感
-   - 国画：勾线填色、没骨渲染、飞白枯笔、水墨晕染渐变
-   - 素描：排线密度、明暗交界线、橡皮提亮、炭笔颗粒感
-   - 数字绘画：笔刷压感、图层混合模式、纹理叠加、色彩过渡平滑度
-6.光源方向、冷暖明暗过渡、全局光影氛围
-7.70/25/5分层色彩配比、整体饱和度调性
+1.画种与造型基础
+2.风格化艺术定位
+3.画种专属笔触与线条
+4.三维度镜头视角与构图
+   - 画面比例：竖版人物插画（4:5/3:4）/ 横版场景插画（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：面部特写 / 半身人物 / 九分人像 / 全身动态 / 场景全景，对应叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注主体展现效果与叙事特点
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角 / 满版构图，对应画面张力
+   - 景深氛围：浅景深主体突出 / 中景深环境兼顾 / 深景深全景清晰 / 满版无景深，标注虚实层次
+5.主体造型与姿态
+   - 核心主体：人物/动物/意象，造型特征与姿态动态
+   - 面部表情：眼神聚焦方向、嘴角弧度、情绪表达（治愈/梦幻/忧郁/活力）
+   - 动态细节：发丝飘动/衣袂飘飘/光影流动等
+5.1 笔触专属细节（仅插画类使用）
+   - 画种笔触：水彩透明叠加/油画厚涂堆叠/国画勾线渲染/数字笔刷压感
+   - 线条质感：粗细变化/虚实过渡/干湿笔触/肌理叠加
+   - 材质肌理：纸面纹理/画布质感/数字噪点/颗粒效果
+6.色彩配比与整体调性
    - 主色调：占比70%，奠定整体基调（暖调/冷调/中性）
    - 辅助色：占比25%，丰富层次与环境过渡
    - 点缀色：占比5%，制造视觉焦点与细节提亮
-8.国风/国潮专属传统纹样、水墨留白元素
-9.场景环境、核心意境与情感表达
-10.笔刷、纸张质感定性建议、全局禁止参数清单
-11.3-5个概括插画气质的风格标签
-12.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 水彩/水墨：借鉴广角构图，摄影机靠近主体，前景浓重远景淡染，强化近大远小张力
-   - 油画/奇幻：借鉴中焦构图，摄影机与主体保持常规距离，主体与背景比例协调
-   - 二次元/动漫：借鉴50mm标准视角，透视自然，角色与场景融合""",
+   - 饱和度：低饱和=高级/文艺/复古；中饱和=自然/真实；高饱和=活力/梦幻/冲击
+   - 色彩过渡：冷暖过渡/明暗渐变/光斑流动/粒子散落
+7.环境场景与意境
+   - 所处空间：室内/户外/幻想空间，远景元素（山水/建筑/天空）
+   - 纸面画布肌理：纸张纹理/画布质感/数字底纹
+   - 光影特效：光影斑驳/动态光斑/边缘发光/柔化光晕/胶片颗粒感/明暗渐变过渡
+8.整体意境氛围
+   - 情感基调：治愈/梦幻/忧郁/活力/宁静等
+   - 画面气质收尾：整体艺术感受
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述画种工具与空间效果，禁用数值参数：
+- 水彩透明叠加：湿润画纸，颜料自然晕染，色彩叠加通透
+- 油画厚涂堆叠：刮刀堆叠笔触，肌理丰富厚重
+- 国画勾线渲染：毛笔线条勾勒，水墨渲染晕染
+- 数字笔刷压感：压感笔触变化，数字纹理叠加""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Illustration category, painting style & global positive constraints
-2. Frame composition, visual guide, 70% subject proportion, aspect ratio, simplification rule
-3. 3D shot view: distance, horizontal orientation, vertical pitch, depth blur
-4. Core subject shape, movement, secondary narrative elements
-   - Head pose: slight tilt/up/down/turn back, neck line & gaze direction
-   - Torso pose: upright/relaxed/lean forward/back, shoulder angle & body weight
-   - Upper limb: arm bend angle, hand placement (on waist/under chin/hanging/holding art tools props)
-   - Lower limb: standing weight distribution/leg cross sitting/dynamic dance/static standing
-5. Exclusive brush, line, material texture, painting technique performance
-   - Watercolor: transparent layering, water stain edges, wet-on-wet blending, dry layering
-   - Oil painting: thick impasto, palette knife texture, glaze transparent layers, brush direction sense
-   - Chinese painting: outline fill, boneless rendering, flying white dry brush, ink wash gradient
-   - Sketch: hatching density, light-dark junction, eraser highlight, charcoal grain texture
-   - Digital painting: pen pressure, layer blend modes, texture overlay, color transition smoothness
-6. Light source direction, warm-cold transition, global light atmosphere
-7. 70/25/5 layered color ratio, overall saturation tone
+1. Painting type and modeling foundation
+2. Stylized art positioning
+3. Painting-specific brushwork and lines
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical portrait illustration (4:5/3:4) / horizontal scene illustration (16:9/3:2) / square (1:1)
+   - Distance (shot type): facial close-up / half-body / nine-tenth portrait / full-body dynamic / scene panorama, mark narrative focus
+   - Horizontal view: front / three-quarter / profile, describe display effect & narrative feature
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle / full-bleed, describe frame tension
+   - Depth of field: shallow DOF subject focus / medium DOF environment balanced / deep DOF full sharpness / full-bleed no DOF
+5. Subject modeling and pose
+   - Core subject: person/animal/imagination, features and dynamic pose
+   - Facial expression: eye focus direction, mouth curve, emotion expression (healing/dreamy/melancholy/vitality)
+   - Dynamic details: hair flowing / clothing flutter / light & shadow movement
+5.1 Brush-specific details (illustration only)
+   - Painting brush: watercolor transparent overlay / oil thick paint stacking / Chinese painting line & wash / digital pressure brush
+   - Line quality: thickness variation虚实 transition / dry-wet brush / texture overlay
+   - Material texture: paper texture / canvas texture / digital noise / grain effect
+6. Color ratio and overall tone
    - Main Color: 70%, set overall tone (warm/cool/neutral)
    - Auxiliary Color: 25%, enrich hierarchy & environment transition
    - Accent Color: 5%, create visual focal point & detail highlight
-8. Traditional patterns & ink blank elements for chinese/guochao styles
-9. Scene environment, core artistic conception & emotion expression
-10. Qualitative brush/paper texture suggestion, global forbidden param list
-11. 3-5 style tags summarizing illustration temperament
-12.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Watercolor/Ink: borrow wide-angle composition, camera close to subject, heavy foreground light background, emphasize near-far tension
-   - Oil painting/Fantasy: borrow mid-telephoto composition, camera normal distance from subject, balanced subject-background proportion
-   - Anime/2D: borrow 50mm standard perspective, natural perspective, character-scene integration"""
-            }
+   - Saturation: low saturation = high-end/artistic/retro; medium = natural/true; high = vibrant/dreamy/impact
+   - Color transition: warm-cold transition / gradient / light spots / particles
+7. Environment and artistic conception
+   - Space: indoor/outdoor/fantasy space, background elements (mountains/buildings/sky)
+   - Paper/canvas texture: paper grain / canvas texture / digital pattern
+   - Lighting effects: dappled light / dynamic light spots / rim glow / soft haze / highlight bloom / film grain / particles / gradient transition
+8. Overall artistic mood
+   - Emotional tone: healing/dreamy/melancholy/vitality/serenity etc.
+   - Overall artistic feel closing
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of painting tools and spatial effects, no numeric parameters:
+- Watercolor transparent overlay: wet paper, natural pigment bleeding, transparent color layering
+- Oil thick paint stacking: palette knife thick brushwork, rich heavy texture
+- Chinese painting line & wash: brush line outline, ink wash rendering
+- Digital pressure brush: pressure-sensitive stroke variation, digital texture overlay"""
+            },
         }
 
     def detect_language(self, text: str) -> str:

@@ -46,8 +46,8 @@ class Ecommerce:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全域场景光影基调 → 产品气质卖点表达 → 材质道具细节 → 面料石材肌理 → 极简布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: full-scene lighting tone → product temperament and selling point expression → material and prop details → fabric and stone texture → minimalist set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全域场景光影基调 → 产品气质卖点表达 → 材质道具细节 → 面料石材肌理 → 极简布景（密集关键词，中英术语并列），材质肌理高度细致，产品质感逼真呈现",
+                "formula_en": "Content order: full-scene lighting tone → product temperament and selling point expression → material and prop details → fabric and stone texture → minimalist set (dense keywords, Chinese-English terms in parallel), highly detailed material texture, realistic product presentation"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -159,37 +159,69 @@ All themes: user demand highest priority, only add light/texture details without
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.商品品类、适配平台与全局正向约束
-2.画面构图、视觉引导、商品70%占比、画幅比例、精简约束
-3.三维拍摄视角：景别距离、水平朝向、垂直俯仰、景深虚实
-4.产品形态、核心吸引力与购买触发卖点
-5.场景风格、配套道具材质搭配逻辑
-6.产品专属肌理、主辅光色温软硬
-7.70/25/5分层色彩饱和度调性
-8.品类专属搭配元素、品牌营销融合方式
-9.布光质感定性建议、全局禁止参数清单
-10.3-5个概括商品电商气质风格标签
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 美妆/首饰：85mm-100mm长焦微距，摄影机远离主体，突出质地与反光细节
-   - 3C数码：50mm标准中焦，摄影机与主体保持常规距离，多角度均匀展示
-   - 家居用品：35mm-50mm，摄影机较近靠近主体，场景化展示空间感
-   - 产品全貌：50mm标准中焦，自然透视无畸变""",
+1.商品品类与形态特征
+2.平台风格与场景定位
+3.商品主体与核心卖点
+4.三维度镜头视角与构图
+   - 画面比例：竖版商品图（4:5/3:4）/ 横版场景图（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：微距材质 / 标准产品 / 场景融入 / 模特穿搭 / 全景展示，对应商品叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面 / 俯拍，标注商品展现效果
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角，对应商品视觉张力
+   - 景深氛围：浅景深主体突出 / 中景深环境兼顾 / 深景深全景清晰，标注虚实层次
+5.道具搭配与色彩分层
+   - 配套道具材质：与商品呼应的道具选择
+   - 色彩分层：主色70% / 辅助色25% / 点缀色5%
+   - 整体色调：暖调/冷调/中性，与平台风格统一
+6.材质肌理与质感表现
+   - 产品表面质感：光滑/磨砂/纹理/金属光泽
+   - 细节纹理：面料编织/皮革毛孔/木纹年轮
+   - 光泽表现：高光反射/哑光漫射/透明质感
+7.光影氛围与专业布光
+   - 主光类型：柔光箱/硬光/侧光/逆光/顶部光
+   - 光源方向：正侧光45°/90°侧光/逆光轮廓/顶光
+   - 光质软硬：硬光（清晰边缘阴影）/柔光（渐变过渡阴影）
+   - 光影特效：柔化光晕/反光质感/光影斑驳/动态光斑/边缘发光/胶片颗粒感/明暗渐变过渡
+8.购买氛围与转化叙事
+   - 情感触发点：品质感/使用场景/生活方式联想
+   - 画面收尾：整体品质感与购买欲望引导
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述镜头空间效果，禁用数值参数：
+- 微距材质特写：微距镜头，极浅景深，突出材质肌理与细节纹理
+- 标准产品白底：标准镜头，f/8-f/11中等光圈，商品清晰全貌
+- 场景氛围图：中焦镜头，f/4-f/5.6光圈，商品与环境比例协调
+- 模特穿搭图：85mm中长焦，f/2.8-f/4光圈，压缩空间突出穿搭效果""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Product category, platform & global constraints
-2. Composition, visual guide, 70% product ratio, aspect ratio, simplification rule
-3. 3D shooting: distance, horizontal, pitch, depth blur
-4. Product shape, core selling attraction
-5. Scene style & matching prop logic
-6. Exclusive texture, key/fill light temp
-7. 70/25/5 layered color saturation
-8. Category matching & brand info integration
-9. Qualitative lighting suggestion, forbidden param list
-10. 3-5 e-commerce style tags
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Beauty/Jewelry: 85mm-100mm telephoto macro, camera far from subject, highlight texture and reflection details
-   - 3C Digital: 50mm standard mid-telephoto, camera normal distance from subject, multi-angle even display
-   - Home goods: 35mm-50mm, camera moderately close to subject, scene-based spatial display
-   - Product full view: 50mm standard mid-telephoto, natural perspective without distortion"""
+1. Product category and form features
+2. Platform style and scene positioning
+3. Product subject and core selling points
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical product (4:5/3:4) / horizontal scene (16:9/3:2) / square (1:1)
+   - Distance (shot type): macro material / standard product / scene integration / model wear / full display, mark narrative focus
+   - Horizontal view: front / three-quarter / profile / overhead, describe product display effect
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle, describe product visual tension
+   - Depth of field: shallow DOF subject focus / medium DOF environment balanced / deep DOF full sharpness
+5. Props and color layering
+   - Complementary props: material matching product
+   - Color layering: 70% main / 25% auxiliary / 5% accent
+   - Overall tone: warm/cool/neutral, unified with platform style
+6. Material texture and quality expression
+   - Product surface texture: smooth/matte/textured/metallic gloss
+   - Detail patterns: fabric weave/leather pores/wood grain
+   - Gloss expression: highlight reflection/matte diffuse/transparent texture
+7. Lighting atmosphere and professional lighting
+   - Key light type: softbox/hard light/side light/backlight/top light
+   - Light direction: 45° side / 90° side / backlit outline / top
+   - Light quality: hard (clear edge shadow) / soft (gradual transition)
+   - Lighting effects: highlight bloom / soft haze / reflection quality / dappled light / dynamic light spots / rim glow / film grain / particles / gradient transition
+8. Shopping vibe and conversion narrative
+   - Emotional triggers: quality feel / usage scene / lifestyle association
+   - Frame closing: overall quality and purchase desire guidance
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of lens spatial effects, no numeric parameters:
+- Macro material close-up: macro lens, extreme shallow DOF, highlighting material texture and detail patterns
+- Standard product white background: standard lens, f/8-f/11 medium aperture, clear product full view
+- Scene atmosphere: mid-range lens, f/4-f/5.6 aperture, balanced product-environment ratio
+- Model wear shot: 85mm medium telephoto, f/2.8-f/4 aperture, compressed space highlighting outfit effect"""
             }
         }
 

@@ -46,8 +46,8 @@ class PosterDesign:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全局电影光影基调 → 主体情绪表达 → 印刷材质细节 → 字体面料肌理 → 极简文字布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: global cinematic lighting tone → subject emotion expression → print material details → font and fabric texture → minimalist text set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全局电影光影基调 → 主体情绪表达 → 印刷材质细节 → 字体面料肌理 → 极简文字布景（密集关键词，中英术语并列），印刷材质高度细致，画面质感逼真呈现",
+                "formula_en": "Content order: global cinematic lighting tone → subject emotion expression → print material details → font and fabric texture → minimalist text set (dense keywords, Chinese-English terms in parallel), highly detailed print material, realistic image quality presentation"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -161,39 +161,69 @@ All themes: User demand highest priority, only add lens/texture/font/pattern det
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.海报品类、设计风格与全局正向约束
-2.画面构图、视觉引导、主体70%占比、画幅比例、精简约束
-3.三维镜头：景别距离、水平朝向、垂直俯仰、景深虚实
-4.核心主视觉：人物/产品形态、神态、专属质感
-5.多层文字：主标题/副标题/辅助信息、字体风格、画面融合关系
-6.材质肌理、光源方向、冷暖光影层次
-7.70/25/5色彩分层饱和度调性
-8.国潮/复古专属传统纹样、年代装饰元素
-9.留白区域功能与画面疏密节奏
-10.印刷质感定性建议、全局禁止参数清单
-11.3-5个概括海报气质风格标签
-12.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 电影悬疑海报：24mm-35mm广角，摄影机靠近主体，强化近大远小，低角度仰拍增强张力
-   - 现代极简商业海报：50mm标准中焦，摄影机与主体保持常规距离，干净平视
-   - 复古胶片海报：85mm中长焦，摄影机远离主体，柔和压缩营造年代感
-   - 国潮活动海报：35mm-50mm，适度强化透视张力""",
+1.海报品类与设计风格
+2.视觉风格与情绪定位
+3.主视觉核心主体
+4.三维度镜头视角与构图
+   - 画面比例：竖版海报（4:5/3:4）/ 横版海报（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：主体特写 / 半身构图 / 全身动态 / 场景全景，对应叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注主体展现效果
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角 / 强仰视角，对应画面张力
+   - 景深氛围：浅景深主体突出 / 中景深环境兼顾 / 深景深全景清晰，标注虚实层次
+5.文字排版与信息层级
+   - 主标题/副标题/辅助信息：字体风格/大小层级/位置关系
+   - 画面融合关系：文字与图像的遮挡/透叠/留白
+   - 视觉动线引导：阅读顺序/信息优先级
+6.色彩配比与饱和度调性
+   - 主色70% / 辅助色25% / 点缀色5%
+   - 饱和度调性：高饱和冲击/中饱和自然/低饱和高级
+   - 色彩情感：暖调活力/冷调高级/中性稳重
+7.材质光影与光影特效
+   - 主视觉光影：光源方向/光质软硬/光影层次
+   - 材质光影效果：金属反光/纸张纹理/布料质感
+   - 光影特效：光影斑驳/动态光斑/边缘发光/柔化光晕/胶片颗粒感/明暗渐变过渡
+8.画面品质与视觉冲击力
+   - 设计完成度：排版精度/色彩统一/细节处理
+   - 质感细节：材质肌理/光影层次/空间纵深
+   - 整体视觉冲击力：吸引力/记忆点/传播力
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述设计工具与效果，禁用数值参数：
+- 电影海报：大画幅，高对比度，戏剧性光影，文字与图像深度融合
+- 商业海报：标准画幅，色彩鲜明，信息层级清晰，视觉焦点明确
+- 文艺海报：留白构图，低饱和色调，诗意氛围，文字与图像呼应
+- 活动海报：动态构图，高饱和色彩，活力氛围，信息突出醒目""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Poster category, design style & global positive constraints
-2. Frame composition, visual guide, 70% subject ratio, aspect ratio, simplification rule
-3. 3D lens: shot distance, horizontal angle, vertical pitch, depth blur
-4. Core main visual: character/product shape, expression, exclusive texture
-5. Multi-layer text: headline/sub/info, font style, blend with frame
-6. Print texture, light source, warm-cold light layers
-7. 70/25/5 layered color saturation tone
-8. Guochao/vintage exclusive patterns & vintage ornaments
-9. Blank area function & frame density rhythm
-10. Qualitative print texture suggestion, forbidden param list
-11. 3-5 style tags summarizing poster temperament
-12.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Suspense movie poster: 24mm-35mm wide angle, camera close to subject, emphasize near-far contrast, low angle shot enhances tension
-   - Modern minimalist commercial poster: 50mm standard mid-telephoto, camera normal distance from subject, clean eye-level
-   - Vintage film poster: 85mm mid-telephoto, camera far from subject, soft compression creates vintage feel
-   - Guochao event poster: 35mm-50mm, moderate perspective tension enhancement"""
+1. Poster category and design style
+2. Visual style and emotion positioning
+3. Main visual core subject
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical poster (4:5/3:4) / horizontal poster (16:9/3:2) / square (1:1)
+   - Distance (shot type): subject close-up / half-body / full-body dynamic / scene panorama, mark narrative focus
+   - Horizontal view: front / three-quarter / profile, describe subject display effect
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle / strong low-angle, describe frame tension
+   - Depth of field: shallow DOF subject focus / medium DOF environment balanced / deep DOF full sharpness
+5. Typography and information hierarchy
+   - Title/subtitle/info: font style/size hierarchy/position relationship
+   - Image integration: text-image overlap/overlay/blank space
+   - Visual flow guide: reading order/information priority
+6. Color ratio and saturation tone
+   - 70% main / 25% auxiliary / 5% accent
+   - Saturation tone: high saturation impact / medium natural / low saturation high-end
+   - Color emotion: warm vitality / cool high-end / neutral stability
+7. Material lighting and lighting effects
+   - Main visual lighting: light direction/light quality/light layers
+   - Material light effects: metallic reflection/paper texture/fabric texture
+   - Lighting effects: dappled light / dynamic light spots / rim glow / soft haze / highlight bloom / film grain / particles / gradient transition
+8. Image quality and visual impact
+   - Design completion: typography precision/color unity/detail handling
+   - Texture details: material texture / light layers / spatial depth
+   - Overall visual impact: attraction/memory point/spreadability
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of design tools and effects, no numeric parameters:
+- Movie poster: large format, high contrast, dramatic lighting, deep text-image integration
+- Commercial poster: standard format, vivid colors, clear information hierarchy, defined visual focus
+- Artistic poster: blank composition, low saturation tone, poetic atmosphere, text-image echo
+- Event poster: dynamic composition, high saturation colors, vibrant atmosphere, prominent information"""
             }
         }
 

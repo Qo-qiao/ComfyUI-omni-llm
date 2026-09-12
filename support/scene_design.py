@@ -46,8 +46,8 @@ class SceneDesign:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全局光影氛围基调 → 空间尺度情绪 → 场景材质细节 → 地貌建筑面料 → 极简远景布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: global lighting atmosphere tone → spatial scale emotion → scene texture details → terrain and building material → minimalist distant set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全局光影氛围基调 → 空间尺度情绪 → 场景材质细节 → 地貌建筑面料 → 极简远景布景（密集关键词，中英术语并列），场景材质高度细致，材质肌理真实呈现",
+                "formula_en": "Content order: global lighting atmosphere tone → spatial scale emotion → scene texture details → terrain and building material → minimalist distant set (dense keywords, Chinese-English terms in parallel), highly detailed scene material, realistic texture presentation"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -157,59 +157,69 @@ All themes: User-specified content highest priority, only supplement professiona
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.场景类型与全局风格正向约束
-2.画面构图、视觉引导、主体占比、画幅比例、精简规则
-3.三维景别视角：距离、水平朝向、垂直俯仰、景深虚实
-4.三层空间层次：前景叙事功能、中景核心主体、远景延伸环境
-5.材质肌理、主辅光源、阴影过渡、专属特殊光效
-6.风格专属标识元素与时代结构特征
-7.色彩配比、画面核心意境情绪
-8.尺度参照物与情感代入锚点
-9.透视与空间关系
-   - 线性透视：一点透视（纵深汇聚）/ 两点透视（建筑转角）/ 三点透视（仰视俯视）
-   - 大气透视：远处物体偏蓝、对比度降低、细节模糊
-   - 色彩透视：远处物体饱和度降低、色温偏冷
-10.能见度与大气效果
-   - 能见度：晴天清晰/薄雾柔和/浓雾消失/雾霾模糊
-   - 大气效果：丁达尔光束/晨雾弥漫/雨雪纷飞/霞光万丈
-11.天空与天气
-   - 天空类型：晴空万里/多云/阴天/晨昏/星空
-   - 云层形态：卷云/积云/层云/乌云
-   - 天气氛围：晴朗/阴沉/神秘/浪漫
-12.技术质感补充与全局禁止项
-10.3-5个概括画面气质的风格标签
-11.【技术参数建议】仅structured模式可输出，自然模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 赛博朋克/科幻未来：24mm广角，摄影机靠近主体，强化近大远小，空间快速向远处延伸，霓虹纵深感强
-   - 城市现代景观：35mm小广角，摄影机较近靠近主体，适度强化近大远小，背景层次丰富
-   - 自然风光/历史古迹：100mm-200mm长焦，摄影机远距离远离主体，背景被大幅压缩并靠近主体，压缩前景与背景空间
-   - 室内空间：24mm-35mm广角，展现空间纵深与家具动线""",
+1.场景类型与空间格局
+2.风格与氛围定位
+3.前景叙事与核心主体
+4.三维度镜头视角与构图
+   - 画面比例：竖版场景图（4:5/3:4）/ 横版全景图（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：前景特写 / 中景主体 / 远景延伸 / 全景环绕，对应场景叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注场景展现效果
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角 / 强仰视角，对应场景张力
+   - 景深氛围：浅景深前景突出 / 中景深中景兼顾 / 深景深全景清晰，标注虚实层次
+5.中远景空间层次
+   - 中景核心主体：场景核心元素与视觉焦点
+   - 远景延伸环境：背景元素与空间纵深感
+   - 空间纵深感：前景-中景-远景的层次递进
+6.材质肌理与细节纹理
+   - 地面材质：草地/水面/石板/沙地/雪地
+   - 墙面/植被/水体等材质：质感表现与细节纹理
+   - 材质对比：粗糙vs光滑/透明vs不透明/自然vs人工
+7.色彩配比与光影特效
+   - 主色70% / 辅助色25% / 点缀色5%
+   - 整体色调：暖调/冷调/中性，与场景氛围统一
+   - 光影特效：光影斑驳/动态光斑/边缘发光/柔化光晕/胶片颗粒感/明暗渐变过渡/HDR高动态
+8.尺度参照与氛围关键词
+   - 人物/物体比例：空间尺度参照
+   - 氛围关键词：宏大/宁静/神秘/治愈/史诗
+   - 整体空间感：开阔/封闭/纵深/层次
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述镜头空间效果，禁用数值参数：
+- 全景环境：24mm-35mm广角，f/8-f/11光圈，深景深全景清晰，展现空间全貌
+- 中景主体：50mm-85mm中焦，f/4-f/5.6光圈，突出中景核心元素
+- 前景特写：85mm-200mm长焦，f/2.8-f/4光圈，压缩空间突出前景细节
+- 氛围光影：35mm-50mm，f/1.4-f/2大光圈，捕捉光影氛围与空间层次""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Scene type & global style positive constraints
-2. Frame composition, visual guide, subject proportion, aspect ratio, simplification rule
-3. 3D shot view: distance, horizontal orientation, vertical pitch, depth of field blur
-4. Three-layer spatial hierarchy: foreground narrative function, midground core subject, background extended environment
-5. Texture, key & fill light, shadow transition, exclusive special light effects
-6. Style exclusive mark elements & era structural features
-7. Color ratio, core artistic conception & emotion of frame
-8. Scale reference object & emotional substitution anchor
-9. Perspective & spatial relationship
-   - Linear perspective: one-point (vanishing depth) / two-point (building corner) / three-point (looking up/down)
-   - Atmospheric perspective: distant objects bluer, lower contrast, softer detail
-   - Color perspective: distant objects desaturated, cooler color temperature
-10. Visibility & atmospheric effects
-   - Visibility: clear day sharp / light mist soft / thick fog disappearing / haze blurry
-   - Atmospheric effects: Tyndall rays / morning mist / rain snow falling / golden glow
-11. Sky & weather
-   - Sky type: clear / cloudy / overcast / dawn-dusk / starry
-   - Cloud form: cirrus / cumulus / stratus / dark storm
-   - Weather mood: bright / gloomy / mysterious / romantic
-12. Technical texture supplement & global forbidden items
-10. 3-5 style tags summarizing overall visual temperament
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Cyberpunk/Sci-fi: 24mm wide angle, camera close to subject, emphasize near-far contrast, space stretches quickly into depth, strong neon depth
-   - Modern urban landscape: 35mm slight wide, camera moderately close, moderate near-far emphasis, rich background layers
-   - Natural scenery/Historical sites: 100mm-200mm telephoto, camera far from subject, background compressed and pushed close, compressed foreground-background space
-   - Interior space: 24mm-35mm wide angle, revealing spatial depth and furniture circulation"""
+1. Scene type and spatial layout
+2. Style and atmosphere positioning
+3. Foreground narrative and core subject
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical scene (4:5/3:4) / horizontal panorama (16:9/3:2) / square (1:1)
+   - Distance (shot type): foreground close-up / midground subject / background extension / panoramic surround, mark narrative focus
+   - Horizontal view: front / three-quarter / profile, describe scene display effect
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle / strong low-angle, describe scene tension
+   - Depth of field: shallow DOF foreground focus / medium DOF midground balanced / deep DOF full sharpness
+5. Midground-background spatial layers
+   - Midground core subject: scene core elements and visual focus
+   - Background extension: background elements and spatial depth
+   - Spatial depth: foreground-midground-background layer progression
+6. Material texture and detail patterns
+   - Ground material: grass/water/stone/sand/snow
+   - Wall/vegetation/water materials: texture expression and detail patterns
+   - Material contrast: rough vs smooth / transparent vs opaque / natural vs artificial
+7. Color ratio and lighting effects
+   - 70% main / 25% auxiliary / 5% accent
+   - Overall tone: warm/cool/neutral, unified with scene atmosphere
+   - Lighting effects: dappled light / dynamic light spots / rim glow / soft haze / highlight bloom / film grain / particles / gradient transition / HDR
+8. Scale reference and atmosphere keywords
+   - Human/object proportion: spatial scale reference
+   - Atmosphere keywords: grand/serene/mysterious/healing/epic
+   - Overall spatial feel: open/closed/deep/layered
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of lens spatial effects, no numeric parameters:
+- Panoramic environment: 24mm-35mm wide-angle, f/8-f/11 aperture, deep DOF full sharpness, showcasing full spatial view
+- Midground subject: 50mm-85mm mid-range, f/4-f/5.6 aperture, highlighting midground core elements
+- Foreground close-up: 85mm-200mm telephoto, f/2.8-f/4 aperture, compressed space highlighting foreground details
+- Atmosphere lighting: 35mm-50mm, f/1.4-f/2 large aperture, capturing lighting atmosphere and spatial layers"""
             }
         }
 

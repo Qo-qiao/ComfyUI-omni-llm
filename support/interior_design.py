@@ -46,8 +46,8 @@ class InteriorDesign:
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：全屋整体灯光氛围基调 → 空间尺度与人居动线 → 硬装软装材质细节 → 布艺木质面料肌理 → 极简边角布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: whole-house lighting atmosphere tone → spatial scale and living circulation → hard and soft decoration material details → fabric and wood material texture → minimalist corner set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：全屋整体灯光氛围基调 → 空间尺度与人居动线 → 硬装软装材质细节 → 布艺木质面料肌理 → 极简边角布景（密集关键词，中英术语并列），材质肌理高度细致，空间质感真实呈现",
+                "formula_en": "Content order: whole-house lighting atmosphere tone → spatial scale and living circulation → hard and soft decoration material details → fabric and wood material texture → minimalist corner set (dense keywords, Chinese-English terms in parallel), highly detailed material texture, realistic spatial quality presentation"
             },
             "Boogu": {
                 "keyword_dense": False,
@@ -161,59 +161,71 @@ All themes: User-specified content highest priority, only supplement hard decora
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.室内空间类型与全局家装正向约束
-2.画面构图、视觉引导、核心区域占比、画幅比例、精简约束
-3.三维人视景别视角：远近距离、水平朝向、垂直俯仰、景深虚实
-4.硬装完整体系：墙面材质、地面肌理、天花造型处理
-5.软装家具布局、动线走向、布艺配饰搭配
-6.照明整体方案、三层光源、色温空间氛围
-7.70/25/5色彩配比、全屋材质触感搭配
-8.墙面艺术、绿植、摆件人文细节
-9.空间透视与视角
-   - 人视角度：1.2-1.5米高度室内平视
-   - 广角透视：强调空间纵深
-   - 标准透视：自然真实
-10.灯光层次细化
-   - 主照明：吊灯/吸顶灯/筒灯
-   - 辅助照明：落地灯/台灯/壁灯
-   - 氛围照明：灯带/射灯/蜡烛
-11.材质触感细化
-   - 织物：棉麻/丝绸/绒布/针织
-   - 硬装：瓷砖/木地板/大理石/微水泥
-   - 家具：实木/板材/金属/皮革
-12.色温质感补充、全局禁止参数项
-10.3-5个概括家装气质风格标签
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - 现代奶油/日式：24mm广角，摄影机靠近主体，强化近大远小，展现开阔松弛动线
-   - 新中式/轻奢：35mm小广角，摄影机较近靠近主体，聚焦材质细节与禅意氛围
-   - 全屋概览：24mm-35mm广角，展现空间纵深与家具布局""",
+1.空间类型与整体格局
+2.风格与家装定位
+3.硬装墙地顶材质
+4.三维度镜头视角与构图
+   - 画面比例：竖版空间图（4:5/3:4）/ 横版全景图（16:9/3:2）/ 方形（1:1）
+   - 距离维度（景别）：人视全景 / 局部特写 / 俯瞰 / 细节微距，对应空间叙事重心
+   - 水平视角维度：正面 / 四分之三斜侧 / 正侧面，标注空间展现效果
+   - 垂直俯仰维度：小俯视角 / 平视 / 小仰视角 / 强仰视角（挑高展示），对应空间张力
+   - 景深氛围：浅景深局部突出 / 中景深空间兼顾 / 深景深全景清晰，标注虚实层次
+5.软装搭配与人文摆件
+   - 家具排布：位置关系/高低层次/疏密节奏
+   - 布艺配饰：窗帘/地毯/抱枕/挂画
+   - 人文摆件：花瓶/书籍/装饰品/绿植
+   - 色彩分层：主色70% / 辅助色25% / 点缀色5%
+6.分层灯光设计
+   - 主照明：吊灯/筒灯/射灯
+   - 辅助照明：灯带/壁灯/落地灯
+   - 氛围照明：台灯/蜡烛/装饰灯
+7.整体风格与色彩意境
+   - 家装风格定位：现代/北欧/中式/日式/法式/美式
+   - 色彩意境：冷暖调性/饱和度/色彩搭配逻辑
+   - 光影特效：温馨氛围光/层次感光影/光影斑驳/动态光斑/边缘发光/柔化光晕/明暗渐变过渡
+8.画面品质与居住感
+   - 写实程度：照片级/渲染级/手绘感
+   - 质感细节：材质肌理/光影层次/空间纵深
+   - 整体居住感：温馨/舒适/高级/治愈
+9.画面精简约束
+10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许定性描述镜头空间效果，禁用数值参数：
+- 人视全景：24mm-35mm广角，f/8-f/11光圈，深景深全景清晰，展现空间格局
+- 局部特写：85mm中长焦，f/2.8-f/4光圈，突出软装细节与材质肌理
+- 俯瞰全景：鱼眼/超广角，f/8-f/11光圈，展现平面布局与动线走向
+- 氛围灯光：35mm-50mm，f/1.4-f/2大光圈，捕捉灯光氛围与光影层次""",
                 "en": """[Structured Mode] Output strictly in this order:
-1. Indoor space type & global home positive constraints
-2. Frame composition, visual guide, core area proportion, aspect ratio, simplification rule
-3. 3D human shot view: distance, horizontal orientation, vertical pitch, depth of field blur
-4. Complete hard decoration system: wall texture, floor grain, ceiling molding
-5. Soft furniture layout, circulation trend, fabric matching
-6. Whole lighting scheme, three-layer light source, color temperature space mood
-7. 70/25/5 color ratio, full-space tactile texture matching
-8. Wall art, green plants, ornament human details
-9. Space perspective & viewing angle
-   - Human-eye view: 1.2-1.5m height indoor eye-level
-   - Wide-angle perspective: emphasize spatial depth
-   - Standard perspective: natural and real
-10. Lighting layer refinement
-    - Main lighting: pendant/ceiling downlight/recessed
-    - Auxiliary lighting: floor lamp/table lamp/wall sconce
-    - Ambient lighting: light strip/spotlight/candle
-11. Material tactile refinement
-    - Fabric: cotton linen/silk/velvet/knit
-    - Hard decoration: tile/wood floor/marble/micro-cement
-    - Furniture: solid wood/board/metal/leather
-12. Color temperature texture supplement, global forbidden numeric parameters
-10. 3-5 style tags summarizing home temperament
-11.【技术参数建议】仅structured模式可输出，natural模式禁用；仅允许焦距/光圈定性描述，附带空间效果释义，禁用快门/ISO/白平衡等数值参数：
-   - Modern cream/Japanese: 24mm wide angle, camera close to subject, emphasize near-far contrast, reveal open relaxed circulation
-   - Neo-Chinese/Light luxury: 35mm slight wide, camera moderately close to subject, focus on material details and zen atmosphere
-   - Whole-house overview: 24mm-35mm wide angle, reveal spatial depth and furniture layout"""
+1. Space type and overall layout
+2. Style and home furnishing positioning
+3. Hard material wall/floor/ceiling
+4. Three-dimensional camera view and composition
+   - Aspect ratio: vertical space (4:5/3:4) / horizontal panorama (16:9/3:2) / square (1:1)
+   - Distance (shot type): eye-level panorama /局部特写 / overhead / detail macro, mark narrative focus
+   - Horizontal view: front / three-quarter / profile, describe space display effect
+   - Vertical pitch: slight high-angle / eye-level / slight low-angle / strong low-angle (ceiling display), describe space tension
+   - Depth of field: shallow DOF detail focus / medium DOF space balanced / deep DOF full sharpness
+5. Soft furnishing and human ornaments
+   - Furniture layout: position relationship/height layers/density rhythm
+   - Fabric accessories: curtain/carpet/cushion/painting
+   - Human ornaments: vase/books/decorations/greenery
+   - Color layering: 70% main / 25% auxiliary / 5% accent
+6. Layered lighting design
+   - Main lighting: pendant/recessed/spotlight
+   - Auxiliary lighting: light strip/wall lamp/floor lamp
+   - Ambient lighting: table lamp/candle/decorative light
+7. Overall style and color artistic conception
+   - Home style positioning: modern/Scandinavian/Chinese/Japanese/French/American
+   - Color artistic conception: warm-cool tone/saturation/color matching logic
+   - Lighting effects: warm ambient light / layered lighting / dappled light / dynamic light spots / rim glow / soft haze / gradient transition
+8. Image quality and living feel
+   - Realism level: photo-real / rendering / hand-drawn feel
+   - Texture details: material texture / light layers / spatial depth
+   - Overall living feel: warm/comfortable/high-end/healing
+9. Frame simplification constraint
+10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative description of lens spatial effects, no numeric parameters:
+- Eye-level panorama: 24mm-35mm wide-angle, f/8-f/11 aperture, deep DOF full sharpness, showcasing spatial layout
+- Detail close-up: 85mm medium telephoto, f/2.8-f/4 aperture, highlighting soft furnishing details and material texture
+- Overhead panorama: fisheye/super wide-angle, f/8-f/11 aperture, showcasing floor plan and movement flow
+- Ambient lighting: 35mm-50mm, f/1.4-f/2 large aperture, capturing lighting atmosphere and light layers"""
             }
         }
 

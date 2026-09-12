@@ -22,68 +22,68 @@ class YoungBoyPortrait:
             "Flux1": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：整体画面氛围光影 → 孩童气质灵动姿态 → 稚嫩肌肤胎发质感 → 童趣背景留白。侧重童真氛围叙事，弱化关键词堆砌，画面治愈柔和。",
-                "formula_en": "Content order: overall atmosphere lighting → kid lively pose → tender skin baby hair texture → childlike negative space. Focus on innocent atmosphere narration."
+"formula_zh": "内容组织顺序：整体画面氛围光影 → 孩童气质灵动姿态 → 肌肤发丝质感 → 背景留白。侧重童真氛围叙事，弱化细碎关键词堆砌，画面柔和治愈，写实肤质发丝高度细致，纹理清晰可见。",
+                 "formula_en": "Content order: overall atmosphere lighting → kid lively pose → skin hair texture → negative space. Focus on innocent atmosphere narration, realistic skin and hair highly detailed with clear texture."
             },
             "Flux2_klein": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：少年儿童（年龄、发型、童装、表情）→ 嫩滑肤质与童真写实 → 明亮自然光、活泼氛围 → 平视特写、简洁背景",
-                "formula_en": "Content order: child or teenager (age, hairstyle, kids clothing, expression) → smooth tender skin and innocent realism → bright natural light, lively atmosphere → eye-level close-up, simple background "
+                "formula_zh": "内容组织顺序：一位超写实孩童（年龄、发型、服饰与表情）→ 照片级写实与皮肤质感 → 自然光或柔和布光、活泼氛围 → 半身特写、浅景深，逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: a photorealistic child (age, hairstyle, outfit and expression) → photo-level realism and skin texture → natural or soft lighting, lively atmosphere → half-body close-up, shallow depth of field, realistic, highly detailed skin and hair texture"
             },
             "Z_image": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：少年儿童主体（年龄、发型、童装、表情）→ 嫩滑肤质与童真写实 → 明亮自然光、活泼欢快氛围 → 蹲平视角特写、背景简洁（需渲染文字直接写入，支持中英双语）。",
-                "formula_en": "Content order: child subject (age, hairstyle, kids' outfit, expression) → tender smooth skin and innocent realism → bright natural light, lively cheerful atmosphere → crouching eye-level close-up, simple background (write any rendered text directly, supports Chinese and English)."
+                "formula_zh": "内容组织顺序：一位超写实孩童主体（年龄、发型、服饰）→ 照片级写实与皮肤质感 → 柔和自然光、活泼氛围 → 半身或特写、浅景深；建议描述孩子的神态与目光（需渲染文字直接写入，支持中英双语），逼真，皮肤和头发纹理高度细致。",
+                "formula_en": "Content order: a photorealistic child subject (age, hairstyle, outfit) → photo-level realism with skin texture → soft natural light, lively atmosphere → half-body or close-up, shallow depth of field; describe the child's expression and gaze (write any rendered text directly, supports Chinese and English), realistic, highly detailed skin and hair texture."
             },
             "Qwen_Image2512": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：儿童或少年身份、天真活泼表情与动作 → 风格与画质（娇嫩肤质、清澈眼神） → 明亮自然光或户外柔光、轻盈氛围 → 平视或蹲位特写、大光圈虚化 →（需渲染文字直接写入提示词，支持中英双语）",
-                "formula_en": "Content order: child identity, innocent lively expression and action → style & quality (delicate skin, clear eyes) → bright natural light or outdoor soft light, airy atmosphere → eye-level or crouching close-up, wide aperture blur → (write any rendered text directly into the prompt, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：孩童身份、年龄与天真表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然光或柔和光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: child identity, age and innocent expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural or soft light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
             },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：治愈电影级柔光氛围 → 孩童鲜活肢体情绪 → 胶片细腻颗粒质感 → 棉质服饰面料 → 极简童趣布景（密集关键词，中英术语并列）",
-                "formula_en": "Content order: healing cinematic soft light atmosphere → kid lively body emotion → delicate film grain texture → cotton fabric → minimalist playful set (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：景别构图（特写/半身/全身）→ 人物主体（发型发色、五官特征、神情表情、姿态动作）→ 服饰配件（衣款面料、童趣道具）→ 光影氛围（治愈柔光、自然光线）→ 环境场景（所处空间、远景元素）→ 风格（画面风格定位）→ 画质（浅景深虚化/柔焦/锐化）→ 极简布景（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: shot composition (close-up/half-body/full-body) → subject (hairstyle, facial features, expression, pose) → outfit & accessories (clothing, playful props) → lighting atmosphere (healing soft light, natural light) → environment (space, background elements) → style (image style) → quality (shallow DOF/soft focus/sharpness) → minimalist set (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
             },
             "Boogu": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：整体治愈画面基调 → 孩童松弛灵动姿态 → 原生细嫩肌肤质感 → 简约童趣留白环境",
-                "formula_en": "Content order: overall healing image tone → kid relaxed lively pose → natural tender skin texture → simple playful negative-space environment"
+"formula_zh": "内容组织顺序：整体画面基调（治愈柔和氛围）→ 孩童松弛灵动姿态 → 自然肌肤质感与细节 → 简约童趣留白环境，写实风格，肤质发丝高度细致，纹理清晰。",
+                 "formula_en": "Content order: overall image tone (healing soft atmosphere) → kid relaxed lively pose → natural skin texture and details → simple playful negative-space environment, realistic style, highly detailed skin and hair with clear texture."
             },
             "Mage_Flow": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：孩童稚嫩五官肤质、天真表情 → 灵动体态姿态 → 柔和光影层次、明亮自然光 → 童趣服饰细节 → 轻量化环境（密集关键词，中英术语并列）",
-                "formula_en": "Content order: kid tender facial skin, innocent expression → lively body pose → soft lighting layers, bright natural light → playful clothing details → lightweight environment (dense keywords, Chinese-English terms in parallel)"
+                "formula_zh": "内容组织顺序：孩童五官肤质、年龄气质 → 灵动体态姿态 → 光影层次、柔和自然光 → 服饰细节、面料质感 → 轻量环境、minimal background（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: kid facial features and skin, age and temperament → lively body pose → lighting layers, soft natural light → clothing details, fabric texture → lightweight environment, minimal background (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
             },
             "ERNIE_Image": {
                 "keyword_dense": True,
                 "mix_lang": True,
-                "formula_zh": "内容组织顺序：儿童少年身份、天真活泼表情动作 → 风格与画质（娇嫩肤质、清澈眼神） → 明亮自然光或户外柔光 → 平视或蹲位特写、大光圈虚化 →（需渲染文字直接写入提示词，支持中英双语）",
-                "formula_en": "Content order: child identity, innocent lively expression and action → style & quality (delicate skin, clear eyes) → bright natural light or outdoor soft light → eye-level or crouching close-up, wide aperture blur → (write any rendered text directly into the prompt, supports Chinese and English)"
+                "formula_zh": "内容组织顺序：孩童身份、年龄与天真表情、超写实电影质感 → 风格与画质（真实肤质、发丝与微表情） → 自然光或柔和光勾勒轮廓氛围 → 半身或特写、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
+                "formula_en": "Content order: child identity, age and innocent expression, photorealistic cinematic texture → style and quality (real skin, hair strands and micro-expressions) → natural or soft light outlining silhouette and atmosphere → half-body or close-up, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
             },
             "GLM_Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：儿童或少年纯真面容 → 明亮写实风格、细腻肌肤与动感发丝 → 户外柔光、活泼氛围 → 低角度平视、自然笑容 → 强调童真无成人化、避免畸变与浓妆。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词。",
-                "formula_en": "Content order: child pure innocent face → bright realistic style, delicate skin and lively hair → outdoor soft light, lively atmosphere → low angle eye level, natural smile → emphasize innocent childishness, avoid adultification, distortion and heavy makeup. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt."
+                "formula_zh": "内容组织顺序：超写实孩童面部与半身肖像 → 高清写实摄影风格、皮肤肌理与发丝质感 → 柔和自然光与温暖氛围 → 浅景深特写、眼神平视 → 强调真实无磨皮、避免畸变与成人化。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词，肤质发丝高度细致。",
+                "formula_en": "Content order: photorealistic child face and half-body portrait → high-definition realistic photography style, skin texture and hair details → soft natural light and warm tone → shallow depth close-up, eye-level gaze → emphasize real un-retouched skin, avoid distortion and adultification. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt, highly detailed skin and hair texture."
             },
             "LongCat_Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹。",
-                "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks."
+"formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹，肤质发丝高度细致，纹理清晰可见。",
+                 "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks, highly detailed skin and hair with clear texture."
             },
             "HiDream-O1-Image": {
                 "keyword_dense": False,
                 "mix_lang": False,
-                "formula_zh": "内容组织顺序：儿童或少年主体与纯真笑容 → 场景与构图（低角度平视）→ 光影与氛围（户外柔光活泼）→ 画种/摄影风格（明亮写实）→ 需渲染文字用引号包裹。",
-                "formula_en": "Content order: child subject & innocent smile → scene & composition (low angle eye level) → light & atmosphere (outdoor soft light, lively) → art/photography style (bright realism) → wrap rendered text in quotes. "
+                "formula_zh": "内容组织顺序：超写实孩童主体与天真表情 → 场景与构图（浅景深特写）→ 光影与氛围（柔和自然光温暖）→ 画种/摄影风格（高清写实摄影）→ 需渲染文字用引号包裹，肤质发丝高度细致。",
+                "formula_en": "Content order: photorealistic child subject & innocent expression → scene & composition (shallow depth close-up) → light & atmosphere (soft natural light, warm) → art/photography style (high-definition realistic photography) → wrap rendered text in quotes, highly detailed skin and hair texture."
             }
         }
         # 全局底层规则 改为少年儿童专用
@@ -154,14 +154,24 @@ All kid themes keep user specified scene & outfit, only add tender skin, baby ha
         # 双输出格式指引 完全沿用参考原版无修改
         self.format_guide = {
             "natural": {
-                "zh": "【自然段落模式】三段连贯文字：第一段场景布光整体氛围；第二段孩童灵动姿态视线表情；第三段稚嫩肌肤胎发服饰面料色彩调性，300‑600字纯画面描写。",
-                "en": "[Natural Paragraph Mode] Three coherent paragraphs: scene‑lighting‑atmosphere; kid lively pose gaze expression; tender skin baby hair fabric color tone, 300‑600 words pure visual description."
+                "zh": """【自然段落模式】4-5段连贯文字，严格按以下顺序组织，全程禁用mm/f/光圈/焦距/ISO等数字光学参数，300-800字纯画面描写：
+
+第一段·景别与构图：明确拍摄类型（日常生活快照/户外玩耍/居家纪实/棚拍摆拍等）与视角构图方式（蹲平视角/平视/俯拍/仰拍/随手一拍等），交代画面整体取景范围与空间感。
+
+第二段·光影氛围：具体描述光源类型与方向（明亮自然光/柔和窗光/户外散射光等），以及光线在孩童头发、肌肤、衣物上的视觉效果（光影斑驳/动态光斑/边缘发光/柔化光晕/高光溢出/胶片颗粒感等），用定性光影语汇替代光学数值。
+
+第三段·孩童姿态与神情：完整描述头部、躯干、四肢的具体姿态（奔跑/蹲坐/站立/手持玩具等），视线方向与镜头关系，面部表情神态（天真/活泼/好奇/专注/笑容等），以及发丝随风飘动等动态细节。
+
+第四段·面部细节与发型：精细刻画孩童面部五官特征（圆润脸型/大眼睛/稚嫩唇色/嫩滑肤质），皮肤质感（白皙嫩滑/婴儿肥/自然光泽），发型发色与打理方式（短发/马尾/刘海等）。
+
+第五段·服饰配件与环境：描述穿搭细节（童装款式/面料/颜色/花纹/可爱配饰等），互动道具（玩具/零食/气球等），以及所处环境场景（公园/室内/游乐场/花园等），含远景元素（树木/草地/建筑等），最后以画面整体色调氛围收尾。""",
+                "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, no optical numeric parameters, 300-800 words pure visual: 1) Shot type & composition (snapshot/outdoor play/indoor daily/studio, crouching eye-level/angle/framing); 2) Lighting atmosphere (bright natural light/soft window light, effects on hair/skin/clothing: dappled light, dynamic spots, rim glow, soft haze, highlight bloom, film grain); 3) Full pose & expression (running/squatting/standing/holding toys, gaze direction, facial emotion, hair wind-blown details); 4) Face details & styling (round face, big eyes, tender lips, smooth skin, hairstyle); 5) Outfit accessories & environment (kids clothing details, toys/props, scene setting with background elements, overall color tone)."
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
-1.人种孩童五官轮廓特征
-2.童真风格与穿搭造型定位
-3.稚嫩肤质胎发原生细节
+1.人种五官轮廓特征
+2.风格与服饰造型定位
+3.肤质与毛发原生细节
 4.三维度镜头视角与构图
    - 画面比例：竖版人像（4:5/3:4）/ 横版环境人像（16:9/3:2）/ 方形（1:1）
    - 距离维度（景别）：微距特写 / 标准特写 / 肩特写 / 七分人像 / 九分人像 / 全景人像，对应叙事重心与细节展现层级
@@ -173,11 +183,11 @@ All kid themes keep user specified scene & outfit, only add tender skin, baby ha
    - 躯干姿态：挺直/放松/前倾/后仰，肩线角度与身体重心
    - 上肢姿态：手臂弯曲角度、手部摆放位置（叉腰/托腮/自然下垂/手持道具）
    - 下肢姿态：站姿重心分配、坐姿腿部交叠、躺卧腿部伸展/蜷缩、动态迈步/静止支撑
-   - 表情神态：眼神聚焦方向、嘴角弧度、眉宇情绪（平静/专注/柔和/自信）
+   - 表情神态：眼神聚焦方向、嘴角弧度、眉宇情绪（天真/活泼/好奇/专注/笑容）
 5.1 人像专属细节（仅人像类使用）
    - 眼神光：环形眼神光（眼下圆形光斑）/ 方形眼神光（窗光反射）/ 自然窗光（柔和反射）
-   - 肤质表现：毛孔细腻（可见细微毛孔）/ 丝绒柔滑（磨皮但保留质感）/ 光泽水润（高光通透）/ 丝绸光泽（面料反光）
-   - 发丝质感：根根分明（发丝清晰可见）/ 柔顺飘逸（动态飘动）/ 蓬松空气感（发量充盈）
+   - 肤质表现：白皙嫩滑（婴儿肌肤质感）/ 婴儿肥（圆润脸颊）/ 自然光泽（健康红润）
+   - 发丝质感：柔顺飘逸（动态飘动）/ 蓬松空气感（发量充盈）/ 童趣造型（马尾/刘海等）
    - 面部光影：高光区（额头/鼻梁/颧骨提亮）/ 中间调（面颊/下巴自然过渡）/ 阴影区（鼻翼侧/脸颊侧立体）
 6.色彩配比与整体调性
    - 主色调：占比70%，奠定整体基调（暖调/冷调/中性）
@@ -191,60 +201,18 @@ All kid themes keep user specified scene & outfit, only add tender skin, baby ha
    - 光源方向：正侧光45°/90°侧光/逆光轮廓/顶光戏剧/底光诡异/窗光网格投影
    - 光质软硬：硬光（清晰边缘阴影）/柔光（渐变过渡阴影）/散射光（均匀无影）
    - 环境光：补光比例、反光板效果、环境反射色调
+   - 光影特效：光影斑驳/动态光斑/边缘发光/柔化光晕/胶片颗粒感/明暗渐变过渡/HDR高动态/高饱和强对比
 8.背景与环境
    - 虚化程度：奶油般化开（f/1.4-1.8极致虚化）/ 柔美光斑（f/2.8光斑）/ 环境可辨（f/4-5.6）
    - 环境呼应：色彩呼应（背景与服装色调统一）/ 光影呼应（环境光与主光协调）
    - 负空间：眼神方向留白（看向处留空间）/ 呼吸空间（头顶/两侧留白）
-9.童趣画面精简约束
+9.画面精简约束
 10.【技术参数建议】仅structured模式可输出，natural模式禁用；允许完整相机参数描述（焦距、光圈、快门速度、ISO、白平衡），附带空间效果释义：
-- 春日户外/森林探险：35mm小广角，f/2.8-f/4光圈，1/250s-1/500s快门，ISO100-400，摄影机较近靠近主体，蹲平视角追随孩童动态，背景层次丰富
-- 极简棚拍/特写：85mm中长焦，f/1.8-f/2.8光圈，1/160s-1/320s快门，ISO100-200，聚焦圆润面部与胎发肌理
-- 日常居家：50mm标准中焦，f/2.8-f/4光圈，1/60s-1/125s快门，ISO400-1600，自然透视记录成长
-- 动态抓拍：200mm长焦，f/2.8-f/4光圈，1/1000s-1/4000s高速快门，ISO400-1600，冻结高速运动瞬间
-- 蓝调时刻/夜景：35mm-50mm，f/1.4-f/2大光圈，1/30s-1/60s慢速快门，ISO800-3200，捕捉低光环境氛围""",
-                "en": """[Structured Mode] Output strictly in this order:
-1. Ethnic kid facial features
-2. Innocent style & outfit positioning
-3. Tender skin baby hair details
-4. Three-dimensional camera view and composition
-   - Aspect ratio: vertical portrait (4:5/3:4) / horizontal environmental (16:9/3:2) / square (1:1)
-   - Distance (shot type): macro close-up / standard close-up / shoulder shot / three-quarter portrait / nine-tenth portrait / full-scene portrait, mark narrative focus
-   - Horizontal view: front / three-quarter / profile, describe display effect & narrative feature
-   - Vertical pitch: slight high-angle / eye-level / slight low-angle / strong low-angle (soles foreground extension), describe mental feeling & frame tension
-   - Depth of field: shallow DOF soft bokeh / medium DOF environment balanced / deep DOF full sharpness
-5. Pose body and expression
-   - Head pose: slight tilt/up/down/turn back, neck line & gaze direction
-   - Torso pose: upright/relaxed/lean forward/back, shoulder angle & body weight
-   - Upper limb: arm bend angle, hand placement (on waist/under chin/hanging/holding props)
-   - Lower limb: standing weight distribution/leg cross sitting/lying legs extended/curled/dynamic stepping/static support
-   - Expression: eye focus direction, mouth curve, brow emotion (calm/focused/soft/confident)
-5.1 Portrait-specific details (portrait only)
-   - Catchlight: ring catchlight (circular under-eye) / square catchlight (window reflection) / natural window light (soft reflection)
-   - Skin texture: fine pores (visible subtle pores) / velvet smooth (retouched but textured) / dewy glow (translucent highlight) / silk sheen (fabric reflection)
-   - Hair texture: strand-defined (individual hairs visible) / silky flowing (dynamic movement) / fluffy airy (voluminous)
-   - Facial lighting: highlight zone (forehead/nose bridge/cheekbone brightening) / midtone (cheek/chin natural transition) / shadow zone (nose side/cheek side dimension)
-6. Color ratio and overall tone
-   - Main Color: 70%, set overall tone (warm/cool/neutral)
-   - Auxiliary Color: 25%, enrich hierarchy & environment transition
-   - Accent Color: 5%, create visual focal point & detail highlight
-   - Color temperature mood: warm (3200K-4500K) = cozy/retro/intimate; cool (5500K-7000K) = cold/high-end/detached; neutral (5000K-5500K) = natural/true/peaceful
-   - Saturation: low saturation = high-end/artistic/retro; medium = natural/true; high = vibrant/fashion/impact
-   - Skin tone: yellowish (Asian natural) / pinkish (Western fair) / natural translucent (healthy blood color)
-7. Professional lighting method
-   - Key light type: Rembrandt (triangle under nose) / butterfly (symmetric shadow under nose) / side light (light-dark split) / ring light (even facial dimension)
-   - Light direction: 45° side / 90° side / backlit outline / top dramatic / bottom eerie / window grid projection
-   - Light quality: hard (clear edge shadow) / soft (gradual transition) / diffused (even shadowless)
-   - Ambient light: fill light ratio, reflector effect, environmental reflection tone
-8. Background & Environment
-   - Bokeh: creamy smooth (f/1.4-1.8 extreme blur) / beautiful light orbs (f/2.8 bokeh) / environment discernible (f/4-5.6)
-   - Environment echo: color echo (background-clothing tone unity) / lighting echo (ambient light-key light coordination)
-   - Negative space: gaze direction留白 (space where looking) / breathing room (headroom/sides margin)
-9. Child scene simplification rule
-10. [Tech params] Only structured mode can output, natural mode forbidden; only qualitative focal length/aperture description with spatial effect explanation, shutter/ISO/white balance numerical parameters forbidden:
-- Spring outdoor/forest adventure: 35mm small wide-angle, camera closer to subject, crouching eye-level following kid movement, rich background layers
-- Minimal studio/close-up: 85mm medium telephoto, focusing on round face and baby hair texture
-- Daily home: 50mm standard mid-range, natural perspective recording growth"""
-            }
+- 春季户外/森林探险：35mm小广角，蹲平跟随孩童视角，丰富背景层次
+- 极简棚拍/特写：85mm中长焦，聚焦圆润脸庞与胎发质感
+- 日常居家：50mm标准中焦，自然视角记录成长""",
+                "en": "[Structured Mode] Output strictly in order: 1. Ethnic features 2. Style & outfit 3. Skin & hair texture 4. Three-dimensional composition (aspect ratio, distance, horizontal angle, vertical pitch, depth of field) 5. Pose & expression (head, torso, limbs, emotion) 5.1 Portrait details (catchlight, skin, hair, lighting) 6. Color ratio (main 70%, accent 25%, highlight 5%, temperature, saturation, skin tone) 7. Professional lighting (key light type, direction, quality, ambient, effects) 8. Background (bokeh, echo, negative space) 9. Frame constraint 10. Tech params: focal length, aperture, shutter, ISO, white balance with spatial effect explanation."
+            },
         }
     def detect_language(self, text: str) -> str:
         import re
