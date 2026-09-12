@@ -706,9 +706,6 @@ class omni_llm_unified_inference:
     def INPUT_TYPES(s):
         return {
             "required": {
-                # ========== 模型配置 ==========
-                "llama_model": ("LLAMACPPMODEL", {"tooltip": "加载的VL模型，用于图像理解和文本生成"}),
-                
                 # ========== 推理模式 ==========
                 "inference_mode": ([
                         "[基础] 文本生成 (Text Generation)",
@@ -772,11 +769,12 @@ class omni_llm_unified_inference:
 
                 
                 # ========== 生成参数 ==========
-                "seed": ("INT", {"default": 101, "min": 0, "max": 0xffffffffffffffff, "step": 1, "tooltip": "随机种子，用于复现结果"}),
                 "force_offload": ("BOOLEAN", {"default": False, "tooltip": "强制卸载模型释放显存"}),
             },
             "hidden": {"unique_id": "UNIQUE_ID"},
             "optional": {
+                "llama_model": ("LLAMACPPMODEL", {"tooltip": "加载的VL模型，用于图像理解和文本生成（API模式可不连接）"}),
+                "api_config": ("OMNI_LLM_API_CONFIG", {"tooltip": "API 配置（用于 API 推理模式）"}),
                 "parameters": ("LLAMACPPARAMS", {"tooltip": "额外的生成参数配置"}),
                 "images": ("IMAGE", {"tooltip": "图像输入（用于图像理解模式）"}),
                 "video": ("VIDEO", {"tooltip": "视频输入（用于视频理解模式）"}),
@@ -1388,11 +1386,106 @@ class omni_llm_unified_inference:
             import traceback
             traceback.print_exc()
             return []
-    
+    @staticmethod
+    def _call_api_chat_completion(api_base_url, api_key, api_model, messages, params):
+        """调用外部 API（OpenAI 兼容格式）"""
+        import requests as _requests
 
-    
+        if not api_key:
+            raise RuntimeError("API 密钥为空，请在 API 配置节点中填写 api_key")
+        if not api_base_url:
+            raise RuntimeError("API 地址为空，请在 API 配置节点中填写 api_base")
+        if not api_model:
+            raise RuntimeError("模型名称为空，请在 API 配置节点中填写 model_name")
 
-    
+        base = api_base_url.rstrip("/")
+        if base.endswith("/v1"):
+            url = f"{base}/chat/completions"
+        elif "/v1/" in base:
+            url = f"{base}/chat/completions"
+        else:
+            url = f"{base}/v1/chat/completions"
+
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}",
+        }
+        payload = {
+            "model": api_model,
+            "messages": messages,
+            "max_tokens": params.get("max_tokens", 1024),
+            "temperature": params.get("temperature", 0.7),
+            "top_p": params.get("top_p", 0.9),
+            "stream": False,
+        }
+        if params.get("seed", -1) >= 0:
+            payload["seed"] = params["seed"]
+
+        timeout = int(params.get("timeout", 300))
+
+        def _do_request():
+            try:
+                return _requests.post(url, headers=headers, json=payload, timeout=timeout)
+            except _requests.ProxyError:
+                # 系统代理不可用（如 Clash 未启动）时绕过代理直连重试（国内 API 通常无需代理）
+                try:
+                    return _requests.post(url, headers=headers, json=payload, timeout=timeout,
+                                          proxies={"http": None, "https": None})
+                except _requests.ConnectionError as e:
+                    raise RuntimeError(f"网络连接失败，无法访问 {api_base_url}（已尝试直连和系统代理）。请检查网络、VPN/代理、防火墙设置。") from e
+            except _requests.ConnectionError as e:
+                raise RuntimeError(f"网络连接失败，无法访问 {api_base_url}。请检查网络、VPN/代理、防火墙设置。") from e
+            except _requests.Timeout as e:
+                raise RuntimeError(f"API 请求超时（{timeout}秒）。请检查网络或稍后重试。") from e
+            except _requests.RequestException as e:
+                raise RuntimeError(f"API 请求异常：{e}") from e
+
+        # 推理模型（如 deepseek-flash）的思考 token 也计入 max_tokens，复杂预设提示词可能导致
+        # 思考过程占满配额、正文 content 为空（finish_reason=length），此时自动翻倍配额重试
+        max_tokens_cap = 8192
+        while True:
+            resp = _do_request()
+
+            if resp.status_code != 200:
+                error_msg = resp.text[:500]
+                status_hints = {
+                    400: f"请求参数错误：{error_msg}",
+                    401: "API 密钥无效或已过期，请检查 api_key",
+                    402: "API 余额不足，请充值后重试",
+                    403: "没有 API 访问权限",
+                    404: f"接口不存在：{url}",
+                    429: "请求过于频繁，请稍后重试",
+                    500: "API 服务端异常，请稍后重试",
+                    502: "API 服务暂时不可用，请稍后重试",
+                    503: "API 服务繁忙，请稍后重试",
+                }
+                hint = status_hints.get(resp.status_code, f"HTTP {resp.status_code}")
+                raise RuntimeError(f"API 错误 {resp.status_code}：{hint}")
+
+            try:
+                result = resp.json()
+            except Exception:
+                raise RuntimeError(f"API 响应解析失败：{resp.text[:300]}")
+
+            choices = result.get("choices")
+            if not isinstance(choices, list) or not choices:
+                raise RuntimeError(f"API 返回格式异常，无 choices 字段：{str(result)[:300]}")
+
+            first_choice = choices[0]
+            content = first_choice.get("message", {}).get("content")
+            if content is None:
+                content = first_choice.get("text", "")
+
+            current_max_tokens = payload["max_tokens"]
+            if (not content) and first_choice.get("finish_reason") == "length" \
+                    and current_max_tokens < max_tokens_cap:
+                payload["max_tokens"] = min(current_max_tokens * 2, max_tokens_cap)
+                print(f"【API推理】思考过程占满 max_tokens={current_max_tokens} 导致正文为空，"
+                      f"自动提升至 {payload['max_tokens']} 重试...")
+                continue
+
+            return content or ""
+
     def _run_inference(self, llama_model, messages, gen_params):
         """执行推理的内部方法，用于异步处理"""
         generated_text = ""
@@ -1522,18 +1615,29 @@ class omni_llm_unified_inference:
         
         return generated_text
     
-    def process(self, llama_model, inference_mode, preset_prompt, system_prompt, text_input,
+    def process(self, inference_mode, preset_prompt, system_prompt, text_input,
                 prompt_language, response_language, output_format, enable_constraints,
                 enable_negative_prompts,
                 video_max_frames, video_sampling, video_manual_indices, image_max_size, batch_combination,
-                seed, force_offload,
-                parameters=None, images=None, video=None, audio=None,
+                force_offload,
+                api_config=None, parameters=None, images=None, video=None, audio=None,
                 asr_model=None, queue_handler=None, unique_id=None,
-                image_model="Auto", video_model="Auto", audio_model="Auto"):
+                image_model="Auto", video_model="Auto", audio_model="Auto",
+                llama_model=None):
         """处理推理请求"""
         try:
-            # 检测模型类型
-            self.model_info = self.detect_model_type(llama_model)
+            # 检测模型类型（无模型时使用"none"类型，走API推理路径）
+            if llama_model is None:
+                self.model_info = {
+                    "key": "none",
+                    "type": "none",
+                    "subtype": "none",
+                    "supports_audio": False,
+                    "supports_vision": False,
+                    "file_formats": []
+                }
+            else:
+                self.model_info = self.detect_model_type(llama_model)
             
             # 处理推理模式
             mode_map = {
@@ -1648,21 +1752,59 @@ class omni_llm_unified_inference:
                 generated_text = asr_text
                 print("【ASR模式】已将识别结果作为输出文本")
             
-            # 处理无模型情况（音频转文本模式）
+            # 处理无模型情况：优先 API 推理，其次 ASR，最后返回空
             if self.model_info["type"] == "none":
                 if mode == "audio" and asr_text:
-                    # 音频转文本模式，直接返回ASR结果
                     print("【无模型模式】音频转文本模式，仅返回ASR识别结果")
-                    return (generated_text, [generated_text], seed)
+                    return (generated_text, [generated_text], 0)
+
+                # 尝试 API 推理
+                api_base_url = ""
+                api_key = ""
+                api_model = ""
+                api_timeout = 300
+                if isinstance(api_config, dict):
+                    api_base_url = api_config.get("base_url", "")
+                    api_key = api_config.get("api_key", "")
+                    api_model = api_config.get("model", "")
+                    api_timeout = int(api_config.get("timeout", 300))
+
+                if api_base_url and api_key and api_model:
+                    print(f"【API推理】未加载本地模型，使用 API 模式（model={api_model}）")
+                    api_messages = [{"role": "system", "content": system_prompt.strip()}]
+                    api_messages.append({"role": "user", "content": final_prompt})
+                    api_params = {
+                        "max_tokens": 1024,
+                        "temperature": 0.7,
+                        "top_p": 0.9,
+                        "timeout": api_timeout,
+                    }
+                    if parameters:
+                        api_params.update({k: v for k, v in parameters.items()
+                                           if k in ("max_tokens", "temperature", "top_p", "seed", "timeout")})
+                    try:
+                        generated_text = self._call_api_chat_completion(
+                            api_base_url, api_key, api_model, api_messages, api_params
+                        )
+                        generated_text = self._filter_thinking_content(generated_text)
+                        _uid = parameters.get("state_uid", None) if parameters else None
+                        uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
+                        return (generated_text, [generated_text], int(uid))
+                    except Exception as e:
+                        print(f"【API推理错误】{e}")
+                        return (str(e), [str(e)], 0)
                 else:
-                    # 其他模式但没有LLM模型，返回空结果
-                    print(f"【无模型模式】模式: {mode}，未选择LLM模型，返回空结果")
-                    return ("", [""], seed)
+                    print(f"【无模型模式】模式: {mode}，未选择LLM模型且无API配置，返回空结果")
+                    return ("", [""], 0)
 
             # 非音频转文本模式清空预置文本
             if mode != "audio":
                 generated_text = ""
-            
+
+            # 本地模型优先：当本地模型已加载时，忽略 API 配置
+            if isinstance(api_config, dict) and api_config.get("base_url") and api_config.get("api_key"):
+                print("【模式选择】本地模型已加载，忽略 API 配置，使用本地模型推理")
+
             # 创建推理引擎（使用缓存）
             engine_key = f"{self.model_info['key']}_{self.model_info['type']}_{self.model_info['subtype']}"
             if engine_key not in self._model_cache:
@@ -1731,8 +1873,6 @@ class omni_llm_unified_inference:
             # 应用用户自定义参数
             if parameters:
                 gen_params.update({k: v for k, v in parameters.items() if k != "state_uid"})
-            
-            gen_params["seed"] = seed
             
             # ========== 视频处理逻辑 ==========
             video_frames = []
@@ -2042,7 +2182,7 @@ class omni_llm_unified_inference:
         except Exception as e:
             error_message = ErrorHandler.handle_error(e, context={"mode": mode, "model_type": self.model_info.get("type", "unknown")})
             print(f"【处理错误】{str(e)}")
-            return (error_message, [error_message], seed)
+            return (error_message, [error_message], locals().get("gen_params", {}).get("seed", 0))
     
     @classmethod
     def _run_parallel_inference(cls, llm, tasks, params):
