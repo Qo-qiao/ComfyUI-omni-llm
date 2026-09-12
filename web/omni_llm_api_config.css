@@ -1,0 +1,146 @@
+/* OmniLLM API Config 面板样式 */
+
+/* 主面板容器 */
+.ac-panel {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: #ddd;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    overflow: hidden;
+    padding: 8px;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+}
+
+/* 按钮行 */
+.ac-bar {
+    display: flex;
+    gap: 6px;
+}
+
+/* 通用按钮 */
+.ac-btn {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all .15s;
+    text-align: center;
+}
+
+.ac-btn:hover {
+    background: #333;
+    border-color: #555;
+}
+
+/* 主按钮 */
+.ac-btn.primary {
+    background: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.ac-btn.primary:hover {
+    background: #66BB6A;
+}
+
+/* 危险按钮 */
+.ac-btn.danger {
+    background: #c62828;
+    border-color: #c62828;
+}
+
+.ac-btn.danger:hover {
+    background: #e53935;
+}
+
+/* 表单行 */
+.ac-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ac-row label {
+    flex-shrink: 0;
+    width: 60px;
+    font-size: 11px;
+    color: #888;
+    text-align: right;
+}
+
+/* 表单输入/下拉 */
+.ac-row select,
+.ac-row input {
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background: #111;
+    color: #fff;
+    font-size: 12px;
+    outline: none;
+    min-width: 0;
+}
+
+.ac-row select:focus,
+.ac-row input:focus {
+    border-color: #4fc3f7;
+}
+
+/* 提示信息 */
+.ac-info {
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    padding: 2px 0;
+}
+
+/* 预览框 */
+.ac-preview-box {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #ddd;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+/* 预览标题 */
+.ac-preview-header {
+    background: #1a1a1a;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: #888;
+    border-bottom: 1px solid #333;
+}
+
+/* 预览内容 */
+.ac-preview-content {
+    margin: 0;
+    padding: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 11px;
+    color: #4fc3f7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.5;
+}

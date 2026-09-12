@@ -1,0 +1,653 @@
+/* OmniLLM Skill Loader 面板样式 */
+
+/* 主面板容器 */
+.sl-panel {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    border-radius: 8px;
+    color: #ddd;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    overflow: hidden;
+    gap: 6px;
+}
+
+/* 头部区域：搜索行 */
+.sl-header {
+    padding: 10px;
+    background: #252525;
+    border-bottom: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 搜索行：语言按钮 + 搜索框 + 筛选按钮 */
+.sl-search-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+/* 搜索框容器 */
+.sl-search-bar {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 搜索输入框 */
+.sl-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.sl-search-input:focus {
+    border-color: #666;
+}
+
+.sl-search-input::placeholder {
+    color: #888;
+}
+
+/* 分类筛选按钮 */
+.sl-filter-btn {
+    padding: 8px 12px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #888;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 16px;
+    outline: none;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    min-width: 32px;
+    text-align: center;
+}
+
+.sl-filter-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+/* 筛选按钮激活态 */
+.sl-filter-btn.active {
+    background: #388e3c;
+    color: #fff;
+    border-color: #388e3c;
+}
+
+/* 语言切换按钮 */
+.sl-lang-btn {
+    padding: 8px 10px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #888;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    outline: none;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    min-width: 32px;
+    text-align: center;
+}
+
+.sl-lang-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+/* 分类下拉菜单 */
+.sl-filter-dropdown {
+    position: fixed;
+    background: #252525;
+    border: 1px solid #444;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    z-index: 10000;
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 150px;
+}
+
+/* 下拉选项 */
+.sl-filter-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.sl-filter-option:hover {
+    background: #333;
+}
+
+.sl-filter-option.active {
+    background: #388e3c;
+    color: #ffffff;
+}
+
+/* Skill 列表容器 */
+.sl-list-container {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    background: #1a1a1a;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+/* 滚动条样式 */
+.sl-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sl-list-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.sl-list-container::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+}
+
+.sl-list-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Skill 卡片 */
+.sl-list-card {
+    margin-bottom: 6px;
+    background: #2a2a2a;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s;
+    overflow: hidden;
+}
+
+.sl-list-card:hover {
+    border-color: #444;
+}
+
+/* 选中态 */
+.sl-list-card.sel {
+    background: #2a3a4a;
+    border-color: #4fc3f7;
+}
+
+/* 卡片头部：名称区域 */
+.sl-list-card-head {
+    display: block;
+    padding: 12px;
+}
+
+/* Skill 名称 */
+.sl-list-card-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 卡片内容区域（标签+描述） */
+.sl-list-card-body {
+    background: #252525;
+    padding: 0 12px 12px;
+}
+
+/* 标签容器 */
+.sl-list-card-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    padding-top: 8px;
+}
+
+/* 单个标签 */
+.sl-list-card-tag {
+    padding: 2px 8px;
+    background: #388e3c;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* 卡片描述 */
+.sl-list-card-desc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 空状态提示 */
+.sl-list-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #555;
+    font-size: 12px;
+}
+
+/* 悬停预览浮窗 */
+.sl-tooltip {
+    position: fixed;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+    width: 380px;
+    max-height: 600px;
+    overflow-y: auto;
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.6;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.sl-tooltip.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.sl-tooltip::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sl-tooltip::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.sl-tooltip::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
+}
+
+/* 底部按钮栏 */
+.sl-bar {
+    display: flex;
+    gap: 6px;
+    flex: 0 0 auto;
+    padding: 10px;
+    background: #252525;
+    border-top: 1px solid #333;
+}
+
+/* 通用按钮 */
+.sl-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.sl-btn:hover {
+    background: #333;
+    border-color: #555;
+}
+
+/* 主按钮 */
+.sl-btn.primary,
+.sl-btn-primary {
+    background: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.sl-btn.primary:hover,
+.sl-btn-primary:hover {
+    background: #66BB6A;
+}
+
+/* 危险按钮 */
+.sl-btn-danger {
+    background: #ef5350;
+    border-color: #ef5350;
+    color: #fff;
+}
+
+.sl-btn-danger:hover {
+    background: #e57373;
+    border-color: #e57373;
+}
+
+/* 导入弹窗遮罩 */
+.sl-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+/* 导入弹窗主体 */
+.sl-popup-box {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .5);
+}
+
+/* 弹窗标题栏 */
+.sl-popup-hdr {
+    padding: 12px 16px;
+    border-bottom: 1px solid #333;
+    border-radius: 10px 10px 0 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 关闭按钮 */
+.sl-popup-x {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.sl-popup-x:hover {
+    color: #fff;
+}
+
+/* 弹窗输入框 */
+.sl-popup-search {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.sl-popup-search:focus {
+    border-color: #666;
+}
+
+/* 弹窗内容区 */
+.sl-popup-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+/* 弹窗底部 */
+.sl-popup-ftr {
+    padding: 10px 16px;
+    border-top: 1px solid #333;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* 弹窗按钮 */
+.sl-popup-btn {
+    padding: 7px 16px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .2s;
+}
+
+.sl-popup-btn:hover {
+    background: #333;
+    border-color: #555;
+}
+
+.sl-popup-btn.primary {
+    background: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.sl-popup-btn.primary:hover {
+    background: #66BB6A;
+}
+
+.sl-popup-btn.danger {
+    background: #ef5350;
+    border-color: #ef5350;
+    color: #fff;
+}
+
+.sl-popup-btn.danger:hover {
+    background: #e57373;
+    border-color: #e57373;
+}
+
+/* 编辑弹窗遮罩 */
+.sl-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 编辑弹窗主体 */
+.sl-modal {
+    background: #252525;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 80vh;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* 编辑弹窗标题 */
+.sl-modal-header {
+    padding: 16px 20px;
+    background: #1e1e1e;
+    border-radius: 10px 10px 0 0;
+    font-size: 16px;
+    font-weight: 500;
+    border-bottom: 1px solid #333;
+}
+
+/* 编辑弹窗内容区 */
+.sl-modal-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 编辑表单字段 */
+.sl-modal-field {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sl-modal-field:last-child {
+    flex: 1;
+}
+
+.sl-modal-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+/* 编辑表单输入框 */
+.sl-modal-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* 编辑表单文本域 */
+.sl-modal-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    resize: none;
+    font-family: inherit;
+}
+
+/* 技能介绍文本域（较小） */
+.sl-modal-textarea.intro {
+    min-height: 120px;
+    max-height: 160px;
+}
+
+/* 技能内容文本域（较大） */
+.sl-modal-textarea.content {
+    min-height: 200px;
+    flex: 1;
+}
+
+.sl-modal-input:focus,
+.sl-modal-textarea:focus {
+    border-color: #ffffff;
+}
+
+/* 编辑弹窗底部按钮栏 */
+.sl-modal-footer {
+    padding: 16px 20px;
+    background: #1e1e1e;
+    border-radius: 0 0 10px 10px;
+    border-top: 1px solid #333;
+    display: flex;
+    gap: 10px;
+}
+
+.sl-modal-footer .sl-btn {
+    flex: 1;
+    padding: 10px;
+}
+
+/* 导入区域 */
+.sl-import-section {
+    margin-bottom: 12px;
+}
+
+.sl-import-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.sl-import-desc {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.sl-import-divider {
+    height: 1px;
+    background: #333;
+    margin: 16px 0;
+}
+
+.sl-import-info {
+    text-align: center;
+    padding: 8px;
+    font-size: 12px;
+    color: #4fc3f7;
+}
+
+/* 分类自动补全下拉 */
+.sl-popup-category {
+    position: fixed;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10000;
+    min-width: 150px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.sl-category-option {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .15s;
+}
+
+.sl-category-option:hover {
+    background: #388e3c;
+}

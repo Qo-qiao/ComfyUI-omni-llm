@@ -1,0 +1,1124 @@
+/* OmniLLM Realtime Chat 聊天窗样式 */
+
+/* 主聊天容器 */
+.omni-llm-chat {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 260px;
+    padding: 0;
+    color: #ddd;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 消息列表 */
+.omni-llm-chat__messages {
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 2px;
+}
+
+.omni-llm-chat__messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.omni-llm-chat__messages::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.omni-llm-chat__messages::-webkit-scrollbar-thumb {
+    background: #5a5a5a;
+    border-radius: 4px;
+}
+
+.omni-llm-chat__messages::-webkit-scrollbar-thumb:hover {
+    background: #6a6a6a;
+}
+
+/* 流程状态栏 */
+.omni-llm-chat__flow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 56px;
+    padding: 4px 8px;
+    color: #999;
+    font-size: 11px;
+}
+
+.omni-llm-chat__flow-summary {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* 工具栏 */
+.omni-llm-chat__flow-tools {
+    box-sizing: border-box;
+    display: flex;
+    height: 52px;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 4px;
+    background: #252525;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* 阶段标签 */
+.omni-llm-chat__stage {
+    max-width: 76px;
+    flex: 0 1 auto;
+    overflow: hidden;
+    padding: 3px 7px;
+    color: #fff;
+    border-radius: 4px;
+    background: #388e3c;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+/* Skill 名称 */
+.omni-llm-chat__skill {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: #999;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 字体大小控制 */
+.omni-llm-chat__font-size {
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 18px 24px 18px;
+    width: 62px;
+    height: 24px;
+    flex: 0 0 62px;
+    align-items: center;
+    overflow: hidden;
+    color: #999;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+.omni-llm-chat__font-button {
+    width: 18px;
+    height: 22px;
+    padding: 0;
+    color: #ccc;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: 15px/22px Arial, sans-serif;
+}
+
+.omni-llm-chat__font-button:hover:not(:disabled) {
+    color: #fff;
+    background: #333;
+}
+
+.omni-llm-chat__font-button:disabled {
+    cursor: default;
+    opacity: 0.3;
+}
+
+.omni-llm-chat__font-value {
+    overflow: hidden;
+    text-align: center;
+    color: #ddd;
+    font: 10px/22px Arial, sans-serif;
+    white-space: nowrap;
+}
+
+/* 卸载模型按钮 */
+.omni-llm-chat__unload {
+    height: 28px;
+    flex: 0 0 auto;
+    padding: 0 6px;
+    color: #999;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    font: 11px/26px Arial, sans-serif;
+    white-space: nowrap;
+}
+
+.omni-llm-chat__unload:hover:not(:disabled) {
+    color: #ef5350;
+    background: #2a2a2a;
+    border-color: #ef5350;
+}
+
+.omni-llm-chat__unload:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+/* 上下文用量指示器 */
+.omni-llm-chat__context {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 180px;
+    height: 50px;
+    flex: 0 0 180px;
+    padding: 0 6px;
+    border-right: 1px solid #333;
+    border-left: 1px solid #333;
+}
+
+.omni-llm-chat__context-ring {
+    position: relative;
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border-radius: 50%;
+    background: conic-gradient(#5d9f80 0deg, #45494f 0deg);
+}
+
+.omni-llm-chat__context-ring::after {
+    position: absolute;
+    inset: 4px;
+    content: "";
+    border-radius: 50%;
+    background: #1a1a1a;
+}
+
+.omni-llm-chat__context-percent {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.omni-llm-chat__context-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.omni-llm-chat__context-tokens {
+    color: #ddd;
+    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.omni-llm-chat__context-rounds {
+    color: #999;
+    font-size: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.omni-llm-chat__context-note {
+    color: #888;
+    font-size: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 选项按钮组 */
+.omni-llm-chat__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    flex: 0 0 auto;
+}
+
+.omni-llm-chat__options:empty {
+    display: none;
+}
+
+/* 消息操作栏 */
+.omni-llm-chat__message-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 22px;
+    margin-top: 4px;
+}
+
+.omni-llm-chat__message-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow: hidden;
+    color: #888;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.omni-llm-chat__message-time {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.omni-llm-chat__message-controls {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+/* 复制按钮 */
+.omni-llm-chat__message-copy {
+    width: 24px;
+    height: 22px;
+    padding: 0;
+    color: #888;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font: 16px/22px Arial, sans-serif;
+}
+
+.omni-llm-chat__message-copy:hover {
+    color: #fff;
+    background: #333;
+}
+
+/* 选项按钮 */
+.omni-llm-chat__option {
+    min-height: 27px;
+    padding: 3px 8px;
+    color: #fff;
+    background: #388e3c;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+
+.omni-llm-chat__option:hover:not(:disabled) {
+    background: #4CAF50;
+}
+
+.omni-llm-chat__option:disabled {
+    cursor: default;
+    opacity: 0.55;
+}
+
+/* 空状态 */
+.omni-llm-chat__empty {
+    display: grid;
+    height: 100%;
+    min-height: 100px;
+    place-items: center;
+    color: #666;
+}
+
+/* 消息气泡 */
+.omni-llm-chat__message {
+    box-sizing: border-box;
+    margin: 0 0 8px;
+    padding: 7px 9px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    border: 1px solid #444;
+    border-radius: 6px;
+    background: #2a2a2a;
+}
+
+/* 用户消息（右对齐） */
+.omni-llm-chat__message--user {
+    width: fit-content;
+    max-width: calc(100% - 24px);
+    margin-right: 0;
+    margin-left: auto;
+    border-color: #388e3c;
+    background: #388e3c;
+    color: #fff;
+}
+
+/* 用户消息内的角色标签 */
+.omni-llm-chat__message--user .omni-llm-chat__role {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* 用户消息内的meta信息（token、时间） */
+.omni-llm-chat__message--user .omni-llm-chat__message-meta {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 用户消息内的复制按钮 */
+.omni-llm-chat__message--user .omni-llm-chat__message-copy {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.omni-llm-chat__message--user .omni-llm-chat__message-copy:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 角色标签 */
+.omni-llm-chat__role {
+    display: block;
+    margin-bottom: 3px;
+    color: #999;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* 消息内容 */
+.omni-llm-chat__message-content {
+    min-width: 0;
+    font-size: var(--omni-llm-chat-font-size, 15px);
+    line-height: 1.55;
+}
+
+/* 图片/视频画廊 */
+.omni-llm-chat__message-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 2px 0 7px;
+}
+
+.omni-llm-chat__message-image-link {
+    position: relative;
+    box-sizing: border-box;
+    display: block;
+    width: 96px;
+    height: 72px;
+    flex: 0 0 96px;
+    padding: 0;
+    overflow: hidden;
+    color: #ccc;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    cursor: zoom-in;
+}
+
+.omni-llm-chat__message-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.omni-llm-chat__message-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+.omni-llm-chat__message-image-label {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    padding: 2px 5px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 3px;
+    font-size: 10px;
+    line-height: 1.2;
+}
+
+/* 全屏预览遮罩 */
+.omni-llm-chat__preview {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 42px;
+    background: rgba(0, 0, 0, 0.85);
+    cursor: zoom-out;
+}
+
+.omni-llm-chat__preview-image {
+    display: block;
+    max-width: min(92vw, 1400px);
+    max-height: 88vh;
+    object-fit: contain;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.omni-llm-chat__preview-video {
+    display: block;
+    max-width: min(92vw, 1400px);
+    max-height: 88vh;
+    object-fit: contain;
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+    background: #000;
+}
+
+/* 预览关闭按钮 */
+.omni-llm-chat__preview-close {
+    position: fixed;
+    top: 14px;
+    right: 18px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: #fff;
+    background: rgba(30, 30, 30, 0.92);
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    font: 26px/32px Arial, sans-serif;
+}
+
+.omni-llm-chat__preview-close:hover {
+    background: #333;
+}
+
+/* 代码块 */
+.omni-llm-chat__code {
+    overflow: auto;
+    margin: 6px 0 2px;
+    padding: 9px 10px;
+    color: #e6edf3;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 4px;
+    white-space: pre;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: var(--omni-llm-chat-font-size, 15px);
+    line-height: 1.5;
+    max-height: 300px;
+}
+
+/* 代码块头部 */
+.omni-llm-chat__code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 22px;
+    margin: -2px -3px 5px;
+}
+
+.omni-llm-chat__code-language {
+    color: #888;
+    font: 10px/1.2 Arial, sans-serif;
+}
+
+.omni-llm-chat__code-copy {
+    width: 24px;
+    height: 22px;
+    padding: 0;
+    color: #888;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font: 16px/22px Arial, sans-serif;
+}
+
+.omni-llm-chat__code-copy:hover {
+    color: #fff;
+    background: #333;
+}
+
+.omni-llm-chat__code-scroll-buttons {
+    display: flex;
+    gap: 2px;
+}
+
+.omni-llm-chat__code-scroll-btn {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    color: #888;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font: 12px/22px Arial, sans-serif;
+}
+
+.omni-llm-chat__code-scroll-btn:hover {
+    color: #fff;
+    background: #333;
+}
+
+/* 输入区 */
+.omni-llm-chat__composer {
+    flex: 0 0 auto;
+    padding: 0 4px 4px 4px;
+}
+
+/* 输入容器 */
+.omni-llm-chat__input-container {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* 工具栏 */
+.omni-llm-chat__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px 4px;
+    border-bottom: 1px solid #333;
+}
+
+.omni-llm-chat__toolbar-btn {
+    height: 28px;
+    padding: 0 12px;
+    color: #ccc;
+    background: transparent;
+    border: 1px solid #555;
+    border-radius: 16px;
+    cursor: pointer;
+    font: inherit;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.omni-llm-chat__toolbar-btn:hover:not(:disabled) {
+    color: #fff;
+    background: #3a3a3a;
+    border-color: #666;
+}
+
+.omni-llm-chat__toolbar-btn:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+/* 保存对话复选框容器 */
+.omni-llm-chat__save-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 0 6px;
+}
+
+.omni-llm-chat__save-checkbox {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #4CAF50;
+}
+
+.omni-llm-chat__save-checkbox:checked {
+    background-color: #4CAF50;
+}
+
+.omni-llm-chat__save-label {
+    color: #999;
+    font: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.omni-llm-chat__save-label:hover {
+    color: #ccc;
+}
+
+/* 发送按钮组 */
+.omni-llm-chat__actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 6px;
+}
+
+/* 输入行 */
+.omni-llm-chat__input-row {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 4px 10px;
+}
+
+/* 附件预览 */
+.omni-llm-chat__attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.omni-llm-chat__attachments:empty {
+    display: none;
+}
+
+.omni-llm-chat__attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 100%;
+    height: 24px;
+    padding: 0 6px;
+    color: #fff;
+    background: #388e3c;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.omni-llm-chat__attachment-remove {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 16px;
+}
+
+/* 文本输入框 */
+.omni-llm-chat__input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 60px;
+    min-height: 40px;
+    max-height: 200px;
+    resize: vertical;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border: none;
+    outline: none;
+    font: inherit;
+    font-size: var(--omni-llm-chat-font-size, 15px);
+    line-height: 1.5;
+}
+
+.omni-llm-chat__input:focus {
+    outline: none;
+}
+
+.omni-llm-chat__input::placeholder {
+    color: #888;
+}
+
+/* 发送按钮 */
+.omni-llm-chat__button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: #fff;
+    background: #4CAF50;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.omni-llm-chat__button::before {
+    content: "↑";
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.omni-llm-chat__button:hover:not(:disabled) {
+    background: #66BB6A;
+    transform: scale(1.05);
+}
+
+.omni-llm-chat__button:disabled {
+    cursor: default;
+    opacity: 0.45;
+}
+
+/* 状态栏 */
+.omni-llm-chat__status {
+    flex: 0 0 auto;
+    min-height: 12px;
+    padding: 2px 8px;
+    color: #999;
+    font-size: 10px;
+    line-height: 1.2;
+}
+
+.omni-llm-chat__status[data-state="busy"] {
+    color: #4CAF50;
+}
+
+.omni-llm-chat__status[data-state="error"] {
+    color: #ef5350;
+}
+
+/* 系统提示词输入框 */
+.omni-llm-chat__system-prompt {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+.omni-llm-chat__system-prompt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+    border: 1px solid #3a3a3a;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.omni-llm-chat__system-prompt-header:hover {
+    background: linear-gradient(135deg, #252525 0%, #333333 100%);
+    border-color: #4a4a4a;
+}
+
+.omni-llm-chat__system-prompt-toggle {
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.omni-llm-chat__system-prompt-toggle:hover {
+    color: #4CAF50;
+}
+
+.omni-llm-chat__system-prompt-label {
+    font-size: 11px;
+    color: #777;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.omni-llm-chat__system-prompt-input {
+    width: 100%;
+    min-height: 50px;
+    max-height: 100px;
+    padding: 8px 10px;
+    border: 1px solid #3a3a3a;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background: linear-gradient(180deg, #1e1e1e 0%, #252525 100%);
+    color: #e0e0e0;
+    font-size: 12px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+
+.omni-llm-chat__system-prompt-input::placeholder {
+    color: #555;
+}
+
+.omni-llm-chat__system-prompt-input:focus {
+    border-color: #4CAF50;
+    background: linear-gradient(180deg, #1e1e1e 0%, #2a2a2a 100%);
+}
+
+.omni-llm-chat__system-prompt.collapsed .omni-llm-chat__system-prompt-input {
+    display: none;
+}
+
+.omni-llm-chat__system-prompt.collapsed .omni-llm-chat__system-prompt-header {
+    border-radius: 8px;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.omni-llm-chat__system-prompt.collapsed .omni-llm-chat__system-prompt-header:hover {
+    background: linear-gradient(135deg, #252525 0%, #333333 100%);
+}
+
+/* ===== 历史对话按钮 ===== */
+.omni-llm-chat__history-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    color: #999;
+    background: transparent;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.omni-llm-chat__history-btn:hover {
+    color: #fff;
+    background: rgba(76, 175, 80, 0.15);
+    border-color: #4CAF50;
+}
+
+.omni-llm-chat__history-btn--active {
+    color: #fff;
+    background: rgba(76, 175, 80, 0.3);
+    border-color: #4CAF50;
+}
+
+.omni-llm-chat__history-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ===== 主内容区域 ===== */
+.omni-llm-chat__main {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 左侧内容面板 */
+.omni-llm-chat__left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* ===== 右侧历史面板 ===== */
+.omni-llm-chat__history-sidebar {
+    width: 0;
+    height: 100%;
+    overflow: hidden;
+    border-left: 1px solid #333;
+    background: #1a1a1a;
+    transition: width 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 0;
+}
+
+.omni-llm-chat__history-sidebar.omni-llm-chat__history-sidebar--visible {
+    width: 240px;
+    flex: 0 0 240px;
+}
+
+.omni-llm-chat__history-sidebar.omni-llm-chat__history-sidebar--visible {
+    transform: translateX(0);
+}
+
+.omni-llm-chat__history-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #333;
+    background: linear-gradient(180deg, #252525 0%, #1a1a1a 100%);
+}
+
+.omni-llm-chat__history-sidebar-title {
+    color: #ccc;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.omni-llm-chat__history-sidebar-close {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    color: #999;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    transition: all 0.15s ease;
+}
+
+.omni-llm-chat__history-sidebar-close:hover {
+    color: #fff;
+    background: rgba(244, 67, 54, 0.2);
+}
+
+/* ===== 搜索框 ===== */
+.omni-llm-chat__history-search {
+    padding: 10px 12px;
+    border-bottom: 1px solid #333;
+}
+
+.omni-llm-chat__history-search-input {
+    width: 100%;
+    padding: 8px 10px;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #ddd;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.omni-llm-chat__history-search-input::placeholder {
+    color: #666;
+}
+
+.omni-llm-chat__history-search-input:focus {
+    border-color: #4CAF50;
+}
+
+/* ===== 历史列表 ===== */
+.omni-llm-chat__history-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.omni-llm-chat__history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.omni-llm-chat__history-list::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.omni-llm-chat__history-list::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+}
+
+.omni-llm-chat__history-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* ===== 历史列表项 ===== */
+.omni-llm-chat__history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.omni-llm-chat__history-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.omni-llm-chat__history-item--selected {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.omni-llm-chat__history-item-icon {
+    flex-shrink: 0;
+    color: #666;
+    display: flex;
+    align-items: center;
+}
+
+.omni-llm-chat__history-item--selected .omni-llm-chat__history-item-icon {
+    color: #4CAF50;
+}
+
+.omni-llm-chat__history-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.omni-llm-chat__history-item-name {
+    display: block;
+    color: #ddd;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.omni-llm-chat__history-item-meta {
+    display: block;
+    color: #777;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.omni-llm-chat__history-item-del {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    z-index: 1;
+}
+.omni-llm-chat__history-item:hover .omni-llm-chat__history-item-del {
+    opacity: 1;
+}
+.omni-llm-chat__history-item-del:hover {
+    background: rgba(239, 83, 80, 0.25);
+}
