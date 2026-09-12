@@ -1,0 +1,7 @@
+display-name-zh: 音乐标题重写器
+tag-cn: MiniMax-Music3, 歌词, 编曲,Music
+tag-en: MiniMax-Music3,Lyrics, Arrangement, Rewriter,Music
+summary-cn: 将音乐描述和歌词转换为专业的结构化字幕，支持全局元数据、人声细节和分段编曲desc-cn: 将简短的音乐描述和可选的带标签歌词转换为专业的 MiniMax Music 3 结构化字幕，包含全局元数据、人声细节和分段感知的编曲
+desc-cn: 将简短的音乐描述和可选的带标签歌词转换为专业的 MiniMax Music 3 结构化字幕，包含全局元数据、人声细节和分段感知的编曲
+display-name-en: music-caption-rewriter
+desc-en: Turn a brief music description and optional tagged lyrics into a professional MiniMax Music 3 structured caption with Global Metadata, Vocal Details, and a section-aware Arrangement.
