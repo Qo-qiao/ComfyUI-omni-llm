@@ -1,0 +1,222 @@
+# 视频提示词编写指南 (T2VA / I2VA / FL2VA / L2VA)
+
+## 1. 任务概述
+
+- **T2VA**：从文本构建完整的视听时间线。
+- **I2VA**：T2VA 主体 + 第一帧指令 + 从第一帧向前发展的视觉路径。
+- **FL2VA**：T2VA 主体 + 首尾帧指令 + 从第一帧到最后一帧的连续路径。
+- **L2VA**：T2VA 主体 + 最后一帧指令 + 从前置状态收敛到最后一帧的路径。
+
+## 2. 最终提示词结构
+
+### 2.1 第一部分是指令
+
+**T2VA** 没有图像对齐指令，直接从三个核心字段开始。
+
+**I2VA** 始终使用：
+
+```text
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+```
+
+**FL2VA** 始终使用：
+
+```text
+How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot N) aligns with the S.SS-second mark of the target video.
+```
+
+**L2VA** 始终使用：
+
+```text
+How the reference pictures align with the target video — <Picture 1> (from [Shot N]) aligns with the S.SS-second mark of the target video.
+```
+
+这里，`N` 是实际最后一个镜头的索引，`S.SS` 是有效视频时长，格式为两位小数。指令必须是最终提示词的第一行，后面跟一个空行，然后是核心字段。
+
+### 2.2 第二部分包含三个核心字段
+
+```text
+integrated_multimodal_description: [Shot 1] ...
+
+overall_soundscape: ...
+
+non_diegetic_music: ...
+```
+
+- **integrated_multimodal_description**：沿时间线描述视觉、动作、镜头、说话者、对话、歌唱和画内音。
+- **overall_soundscape**：总结整个视频的环境音、物理动作声和非语言人声。
+- **non_diegetic_music**：描述角色听不到、只有观众能听到的背景音乐。
+
+## 3. 如何将关键帧融入多模态描述
+
+### 3.1 I2VA：从图像开始向前发展
+
+`<Picture 1>` 是视频在 0.00 秒的实际第一帧，属于 `[Shot 1]`。描述应首先确立图像中的风格、主体、构图和场景锚点，然后描述下一个动作。角色身份、服装、颜色、关键物体和空间关系应保持一致。
+
+推荐结构：**第一帧锚点 → 动作开始 → 连续发展 → 结果或反应**。
+
+### 3.2 FL2VA：描述首尾帧之间的路径
+
+Picture 1 是开头，Picture 2 是结尾。重点关注主体如何移动、姿势如何变化、物体如何操作、构图如何演变以及场景或光线如何过渡。
+
+FL2VA 通常倾向于单个镜头，以便模型可以从第一帧连续插值到最后一帧。仅在明确指定时使用多个镜头。最后一个 `[Shot N]` 必须在视频结束时到达最后一帧。
+
+推荐结构：**第一帧状态 → 可观察的中间变化 → 逐渐缩小的差异 → 最后一帧状态**。
+
+### 3.3 L2VA：推断开头并在结尾落在图像上
+
+`<Picture 1>` 是视频的最后一帧，属于最后一个 `[Shot N]`；它本质上不属于 Shot 1。从用户意图和最后一帧推断合理的前置状态，然后描述角色、物体、镜头和场景如何逐渐接近参考图像。
+
+推荐结构：**合理的前置状态 → 明确的动作和过渡路径 → 在最后一个镜头中逐渐收敛 → 最后一帧着陆**。
+
+## 4. 如何编写三个共享核心部分
+
+### 4.1 沿时间线发展多模态描述
+
+`integrated_multimodal_description` 是改写提示词的主体。每个细节都应对应可见或可听的内容：视觉风格、初始构图、主体外观和位置、场景和关键道具、动作和反应、镜头变化、说话语言以及同步的画内音。
+
+在 `[Shot 1]` 开头，说明整体风格和初始构图。常见风格包括 `Cinematic`（电影感）、`live-action`（实景）、`2D-animated`（2D 动画）、`3D CG`（3D 计算机图形）、`claymation`（粘土动画）、`watercolor`（水彩）和 `vintage film`（复古胶片）。对于关键帧任务，从参考图像推断风格；对于 T2VA，从用户文本中选择。
+
+```text
+[Shot 1] Live-action, cinematic, a medium-wide shot frames...
+```
+
+### 4.2 镜头和切换
+
+不要为第一个镜头添加时间戳。为后续镜头使用顺序镜头编号，每个镜头以严格递增的切换时间开始，且该时间必须在视频时长内：
+
+```text
+[Shot 2] At 00:03.500, the camera cuts to...
+```
+
+对于普通切换，使用 `the camera cuts to`、`the shot cuts to`、`the shot transitions to`、`the shot changes to` 或 `the shot switches to`。当用户明确要求时，也可以使用交叉溶解、淡入淡出或擦除。切换应引入关于主体、空间、状态、视角或时间的新信息。如果只是距离或角度的轻微变化，优先使用镜头运动。
+
+### 4.3 镜头运动：运动类型 + 幅度 + 速度
+
+完整的镜头运动表达有三个维度：**运动类型**定义镜头如何移动，**幅度**定义构图变化的范围，**速度**定义变化的节奏。仅在有意义时添加幅度和速度；中等幅度和正常速度通常省略。
+
+| 维度 | 可用表达 | 描述 |
+|-|-|-|
+| 运动类型 | `Zoom In / Zoom Out`（推拉变焦） | 焦距变化，镜头机身保持静止 |
+| 运动类型 | `Push In / Pull Out`（推拉移动） | 镜头向前/向后移动 |
+| 运动类型 | `Pan Left / Pan Right`（左右摇摄） | 镜头保持原位，镜头水平转动 |
+| 运动类型 | `Truck Left / Truck Right`（左右横移） | 镜头水平平移 |
+| 运动类型 | `Tilt Up / Tilt Down`（上下俯仰） | 镜头保持原位，镜头垂直转动 |
+| 运动类型 | `Pedestal Up / Pedestal Down`（上下升降） | 整个镜头向上/向下移动 |
+| 运动类型 | `Arc Shot`（弧形镜头） | 镜头围绕主体做弧形运动 |
+| 运动类型 | `Tracking Shot`（跟踪镜头） | 镜头跟随移动的主体 |
+| 运动类型 | `Static Shot`（静态镜头） | 镜头位置和镜头保持静止 |
+| 运动类型 | `Shake Slightly / Shake Strongly`（轻微/强烈抖动） | 轻微/强烈的镜头抖动 |
+| 运动类型 | `POV`（主观视角） | 主体的第一人称视角 |
+| 运动类型 | `Roll Clockwise / Roll Counterclockwise`（顺时针/逆时针旋转） | 镜头绕镜头轴顺时针/逆时针旋转 |
+| 幅度 | `with small amplitude`（小幅度） | 小范围变化 |
+| 幅度 | `with large amplitude`（大幅度） | 大范围变化 |
+| 速度 | `at slow speed`（慢速） | 缓慢移动 |
+| 速度 | `at fast speed`（快速） | 快速移动 |
+
+镜头运动应作为镜头内的自然英文动作书写，而不是在句子末尾堆叠为单独的标签：
+
+```text
+The camera pushes in with small amplitude at slow speed toward the folded letter in her hands.
+The camera pans right with large amplitude at fast speed, revealing the open doorway.
+The camera holds a static shot as the runner exits the frame.
+```
+
+### 4.4 说话者、对话和歌唱
+
+说话、歌唱或产生画外人声的主体使用稳定的 ID，如 `(S1)` 和 `(S2)`。当多个已编号的说话者同时说话或歌唱时，使用复合 ID，如 `(S1,S2)`。说话者在不同镜头中保持相同的 ID；从未发声的角色不获得说话者 ID。
+
+当说话者首次出现时，提供足够的视觉和音频上下文信息以建立稳定的身份，如角色类型、年龄、性别、是否在画面上、音高、音色、语速或口音。将说话者的识别短语、ID、动作和表达放在 `<d>` 外部。在 `<d>` 内部，仅包含语言标签和实际用户提供的说话内容。逐字保留每个原始单词和标点符号；不要翻译或改写它们。
+
+```text
+The young woman with a quiet, breathy voice (S1) says: <d>[English] I get off at the next station.</d>
+The two children (S1,S2) shout together, <d>[English] Wait for us!</d>
+```
+
+对于画外音，使用确切短语 `says in an off-screen voiceover`。在每个画外音 `<d>` 块之后，立即说明相应画面角色的嘴唇保持闭合：
+
+```text
+The man (S1) says in an off-screen voiceover: <d>[English] I still remember that road.</d> while his lips remain completely closed.
+```
+
+当同一句对话或歌词跨越切换时，在两部分的连接点使用 `<scenetrans>` 并明确说明音频跨越切换继续。当语音被视频结束截断时使用 `<cutoff>`。连续性可以用 `continues seamlessly across the cut`（无缝跨越切换继续）、`continues uninterrupted into the next shot`（不间断地延续到下一个镜头）、`carries over from the previous shot`（从前一个镜头延续过来）或 `remains audible across the transition`（在过渡中保持可听）来表达。
+
+### 4.5 屏幕文字
+
+将任何实际在屏幕上可见的横幅、标志、标签、字幕或霓虹灯文字放在英文双引号中。逐字保留原始文本和标点符号，不翻译。
+
+```text
+A red neon sign reading "营业中" glows above the doorway.
+```
+
+### 4.6 overall_soundscape（整体音景）
+
+用 1-4 个英文句子在一个连续段落中总结整个视频的环境音、物理动作声和非语言人声，如风声、雨声、交通声、脚步声、织物移动声、撞击声、呼吸声、笑声或喘息声。对话、歌唱和画内音已属于多模态描述的一部分，不应在此重复。仅当用户明确要求整个视频完全静音时使用 `N/A`。
+
+```text
+overall_soundscape: Steady rain taps against the café windows while low room ambience continues underneath. The entrance bell rings once, followed by wet footsteps and the soft scrape of a chair.
+```
+
+### 4.7 non_diegetic_music（非画内音乐）
+
+用 1-3 个英文句子描述角色听不到、只有观众能听到的背景音乐。重点关注乐器、速度、节奏和动态变化；不要使用抽象的情绪词汇或解释配乐的情感功能。角色能听到的歌唱、乐器、收音机、电视或手机音乐属于画内事件，应出现在多模态描述中。当没有非画内音乐时使用 `N/A`。
+
+```text
+non_diegetic_music: Sparse piano notes at a slow tempo, joined by sustained low strings that gradually increase in volume before fading out.
+```
+
+## 5. 案例
+
+### 案例 1: T2VA
+
+没有参考图像时，直接从文本构建完整的时间线。您可以添加与用户意图一致的场景、角色、动作和声音细节。
+
+```text
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, a medium-wide shot frames a baker opening the shutters of a small street bakery before sunrise. The camera pushes in with small amplitude at slow speed as the middle-aged baker with a calm, slightly raspy voice (S1) places a fresh loaf on the wooden counter and says: <d>[English] First batch of the morning.</d> [Shot 2] At 00:05.000, the camera cuts to a close-up of steam rising from the sliced bread while the baker's final words carry over from the previous shot.
+
+overall_soundscape: Wooden shutters scrape open over a quiet street as trays clink softly inside the bakery. The doorbell rings once, followed by light footsteps and the crisp sound of bread being sliced.
+
+non_diegetic_music: A soft acoustic-guitar pattern at a moderate tempo, joined by sparse upright-bass notes and a gentle fade at the end.
+```
+
+### 案例 2: I2VA
+
+首先编写第一帧指令，然后使用 Picture 1 中的主体、构图和场景作为 Shot 1 的起点，然后描述场景如何继续发展。
+
+```text
+For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, the young woman shown in <Picture 1> remains beside the rain-covered train window, preserving her appearance, clothing, seat position, and the carriage layout. The camera trucks right with small amplitude at slow speed as she lifts her gaze from the folded letter toward the passing city lights. Her reflection moves across the glass while the quiet, breathy young woman (S1) says: <d>[English] I get off at the next station.</d> She folds the letter along its existing crease.
+
+overall_soundscape: The train wheels produce a steady metallic rhythm beneath a low ventilation hum. Rain ticks against the window while paper rustles softly in her hands.
+
+non_diegetic_music: Sustained cello notes at a slow tempo with widely spaced piano tones, gradually decreasing in volume.
+```
+
+### 案例 3: FL2VA
+
+两张图像分别锚定开头和结尾。主体不应重复两张静态图像描述；而应提供连接它们的运动路径。以下示例是八秒的单镜头。
+
+```text
+How the reference pictures align with the target video — Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 8.00-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, a rain-soaked cyclist begins in the position and framing established by Picture 1, holding a closed black umbrella beside a silver bicycle. The camera pulls out with small amplitude at slow speed as she releases the bicycle handle, raises the umbrella above her shoulder, and presses the runner upward until the canopy opens. Water rolls from the expanding fabric while she steps beneath it, rotates the handle into the final angle, and settles into the pose, spacing, and composition established by Picture 2 at the end of the shot.
+
+overall_soundscape: Rain falls steadily on the pavement, followed by the metallic click of the umbrella runner and the soft snap of the canopy opening. Water drips from the bicycle frame as distant traffic passes.
+
+non_diegetic_music: N/A
+```
+
+### 案例 4: L2VA
+
+图像仅锚定最后一刻。首先建立一个兼容的前置状态，然后让动作、物体状态和构图在最后一个镜头中逐渐落在 Picture 1 上。以下示例是六秒的单镜头。
+
+```text
+How the reference pictures align with the target video — <Picture 1> (from [Shot 1]) aligns with the 6.00-second mark of the target video.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic, a close shot begins with an intact drinking glass near the edge of a dark wooden table, while the same hand and sleeve visible in <Picture 1> approach from the right. The camera pushes in with small amplitude at slow speed as the fingertips strike the rim. The glass tips, falls, and hits the floor with a sharp impact; cracks spread through it as fragments slide outward. Toward the end, the moving pieces lose momentum and settle into the exact broken arrangement, hand position, camera angle, lighting, and final composition established by <Picture 1>.
+
+overall_soundscape: Fingertips tap the glass before it scrapes across the tabletop, falls, and breaks with a sharp crash. Small fragments scatter and gradually stop sliding across the floor.
+
+non_diegetic_music: A low electronic pulse at a slow tempo, ending immediately after the glass breaks.
+```

@@ -1,0 +1,7 @@
+display-name-zh: H3视频提示词编写
+tag-cn: MiniMax-H3, 提示词, Video
+tag-en: MiniMax-H3,Prompt,Video,
+summary-cn: 为MiniMax H3视频生成编写提示词，支持T2VA、I2VA、FL2VA、L2VA和Ref2VA模式desc-cn: 为 MiniMax H3 视频生成编写提示词，支持 T2VA、I2VA、FL2VA、L2VA 和 Ref2VA 模式。当需要将多模态请求改写为 H3 提示词结构、编写 integrated_multimodal_description、overall_soundscape 和 non_diegetic_music、对齐关键帧、或为图像、视频和音频定义参考标签时使用
+desc-cn: 为 MiniMax H3 视频生成编写提示词，支持 T2VA、I2VA、FL2VA、L2VA 和 Ref2VA 模式。当需要将多模态请求改写为 H3 提示词结构、编写 integrated_multimodal_description、overall_soundscape 和 non_diegetic_music、对齐关键帧、或为图像、视频和音频定义参考标签时使用
+display-name-en: h3-prompt-writing
+desc-en: Write MiniMax H3 video generation prompts for T2VA, I2VA, FL2VA, L2VA, and Ref2VA. Use when rewriting multimodal requests into H3 prompt structures, composing integrated_multimodal_description, overall_soundscape, and non_diegetic_music, aligning keyframes, or defining reference labels for images, videos, and audio.

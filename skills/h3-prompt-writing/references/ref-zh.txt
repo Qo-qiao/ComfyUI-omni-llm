@@ -1,0 +1,341 @@
+# 全参考模式改写输出格式指南
+
+本指南解释了全参考模式下改写输出的组织和编写方式。
+
+用英文编写所有六个改写部分。仅保留对话和歌词内部的原始语言（在 `<d>` 内），以及场景中可见的文本。
+
+**描述细节：** 使 `detailed_description` 尽可能详细和明确。对于每个镜头，清楚建立当前构图、主体外观和位置、环境和光线、动作和状态变化、镜头运动、当前声音，以及引用内容实际出现或生效的点。避免将描述简化为剧情摘要或引用关系列表。
+
+> 镜头、镜头运动、说话者、对话和普通声音的基本格式与视频提示词编写指南 (T2VA / I2VA / FL2VA / L2VA) 共享。本指南专注于全参考模式特有的参考标签、分析部分和格式差异。
+
+## 1. 整体结构
+
+完整的改写输出由以下六个部分按顺序组成：
+
+| 部分 | 目的 |
+| --- | --- |
+| `subject_definitions`（主体定义） | 定义引用内容及其参考标签 |
+| `summary`（摘要） | 总结任务类型、目标视频和主要引用关系 |
+| `retention_analysis`（保留分析） | 描述引用内容如何被保留、转移或重用 |
+| `detailed_description`（详细描述） | 按播放顺序描述视觉、动作、镜头、声音和对话 |
+| `overall_soundscape`（整体音景） | 总结环境音和物理声音 |
+| `non_diegetic_music`（非画内音乐） | 描述只有观众能听到的背景音乐 |
+
+## 2. 参考标签和定义 (`subject_definitions`)
+
+全参考改写使用四种标签来标识引用内容的来源和角色：
+
+| 标签 | 含义 |
+| --- | --- |
+| `<Subject N>`（主体 N） | 从引用资产中抽象出的可见内容，可在目标视频中重用或修改 |
+| `<Picture N>`（图片 N） | 用作具体目标帧或镜头规划锚点的参考图片 |
+| `<Video N>`（视频 N） | 提供编辑来源、续接起点或全视频时间结构的参考视频 |
+| `<Audio N>`（音频 N） | 被复制或引用的音频信号 |
+
+> 一旦为某个内容分配了参考标签，它在 `subject_definitions`、`summary`、`retention_analysis`、`detailed_description` 和音频部分中保持相同的含义。
+
+`subject_definitions` 定义每个需要单独跟踪的引用内容，例如人物、环境、源视频的结构或音轨。为每个项目分配单独的行，解释其标签表示什么、引用角色以及需要跟踪的主要特征；当需要明确来源时，命名相应的源资产。如果 `<Picture N>` 或 `<Video N>` 仅标识另一个引用内容的来源，且后续不会单独分析或使用，则在其定义内引用，不添加单独的行。`retention_analysis` 记录每个引用项目出现的位置以及它是完全保留、部分保留、转移还是重用。
+
+### 2.1 `<Subject N>`
+
+`<Subject N>` 用于可重用的可见内容，包括：
+
+- 人物、动物或物体
+- 场景、背景或环境
+- 服装、道具、界面或视觉效果
+- 风格、动作、表情或姿势
+
+它代表将在目标视频中实际使用的内容单元，而非源文件本身。一个主体可以由多个引用资产定义，一个引用资产也可以提供多个主体。
+
+```text
+<Subject 1> is the young woman in <Picture 1>, with long dark hair, a blue cardigan, and a thin silver necklace.
+```
+
+当同一主体来自多个资产时，组合来源并说明每个资产提供什么：
+
+```text
+<Subject 1> is the woman whose appearance comes from <Picture 1> and whose walking motion comes from <Video 1>.
+```
+
+### 2.2 `<Picture N>`
+
+当参考图像本身作为镜头的第一帧、关键帧、最后一帧、编辑后的关键帧或构图锚点时，使用独立的 `<Picture N>`：
+
+```text
+<Picture 2> is the first frame of [Shot 1], showing a woman seated beside a café window.
+```
+
+如果图像仅用于定义角色、场景、服装或样式，不要创建独立的图片条目。而是在相应的 `<Subject N>` 定义内引用图像来源。
+
+当图像作为分镜或镜头规划参考时，说明它映射到哪些镜头以及提供什么规划信息：
+
+```text
+<Picture 3> is a storyboard reference for [Shot 1] and [Shot 2], defining their viewpoint, subject placement, and shot order.
+```
+
+### 2.3 `<Video N>`
+
+`<Video N>` 保留用于全视频关系，例如：
+
+- 编辑原始视频
+- 从原始视频结尾续接
+- 引用原始视频的镜头运动、切换、节奏或时间结构
+
+```text
+<Video 1> is the source video for the target video edit.
+```
+
+如果参考视频中的某个人物、物体、场景、动作或效果作为可见内容被重用，它仍属于 `<Subject N>`。`<Video N>` 标识资产或结构来源，不替代主体标签。
+
+### 2.4 `<Audio N>`
+
+`<Audio N>` 代表独立的音频资产或参考视频中启用的同步音轨。常见用途包括：
+
+- 复制全部或部分音频信号
+- 引用背景音乐风格
+- 引用说话者的音色和表达
+- 使用原始音频中的对话、歌词或音效
+- 引用节拍、节奏或音频连续性
+
+当 `<Audio N>` 明确对应目标说话者时，在定义中重用该说话者的全局 ID：当说话者映射到已定义的主体时写 `<Subject N> (Sx)`，否则使用稳定的语音描述后跟 `(Sx)`。ID 来自目标视频的全局说话者顺序，不在音频定义中独立分配或重新编号。参见第 5.4 节的说话者编号规则：
+
+```text
+<audio 1> is the voice-timbre reference for <Subject 1> (S1).
+```
+
+当一个音频资产服务多个角色时，在一个自然句子中描述这些角色，而不是创建额外的子部分。
+
+### 2.5 来自同一参考视频的视觉和音频轨道
+
+`<Video N>` 和 `<Audio N>` 独立编号。每个索引仅表示其自身类别内标签的顺序，不编码两个类别之间的配对。因此，同一参考视频可以对应 `<Video 1>` 和 `<Audio 2>`；不同的索引并不妨碍它们来自同一源资产。
+
+普通参考视频不会仅仅因为文件包含音频就创建 `<Audio N>`。
+
+`<Audio N>` 定义主要说明音频的角色，不必命名其来源的 `<Video N>`。仅在需要消除来源歧义时说明共享来源，例如：
+
+```text
+<Video 1> is the source video for the target video edit.
+<Audio 2> is the synchronized audio track of <Video 1> and is reused in the target video.
+```
+
+## 3. `summary`（摘要）
+
+本部分用一个简短的英文段落总结目标视频及其引用关系。以方括号内的任务类型前缀开头：
+
+```text
+[reference generation] ...
+[video editing + reference generation + audio reuse] ...
+```
+
+根据每个引用资产在目标视频中的实际角色选择任务类型：
+
+| 任务类型 | 使用场景 |
+| --- | --- |
+| `keyframe completion`（关键帧补全） | 图像作为目标视频的第一帧、关键帧、最后一帧、编辑后的关键帧或其他具体帧锚点 |
+| `reference generation`（参考生成） | 图像、视频或音频资产为角色、场景、样式、动作、镜头运动、分镜等提供生成指导，但不作为具体帧或被编辑/续接的源视频 |
+| `video editing`（视频编辑） | 直接修改现有源视频；编辑图像或在静态关键帧之间生成不属于此类型 |
+| `video continuation`（视频续接） | 新内容从现有源视频继续、扩展、恢复或过渡 |
+| `audio reuse`（音频重用） | 完全或部分重用同一音频信号 |
+| `audio reference`（音频参考） | 不直接复制音频信号；仅引用其音乐风格、音色、对话或歌词内容、音效纹理、节拍或连续性 |
+
+当一个任务满足多个关系时，用 ` + ` 组合任务类型，不要重复类型。例如，从源视频续接同时使用图像作为最后一帧写为 `[video continuation + keyframe completion]`。编辑源视频同时保留其原始音频可写为 `[video editing + audio reuse]`。
+
+视频或音频的存在本身不会自动创建相应的任务类型。如果参考视频仅提供镜头运动、切换或节奏，通常属于 `reference generation`。仅在直接编辑或续接该视频时使用 `video editing` 或 `video continuation`。
+
+编辑源视频时，如果其原始音频仍然可听，也使用 `audio reuse`。续接源视频时不直接复制音频信号，如果新音频仅延续原始音轨的可听特性，使用 `audio reference`。
+
+摘要使用先前定义的 `<Subject N>`、`<Picture N>`、`<Video N>` 和 `<Audio N>` 标签来描述主要主体、镜头流程和引用资产的角色。不要在此部分引入新的引用标签。
+
+对于视频编辑任务，在任务类型前缀后以以下内容开头：
+
+```text
+The target video is an edited version of <Video 1>.
+```
+
+## 4. `retention_analysis`（保留分析）
+
+本部分描述每个引用内容在目标视频中如何被保留、转移、复制或引用。每个引用标签使用一行，并保留 `subject_definitions` 中建立的含义。
+
+### 4.1 可见内容
+
+`<Subject N>`、`<Picture N>` 和 `<Video N>` 使用以下关系标记。这些标记是输出格式中的固定英文值：
+
+| 关系标记 | 含义 |
+| --- | --- |
+| `fully_preserved`（完全保留） | 引用内容的定义角色被完全保留 |
+| `partially_preserved`（部分保留） | 引用内容仍被使用，但某些定义特征被更改或仅部分保留 |
+| `attribute_transfer`（属性转移） | 引用特征被转移到不同的可识别目标主体 |
+| `weak_reference`（弱参考） | 仅保留风格、类别、构图或氛围的广泛相似性 |
+
+主体条目：
+
+```text
+<Subject 1> (appears in [Shot 1], [Shot 3]): fully_preserved - ...
+```
+
+图片条目：
+
+```text
+<Picture 2> ([Shot 1] first frame): fully_preserved - ...
+```
+
+视频结构条目：
+
+```text
+<Video 1> (cut and pacing structure): weak_reference - ...
+```
+
+### 4.2 音频
+
+`<Audio N>` 使用以下关系标记：
+
+| 关系标记 | 含义 |
+| --- | --- |
+| `fully_copy`（完全复制） | 完整的源音频作为目标视频的完整最终音轨 |
+| `partially_copy`（部分复制） | 仅复制时间线的一部分或选定的音频层，或在复制后添加、移除或替换其他声音 |
+| `reference`（参考） | 不直接复制信号；仅引用音色、节奏、音乐风格、对话内容或声音纹理 |
+| `weak_reference`（弱参考） | 仅保留类别或氛围的广泛相似性 |
+
+```text
+<Audio 1>: fully_copy - <Audio 1> is reused 1:1 as the target video's complete final audio track.
+```
+
+```text
+<Audio 2>: reference - the target speaker follows <Audio 2>'s voice timbre and measured delivery without copying the original signal.
+```
+
+仅在该标签在 `subject_definitions` 中已定义的引用角色内选择每个关系标记。不要将目标视频中新添加的动作、背景或剧情事件视为引用保真度的损失。
+
+## 5. `detailed_description`（详细描述）
+
+这是全参考改写的主体。它按目标视频播放顺序逐镜头描述视觉、动作、声音和对话，并在适用处插入引用标签。
+
+### 5.1 基本格式
+
+基本格式遵循视频提示词编写指南 (T2VA / I2VA / FL2VA / L2VA)：
+
+- 用英文编写主体。保留对话、歌词和可见文本的原始语言。
+- `[Shot 1]` 标记开场镜头，没有时间戳。后续镜头使用 `[Shot N] At MM:SS.mmm, ...` 标记切换时间。
+- 将镜头运动作为当前镜头内的自然英文书写，包括需要表达时的运动类型、幅度和速度。
+- 为发声来源分配稳定的 `(S1)`、`(S2)` 及后续 ID。将对话和歌词写为 `<d>[Language] ...</d>`。
+- 使用 `<scenetrans>`、`<cutoff>` 以及相应的连续性描述来处理跨越切换的对话、被视频结束截断的语音以及跨镜头的连续音频。
+
+有关镜头词汇、群组对话、画外音、跨越切换的对话和可见文本的完整规则和示例，请参阅视频提示词编写指南 (T2VA / I2VA / FL2VA / L2VA)。
+
+### 5.2 全参考模式差异
+
+| 维度 | T2VA | 全参考模式 |
+| --- | --- | --- |
+| 主字段 | `integrated_multimodal_description` | `detailed_description` |
+| 风格开头 | 在 `[Shot 1]` 之后书写 | 在 `[Shot 1]` 之前用一两个英文句子建立 |
+| 引用信息 | 不使用全参考标签 | 在 `<Subject N>`、`<Picture N>`、`<Video N>` 和 `<Audio N>` 首次出现及其角色适用处插入 |
+| 音频关系 | 描述目标视频自身的声音 | 在相应的镜头或音频阶段引用 `<Audio N>` 并说明信号是被复制还是被引用 |
+
+开头示例：
+
+```text
+The target video is in a cinematic, literary music-video style with soft lighting and a slightly desaturated color palette.
+[Shot 1] The scene opens in a crowded urban street...
+[Shot 2] At 00:09.000, the shot cuts to an extreme close-up...
+```
+
+对于生成任务，`detailed_description` 通常为 350-500 个英文单词。对话密集的内容优先适应完整的说话时间线，而不是机械地达到字数。视频编辑描述根据源视频的复杂性调整，不必遵循生成任务的范围。单个镜头不一定意味着更短的描述；根据信息负载在多个镜头之间分配细节。
+
+### 5.3 在镜头中使用引用标签
+
+在重要的 `<Subject N>` 首次清晰出现时，描述其引用特征、在画面中的位置以及当前镜头中实际可见的当前动作。在后续镜头中继续使用相同的标签，而不重新定义标签代表什么。
+
+使用自然措辞表达具体的帧锚点：
+
+```text
+the shot begins from <Picture 1>
+the shot's keyframe corresponds to <Picture 2>
+the shot ends on <Picture 3>
+```
+
+编辑或续接原始视频时，在适用的源状态、结构或续接关系处自然引用 `<Video N>`。在音频关系活跃的镜头或语义阶段引用 `<Audio N>`。
+
+### 5.4 说话者、音频来源和对话
+
+说话者 ID 和 `<d>` 基本格式遵循 T2VA。当引用的主体实际说话时，保留视觉引用标签和说话者 ID：
+
+```text
+<Subject 2> (S1) turns toward the woman and says, <d>[English] Last summer, I went to my grandfather's house. He talked about you.</d>
+```
+
+`<Subject N>` 标识引用的主体，而 `(Sx)` 标识实际的说话者。当主体说话时，写 `<Subject N> (Sx)`。如果同一主体在画外说话，保持相同形式并标记为 `off-screen`。当说话者不对应已定义的主体时，使用稳定的语音描述后跟 `(Sx)`。
+
+当口头内容仅是直接重用的 BGM 或完整音轨内的提示，且没有人、角色、叙述者或其他独立人声来源实际产生它时，使用 `<Audio N>` 作为可听来源，不发明额外的 `(Sx)`。如果具体的人、角色、叙述者或其他独立人声来源产生语音，则为该来源分配并重用 `(Sx)`：
+
+```text
+When <Audio 1> reaches the phrase <d>[English] I'm lonely lonely lonely lonely lonely I'm lonely</d>, <Subject 1> performs the corresponding hand gesture without becoming a separate speaker source.
+```
+
+当参考音频中的对话、叙述或歌词被直接重用，或输入提示明确要求重新表演时，在 `<d>` 内保留确切的源词和原始语言。对于无法辨认的部分写 `[unclear]`，而不是猜测或意译。将标点符号标准化为表达句子所需的基本书写标记，如 `,`、`.`、`?` 和 `!`；移除重复的波浪号、表情符号、项目符号和重复或装饰性标点。在 `</d>` 之前用 `.`、`?` 或 `!` 分别结束完整的陈述、问题和感叹句。
+
+当仅引用音色、节奏、情感或表达时，不要将参考音频中的原始对话带入目标视频。
+
+根据目标视频中实际发声事件的顺序分配 `(Sx)` 一次。在 `detailed_description` 中的每个实际发声事件处重用相应的 ID；在 `subject_definitions` 中绑定到目标说话者的 `<Audio N>` 定义也重用相同的 `(Sx)`，但绝不独立分配新的。不要在 `retention_analysis` 中写 `(Sx)`。仅存在于直接重用的 BGM 或完整音轨内的口头提示使用 `<Audio N>`；由具体的人、角色、叙述者或其他独立人声来源实际产生的声音使用 `(Sx)`。
+
+## 6. `overall_soundscape`（整体音景）和 `non_diegetic_music`（非画内音乐）
+
+这两个声音类别的定义遵循视频提示词编写指南 (T2VA / I2VA / FL2VA / L2VA)。
+
+`overall_soundscape` 总结整个视频的环境音和物理声音。对话、歌唱和与特定镜头同步的声音事件保留在 `detailed_description` 中：
+
+```text
+overall_soundscape: Quiet indoor room tone and a low ventilation hum continue throughout the video.
+```
+
+`non_diegetic_music` 描述角色听不到、只有观众能听到的背景音乐。当音乐存在时，说明其乐器、节奏和动态发展：
+
+```text
+non_diegetic_music: A restrained solo-piano score at a slow tempo, with sustained low cello underneath and no swell.
+```
+
+使用参考音频时，仅在匹配可听层的部分说明其复制或引用关系：环境音和音效属于 `overall_soundscape`，而仅观众可听的配乐属于 `non_diegetic_music`。如果同一音频提供两种类型的内容，在每个部分中描述相应的关系：
+
+```text
+overall_soundscape: The copied ambience layer from <Audio 1> continues throughout the target video.
+non_diegetic_music: <Audio 2> is directly reused as the complete audience-only score.
+```
+
+完整的对话和歌词仅在 `detailed_description` 中的 `<d>` 内书写；不要在这两个部分中重复。
+
+## 7. 完整示例
+
+<details>
+<summary>显示完整示例</summary>
+
+```text
+subject_definitions:
+<Subject 1> is the coffee-shop environment in <Picture 1>, featuring an exposed brick wall, an orange tufted sofa with patterned pillows, a neon sign, and a wooden coffee table.
+<Subject 2> is the fluffy white Samoyed in <Picture 2>, <Picture 3>, and <Picture 4>, with thick white fur, pointed ears, a dark nose, and a curved tail.
+<Subject 3> is the young blonde woman in <Video 1>, with long blonde hair and a light-pink button-down shirt with rolled-up sleeves.
+<Subject 4> is the young man in <Video 2>, with short wavy brown hair and a dark-grey hoodie with drawstrings.
+<Audio 1> is the voice-timbre reference for <Subject 3> (S1), containing a spoken English vocal layer.
+
+summary:
+[reference generation + audio reference] The target video shows <Subject 3> eating a cookie in <Subject 1>. <Subject 4> enters with <Subject 2>, which lunges toward the cookie. The three-shot exchange uses <Audio 1> as the voice-timbre reference for <Subject 3> and ends with a canned audience laugh.
+
+retention_analysis:
+<Subject 1> (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the exposed brick wall, orange tufted sofa, patterned pillows, neon sign, and wooden coffee table are retained.
+<Subject 2> (appears in [Shot 1], [Shot 2]): fully_preserved - the Samoyed's thick white fur, pointed ears, dark nose, and curved tail are retained.
+<Subject 3> (appears in [Shot 1], [Shot 2], [Shot 3]): fully_preserved - the blonde woman's identity, long hair, and light-pink shirt are retained.
+<Subject 4> (appears in [Shot 1], [Shot 2]): fully_preserved - the young man's short wavy brown hair and dark-grey hoodie are retained.
+<Audio 1>: reference - its vocal timbre guides the dialogue delivery of <Subject 3> without copying the original signal.
+
+detailed_description:
+The target video uses a realistic multi-camera sitcom style with warm indoor lighting.
+[Shot 1] A medium shot establishes <Subject 1>, the coffee shop with its exposed brick wall, orange tufted sofa, patterned pillows, neon sign, and wooden coffee table. <Subject 3> (S1), the young woman with long blonde hair and a light-pink button-down shirt with rolled-up sleeves, sits on the sofa holding a chocolate-chip cookie. From the left, <Subject 4>, the young man with short wavy brown hair and a dark-grey hoodie with drawstrings, enters holding the leash of <Subject 2>, the thick-furred white Samoyed with pointed ears, a dark nose, and a curved tail. The dog lunges toward the cookie and pulls the leash taut. <Subject 3> (S1) jerks her hand back and, using the clear youthful voice timbre referenced from <Audio 1>, exclaims with light annoyance, <d>[English] Hey! Watch your dog!</d> She closes her lips and guards the cookie while <Subject 4> pulls the dog back.
+[Shot 2] At 00:03.000, the shot cuts to a close-up of <Subject 4> (S2), the young man in the dark-grey hoodie from Shot 1, sitting beside <Subject 3> on the sofa and holding <Subject 2> securely in his arms. <Subject 4> (S2) says in a casual young male voice with a playful tone and an easy conversational pace, <d>[English] He just likes cookies more than me.</d> He closes his mouth into an apologetic smile and strokes the dog's thick white fur.
+[Shot 3] At 00:05.000, the shot cuts to a close-up of <Subject 3> (S1), the blonde woman in the light-pink shirt from Shot 1. Her annoyance softens as she looks toward the Samoyed. <Subject 3> (S1) replies in the same clear youthful voice referenced from <Audio 1> with an amused cadence, <d>[English] Well, he has good taste at least.</d> She smiles and raises the cookie in a small toast-like gesture. A classic canned audience laugh begins immediately after the line and continues through the final frame.
+
+overall_soundscape:
+Soft indoor coffee-shop room tone continues throughout the scene.
+
+non_diegetic_music:
+N/A
+```
+
+</details>
