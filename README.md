@@ -92,7 +92,7 @@ If you are not familiar with installing dependencies, it is recommended to use t
 ![Text Generation Workflow Example](./workflows/文本生成（Text_Generation）.png)
 
 #### Multi-Turn Chat
-![Multi-Turn Chat Workflow Example](./workflows/多轮对话（Multi-Turn_Chat）.png)
+![Multi-Turn Chat Workflow Example](./workflows/多轮对话（Multi_turn_chat）.png)
 
 #### Image Processing
 ![Image Reverse Engineering Workflow Example](./workflows/图像反推（Image_reverse_engineering）.png)
@@ -387,5 +387,6 @@ The following updates are based on llama-cpp-python version 0.3.49, so please in
 
 ## Acknowledgments
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
+* [comfyUI-llama-TE](https://github.com/tl2012tl/comfyUI-llama-TE) @tl2012tl
 * [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) @comfyanonymous

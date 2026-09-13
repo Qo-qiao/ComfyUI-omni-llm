@@ -393,6 +393,6 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
 ## 致谢
 * [ComfyUI-llama-cpp_vlm](https://github.com/lihaoyun6/ComfyUI-llama-cpp_vlm) @lihaoyun6
-* [comfyUI-llama-TE](https://github.com/lihaoyun6/comfyUI-llama-TE) @lihaoyun6
+* [comfyUI-llama-TE](https://github.com/tl2012tl/comfyUI-llama-TE) @tl2012tl
 * [llama-cpp-python](https://github.com/JamePeng/llama-cpp-python) @JamePeng
 * [ComfyUI](https://github.com/comfyanonymous/ComfyUI) @comfyanonymous
