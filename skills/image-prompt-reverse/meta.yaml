@@ -1,0 +1,5 @@
+display-name-zh: 图像提示词反推
+tag-cn: 反推, 图像, 提示词
+tag-en: Reverse, Image, Prompts, Analysis, AI Drawing
+summary-cn: 分析用户上传的图片，生成精准、可复现的AI绘图提示词，支持19+种主流AI绘图模型格式输出
+desc-cn: AI图像提示词反推工具。分析用户上传的图片，生成精准的描述性提示词，支持输出多种主流AI绘图模型格式，提供正向质量提示词和反向提示词推荐。
