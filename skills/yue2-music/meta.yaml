@@ -1,0 +1,7 @@
+display-name-zh: YuE2 音乐生成
+tag-cn: YuE2, 音乐, 生成, 翻唱, 编辑,SheetSage2
+tag-en: YuE2, Music, Generation, Cover, Edit,SheetSage2
+summary-cn: 使用YuE2和SheetSage2生成、翻唱、转录和编辑歌曲，支持full/melody/off三种模式，音频转ABC翻唱，风格或歌词修改，乐谱编辑和可重复的试听对比
+desc-cn: 使用 YuE2 和 SheetSage2/MERT2 生成、翻唱、转录和编辑歌曲。支持 YuE2 full/melody/off 生成、音频转ABC翻唱、风格或歌词修改、乐谱编辑、智能体重和声、旋律保留、可唱歌词适配和可重复的试听对比；也适用于 YuE2 生成、翻唱、改编、改谱、换词和智能体编辑
+display-name-en: yue2-music
+desc-en: Generate, cover, transcribe, and edit songs with YuE2 and SheetSage2/MERT2. Use for YuE2 full/melody/off generation, audio-to-ABC covers, style or lyric changes, score editing, agentic reharmonization, melody preservation, singable lyric adaptation, and reproducible listening comparisons; also for YuE2 生成、翻唱、改编、改谱、换词和智能体编辑
