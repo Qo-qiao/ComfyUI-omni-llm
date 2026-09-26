@@ -3,6 +3,7 @@
   "[基础] 图像理解 (Image Understanding)": "[基础] 图像理解",
   "[基础] 批量图像理解 (Batch Image Understanding)": "[基础] 批量图像理解",
   "[基础] 音频转文本 (Audio to Text)": "[基础] 音频转文本",
+  "[基础] 文本转语音 (Text to Speech)": "[基础] 文本转语音",
   "[高级] 视频理解 (Video Understanding)": "[高级] 视频理解",
   "Empty - Nothing": "空白-无内容",
   "[Reverse] Tags": "[反推] SDXL标签",
