@@ -1,0 +1,7 @@
+display-name-zh: Qwen-Image 2.1 提示词改写
+tag-cn: Qwen-Image, 提示词, 改写, 图像
+tag-en: Qwen-Image, Prompt, Rewriting, Image
+summary-cn: 按 Qwen-Image 2.1 改写规则把需求转成提示词，支持文生图与图生图双链路、含文字图像渲染、透明 RGBA 输出与常见失败模式修复
+display-name-en: qwen-image2.1
+desc-cn: Qwen-Image-2.1 提示词改写专家。根据有无输入图自动分流：文生图走官方 PE-T2I 规则（图生图走官方 PE-I2I 规则），叠加文字渲染、透明 RGBA、画幅速查与精选示例。当用户要求按 Qwen-Image 2.1 格式改写提示词、生成文生图提示词、改写图片编辑指令或渲染图像内文字时调用。
+desc-en: Qwen-Image-2.1 prompt rewriting expert. Routes by input: text-to-image follows the official PE-T2I rules, image editing follows the official PE-I2I rules, with text-rendering, RGBA transparent, aspect-ratio cheat sheet and curated examples layered on top. Use when rewriting prompts in Qwen-Image 2.1 format, writing text-to-image prompts, rewriting image-editing instructions, or rendering readable text inside images.
