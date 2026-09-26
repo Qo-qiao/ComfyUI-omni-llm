@@ -43,6 +43,12 @@ class PosterDesign:
                 "formula_zh": "内容组织顺序：主视觉主体与情绪、文字层级（标题/标语直接写入提示词） → 风格与画质（平面化或插画风、强对比） → 色彩与光影烘托主题氛围 → 中心或对角线构图、留白排版 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: main visual subject and emotion, text hierarchy (title/slogan written directly into prompt) → style & quality (flat or illustration style, strong contrast) → color and light supporting theme atmosphere → centered or diagonal composition, blank layout → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：主视觉主体与情绪、文字层级（标题/标语直接写入提示词） → 风格与画质（平面化或插画风、强对比） → 自然段落混排冒号标签块（主视觉：/文字层级：/色彩：/构图：/氛围：）与光影效果关键词列表（色彩对比/光影烘托/高饱和点缀等） → 色彩与光影烘托主题氛围 → 中心或对角线构图、留白排版 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，元素畸形、文字扭曲、比例失衡等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: main visual subject and emotion, text hierarchy (title/slogan written directly into prompt) → style & quality (flat or illustration style, strong contrast) → natural paragraph mixed with colon label blocks (main visual:/text hierarchy:/color:/composition:/atmosphere:) and lighting effect keyword list (color contrast, lighting support, saturated accents, etc.) → color and light supporting theme atmosphere → centered or diagonal composition, blank layout → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write deformed elements, distorted text and proportion imbalance into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

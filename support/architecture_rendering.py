@@ -43,6 +43,12 @@ class ArchitectureRendering:
                 "formula_zh": "内容组织顺序：建筑体量、外立面材质与园林植被关系 → 风格与画质（写实渲染、清晰结构） → 自然天光或黄昏光营造层次 → 透视构图（一点/两点透视）、广角涵盖全景 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: building volume, facade material and garden vegetation relationship → style & quality (realistic rendering, clear structure) → natural skylight or dusk light creating layers → perspective composition (one-point/two-point), wide angle covering panorama → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：建筑体量、外立面材质与园林植被关系 → 风格与画质（写实渲染、清晰结构） → 自然段落混排冒号标签块（建筑体量：/外立面材质：/园林植被：/视角：/光线：）与光影效果关键词列表（自然天光/黄昏暖光/明暗层次/空气透视等） → 自然天光或黄昏光营造层次 → 透视构图（一点/两点透视）、广角涵盖全景 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，结构畸变、比例失衡、透视错误等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: building volume, facade material and garden vegetation relationship → style & quality (realistic rendering, clear structure) → natural paragraph mixed with colon label blocks (volume:/facade material:/garden vegetation:/viewpoint:/lighting:) and lighting effect keyword list (natural skylight, warm dusk light, light-to-shadow layers, atmospheric perspective, etc.) → natural skylight or dusk light creating layers → perspective composition (one-point/two-point), wide angle covering panorama → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write structural distortion, proportion imbalance and perspective errors into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

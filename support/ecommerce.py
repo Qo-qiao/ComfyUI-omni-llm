@@ -43,6 +43,12 @@ class Ecommerce:
                 "formula_zh": "内容组织顺序：产品主体、材质与核心卖点（名称/卖点可写入提示词） → 风格与画质（高清晰度、商业级打光） → 干净布光突出质感与反光 → 中心构图或 45° 展示、纯色或场景背景 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: product subject, material and core selling points (name/selling points can be written into prompt) → style & quality (high clarity, commercial-grade lighting) → clean lighting highlighting texture and reflection → centered composition or 45-degree display, solid or scene background → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：产品主体、材质与核心卖点（名称/卖点可写入提示词） → 风格与画质（高清晰度、商业级打光） → 自然段落混排冒号标签块（产品主体：/材质卖点：/摆位：/背景：/光线：）与光影效果关键词列表（干净布光/高光反光/柔光箱质感/明暗层次等） → 干净布光突出质感与反光 → 中心构图或 45° 展示、纯色或场景背景 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，产品变形、结构错误、比例失衡等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: product subject, material and core selling points (name/selling points can be written into prompt) → style & quality (high clarity, commercial-grade lighting) → natural paragraph mixed with colon label blocks (product:/material selling points:/display position:/background:/lighting:) and lighting effect keyword list (clean lighting, specular highlights, softbox texture, light-to-shadow layers, etc.) → clean lighting highlighting texture and reflection → centered composition or 45-degree display, solid or scene background → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write warped product, structural errors and proportion imbalance into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

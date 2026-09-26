@@ -43,6 +43,12 @@ class InteriorDesign:
                 "formula_zh": "内容组织顺序：空间功能、家具与材质配色 → 风格与画质（写实室内、纹理可信） → 室内主灯与环境光平衡氛围 → 广角透视呈现空间纵深、注意画面整洁 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: space function, furniture and material color scheme → style & quality (realistic interior, credible texture) → indoor main light and ambient light balancing atmosphere → wide-angle perspective showing spatial depth, keep frame clean → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：空间功能、家具与材质配色 → 风格与画质（写实室内、纹理可信） → 自然段落混排冒号标签块（空间功能：/家具：/材质配色：/光线：/构图：）与光影效果关键词列表（主灯暖光/环境光/柔和阴影/明暗层次等） → 室内主灯与环境光平衡氛围 → 广角透视呈现空间纵深、注意画面整洁 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，家具变形、比例失衡、透视错误等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: space function, furniture and material color scheme → style & quality (realistic interior, credible texture) → natural paragraph mixed with colon label blocks (space:/furniture:/material palette:/lighting:/composition:) and lighting effect keyword list (warm key light, ambient light, soft shadows, light-to-shadow layers, etc.) → indoor main light and ambient light balancing atmosphere → wide-angle perspective showing spatial depth, keep frame clean → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write warped furniture, proportion imbalance and perspective errors into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

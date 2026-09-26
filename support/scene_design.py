@@ -43,6 +43,12 @@ class SceneDesign:
                 "formula_zh": "内容组织顺序：场景主体、环境元素与地貌关系 → 风格与画质（写实景观、空气透视） → 天光与时段光渲染氛围 → 广角或远景构图、地平线取景 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: scene subject, environment elements and terrain relationship → style & quality (realistic landscape, atmospheric perspective) → skylight and time-of-day light rendering atmosphere → wide-angle or long-shot composition, horizon framing → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：场景主体、环境元素与地貌关系 → 风格与画质（写实景观、空气透视） → 自然段落混排冒号标签块（场景主体：/地貌元素：/时段光线：/构图：/氛围：）与光影效果关键词列表（天光/时段光/空气透视/明暗层次等） → 天光与时段光渲染氛围 → 广角或远景构图、地平线取景 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，结构畸变、比例失衡、元素穿插错误等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: scene subject, environment elements and terrain relationship → style & quality (realistic landscape, atmospheric perspective) → natural paragraph mixed with colon label blocks (scene:/terrain:/time-of-day light:/composition:/atmosphere:) and lighting effect keyword list (skylight, time-of-day light, atmospheric perspective, light-to-shadow layers, etc.) → skylight and time-of-day light rendering atmosphere → wide-angle or long-shot composition, horizon framing → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write structural distortion, proportion imbalance and clashing elements into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

@@ -42,6 +42,12 @@ class ThickPaintRole:
                 "formula_zh": "内容组织顺序：角色身份、装备与厚涂笔触特征 → 风格与画质（次世代 CG、立体笔触与材质） → 戏剧性光效塑造体积与金属/布料质感 → 三分法或动态构图、景深突出角色 →（需渲染文字直接写入提示词，支持中英双语），皮肤和头发纹理高度细致",
                 "formula_en": "Content order: character identity, equipment and thick paint brushwork features → style & quality (next-gen CG, three-dimensional brushwork and material) → dramatic lighting shaping volume and metal/fabric texture → rule of thirds or dynamic composition, depth of field highlighting character → (write any rendered text directly into the prompt, supports Chinese and English), highly detailed skin and hair texture"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：角色身份、装备与厚涂笔触特征 → 风格与画质（次世代 CG、立体笔触与材质） → 自然段落混排冒号标签块（角色：/装备：/姿势动作：/光效：/场景：）与光影效果关键词列表（戏剧光效/体积高光/金属反光/颗粒感等） → 戏剧性光效塑造体积与金属/布料质感 → 三分法或动态构图、景深突出角色 →（需渲染文字直接写入提示词，支持中英双语），皮肤和头发纹理高度细致；支持负向提示词通道，肢体畸变、解剖错误、比例失调等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: character identity, equipment and thick paint brushwork features → style & quality (next-gen CG, three-dimensional brushwork and material) → natural paragraph mixed with colon label blocks (character:/equipment:/pose:/lighting effect:/scene:) and lighting effect keyword list (dramatic light, volumetric highlights, metal reflection, film grain, etc.) → dramatic lighting shaping volume and metal/fabric texture → rule of thirds or dynamic composition, depth of field highlighting character → (write any rendered text directly into the prompt, supports Chinese and English), highly detailed skin and hair texture; supports a negative prompt channel, write limb distortion, anatomical errors and proportion imbalance into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

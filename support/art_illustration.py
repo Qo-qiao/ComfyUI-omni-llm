@@ -43,6 +43,12 @@ class ArtIllustration:
                 "formula_zh": "内容组织顺序：插画主体与叙事意象、笔触或媒介取向 → 风格与画质（手绘感、色彩语言） → 主观光影与情绪色调 → 自由构图、强调画面节奏 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: illustration subject and narrative imagery, brushwork or medium direction → style & quality (hand-drawn feel, color language) → subjective lighting and emotional tone → free composition, emphasizing picture rhythm → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：插画主体与叙事意象、笔触或媒介取向 → 风格与画质（手绘感、色彩语言） → 自然段落混排冒号标签块（主体意象：/姿势动作：/笔触媒介：/色调：/构图：）与光影效果关键词列表（光影斑驳/边缘发光/颗粒感等） → 主观光影与情绪色调 → 自由构图、强调画面节奏 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，肢体畸变、解剖错误、比例失调等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: illustration subject and narrative imagery, brushwork or medium direction → style & quality (hand-drawn feel, color language) → natural paragraph mixed with colon label blocks (subject:/pose:/brushwork:/tone:/composition:) and lighting effect keyword list (dappled light, rim glow, film grain, etc.) → subjective lighting and emotional tone → free composition, emphasizing picture rhythm → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write limb distortion, anatomical errors and proportion imbalance into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,

@@ -43,6 +43,12 @@ class FoodPhotography:
                 "formula_zh": "内容组织顺序：菜品主体、食材质感与摆盘 → 风格与画质（诱人色泽、高清细节） → 顶部柔光或侧逆光突出油脂与蒸汽 → 俯拍或 45° 近景、简洁背景 →（需渲染文字直接写入提示词，支持中英双语）",
                 "formula_en": "Content order: dish subject, ingredient texture and plating → style & quality (appetizing color, HD details) → top soft light or side backlight highlighting oil sheen and steam → top-down or 45-degree close-up, simple background → (write any rendered text directly into the prompt, supports Chinese and English)"
             },
+            "Qwen_Image2.1": {
+                "keyword_dense": True,
+                "mix_lang": True,
+                "formula_zh": "内容组织顺序：菜品主体、食材质感与摆盘 → 风格与画质（诱人色泽、高清细节） → 自然段落混排冒号标签块（菜品：/食材：/摆盘：/光线：/景别：）与光影效果关键词列表（油脂高光/蒸汽柔光/顶部柔光/明暗层次等） → 顶部柔光或侧逆光突出油脂与蒸汽 → 俯拍或 45° 近景、简洁背景 →（需渲染文字直接写入提示词，支持中英双语）；支持负向提示词通道，食物畸变、形态崩坏、比例失衡等缺陷写入负向提示词，正向只做纯加法",
+                "formula_en": "Content order: dish subject, ingredient texture and plating → style & quality (appetizing color, HD details) → natural paragraph mixed with colon label blocks (dish:/ingredients:/plating:/lighting:/framing:) and lighting effect keyword list (oily highlights, steam haze, top soft light, light-to-shadow layers, etc.) → top soft light or side backlight highlighting oil sheen and steam → top-down or 45-degree close-up, simple background → (write any rendered text directly into the prompt, supports Chinese and English); supports a negative prompt channel, write deformed food, collapsed shapes and proportion imbalance into the negative prompt, keep the positive prompt purely additive"
+            },
             "Krea2": {
                 "keyword_dense": True,
                 "mix_lang": True,
