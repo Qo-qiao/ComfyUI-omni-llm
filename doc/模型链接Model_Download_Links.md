@@ -39,22 +39,6 @@
 - **必需场景**：语音合成、音频生成、音频理解、语音识别
 - **示例文件名**：`Qwen3-TTS-12Hz-1.7B-CustomVoice`
 
-#### .safetensors 模型配套文件
-
-**必需配置文件**（模型无法正常加载）：
-- `config.json` - 模型架构配置
-- `tokenizer_config.json` - 分词器配置
-- `tokenizer.json` - 分词器定义
-
-**可选配置文件**（影响特定功能）：
-- `merges.txt` - BPE合并规则（文本生成质量）
-- `vocab.json` - 词汇表（多语言支持）
-- `special_tokens_map.json` - 特殊标记映射
-- `added_tokens.json` - 自定义标记
-- `chat_template.json` - 聊天模板（对话质量）
-- `generation_config.json` - 生成参数配置
-- `preprocessor_config.json` - 预处理配置（图像处理）
-- `spk_dict.pt` - 说话人字典（音频生成必需）
 
 #### 配套文件下载方法
 
@@ -86,17 +70,9 @@
 5. **目录结构**：配套文件必须与主模型文件放在同一目录下
 
 
-## ASR系列（语音识别）
+## ASR系列（语音识别，请参考llama-cpp-python支持情况下载）
 
-### Qwen系列（只支持提供的模型）
-
-**模型系列**：Qwen-ASR
-**具体型号**：Qwen3-ASR-0.6B
-**核心特点**：语言覆盖：非常广泛，支持 28+ 种语言 及 20+ 种中国方言（如东北话、四川话、粤语、吴语、闽南语等）。
-**音频类型**：不仅能处理纯语音，还支持歌声和带背景音乐的歌曲（抗噪/音乐场景能力强）。
-**适配场景**：语音识别、实时语音转文字、会议记录、音频内容提取、字幕生成
-**下载链接**：https://huggingface.co/Qwen/Qwen3-ASR-0.6B
-**魔搭链接**：https://www.modelscope.cn/models/Qwen/Qwen3-ASR-0.6B
+### Qwen系列
 
 
 **模型系列**：Qwen-ASR
@@ -104,19 +80,19 @@
 **核心特点**：语言覆盖广泛，支持 28+ 种语言及 20+ 种中国方言。相比0.6B版本，识别精度更高，对低质量音频和复杂口音的处理能力更强，支持更长音频的连续识别。
 **音频类型**：支持纯语音、歌声和带背景音乐的歌曲（抗噪/音乐场景能力强）。
 **适配场景**：高精度语音识别、实时语音转文字、会议记录、音频内容提取、字幕生成
-**下载链接**：https://huggingface.co/Qwen/Qwen3-ASR-1.7B
-**魔搭链接**：https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B
+**下载链接**：https://huggingface.co/ggml-org/Qwen3-ASR-1.7B-GGUF（含mmproj模型，请下载BF16版本）
 
 
+## TTS系列（语音合成）
 
-**模型系列**：Qwen-ASR
-**具体型号**：Qwen3-ForcedAligner-0.6B
-**核心特点**：强制对齐。它不是做语音识别，而是将给定的文本与音频进行时间戳对齐，输出每个音素、单词或句子在音频中的起止时间。
-**语言覆盖**：仅支持 11 种语言（中、英、粤、法、德、意、日、韩、葡、俄、西），不支持方言。
-**音频类型**：仅限纯净语音（不适合歌声或带背景音乐的歌曲）。
-**适配场景**：字幕生成
-**下载链接**：https://huggingface.co/Qwen/Qwen3-ForcedAligner-0.6B
-**魔搭链接**：https://www.modelscope.cn/models/Qwen/Qwen3-ForcedAligner-0.6B
+### Qwen系列
+
+**模型系列**：Qwen-TTS
+**具体型号**：Qwen3-TTS-12Hz-1.7B-Base
+**核心特点**：语言覆盖广泛，支持 28+ 种语言及 20+ 种中国方言。相比0.6B版本，识别精度更高，对低质量音频和复杂口音的处理能力更强，支持更长音频的连续识别。
+**音频类型**：支持纯语音、歌声和带背景音乐的歌曲（抗噪/音乐场景能力强）。
+**适配场景**：高精度语音合成、实时语音转文字、会议记录、音频内容提取、字幕生成
+**下载链接**：https://huggingface.co/ggml-org/Qwen3-TTS-12Hz-1.7B-Base-GGUF（含mmproj模型，请下载BF16版本）
 
 
 
@@ -296,7 +272,7 @@
 **下载链接**：https://huggingface.co/mradermacher/MiMo-VL-7B-RL-2508-GGUF（含mmproj模型）
 
 
-### Nex-N2系列（暂不可用）
+### Nex-N2系列（未测）
 
 **模型系列**：Nex-N2
 **具体型号**：Huihui-Nex-N2-mini-abliterated-APEX
@@ -305,291 +281,3 @@
 **下载链接（nsfw）**：https://huggingface.co/SC117/Huihui-Nex-N2-mini-abliterated-APEX-GGUF（含mmproj模型）
 
 
-
-## english version
-
-### Quantization Level Selection
-
-- **Q4_K_M**: Balanced size and quality (Recommended)
-- **Q5_K_M**: Higher quality, slightly larger file
-- **Q3_K_M**: Smaller file, suitable for low VRAM devices
-- **Q2_K**: Smallest file, lower quality
-
-
-### Model Preparation
-
-1. **Create Model Directory**:
-
-   - Create `LLM` folder under `ComfyUI/models/` directory
-   - Place downloaded model files in this directory. If you download multiple models, it is recommended to create subfolders within the LLM folder for better organization
-
-
-### Companion File Download Guide
-
-#### Required Companion Files
-
-**1. Main Model File**
-- Main model file in `.gguf` or `.safetensors` format
-- File name usually contains model name and quantization level (e.g., `Qwen2.5-Omni-7B-Q4_K_M.gguf`)
-
-**2. Visual Companion File (mmproj)**
-- Visual projector for image and video processing
-- File name usually contains `mmproj` keyword
-- **Required Scenarios**: Image reverse prompting, video frame processing, OCR recognition
-- **Example File Name**: `mmproj-model-f16.gguf`
-
-**3. Audio Companion Files**
-- Specialized models for audio generation and processing, including Text-to-Speech (TTS), Automatic Speech Recognition (ASR), etc.
-- File names usually contain `tts`, `asr` keywords
-- **Required Scenarios**: Speech synthesis, audio generation, audio understanding, speech recognition
-- **Example File Name**: `Qwen3-TTS-12Hz-1.7B-CustomVoice`
-
-#### .safetensors Model Companion Files
-
-**Required Configuration Files** (model cannot load properly without these):
-- `config.json` - Model architecture configuration
-- `tokenizer_config.json` - Tokenizer configuration
-- `tokenizer.json` - Tokenizer definition
-
-**Optional Configuration Files** (affect specific functions):
-- `merges.txt` - BPE merge rules (text generation quality)
-- `vocab.json` - Vocabulary (multilingual support)
-- `special_tokens_map.json` - Special token mapping
-- `added_tokens.json` - Custom tokens
-- `chat_template.json` - Chat template (conversation quality)
-- `generation_config.json` - Generation parameter configuration
-- `preprocessor_config.json` - Preprocessing configuration (image processing)
-- `spk_dict.pt` - Speaker dictionary (required for audio generation)
-
-#### Companion File Download Method
-
-**Download from Hugging Face Repository**
-
-1. Visit the model's main repository page
-2. Find companion files in the file list
-3. Download all required configuration files
-4. Place files in the same directory as the main model
-
-
-### Main Model File Name Preservation Rules
-
-**Model Type Recognition Dependency**:
-- The plugin automatically recognizes model types through keywords in the main model file name (e.g., "qwen3.5", "minicpm-o", "dreamomni2", etc.)
-- Keywords in the file name directly affect the enabling of model functions (e.g., audio support, visual support, etc.)
-- Renaming the main model file may cause incorrect model type recognition, affecting functionality
-
-**Recommended Practice**:
-- Keep the original name of the main model file, do not remove or modify the model identification keywords
-- Examples: `Qwen2.5-Omni-7B-Q4_K_M.gguf`, `MiniCPM-o-4_5-Q4_K_M.gguf`, etc.
-- If renaming is necessary, ensure the core model identification keywords are preserved
-
-### Notes
-1. **File names are case-sensitive**: Please keep the original case, especially for model identification keywords
-2. **Do not rename companion files**: Otherwise the model may not find corresponding components
-3. **Main model file name recommendation**: Try to keep the original name to ensure correct model type recognition
-4. **Version matching**: Different versions of models may require different companion files, do not mix them
-5. **Directory structure**: Companion files must be placed in the same directory as the main model file
-
-
-## ASR Series (Speech Recognition)
-
-### Qwen Series (Only supports the provided models)
-
-**Model Series**: Qwen-ASR
-**Specific Model**: Qwen3-ASR-0.6B
-**Key Features**: Language coverage: Very extensive, supporting 28+ languages and 20+ Chinese dialects (such as Northeastern Mandarin, Sichuan dialect, Cantonese, Wu dialect, Minnan dialect, etc.).
-**Audio Types**: Not only handles pure speech, but also supports singing voices and songs with background music (strong anti-noise/music scene capability).
-**Applicable Scenarios**: Speech recognition, real-time speech-to-text, meeting recording, audio content extraction, subtitle generation
-**Download Link**: https://huggingface.co/Qwen/Qwen3-ASR-0.6B
-**ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3-ASR-0.6B
-
-
-**Model Series**: Qwen-ASR
-**Specific Model**: Qwen3-ASR-1.7B
-**Key Features**: Extensive language coverage, supports 28+ languages and 20+ Chinese dialects. Compared to the 0.6B version, it offers higher recognition accuracy, stronger processing capability for low-quality audio and complex accents, and supports continuous recognition of longer audio.
-**Audio Types**: Supports pure speech, singing voices, and songs with background music (strong anti-noise/music scene capability).
-**Applicable Scenarios**: High-precision speech recognition, real-time speech-to-text, meeting recording, audio content extraction, subtitle generation
-**Download Link**: https://huggingface.co/Qwen/Qwen3-ASR-1.7B
-**ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B
-
-
-
-**Model Series**: Qwen-ASR
-**Specific Model**: Qwen3-ForcedAligner-0.6B
-**Key Features**: Forced alignment. It does not perform speech recognition, but aligns given text with audio timestamps, outputting the start and end times of each phoneme, word, or sentence in the audio.
-**Language Coverage**: Supports only 11 languages (Chinese, English, Cantonese, French, German, Italian, Japanese, Korean, Portuguese, Russian, Spanish), no dialects.
-**Audio Types**: Pure speech only (not suitable for singing or songs with background music).
-**Applicable Scenarios**: Subtitle generation
-**Download Link**: https://huggingface.co/Qwen/Qwen3-ForcedAligner-0.6B
-**ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3-ForcedAligner-0.6B
-
-
-
-## VLM Series (Vision-Language Models, supporting text generation and image reverse prompting for all visual models)
-
-### ToriiGate Series (XL Anime-specialized)
-**Model Series**: ToriiGate
-**Specific Model**: ToriiGate-v0.4-7B
-**Key Features**: Based on Qwen2-VL fine-tuned, focused on advanced understanding of anime and digital art domains. Supports structured output, multiple caption modes (regular summary, Midjourney style, DeviantArt style), Bounding Box localization, and character name recognition. Descriptions are precise, dense, and avoid verbose filler words.
-**Applicable Scenarios**: Anime/digital art image description, character feature extraction, multi-character recognition, prompt generation, caption correction and cropping
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/ToriiGate-v0.4-7B-GGUF (includes mmproj model)
-
-
-### Qwen Series (Recommend to use clip model to select prompt reverse prompting model. For Chinese prompts, recommend qwen, MiMo series. For English prompts, recommend Llama series. For large VRAM devices, recommend larger models)
-
-**Model Series**: Qwen-VL
-**Specific Model**: Qwen2.5-7B-VL
-**Key Features**: Alibaba Tongyi Qianwen multimodal series, full-size coverage, balanced multilingual OCR and image-text reasoning.
-**Applicable Scenarios**: Multilingual OCR, image/video frame reverse prompting, prompt generation, regular image-text QA, batch text extraction
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/Qwen2.5-VL-7B-Instruct-abliterated-GGUF (includes mmproj model)
-**ModelScope Link**: https://www.modelscope.cn/models/unsloth/Qwen2.5-VL-7B-Instruct-GGUF (includes mmproj model)
-
-
-**Specific Model**: Qwen3-VL-8B-Instruct (Text Generation & Reverse Prompting, Recommended)
-**Key Features**: Qwen3-VL instruction-optimized version, highest instruction following accuracy, supports complex visual instruction execution (e.g., "extract all tables from the image and generate text").
-**Applicable Scenarios**: Instruction-based OCR extraction, complex image-text reverse prompting, professional visual task processing, high-precision prompt generation
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/Qwen3-VL-8B-Instruct-abliterated-v2.0-GGUF (includes mmproj model)
-**Alternative Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3VL-8B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-**ModelScope Link**: https://www.modelscope.cn/models/Qwen/Qwen3-VL-8B-Instruct-GGUF (includes mmproj model)
-
-
-**Specific Model**: Qwen3-VL-8B-maid
-**Key Features**: Maid version of Qwen3-VL-8B model
-**Download Link**: https://huggingface.co/mradermacher/Qwen3-VL-8B-maid-i1-GGUF (includes mmproj model)
-**Alternative Link**: https://huggingface.co/mradermacher/Qwen3-VL-8B-maid-GGUF (includes mmproj model)
-**ModelScope Link**: https://www.modelscope.cn/models/Zyi4082/Qwen3-VL-8B-Maid-GGUF (includes mmproj model)
-
-### For Qwen3.5, Qwen3.6 and other thinking models using text generation mode, mmproj model must be enabled. 
-
-**Specific Model**: Qwen3.5-4B (Reverse Prompting)
-**Key Features**: Lightweight version of Qwen3.5 series, moderate parameter count, balances reasoning capability with resource consumption, supports multimodal input and tool calling, fast response, suitable for low VRAM devices.
-**Applicable Scenarios**: Low VRAM device deployment, fast reasoning, mobile applications, lightweight dialogue, basic multimodal tasks, real-time interaction
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/Qwen3.5-4B_Abliterated-GGUF (includes mmproj model)
-**Alternative Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.5-4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-
-
-**Specific Model**: Qwen3.5-9B (Reverse Prompting)
-**Key Features**: Balanced version of Qwen3.5 series, moderate parameter count, balances reasoning capability with resource consumption, supports multimodal input and tool calling, suitable for medium VRAM devices.
-**Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text dialogue, image understanding analysis, video frame content recognition
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF (includes mmproj model)
-
-
-### Qwen3.5 Variant Series
-
-**Specific Model**: Qwen3.5-9B-DeepSeek-V4-Flash
-**Key Features**: Distilled from DeepSeek-V4-Flash, inherits advanced structured reasoning and multi-step problem-solving capabilities. It successfully transfers the high-quality reasoning abilities of DeepSeek-V4 to the efficient Qwen3.5-9B parameter space, providing excellent AI reasoning experience with token efficiency and speed.
-**Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text dialogue, image understanding analysis, video frame content recognition, structured reasoning tasks, tool-enhanced workflows
-**Download Link**: https://huggingface.co/Jackrong/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF (includes mmproj model)
-
-
-**Specific Model**: Qwen3.6-27B (Large VRAM Required)
-**Key Features**: High-performance version of Qwen3.6 series, large parameter count with strong reasoning capability, supports complex multimodal tasks and long context processing, suitable for large VRAM device deployment.
-**Applicable Scenarios**: Large VRAM device deployment, complex image-text reasoning, professional image analysis, long text understanding, video content deep analysis, high-precision generation tasks
-**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.6-27B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-
-
-**Specific Model**: Qwen3.6-35B-A3B (Large VRAM Required)
-**Key Features**: MoE version of Qwen3.6 series, 35B total parameters with only 3B active parameters for inference, balances high performance with inference efficiency, A3B architecture optimizes VRAM usage, supports complex multimodal tasks.
-**Applicable Scenarios**: Medium VRAM device deployment, high-quality multimodal reasoning, complex image-text analysis, long text understanding, video content deep analysis
-**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-
-
-### OCR Specialized Series
-
-**Model Series**: Unlimited-OCR
-**Specific Model**: Unlimited-OCR
-**Key Features**: Baidu's newly optimized model, fine-tuned for OCR-specific tasks, outstanding capability in recognizing formulas, tables, and old scanned documents, high text extraction accuracy, no additional configuration required, excellent local inference efficiency.
-**Applicable Scenarios**: Poster text recognition, document OCR, academic paper formula recognition, batch scanned document text extraction, form information extraction, ancient text digitization
-**Download Link**: https://huggingface.co/sahilchachra/Unlimited-OCR-GGUF (includes mmproj model)
-
-
-### MiniCPM Series
-
-**Specific Model**: MiniCPM-V-4.6-abliterated-MAX
-**Key Features**: Upgraded version of MiniCPM-V-4.5, further improved visual recognition accuracy, stronger capability for recognizing complex scenes and small targets, optimized inference speed, supports longer context multimodal understanding.
-**Applicable Scenarios**: High-precision prompt generation, fine-grained image/video frame reverse prompting, multilingual OCR, complex scene image analysis, daily visual reasoning
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/MiniCPM-V-4.6-abliterated-MAX-GGUF (includes mmproj model)
-
-
-### GLM Series
-
-**Model Series**: GLM-4
-**Specific Model**: GLM-4.6V-Flash-abliterated
-**Key Features**: Zhipu large-parameter multimodal model, top-tier OCR and complex document parsing capabilities, supports high-resolution image recognition, stable local reasoning, adapts to complex visual tasks.
-**Applicable Scenarios**: Professional OCR text extraction, complex document/table recognition, academic paper analysis, high-precision image reverse prompting, multilingual image-text reasoning
-**Download Link (nsfw)**: https://huggingface.co/seanbailey518/Huihui-GLM-4.6V-Flash-abliterated-GGUF (includes mmproj model)
-
-
-### JoyCaption Series
-
-**Model Series**: JoyCaption
-**Specific Model**: llama-joycaption (Reverse Prompting)
-**Key Features**: ComfyUI-specific prompt generation/image reverse prompting model, strong detail capture capability, generated prompts fit creative needs.
-**Applicable Scenarios**: ComfyUI prompt generation, precise image reverse prompting, art creation image-text association, batch image tag generation
-**Download Link (nsfw)**: https://huggingface.co/mradermacher/llama-joycaption-beta-one-hf-llava-GGUF
-**mmproj Model**: https://huggingface.co/concedo/llama-joycaption-beta-one-hf-llava-mmproj-gguf
-
-
-### Gemma Series
-
-**Model Series**: Gemma
-**Specific Model**: google_gemma-3-4b-it
-**Key Features**: Google Gemma 3 series multimodal model, features vision-language understanding, long context processing, and enhanced multilingual support, runs on single GPU, outperforms models with similar parameter counts.
-**Applicable Scenarios**: Multilingual prompt generation, complex visual reasoning, long text understanding, multimodal interaction tasks
-**Download Link**: https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF (includes mmproj model)
-**Alternative Link (nsfw)**: https://huggingface.co/mlabonne/gemma-3-4b-it-abliterated-GGUF
-
-
-**Specific Model**: Gemma-4-E2B-Uncensored-HauhauCS-Aggressive
-**Key Features**: Uncensored version of Google Gemma 4 series, uses more advanced architecture design, significant improvements in visual understanding, language generation, and multimodal reasoning, moderate parameter count, suitable for single GPU deployment, supports more open content generation.
-**Applicable Scenarios**: Advanced visual reasoning, multilingual dialogue, creative content generation, complex multimodal tasks, scenarios requiring uncensored content
-**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma-4-E2B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-
-
-**Specific Model**: Gemma-4-E4B-Uncensored-HauhauCS-Aggressive
-**Key Features**: Uncensored flagship model of Google Gemma 4 series, stronger visual understanding, longer context processing, and more accurate multilingual support, performance close to larger-scale models, supports more open content generation.
-**Applicable Scenarios**: Complex visual reasoning, long text understanding, multilingual translation, advanced multimodal interaction, scenarios requiring uncensored content
-**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive (includes mmproj model)
-
-
-**Specific Model**: Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced (Large VRAM Required)
-**Key Features**: MoE version of Google Gemma 4 series, 26B total parameters with only 4B active parameters for inference, balances large model performance with inference efficiency, A4B architecture optimizes VRAM usage, supports complex visual reasoning and long context processing, supports more open content generation.
-**Applicable Scenarios**: High-quality visual reasoning, long text understanding, multilingual translation, advanced multimodal interaction, complex tasks requiring uncensored content
-**Download Link (nsfw)**: https://huggingface.co/HauhauCS/Gemma4-26B-A4B-Uncensored-HauhauCS-Balanced (includes mmproj model)
-
-
-### Phi Vision Series
-
-**Model Series**: Phi-Vision
-**Specific Model**: Phi-3.5-vision-instruct
-**Key Features**: Microsoft iterative multimodal model, optimized for multi-image/video frame sequence reverse prompting, high instruction following accuracy, adapts to ComfyUI video frame processing nodes.
-**Applicable Scenarios**: Video frame reverse prompting, multi-image comparison reverse prompting, instruction-based prompt generation, regular OCR text extraction
-**Download Link**: https://huggingface.co/abetlen/Phi-3.5-vision-instruct-gguf (includes mmproj model)
-
-
-### LLaMA Vision Series
-
-**Model Series**: LLaMA-Vision
-**Specific Model**: Llama-3.2-11B-Vision-Instruct-abliterated
-**Key Features**: Meta official multimodal model, balanced across all scenarios, strong complex visual reasoning capabilities, supports high-resolution image recognition, adapts to various ComfyUI visual tasks.
-**Applicable Scenarios**: High-precision image reverse prompting, complex document OCR, video frame key information extraction, professional visual reasoning
-**Download Link (nsfw)**: https://huggingface.co/case01/Llama-3.2-11B-Vision-Instruct-abliterated-gguf
-**mmproj Model**: https://huggingface.co/leafspark/Llama-3.2-11B-Vision-Instruct-GGUF
-
-
-### MiMo-VL Series (Custom Template Required)
-
-**Model Series**: MiMo-VL
-**Specific Model**: MiMo-VL-7B-RL-2508
-**Key Features**: Xiaomi open-source multimodal vision-language model, 7B parameters, trained with reinforcement learning, four-stage pre-training (projector warm-up, vision-language alignment, general multimodal pre-training, long-context supervised fine-tuning), outperforms 10-billion-level models with small parameter count.
-**Applicable Scenarios**: Chinese-English bilingual dialogue, complex visual reasoning, multimodal interaction, long context understanding, creative prompt generation
-**Download Link**: https://huggingface.co/mradermacher/MiMo-VL-7B-RL-2508-GGUF (includes mmproj model)
-
-
-### Nex-N2 Series (Temporary Unavailable)
-
-**Model Series**: Nex-N2
-**Specific Model**: Huihui-Nex-N2-mini-abliterated-APEX
-**Key Features**: Uncensored version fine-tuned from Nex-N2-mini multimodal model, excellent visual understanding and image-text reasoning capabilities, supports image description, OCR text extraction and multimodal interaction, fast inference speed, suitable for daily visual tasks.
-**Applicable Scenarios**: Image reverse prompting, OCR text extraction, image-text QA, daily visual reasoning, multimodal interaction tasks
-**Download Link (nsfw)**: https://huggingface.co/SC117/Huihui-Nex-N2-mini-abliterated-APEX-GGUF (includes mmproj model)

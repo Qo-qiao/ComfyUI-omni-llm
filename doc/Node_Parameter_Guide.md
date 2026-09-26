@@ -43,9 +43,9 @@ Load and initialize LLM (Large Language Model)/VLM (Vision Language Model) model
 - Supported Format: .gguf
 - Notes: Different models require corresponding mmproj files, ensure version compatibility
 
-**Parameter Name: Enable ASR (enable_asr)**
-- Function: Enable ASR speech recognition functionality
-- Recommended Setting: Set to True when speech recognition is needed
+**Parameter: ASR Speech Recognition**
+- Function: ASR does not need to be manually enabled in the model loader
+- Usage: Connect the "Omni LLM ASR Model Loader" node in the workflow and provide an audio input; transcription runs automatically. In Audio-to-Text mode the transcript is the direct output, while in other modes it is automatically merged into the prompt
 
 #### Runtime Mode Parameters
 
