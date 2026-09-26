@@ -18,6 +18,7 @@ import json
 import base64
 import re
 import io
+import wave
 import time
 from PIL import Image
 from typing import Dict, List, Any, Optional, Tuple, Union
@@ -712,10 +713,11 @@ class omni_llm_unified_inference:
                         "[基础] 图像理解 (Image Understanding)",
                         "[基础] 批量图像理解 (Batch Image Understanding)",
                         "[基础] 音频转文本 (Audio to Text)",
+                        "[基础] 文本转语音 (Text to Speech)",
                         "[高级] 视频理解 (Video Understanding)"
                     ], {
                         "default": "[基础] 文本生成 (Text Generation)",
-                        "tooltip": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [高级] 视频理解：从视频中提取帧并进行分析"
+                        "tooltip": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [基础] 文本转语音：使用TTS模型将文本合成为语音\n• [高级] 视频理解：从视频中提取帧并进行分析"
                     }),
                 
                 # ========== 提示词配置 ==========
@@ -736,7 +738,7 @@ class omni_llm_unified_inference:
                 "enable_negative_prompts": ("BOOLEAN", {"default": False, "tooltip": "启用预设模板中的负向提示词：\n• 负向提示词：会追加到提示词末尾，避免模型生成不想要的内容，部分模型不需要负向提示词"}),
                 "image_model": (IMAGE_MODEL_OPTIONS, {
                     "default": "Auto",
-                    "tooltip": "图像生成模型选择（通用类型，影响提示词构建风格）：\n• Auto：通用类型，自动适配默认模型\n• Flux1：擅长写实人像/场景/空间逻辑\n• Flux2_klein：擅长快速出图/多参考图编辑\n• Z_image：擅长写实人像/风光/静物\n• Krea2：擅长摄影质感/自然语言写实/电影感\n• Qwen_Image2512：擅长长图文/海报/密集排版\n• Boogu：擅长极简产品图/电商/室内渲染\n• ERNIE_Image：擅长文字渲染/社媒图文/商业海报\n• HiDream-O1-Image：擅长高清写实人像/时尚编辑级\n• Mage_Flow：擅长指令编辑/任意比例构图/双语文字渲染\n• LongCat_Image：擅长复杂场景/多角色/长文本描述理解\n• GLM_Image：擅长创意图解/科学科普/文字渲染"
+                    "tooltip": "图像生成模型选择（通用类型，影响提示词构建风格）：\n• Auto：通用类型，自动适配默认模型\n• Flux1：擅长写实人像/场景/空间逻辑\n• Flux2_klein：擅长快速出图/多参考图编辑\n• Z_image：擅长写实人像/风光/静物\n• Krea2：擅长摄影质感/自然语言写实/电影感\n• Qwen_Image2512：擅长长图文/海报/密集排版\n• Qwen_Image2.1：自然段落+冒号标签块混合组织，支持负向提示词\n• Boogu：擅长极简产品图/电商/室内渲染\n• ERNIE_Image：擅长文字渲染/社媒图文/商业海报\n• HiDream-O1-Image：擅长高清写实人像/时尚编辑级\n• Mage_Flow：擅长指令编辑/任意比例构图/双语文字渲染\n• LongCat_Image：擅长复杂场景/多角色/长文本描述理解\n• GLM_Image：擅长创意图解/科学科普/文字渲染"
                 }),
                 "video_model": (VIDEO_MODEL_OPTIONS, {
                     "default": "Auto",
@@ -756,6 +758,8 @@ class omni_llm_unified_inference:
                 "video_manual_indices": ("STRING", {"default": "", 
                                                      "placeholder": "例如: 0,10,20 或 0-10", 
                                                      "tooltip": "手动模式下的帧索引，仅在手动采样时生效"}),
+                "video_audio": ("BOOLEAN", {"default": True,
+                                            "tooltip": "视频理解模式下自动附带视频音轨，实现画面+音频联合分析/内容反推（仅 Omni 全模态模型生效，VLM 恒为纯画面帧分析）\n已连接的音频输入不受此开关影响"}),
                 
                 # ========== 图像处理参数 ==========
                 "image_max_size": ("INT", {"default": 256, "min": 128, "max": 16384, "step": 64,
@@ -775,18 +779,19 @@ class omni_llm_unified_inference:
             "optional": {
                 "llama_model": ("LLAMACPPMODEL", {"tooltip": "加载的VL模型，用于图像理解和文本生成（API模式可不连接）"}),
                 "api_config": ("OMNI_LLM_API_CONFIG", {"tooltip": "API 配置（用于 API 推理模式）"}),
+                "asr_model": ("ASRMODEL", {"tooltip": "ASR模型输入（用于语音识别）"}),
+                "tts_model": ("TTSMODEL", {"tooltip": "TTS模型输入（用于文本转语音）"}),
                 "parameters": ("LLAMACPPARAMS", {"tooltip": "额外的生成参数配置"}),
                 "images": ("IMAGE", {"tooltip": "图像输入（用于图像理解模式）"}),
                 "video": ("VIDEO", {"tooltip": "视频输入（用于视频理解模式）"}),
                 "audio": ("AUDIO", {"tooltip": "音频输入（用于ASR识别）"}),
-                "asr_model": ("ASRMODEL", {"tooltip": "ASR模型输入（用于语音识别）"}),
                 "queue_handler": ("*", {"tooltip": "队列处理器"}),
             },
         }
     
-    RETURN_TYPES = ("STRING", "STRING", "INT")
-    RETURN_NAMES = ("output", "output_list", "state_uid")
-    OUTPUT_IS_LIST = (False, True, False)
+    RETURN_TYPES = ("STRING", "STRING", "INT", "AUDIO")
+    RETURN_NAMES = ("output", "output_list", "state_uid", "audio")
+    OUTPUT_IS_LIST = (False, True, False, False)
     FUNCTION = "process"
     CATEGORY = "omni-llm"
     
@@ -862,7 +867,136 @@ class omni_llm_unified_inference:
         if preset_key == "SONG_CREATION":
             return audio_model if audio_model in AUDIO_MUSIC_MODELS else "Auto"
         return "Auto"
-    
+
+    def _process_tts(self, tts_model, text, speaker_audio, parameters=None):
+        """文本转语音：调用 TTS 模型合成音频，采样参数来自参数设置节点"""
+        if tts_model is None:
+            raise RuntimeError("未连接TTS模型，请先连接TTS模型加载器")
+        if not text or not text.strip():
+            raise RuntimeError("文本输入为空，无法合成语音")
+
+        text = text.strip()
+        print(f"【TTS合成】文本长度: {len(text)}字符")
+
+        speaker_ref = None
+        if speaker_audio is not None:
+            speaker_ref = self._audio_to_wav_bytes(speaker_audio)
+            print(f"【TTS合成】使用说话人参考音频 ({len(speaker_ref)}字节)")
+
+        params = parameters if isinstance(parameters, dict) else {}
+        seed = params.get("seed", -1)
+        try:
+            seed = int(seed) & 0xFFFFFFFF
+            seed = seed if seed > 0 else None
+        except (ValueError, TypeError):
+            seed = None
+
+        audio_result = tts_model.synthesize(
+            text=text,
+            speaker_reference=speaker_ref,
+            seed=seed,
+            temperature=params.get("temperature", 0.8),
+            top_k=params.get("top_k", 40),
+            top_p=params.get("top_p", 0.95),
+            min_p=params.get("min_p", 0.05),
+            repeat_penalty=params.get("repeat_penalty", 1.05),
+        )
+        if audio_result is None:
+            raise RuntimeError("TTS合成失败：未生成音频")
+        waveform = self._decode_generated_audio(audio_result)
+
+        print(f"【TTS合成】完成，时长: {audio_result.duration:.2f}秒, 采样率: {audio_result.sample_rate}")
+        return ("", [""], 0, {"waveform": waveform, "sample_rate": audio_result.sample_rate})
+
+    @staticmethod
+    def _decode_generated_audio(audio):
+        """将 GeneratedAudio 解码为 ComfyUI AUDIO 格式"""
+        import wave
+        if audio.format == "wav":
+            with wave.open(io.BytesIO(audio.data), "rb") as wf:
+                n_channels = wf.getnchannels()
+                sampwidth = wf.getsampwidth()
+                raw = wf.readframes(wf.getnframes())
+        else:
+            n_channels = 1
+            raw = audio.data
+
+        if sampwidth == 2:
+            data = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+        elif sampwidth == 4:
+            data = np.frombuffer(raw, dtype=np.float32)
+        else:
+            raise RuntimeError(f"不支持的采样位深: {sampwidth * 8}bit")
+
+        if n_channels > 1:
+            data = data.reshape(-1, n_channels).mean(axis=1)
+
+        return torch.from_numpy(data).unsqueeze(0).unsqueeze(0)
+
+    @staticmethod
+    def _audio_to_wav_bytes(audio_input):
+        """将 ComfyUI AUDIO 输入转换为 WAV 字节（手写编码，不依赖 torchaudio 的 torchcodec 后端）"""
+        if isinstance(audio_input, dict):
+            waveform = audio_input.get("waveform")
+            sample_rate = audio_input.get("sample_rate", 24000)
+        elif isinstance(audio_input, torch.Tensor):
+            waveform = audio_input
+            sample_rate = 24000
+        else:
+            raise RuntimeError(f"不支持的音频输入类型: {type(audio_input)}")
+
+        if waveform.dim() == 3:
+            waveform = waveform.squeeze(0)
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)
+        if waveform.dtype != torch.float32:
+            waveform = waveform.float()
+        pcm = (waveform.clamp(-1.0, 1.0) * 32767.0).to(torch.int16)
+        data = pcm.transpose(0, 1).contiguous().cpu().numpy().tobytes()
+
+        buf = io.BytesIO()
+        with wave.open(buf, "wb") as wf:
+            wf.setnchannels(pcm.shape[0])
+            wf.setsampwidth(2)
+            wf.setframerate(int(sample_rate))
+            wf.writeframes(data)
+        return buf.getvalue()
+
+    # 支持原生音频输入的主模型 ChatHandler 显示名/类名关键字（Omni 全模态）
+    # 最终以 mmproj 运行期能力 is_support_audio 为准，名称表仅作加载失败时的兜底
+    _NATIVE_AUDIO_HANDLER_KEYWORDS = (
+        "omni", "audio", "gemma-4", "gemma4",
+    )
+
+    def _main_llm_supports_native_audio(self):
+        """
+        判断当前加载的主 LLM 是否支持将音频直接送入 chat（Omni 全模态理解）。
+        优先使用 mmproj 加载后探测到的运行期能力；探测不可用时按 handler/模型名兜底。
+        """
+        try:
+            from common import LLAMA_CPP_STORAGE
+
+            handler = getattr(LLAMA_CPP_STORAGE, "chat_handler", None)
+            # 运行期真实能力（模型加载后已提前初始化 MTMD 上下文）
+            if handler is not None:
+                cap = getattr(handler, "is_support_audio", None)
+                if cap is True:
+                    return True
+                if cap is False and getattr(handler, "mtmd_ctx", None) is not None:
+                    return False
+
+            # 兜底：按 ChatHandler 显示名 / 模型文件名关键字判断
+            haystack = ""
+            if LLAMA_CPP_STORAGE.current_config:
+                haystack += str(LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")).lower()
+                haystack += " " + str(LLAMA_CPP_STORAGE.current_config.get("model", "")).lower()
+            if any(kw in haystack for kw in self._NATIVE_AUDIO_HANDLER_KEYWORDS):
+                # 名称命中 omni/audio 关键字的模型，按 mmproj 运行期能力决定（由 mtmd_support_audio 探测）
+                return getattr(handler, "is_support_audio", False) is True
+        except Exception as e:
+            print(f"【Omni音频】能力检测失败: {e}")
+        return False
+
     def _resolve_effective_model(self, preset_key, image_model="Auto", video_model="Auto", audio_model="Auto"):
         """按预设模板内可用的模型接口解析实际生效模型，忽略其他类型的模型选择：
         - 反推/无模型预设 → Auto
@@ -1621,8 +1755,9 @@ class omni_llm_unified_inference:
                 video_max_frames, video_sampling, video_manual_indices, image_max_size, batch_combination,
                 force_offload,
                 api_config=None, parameters=None, images=None, video=None, audio=None,
-                asr_model=None, queue_handler=None, unique_id=None,
+                asr_model=None, tts_model=None, queue_handler=None, unique_id=None,
                 image_model="Auto", video_model="Auto", audio_model="Auto",
+                video_audio=True,
                 llama_model=None):
         """处理推理请求"""
         try:
@@ -1645,10 +1780,15 @@ class omni_llm_unified_inference:
                 "[基础] 图像理解 (Image Understanding)": "images",
                 "[基础] 批量图像理解 (Batch Image Understanding)": "batch_images",
                 "[基础] 音频转文本 (Audio to Text)": "audio",
+                "[基础] 文本转语音 (Text to Speech)": "tts",
                 "[高级] 视频理解 (Video Understanding)": "video"
             }
             mode = mode_map.get(inference_mode, "text")
-            
+
+            # TTS 模式：直接调用 TTS 模型合成语音，不经过 LLM 推理
+            if mode == "tts":
+                return self._process_tts(tts_model, text_input, audio, parameters)
+
             # 检查输入
             has_images = images is not None and (hasattr(images, 'numel') and images.numel() > 0)
             has_video = self.video_processor._check_video_input(video)
@@ -1657,12 +1797,10 @@ class omni_llm_unified_inference:
             # 处理自定义提示词
             custom_prompt = text_input
             
-            # 检查是否启用ASR
-            enable_asr = mode in ["audio"]
-            
+            # ASR通过模型加载器节点连接自动启用，无需在模型加载节点手动开关
             # 检查是否有ASR模型
             has_asr_model = asr_model is not None
-            
+
             # 检查是否有音频输入
             has_audio_input = has_audio
             
@@ -1723,12 +1861,12 @@ class omni_llm_unified_inference:
             except Exception as e:
                 pass
             
-            # 执行ASR语音识别（如果启用）
+            # 执行ASR语音识别：连接了ASR模型加载器节点且存在音频输入时自动执行（任意推理模式均生效）
             asr_text = ""
-            if enable_asr and has_audio_input:
-                print("【ASR】开始执行语音识别...")
+            if has_asr_model and has_audio_input:
+                print("【ASR】检测到ASR模型节点连接，开始执行语音识别...")
                 try:
-                    if asr_model is not None and hasattr(asr_model, 'transcribe'):
+                    if hasattr(asr_model, 'transcribe'):
                         # 使用独立的ASR模型
                         asr_result = asr_model.transcribe(audio)
                         asr_text = asr_result.get('text', '') if isinstance(asr_result, dict) else str(asr_result)
@@ -1737,10 +1875,13 @@ class omni_llm_unified_inference:
                         # Audio 模式下直接将ASR结果作为最终输出文本
                         if mode == "audio" and asr_text:
                             print("【ASR模式】识别结果可用于输出文本")
-                    else:
-                        print("【ASR提示】未找到可用的ASR模型，跳过语音识别")
                 except Exception as e:
                     print(f"【ASR错误】语音识别失败: {str(e)}")
+            elif mode == "audio" and has_audio_input and not has_asr_model:
+                if self._main_llm_supports_native_audio():
+                    print("【ASR提示】未连接独立ASR节点，音频将直接送入支持音频输入的Omni主模型处理")
+                else:
+                    print("【ASR提示】音频转文本模式未连接ASR模型加载器节点，且主模型不支持原生音频输入，跳过语音识别")
             
             # 将ASR结果合并到提示词中
             if asr_text:
@@ -1756,7 +1897,7 @@ class omni_llm_unified_inference:
             if self.model_info["type"] == "none":
                 if mode == "audio" and asr_text:
                     print("【无模型模式】音频转文本模式，仅返回ASR识别结果")
-                    return (generated_text, [generated_text], 0)
+                    return (generated_text, [generated_text], 0, None)
 
                 # 尝试 API 推理
                 api_base_url = ""
@@ -1789,13 +1930,13 @@ class omni_llm_unified_inference:
                         generated_text = self._filter_thinking_content(generated_text)
                         _uid = parameters.get("state_uid", None) if parameters else None
                         uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-                        return (generated_text, [generated_text], int(uid))
+                        return (generated_text, [generated_text], int(uid), None)
                     except Exception as e:
                         print(f"【API推理错误】{e}")
-                        return (str(e), [str(e)], 0)
+                        return (str(e), [str(e)], 0, None)
                 else:
                     print(f"【无模型模式】模式: {mode}，未选择LLM模型且无API配置，返回空结果")
-                    return ("", [""], 0)
+                    return ("", [""], 0, None)
 
             # 非音频转文本模式清空预置文本
             if mode != "audio":
@@ -1982,7 +2123,40 @@ class omni_llm_unified_inference:
                     import gc
                     gc.collect()
             
-            # 回退机制：当ChatHandler为None且没有图像/视频内容时，将列表格式转换为字符串格式
+            # ========== Omni 原生音频输入 ==========
+            # 主模型 mmproj 具备音频输入能力（Qwen3-Omni/Qwen3-Audio/Gemma-4/MiMo-Audio 等）时，
+            # 将音频作为 input_audio 媒体块直接挂到消息，实现听+看+文本的全模态理解。
+            # 音频来源：优先已连接的音频输入；视频理解模式下未连音频时自动取视频自带音轨（video_audio 开关控制）。
+            # 已连接独立 ASR 节点时不重复挂载（ASR 文本已拼入 final_prompt）。
+            has_native_audio_content = False
+            native_audio_source = None
+            native_audio_desc = ""
+            if asr_model is None and self._main_llm_supports_native_audio():
+                if has_audio_input:
+                    native_audio_source = audio
+                    native_audio_desc = "输入音频"
+                elif mode == "video" and has_video and video_audio:
+                    if isinstance(video, dict):
+                        native_audio_source = video.get("audio")
+                    else:
+                        native_audio_source = getattr(video, "audio", None)
+                    native_audio_desc = "视频音轨"
+                    if not native_audio_source:
+                        print("【Omni音频】视频不含音轨，按纯画面分析；可连接音频输入补充音频")
+            if native_audio_source:
+                try:
+                    audio_wav_bytes = self._audio_to_wav_bytes(native_audio_source)
+                    audio_b64 = base64.b64encode(audio_wav_bytes).decode("utf-8")
+                    content.append({
+                        "type": "input_audio",
+                        "input_audio": {"data": audio_b64, "format": "wav"}
+                    })
+                    has_native_audio_content = True
+                    print(f"【Omni音频】主模型支持原生音频输入，已挂载{native_audio_desc}（WAV {len(audio_wav_bytes)} 字节）")
+                except Exception as e:
+                    print(f"【Omni音频】音频挂载失败，按纯文本继续: {e}")
+
+            # 回退机制：当ChatHandler为None且没有图像/视频/音频内容时，将列表格式转换为字符串格式
             # 这是因为某些模型（如MTP模型）不支持列表格式的content
             # 特殊处理：Qwen3.5/3.6启用mmproj时，根据推理模式决定是否使用纯文本格式
             # - text模式：强制使用纯文本格式，避免模型误判为图片反推
@@ -2000,13 +2174,13 @@ class omni_llm_unified_inference:
                     is_qwen3_model = current_chat_handler_name in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.8", "Qwen3.8-Thinking"]
             except Exception as e:
                 pass
-            
+
             # 判断是否需要强制使用纯文本格式：
-            # 1. ChatHandler不可用且无视觉内容（原有逻辑）
+            # 1. ChatHandler不可用且无视觉/音频内容（原有逻辑）
             # 2. Qwen3.5/3.6启用mmproj且为文本生成模式（根据推理模式判定）
             is_text_mode = mode == "text"
-            force_text_mode = (not chat_handler_available and not has_visual_content) or \
-                              (is_qwen3_model and enable_mmproj and is_text_mode)
+            force_text_mode = (not chat_handler_available and not has_visual_content and not has_native_audio_content) or \
+                              (is_qwen3_model and enable_mmproj and is_text_mode and not has_native_audio_content)
             
             if force_text_mode and isinstance(content, list):
                 # 将列表格式转换为纯文本字符串
@@ -2112,7 +2286,7 @@ class omni_llm_unified_inference:
                         # 直接返回结果
                         _uid = parameters.get("state_uid", None) if parameters else None
                         uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-                        return (generated_text, output_list, int(uid))
+                        return (generated_text, output_list, int(uid), None)
             
             # 执行推理（异步）
             import asyncio
@@ -2177,12 +2351,15 @@ class omni_llm_unified_inference:
             _uid = parameters.get("state_uid", None) if parameters else None
             uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
 
-            return (generated_text, [generated_text], int(uid))
+            return (generated_text, [generated_text], int(uid), None)
         
         except Exception as e:
             error_message = ErrorHandler.handle_error(e, context={"mode": mode, "model_type": self.model_info.get("type", "unknown")})
             print(f"【处理错误】{str(e)}")
-            return (error_message, [error_message], locals().get("gen_params", {}).get("seed", 0))
+            audio_out = None
+            if mode == "tts":
+                audio_out = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 24000}
+            return (error_message, [error_message], locals().get("gen_params", {}).get("seed", 0), audio_out)
     
     @classmethod
     def _run_parallel_inference(cls, llm, tasks, params):

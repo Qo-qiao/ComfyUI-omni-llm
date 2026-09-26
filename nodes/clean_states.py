@@ -3,7 +3,7 @@
 ComfyUI-omni-llm Clean States Node
 
 模型清理节点，用于清理模型缓存和状态，释放内存和显存资源
-支持LLM、ASR模型的卸载，以及卸载所有ComfyUI模型
+支持LLM、ASR、TTS模型的卸载，以及卸载所有ComfyUI模型
 
 Author: 亲卿于情 (@Qo-qiao)
 GitHub: https://github.com/Qo-qiao
@@ -28,6 +28,7 @@ class omni_llm_clean_states:
             "optional": {
                 "clean_llm": ("BOOLEAN", {"default": True, "tooltip": "清理LLM模型"}),
                 "clean_asr": ("BOOLEAN", {"default": True, "tooltip": "清理ASR模型"}),
+                "clean_tts": ("BOOLEAN", {"default": True, "tooltip": "清理TTS模型"}),
                 "unload_all_comfyui_models": ("BOOLEAN", {"default": False, "tooltip": "卸载所有ComfyUI模型"}),
             }
         }
@@ -37,7 +38,7 @@ class omni_llm_clean_states:
     FUNCTION = "process"
     CATEGORY = "omni-llm"
 
-    def process(self, any, state_uid, clean_llm=True, clean_asr=True, unload_all_comfyui_models=False):
+    def process(self, any, state_uid, clean_llm=True, clean_asr=True, clean_tts=True, unload_all_comfyui_models=False):
         print("【资源释放】开始清理模型资源...")
         
         # 记录清理前的显存使用
@@ -62,6 +63,10 @@ class omni_llm_clean_states:
         # 清理ASR模型
         if clean_asr:
             self._clean_asr_model()
+        
+        # 清理TTS模型
+        if clean_tts:
+            self._clean_tts_model()
         
         # 清理所有缓存
         clear_all_caches()
@@ -157,6 +162,33 @@ class omni_llm_clean_states:
             print("【ASR清理】ASR模型已清理")
         except Exception as e:
             print(f"【ASR清理】清理失败: {e}")
+
+    def _clean_tts_model(self):
+        """清理TTS模型"""
+        try:
+            print("【TTS清理】开始清理TTS模型...")
+
+            tts_model_cache = self._get_module_cache("tts_loader", "tts_model_cache")
+            if tts_model_cache is None:
+                print("【TTS清理】找不到TTS模型缓存，跳过清理")
+                return
+
+            model_count = len(tts_model_cache)
+            for key in list(tts_model_cache.keys()):
+                tts_wrapper = tts_model_cache[key]
+                if tts_wrapper is not None:
+                    if hasattr(tts_wrapper, 'release'):
+                        try:
+                            tts_wrapper.release()
+                            print(f"【TTS清理】已调用模型缓存[{key}].release()")
+                        except Exception as e:
+                            print(f"【TTS清理】调用release()失败: {e}")
+                del tts_model_cache[key]
+
+            print(f"【TTS清理】TTS模型缓存已清空（共{model_count}个模型）")
+            print("【TTS清理】TTS模型已清理")
+        except Exception as e:
+            print(f"【TTS清理】清理失败: {e}")
     
     def _release_model(self, model):
         """释放模型资源"""

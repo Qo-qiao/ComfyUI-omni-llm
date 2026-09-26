@@ -48,19 +48,31 @@ class omni_llm_model_loader:
                             all_llms.append(f"{rel_path.replace(os.sep, '/')}/{f}")
 
      
-        # 筛选.gguf格式的主模型，排除mmproj和语音相关模型
+        # 专用语音模型识别：ASR/TTS/对齐/Whisper 等骨干不进入主模型列表。
+        # 注意：含 audio/speech/voice 但不属于上述专用类型的 gguf 是全模态（Omni）骨干，
+        # 必须保留（如 Qwen3-Omni/Qwen3-Audio）；语音编码器文件统一以 mmproj 开头已另行排除。
+        _speech_only_keywords = (
+            "tts", "asr", "whisper", "parakeet", "forcedalign",
+            "aligner", "transcrib", "speech-to-text",
+        )
+
+        def _is_speech_only_model(filename):
+            low = filename.lower()
+            return any(kw in low for kw in _speech_only_keywords)
+
+        # 筛选.gguf格式的主模型，排除mmproj和专用语音模型
         model_list = ["None"]
         model_set = set()  # 使用绝对路径作为去重依据
-        
+
         for f in all_llms:
             ext = os.path.splitext(f)[1].lower()
             if ext != ".gguf":
                 continue
             if "mmproj" in f.lower():
                 continue
-            
-            # 排除ASR等语音模型
-            if any(keyword in f.lower() for keyword in ["tts", "asr", "speech", "voice", "audio"]):
+
+            # 排除ASR/TTS等专用语音模型（保留 Omni 全模态模型）
+            if _is_speech_only_model(f):
                 continue
             
             # 获取文件的绝对路径（去重依据）
@@ -130,7 +142,7 @@ class omni_llm_model_loader:
                 "model": (model_list, {"tooltip": "选择要加载的LLM模型文件"}),
                 "enable_mmproj": ("BOOLEAN", {"default": False, "tooltip": "启用多模态功能（需要选择mmproj模型）"}),
                 "mmproj": (mmproj_list, {"default": "None", "tooltip": "选择对应的视觉编码模型文件"}),
-                "enable_asr": ("BOOLEAN", {"default": False, "tooltip": "启用ASR语音识别功能（需配合ASR模型加载器使用）"}),
+                "mtp_mode": (["Auto", "Enable", "Disable"], {"default": "Auto", "tooltip": "MTP多令牌推测解码：Auto=按模型名自动检测，Enable=强制开启（模型名不含mtp时使用），Disable=强制关闭"}),
                 "n_ctx": ("INT", {"default": default_n_ctx, "min": 1024, "max": 327680, "step": 128, "tooltip": "上下文长度，影响可处理的文本长度"}),
                 "n_gpu_layers": ("INT", {"default": default_n_gpu_layers, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载（GPU模式有效）"}),
                 "vram_limit": ("INT", {"default": default_vram_limit, "min": -1, "max": 24, "step": 1, "tooltip": "显存限制（GB），-1=无限制（GPU模式有效）"}),
@@ -173,7 +185,7 @@ class omni_llm_model_loader:
         return None
     
     @classmethod
-    def IS_CHANGED(s, model, enable_mmproj, mmproj, enable_asr, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split=""):
+    def IS_CHANGED(s, model, enable_mmproj, mmproj, mtp_mode, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split=""):
         if LLAMA_CPP_STORAGE.llm is None:
             return float("NaN") 
         
@@ -194,20 +206,58 @@ class omni_llm_model_loader:
             # 首先尝试使用ChatHandlerManager的智能匹配
             handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
             if handler_name and handler_cls:
+                # GenericMTMDChatHandler 对应多个 Omni/音频模型，按注册表细化为具体显示名
+                if handler_name == "GenericMTMDChatHandler":
+                    refined = detect_model_chat_handler(model_name)
+                    if refined:
+                        return refined
                 info = chat_handler_manager.get_handler_info(handler_name)
                 if info:
                     return info['display_name']
-            
+
             # 回退到原有的检测函数
             detected = detect_model_chat_handler(model_name)
             if detected:
                 return detected
-            
+
             # 默认使用LLaVA-1.6
             return "LLaVA-1.6"
         
         # 使用解析后的路径来获取chat_handler，确保一致性
         chat_handler = get_auto_chat_handler(actual_model)
+
+        # 计算 auto image_min_tokens（与 loadmodel 保持一致）
+        model_lower = actual_model.lower()
+        is_qwen25_omni = "qwen2.5-omni" in model_lower or "qwen25omni" in model_lower
+        is_qwen3_omni = "qwen3-omni" in model_lower or "qwen3omni" in model_lower
+        is_qwen3_audio = "qwen3-audio" in model_lower or "qwen3audio" in model_lower
+        is_minicpm_o = "minicpm-o" in model_lower
+        is_gemma4 = "gemma-4" in model_lower or "gemma4" in model_lower
+        is_mimo_audio = "mimo-audio" in model_lower or "mimo-omni" in model_lower
+        is_omni_model = is_qwen25_omni or is_qwen3_omni or is_qwen3_audio or is_minicpm_o or is_gemma4 or is_mimo_audio
+        
+        # 应用与 loadmodel 一致的 Omni 模型自动优化，确保配置比较一致
+        auto_n_ctx = n_ctx
+        auto_n_gpu_layers = n_gpu_layers
+        image_min_tokens = 0
+        
+        if is_omni_model:
+            # 最小上下文
+            if auto_n_ctx < 8192:
+                auto_n_ctx = 8192
+            if enable_mmproj:
+                image_min_tokens = 1024
+            # 激进GPU层数优化（与 loadmodel 保持一致）
+            if auto_n_gpu_layers == -1:
+                auto_n_gpu_layers = 20
+            elif auto_n_gpu_layers > 0:
+                auto_n_gpu_layers = max(1, auto_n_gpu_layers - 8)
+            # 低显存进一步降低n_ctx
+            vram_gb = HARDWARE_INFO.get("gpu_vram_total", 0)
+            if vram_gb > 0 and vram_gb < 8 and auto_n_ctx > 4096:
+                auto_n_ctx = 4096
+        elif ("qwen3-vl" in model_lower or "qwen3vl" in model_lower) and enable_mmproj:
+            image_min_tokens = 1024
         
         # 注意：不包含model_path字段，因为它是动态计算的
         # 只包含用户可配置的参数，避免不必要的重新加载
@@ -216,17 +266,18 @@ class omni_llm_model_loader:
             "chat_handler": chat_handler,
             "enable_mmproj": enable_mmproj,
             "mmproj": mmproj,
-            "enable_asr": enable_asr,
-            "n_ctx": n_ctx,
-            "n_gpu_layers": n_gpu_layers,
+            "mtp_mode": mtp_mode,
+            "n_ctx": auto_n_ctx,
+            "n_gpu_layers": auto_n_gpu_layers,
             "vram_limit": vram_limit,
+            "image_min_tokens": image_min_tokens,
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
             "tensor_split": tensor_split,
         }
         return json.dumps(custom_config, sort_keys=True, ensure_ascii=False)
     
-    def loadmodel(self, model, enable_mmproj, mmproj, enable_asr, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split="", **kwargs):
+    def loadmodel(self, model, enable_mmproj, mmproj, mtp_mode="Auto", n_ctx=8192, n_gpu_layers=-1, vram_limit=-1, image_max_tokens=0, attention_type="Auto", tensor_split="", **kwargs):
         # 解析完整模型路径，避免同名冲突
         resolved_model_path = self._resolve_llm_model_path(model)
         if resolved_model_path:
@@ -237,7 +288,7 @@ class omni_llm_model_loader:
 
         # 处理"None"模型的情况
         if model == "None":
-            print("【模型加载】未选择模型，仅启用ASR功能")
+            print("【模型加载】未选择模型（ASR/TTS由各自独立加载器节点连接后自动启用）")
             # 清空当前模型状态
             LLAMA_CPP_STORAGE.clean()
             # 返回空的storage对象
@@ -298,6 +349,55 @@ class omni_llm_model_loader:
         
         # 初始化 image_min_tokens，将在后续根据模型类型自动设置
         image_min_tokens = 0
+
+        # 检测 Qwen2.5-Omni / Qwen3-Omni / Qwen3-Audio / MiniCPM-O / Gemma-4 / MiMo-Audio 等 Omni/全模态模型
+        is_qwen25_omni = "qwen2.5-omni" in model.lower() or "qwen25omni" in model.lower()
+        is_qwen3_omni = "qwen3-omni" in model.lower() or "qwen3omni" in model.lower()
+        is_qwen3_audio = "qwen3-audio" in model.lower() or "qwen3audio" in model.lower()
+        is_minicpm_o = "minicpm-o" in model.lower()
+        is_gemma4 = "gemma-4" in model.lower() or "gemma4" in model.lower()
+        is_mimo_audio = "mimo-audio" in model.lower() or "mimo-omni" in model.lower()
+        is_omni_model = is_qwen25_omni or is_qwen3_omni or is_qwen3_audio or is_minicpm_o or is_gemma4 or is_mimo_audio
+
+        # GPU模式下针对Omni/全模态模型的优化（GenericMTMDChatHandler）
+        if is_omni_model:
+            print(f"【GPU模式优化】检测到Omni/全模态模型 ({model})，启用特殊参数配置")
+            # Omni模型需要足够的上下文长度支持音频/视频tokens
+            if n_ctx < 8192:
+                print(f"【GPU模式优化】Omni模型需要至少8192的上下文长度，自动调整从{n_ctx}到8192")
+                n_ctx = 8192
+            # llama.cpp明确建议：Qwen-VL/Omni模型需要image_min_tokens >= 1024
+            if enable_mmproj:
+                image_min_tokens = 1024
+                print(f"【GPU模式优化】Omni模型自动设置image_min_tokens为1024（llama.cpp要求）")
+            # 自动设置image_max_tokens
+            if enable_mmproj and image_max_tokens < image_min_tokens:
+                image_max_tokens = image_min_tokens
+                print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
+            # Omni模型显存压力大，降低n_batch防止KV cache分配失败
+            if n_batch > 512:
+                original_batch = n_batch
+                n_batch = 512
+                print(f"【GPU模式优化】Omni模型降低n_batch从{original_batch}到{n_batch}以避免KV cache OOM")
+            # Omni模型需要更多显存给KV cache + mmproj（视觉/音频编码器也要显存），激进减少GPU层数
+            # n_gpu_layers=-1 表示全层加载，转为自动计算；部分加载模式进一步减少
+            if n_gpu_layers == -1:
+                # 全层加载模式：改为限制层数，留显存给mmproj和KV cache
+                n_gpu_layers = 20
+                print(f"【GPU模式优化】Omni模型：全层加载(-1)改为限制GPU层数={n_gpu_layers}，预留mmproj/KV cache显存")
+            elif n_gpu_layers > 0:
+                original_layers = n_gpu_layers
+                # 更激进：减少8层而非4层，确保mmproj有足够显存
+                n_gpu_layers = max(1, n_gpu_layers - 8)
+                print(f"【GPU模式优化】Omni模型减少GPU层数从{original_layers}到{n_gpu_layers}以预留mmproj/KV cache显存")
+            # 低显存(<8GB)进一步降低n_ctx
+            vram_gb = HARDWARE_INFO.get("gpu_vram_total", 0)
+            if vram_gb > 0 and vram_gb < 8 and n_ctx > 4096:
+                original_ctx = n_ctx
+                n_ctx = 4096
+                print(f"【GPU模式优化】低显存({vram_gb}GB)下Omni模型降低n_ctx从{original_ctx}到{n_ctx}")
+            # 确保正确的ChatHandler
+            print(f"【提示】Omni模型将使用GenericMTMDChatHandler（模板驱动，支持音频/视觉/视频）")
         
         # GPU模式下针对Qwen3系列模型的优化
         if is_qwen3:
@@ -412,7 +512,14 @@ class omni_llm_model_loader:
                 if n_ctx < 32768:
                     print(f"【GPU模式优化】Qwen3.8-MTP模型需要至少32768的上下文长度，自动调整从{n_ctx}到32768")
                     n_ctx = 32768
-        
+
+        # 用户手动强制开启MTP（模型名/目录名不含mtp关键字时），同样保证足够上下文
+        if mtp_mode == "Enable" and not (is_qwen35_mtp or is_qwen36_mtp or is_qwen38_mtp):
+            print(f"【MTP】用户强制开启MTP推测解码")
+            if n_ctx < 32768:
+                print(f"【MTP优化】强制开启模式下将上下文长度从{n_ctx}调整为32768以支持推测解码")
+                n_ctx = 32768
+
         # 针对MiMo-VL模型的特殊优化（基于Qwen2.5-VL架构）
         if is_mimo_vl:
             print(f"【GPU模式优化】MiMo-VL模型启用特殊GPU参数配置")
@@ -438,15 +545,20 @@ class omni_llm_model_loader:
             # 首先尝试使用ChatHandlerManager的智能匹配
             handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
             if handler_name and handler_cls:
+                # GenericMTMDChatHandler 对应多个 Omni/音频模型，按注册表细化为具体显示名
+                if handler_name == "GenericMTMDChatHandler":
+                    refined = detect_model_chat_handler(model_name)
+                    if refined:
+                        return refined
                 info = chat_handler_manager.get_handler_info(handler_name)
                 if info:
                     return info['display_name']
-            
+
             # 回退到原有的检测函数
             detected = detect_model_chat_handler(model_name)
             if detected:
                 return detected
-            
+
             # 默认使用LLaVA-1.6
             return "LLaVA-1.6"
         
@@ -454,20 +566,20 @@ class omni_llm_model_loader:
         chat_handler = get_auto_chat_handler(model)
         
         mmproj_status = "已启用" if enable_mmproj else "已禁用"
-        asr_status = "已启用" if enable_asr else "已禁用"
-        print(f"【自动配置】根据模型 {model} 选择对话格式处理器: {chat_handler}，多模态功能{mmproj_status}，ASR功能{asr_status}")
+        print(f"【自动配置】根据模型 {model} 选择对话格式处理器: {chat_handler}，多模态功能{mmproj_status}")
 
         # 构建用于配置比较的配置字典（与IS_CHANGED返回的格式一致）
-        # 只包含用户可配置的参数，不包含自动计算的参数
+        # 使用自动优化后的值，确保与IS_CHANGED计算一致
         compare_config = {
             "model": model,
             "chat_handler": chat_handler,
             "enable_mmproj": enable_mmproj,
             "mmproj": mmproj,
-            "enable_asr": enable_asr,
-            "n_ctx": n_ctx,
-            "n_gpu_layers": n_gpu_layers,
+            "mtp_mode": mtp_mode,
+            "n_ctx": n_ctx,  # 已在前面应用Omni优化
+            "n_gpu_layers": n_gpu_layers,  # 已在前面应用Omni优化
             "vram_limit": vram_limit,
+            "image_min_tokens": image_min_tokens,
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
             "tensor_split": tensor_split,
@@ -476,7 +588,7 @@ class omni_llm_model_loader:
         # 构建完整的配置字典（包含所有参数，用于实际加载模型）
         custom_config = {
             "model": model, "enable_mmproj": enable_mmproj, "mmproj": mmproj,
-            "enable_asr": enable_asr,
+            "mtp_mode": mtp_mode,
             "chat_handler": chat_handler, "n_ctx": n_ctx,
             "n_gpu_layers": n_gpu_layers, "vram_limit": vram_limit,
             "image_min_tokens": image_min_tokens, "image_max_tokens": image_max_tokens,

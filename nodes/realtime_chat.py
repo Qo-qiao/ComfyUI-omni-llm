@@ -15,6 +15,7 @@ import io
 import json
 import time
 import base64
+import wave
 
 # 添加项目根目录到路径（保持与其他节点模块一致）
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -554,23 +555,29 @@ def _image_path_to_data_uri(image_path: str, max_edge: int) -> str:
     return f"data:image/jpeg;base64,{image_b64}"
 
 
-def _image_ref_to_data_uri(image_ref: dict, max_edge: int) -> str:
+def _resolve_input_media_path(media_ref: dict, media_label: str) -> str:
+    """解析 input 目录内的媒体引用为绝对路径，阻止路径越界"""
     input_root = os.path.realpath(folder_paths.get_input_directory())
-    image_path = os.path.realpath(
-        os.path.join(input_root, image_ref.get("subfolder", ""), image_ref["filename"])
+    media_path = os.path.realpath(
+        os.path.join(input_root, media_ref.get("subfolder", ""), media_ref["filename"])
     )
     try:
-        is_inside_input = os.path.commonpath([input_root, image_path]) == input_root
+        is_inside_input = os.path.commonpath([input_root, media_path]) == input_root
     except ValueError:
         is_inside_input = False
     if not is_inside_input:
-        raise ValueError("图片路径超出 ComfyUI input 目录。")
-    if not os.path.isfile(image_path):
-        raise FileNotFoundError(f"找不到对话图片：{image_path}")
+        raise ValueError(f"{media_label}路径超出 ComfyUI input 目录。")
+    if not os.path.isfile(media_path):
+        raise FileNotFoundError(f"找不到对话{media_label}：{media_path}")
+    return media_path
+
+
+def _image_ref_to_data_uri(image_ref: dict, max_edge: int) -> str:
+    image_path = _resolve_input_media_path(image_ref, "图片")
     return _image_path_to_data_uri(image_path, int(max_edge))
 
 
-def _video_ref_to_content(video_ref: dict, max_edge: int, max_frames: int = 8, native_video: bool = False) -> list:
+def _video_ref_to_content(video_ref: dict, max_edge: int, max_frames: int = 8, native_video: bool = False, with_audio: bool = False) -> list:
     """从视频文件中提取内容
     
     Args:
@@ -578,22 +585,12 @@ def _video_ref_to_content(video_ref: dict, max_edge: int, max_frames: int = 8, n
         max_edge: 图片最大边长
         max_frames: 最大帧数（提取帧模式）
         native_video: 是否发送原生视频（base64）
+        with_audio: 帧提取模式下附带视频音轨（Omni 模型图像+音频同时分析）
     
     Returns:
         content_items: OpenAI 格式的 content 列表
     """
-    input_root = os.path.realpath(folder_paths.get_input_directory())
-    video_path = os.path.realpath(
-        os.path.join(input_root, video_ref.get("subfolder", ""), video_ref["filename"])
-    )
-    try:
-        is_inside_input = os.path.commonpath([input_root, video_path]) == input_root
-    except ValueError:
-        is_inside_input = False
-    if not is_inside_input:
-        raise ValueError("视频路径超出 ComfyUI input 目录。")
-    if not os.path.isfile(video_path):
-        raise FileNotFoundError(f"找不到对话视频：{video_path}")
+    video_path = _resolve_input_media_path(video_ref, "视频")
 
     content_items = []
     
@@ -679,24 +676,27 @@ def _video_ref_to_content(video_ref: dict, max_edge: int, max_frames: int = 8, n
         container.close()
     except Exception as e:
         print(f"【视频处理】提取视频帧失败：{e}")
+
+    # Omni 模型：帧模式附带视频音轨，实现图像+音频同时处理分析
+    if with_audio:
+        try:
+            audio_wav = _media_to_wav_bytes(video_path)
+            if audio_wav:
+                content_items.append({
+                    "type": "input_audio",
+                    "input_audio": {"data": base64.b64encode(audio_wav).decode("utf-8"), "format": "wav"},
+                })
+            else:
+                print("【视频处理】视频无音轨，跳过音频附带")
+        except Exception as e:
+            print(f"【视频处理】提取视频音轨失败（跳过音频）：{e}")
     return content_items
 
 
 def _video_ref_to_data_uri(video_ref: dict, max_edge: int) -> str:
     """将视频第一帧转换为 data URI（用于预览或简单场景）"""
     import av
-    input_root = os.path.realpath(folder_paths.get_input_directory())
-    video_path = os.path.realpath(
-        os.path.join(input_root, video_ref.get("subfolder", ""), video_ref["filename"])
-    )
-    try:
-        is_inside_input = os.path.commonpath([input_root, video_path]) == input_root
-    except ValueError:
-        is_inside_input = False
-    if not is_inside_input:
-        raise ValueError("视频路径超出 ComfyUI input 目录。")
-    if not os.path.isfile(video_path):
-        raise FileNotFoundError(f"找不到对话视频：{video_path}")
+    video_path = _resolve_input_media_path(video_ref, "视频")
 
     try:
         container = av.open(video_path)
@@ -720,6 +720,56 @@ def _video_ref_to_data_uri(video_ref: dict, max_edge: int) -> str:
     except Exception as e:
         print(f"【视频处理】提取视频首帧失败：{e}")
         return ""
+
+
+def _media_to_wav_bytes(media_path: str):
+    """解码媒体文件（音频/视频）的音频流为 16kHz 单声道 WAV；无音频流返回 None"""
+    import av
+    container = av.open(media_path)
+    try:
+        audio_stream = next(
+            (s for s in container.streams if isinstance(s, av.audio.stream.AudioStream)),
+            None,
+        )
+        if audio_stream is None:
+            return None
+        resampler = av.AudioResampler(format="s16", layout="mono", rate=16000)
+        pcm = bytearray()
+        for frame in container.decode(audio_stream):
+            for out in resampler.resample(frame):
+                pcm += out.to_ndarray().tobytes()
+        for out in resampler.resample(None):
+            pcm += out.to_ndarray().tobytes()
+    finally:
+        container.close()
+
+    if not pcm:
+        return None
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wav_file:
+        wav_file.setnchannels(1)
+        wav_file.setsampwidth(2)
+        wav_file.setframerate(16000)
+        wav_file.writeframes(bytes(pcm))
+    return buf.getvalue()
+
+
+def _audio_ref_to_content(audio_ref: dict) -> list:
+    """音频文件 → input_audio 媒体块（wav/mp3 直传，其他格式转 WAV）"""
+    audio_path = _resolve_input_media_path(audio_ref, "音频")
+    fmt = {".wav": "wav", ".mp3": "mp3"}.get(os.path.splitext(audio_ref["filename"])[1].lower())
+    if fmt:
+        with open(audio_path, "rb") as f:
+            audio_bytes = f.read()
+    else:
+        audio_bytes = _media_to_wav_bytes(audio_path)
+        fmt = "wav"
+    if not audio_bytes:
+        raise RuntimeError(f"音频文件解码失败：{audio_ref['filename']}")
+    return [{
+        "type": "input_audio",
+        "input_audio": {"data": base64.b64encode(audio_bytes).decode("utf-8"), "format": fmt},
+    }]
 
 
 # ---------------------------------------------------------------- 输出清洗
@@ -762,6 +812,8 @@ def _normalize_image_ref(item) -> dict | None:
     subfolder = str(item.get("subfolder") or "").replace("\\", "/").strip("/")
     image_type = str(item.get("type") or "input").strip().lower()
     media_type = str(item.get("media_type") or "image").strip().lower()
+    if media_type not in ("image", "video", "audio"):
+        media_type = "image"
     if not filename or image_type != "input":
         return None
     if any(part in ("", ".", "..") for part in subfolder.split("/")) and subfolder:
@@ -1033,15 +1085,45 @@ def _call_chat_completion(llm, messages: list, params: dict) -> dict:
     return _get_engine().create_chat_completion(llm, messages, params)
 
 
-def _build_user_content(text: str, images: list, max_edge: int, max_frames: int = 8, native_video: bool = False):
+# 支持原生音频输入的 Omni 模型关键字（与 unified_inference 保持一致）
+_NATIVE_AUDIO_KEYWORDS = ("omni", "audio", "gemma-4", "gemma4")
+
+
+def _supports_native_audio(api_model: str = "") -> bool:
+    """判断能否将音频直接送入 chat：本地模型按 mmproj 运行期能力/关键字检测，API 模式按模型名关键字检测"""
+    if api_model:
+        hay = str(api_model).lower()
+        return any(kw in hay for kw in _NATIVE_AUDIO_KEYWORDS)
+    try:
+        handler = getattr(LLAMA_CPP_STORAGE, "chat_handler", None)
+        if handler is not None:
+            cap = getattr(handler, "is_support_audio", None)
+            if cap is True:
+                return True
+            if cap is False and getattr(handler, "mtmd_ctx", None) is not None:
+                return False
+        hay = ""
+        if LLAMA_CPP_STORAGE.current_config:
+            hay += str(LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")).lower()
+            hay += " " + str(LLAMA_CPP_STORAGE.current_config.get("model", "")).lower()
+        # 名称命中 omni/audio 关键字的模型，按 mmproj 运行期能力决定
+        return getattr(handler, "is_support_audio", False) is True
+    except Exception as e:
+        print(f"【音频能力】检测失败: {e}")
+        return False
+
+
+def _build_user_content(text: str, images: list, max_edge: int, max_frames: int = 8, native_video: bool = False, video_audio: bool = False):
     if not images:
         return text
     content = [{"type": "text", "text": text}]
     for media_ref in images:
         media_type = media_ref.get("media_type", "image")
         if media_type == "video":
-            video_content = _video_ref_to_content(media_ref, max_edge, max_frames, native_video)
+            video_content = _video_ref_to_content(media_ref, max_edge, max_frames, native_video, with_audio=video_audio)
             content.extend(video_content)
+        elif media_type == "audio":
+            content.extend(_audio_ref_to_content(media_ref))
         else:
             content.append(
                 {
@@ -1052,12 +1134,12 @@ def _build_user_content(text: str, images: list, max_edge: int, max_frames: int 
     return content
 
 
-def _build_model_history(history: list, max_edge: int, native_video: bool = False) -> list:
+def _build_model_history(history: list, max_edge: int, native_video: bool = False, video_audio: bool = False) -> list:
     messages = []
     for item in history:
         images = item.get("images") or []
         if item["role"] == "user" and images:
-            messages.append({"role": "user", "content": _build_user_content(item["content"], images, max_edge, native_video=native_video)})
+            messages.append({"role": "user", "content": _build_user_content(item["content"], images, max_edge, native_video=native_video, video_audio=video_audio)})
         else:
             messages.append({"role": item["role"], "content": item["content"]})
     return messages
@@ -1395,6 +1477,9 @@ class omni_llm_realtime_chat:
         has_api_config = isinstance(api_config, dict) and api_config.get("base_url") and api_config.get("api_key") and api_config.get("model")
         use_api_mode = has_api_config and llama_model is None
 
+        # Omni 全模态模型：视频帧模式附带音轨，实现图像+音频同时处理分析
+        video_audio = _supports_native_audio(api_model if use_api_mode else "")
+
         if use_api_mode:
             # API模式：不需要本地模型
             llm = None
@@ -1444,7 +1529,7 @@ class omni_llm_realtime_chat:
 
         history_image_count = sum(len(item.get("images") or []) for item in history)
         if (history_image_count or current_images) and llama_model is not None and getattr(llama_model, "chat_handler", None) is None:
-            raise RuntimeError("图片对话需要加载对应的视觉投影 mmproj（请在模型加载器启用多模态）。")
+            raise RuntimeError("图片/视频/音频对话需要加载对应的 mmproj（请在模型加载器启用多模态）。")
 
         history_before_context_trim = len(history)
         if llm is not None:
@@ -1464,8 +1549,8 @@ class omni_llm_realtime_chat:
         messages = []
         if system_text:
             messages.append({"role": "system", "content": system_text})
-        messages.extend(_build_model_history(model_history, max_edge, native_video))
-        messages.append({"role": "user", "content": _build_user_content(user_text, current_images, max_edge, native_video=native_video)})
+        messages.extend(_build_model_history(model_history, max_edge, native_video, video_audio))
+        messages.append({"role": "user", "content": _build_user_content(user_text, current_images, max_edge, native_video=native_video, video_audio=video_audio)})
 
         params = {
             "max_tokens": max_tokens,
@@ -1528,9 +1613,9 @@ class omni_llm_realtime_chat:
                 )
             trimmed_message_count += history_before_reference_trim - len(model_history)
             messages = [{"role": "system", "content": system_text}]
-            messages.extend(_build_model_history(model_history, max_edge, native_video))
+            messages.extend(_build_model_history(model_history, max_edge, native_video, video_audio))
             messages.append(
-                {"role": "user", "content": _build_user_content(user_text, current_images, max_edge, native_video=native_video)}
+                {"role": "user", "content": _build_user_content(user_text, current_images, max_edge, native_video=native_video, video_audio=video_audio)}
             )
 
         mm.throw_exception_if_processing_interrupted()
