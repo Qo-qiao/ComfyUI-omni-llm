@@ -44,15 +44,6 @@ If you are not familiar with installing dependencies, it is recommended to use t
 2. **Install llama-cpp-python** (Required):
    - You must download the latest version and install it manually. Please download from [llama_cpp_python_wheels](https://github.com/JamePeng/llama-cpp-python/releases)
 
-3. **Extract dependency files from the plugin's site-packages folder**: [Download dependency package](https://github.com/Qo-qiao/ComfyUI-omni-llm/releases) to directly download the zip package with dependencies (dependency package adapted for transformers-5.0 and above, no need to install for daily use)
-   - Extract the dependency files from the plugin's site-packages folder to `ComfyUI/custom_nodes/ComfyUI-omni-llm/site-packages` directory
-   - Directory reference format:
-     ```
-     ComfyUI/custom_nodes/ComfyUI-omni-llm/site-packages/
-     ├── qwen_asr
-     ├── ... other dependency files
-     ```
-
    **Wheel Selection Guide:**
    - **Python Version Match**: `cp312` in the filename indicates Python 3.12, select the file matching your Python version
    - **CUDA Version Match**: `cu128` in the filename indicates CUDA 12.8, select the file compatible with your CUDA version
@@ -112,16 +103,21 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-The following updates are based on llama-cpp-python version 0.3.49, so please install this version first
+The following updates are based on llama-cpp-python version 0.4.0, so please install this version first
 
-#### v3.4.0 (2026-09-12)
-- **Node Optimization and Adjustments**: Added API loading nodes (expanding model support types to meet different user scenario needs), added multi-turn conversation nodes (for skill usage, making it easier to generate more professional prompt content), added skill loading nodes (expanding text generation capabilities, providing more options for prompt generation), optimized and adjusted parameter node options, adapted for multi-turn conversation node usage. 
-- **Preset Template Optimization**: Optimized and adjusted preset template content, added Skill-related files.
+#### v3.5.0 (2026-09-26)
+
+- **ASR Node Overhaul**: ASR no longer runs inference through qwen3-asr, now uses llama-cpp-python for inference. Only GGUF format is supported, and the mmproj model must be loaded at the same time.  
+- **New TTS Node**: Added a TTS model loader (based on llama-cpp MTMD), supporting Qwen3-TTS and Pocket TTS models (only basic synthesis is supported, voice modulation isn’t available yet. Currently just functional support, due to dependency issues, it’s recommended to use the official pipeline).  
+- **Node Optimization**: Optimized inference and audio support for omni-type models (improved joint inference capabilities for images and audio).
 
 
 <details>
 <summary>📋 Older Versions</summary>
 
+#### v3.4.0 (2026-09-12)
+- **Node Optimization and Adjustments**: Added API loading nodes (expanding model support types to meet different user scenario needs), added multi-turn conversation nodes (for skill usage, making it easier to generate more professional prompt content), added skill loading nodes (expanding text generation capabilities, providing more options for prompt generation), optimized and adjusted parameter node options, adapted for multi-turn conversation node usage. 
+- **Preset Template Optimization**: Optimized and adjusted preset template content, added Skill-related files.
 
 #### v3.3.4 (2026-08-22)
 

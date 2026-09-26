@@ -19,17 +19,13 @@ sys.path.insert(0, nodes_dir)
 api_dir = os.path.join(plugin_dir, "api")
 sys.path.insert(0, api_dir)
 
-# 添加插件自带的site-packages目录到路径（优先使用插件自带的依赖，避免版本冲突）
-site_packages_dir = os.path.join(plugin_dir, "site-packages")
-if os.path.exists(site_packages_dir):
-    sys.path.insert(0, site_packages_dir)
-
 # 导入所有节点模块（模块名对应nodes目录下的实际文件名）
 from model_loader import omni_llm_model_loader
 from unified_inference import omni_llm_unified_inference
 from model_parameters import omni_llm_parameters
 from clean_states import omni_llm_clean_states
 from asr_loader import omni_llm_asr_loader
+from tts_loader import omni_llm_tts_loader
 from multi_image_input import omni_llm_multi_image_input
 from video_loader import omni_llm_video_loader
 from skill_loader import omni_llm_skill_loader
@@ -42,6 +38,7 @@ NODE_CLASS_MAPPINGS = {
     "omni_llm_parameters": omni_llm_parameters,
     "omni_llm_clean_states": omni_llm_clean_states,
     "omni_llm_asr_loader": omni_llm_asr_loader,
+    "omni_llm_tts_loader": omni_llm_tts_loader,
     "omni_llm_multi_image_input": omni_llm_multi_image_input,
     "omni_llm_unified_inference": omni_llm_unified_inference,
     "omni_llm_video_loader": omni_llm_video_loader,
@@ -56,6 +53,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "omni_llm_parameters": "Omni LLM Parameters",
     "omni_llm_clean_states": "Omni LLM Clean States",
     "omni_llm_asr_loader": "Omni LLM ASR Model Loader",
+    "omni_llm_tts_loader": "Omni LLM TTS Model Loader",
     "omni_llm_multi_image_input": "Omni LLM Multi-Image Input (Story Creation)",
     "omni_llm_unified_inference": "Omni LLM Unified Inference",
     "omni_llm_video_loader": "Omni LLM Video Loader",
@@ -71,4 +69,4 @@ WEB_DIRECTORY = "./web"
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
 
 # 版本信息
-VERSION = "3.4.0"
+VERSION = "3.5.0"

@@ -28,12 +28,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter
 
-site_packages_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "site-packages")
-if os.path.exists(site_packages_path):
-    sys.path.insert(0, site_packages_path)
-
 LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
 MIN_LLAMA_CPP_VERSION = "0.3.40"
+MIN_LLAMA_CPP_TTS_VERSION = "0.4.0"
+MIN_LLAMA_CPP_MTMD_AUDIO_VERSION = "0.4.0"
 
 LLAMA_CPP_WHEEL_CONFIG = {
     "Windows": {
@@ -110,6 +108,29 @@ def _check_llama_cpp_version(min_version=MIN_LLAMA_CPP_VERSION):
     except Exception as e:
         print(f"【错误】版本检查失败: {e}")
         return False, None
+
+def _check_llama_cpp_tts_version():
+    """检查llama-cpp-python版本是否支持MTMD TTS和音频功能(>=0.4.0)"""
+    try:
+        import llama_cpp
+        from packaging import version
+        
+        current_version = getattr(llama_cpp, '__version__', '0.0.0')
+        
+        if version.parse(current_version) >= version.parse(MIN_LLAMA_CPP_TTS_VERSION):
+            return True, current_version
+        else:
+            print(f"【TTS警告】llama-cpp-python版本 {current_version} 低于 {MIN_LLAMA_CPP_TTS_VERSION}，MTMD TTS和音频功能不可用")
+            return False, current_version
+    except ImportError:
+        return False, None
+    except Exception as e:
+        print(f"【TTS错误】版本检查失败: {e}")
+        return False, None
+
+def _check_llama_cpp_mtmd_audio():
+    """检查llama-cpp-python是否支持MTMD音频ASR功能(>=0.4.0)"""
+    return _check_llama_cpp_tts_version()
 
 def _validate_requirements_sync():
     """验证common.py中的wheel配置与requirements.txt是否同步"""
@@ -313,9 +334,27 @@ if _check_and_install_llama_cpp_python():
         import llama_cpp
         from llama_cpp import Llama
         import llama_cpp.llama_chat_format as chat_format
+        from packaging import version
+        
         LLAMA_CPP_AVAILABLE = True
         _llama_cpp = llama_cpp
-        _has_mtmd = True
+        _llama_cpp_version = getattr(llama_cpp, '__version__', '0.0.0')
+        
+        # MTMD 支持检查：>= 0.3.35 支持 MTMD 基础功能
+        _has_mtmd = version.parse(_llama_cpp_version) >= version.parse("0.3.35")
+        
+        # MTMD 音频/TTS 支持检查：>= 0.4.0
+        _has_mtmd_audio = version.parse(_llama_cpp_version) >= version.parse(MIN_LLAMA_CPP_MTMD_AUDIO_VERSION)
+        
+        # TTS 支持检查
+        _has_tts, _ = _check_llama_cpp_tts_version()
+        
+        if not _has_mtmd:
+            print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD功能")
+        if not _has_mtmd_audio:
+            print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD音频/TTS功能，建议升级到 {MIN_LLAMA_CPP_TTS_VERSION}+")
+        
+        print(f"【依赖检查】llama-cpp-python 版本: {_llama_cpp_version}, MTMD: {_has_mtmd}, MTMD音频: {_has_mtmd_audio}, TTS: {_has_tts}")
             
     except ImportError as e:
         print(f"【错误】llama-cpp-python 导入失败: {e}")
@@ -1537,13 +1576,24 @@ def parse_json(json_str):
 # 格式: (pattern, handler_class_name, display_name, priority)
 # 按优先级排序：更具体的模式在前（数字越大优先级越高）
 MODEL_REGISTRY = [
+    # ===== Omni / 原生音频输入模型（mmproj 同时提供视觉/音频能力） =====
+    # 0.4.0 无专用 Handler 时统一使用模板驱动的 GenericMTMDChatHandler（支持 <|audio_pad|>/<|audio|> 等媒体占位符）
+    ('qwen3-omni', 'GenericMTMDChatHandler', 'Qwen3-Omni', 35),
+    ('qwen3omni', 'GenericMTMDChatHandler', 'Qwen3-Omni', 35),
+    ('qwen3-audio', 'GenericMTMDChatHandler', 'Qwen3-Audio', 35),
+    ('qwen3audio', 'GenericMTMDChatHandler', 'Qwen3-Audio', 35),
+    ('mimo-audio', 'GenericMTMDChatHandler', 'MiMo-Audio', 35),
+    ('mimo-omni', 'GenericMTMDChatHandler', 'MiMo-Omni', 35),
+    # Gemma-4 为视觉+音频全模态，使用自带音频模板的 Gemma4ChatHandler
+    ('gemma-4', 'Gemma4ChatHandler', 'Gemma-4', 35),
+
     # ===== Qwen 系列 =====
     ('qwen3.6-vl-thinking', 'Qwen3VLChatHandler', 'Qwen3.6-VL-Thinking', 30),
     ('qwen3-vl-thinking', 'Qwen3VLChatHandler', 'Qwen3-VL-Thinking', 30),
     ('qwen3.6-vl', 'Qwen3VLChatHandler', 'Qwen3.6-VL', 25),
     ('qwen3-vl', 'Qwen3VLChatHandler', 'Qwen3-VL', 25),
     ('qwen2.5-vl', 'Qwen25VLChatHandler', 'Qwen2.5-VL', 25),
-    ('qwen2.5-omni', 'Qwen25VLChatHandler', 'Qwen2.5-Omni', 25),
+    ('qwen2.5-omni', 'GenericMTMDChatHandler', 'Qwen2.5-Omni', 25),
     ('mineru2.5-pro', 'Qwen25VLChatHandler', 'MinerU2.5-Pro', 25),
     ('qwen3.5-thinking', 'Qwen35ChatHandler', 'Qwen3.5-Thinking', 20),
     ('qwen3.6-thinking', 'Qwen35ChatHandler', 'Qwen3.6-Thinking', 20),
@@ -1557,20 +1607,24 @@ MODEL_REGISTRY = [
     ('deepseek-v4-flash', 'Qwen35ChatHandler', 'Qwen3.5-DeepSeek-V4-Flash', 15),
     ('qwen3.5-mtp', 'Qwen35ChatHandler', 'Qwen3.5-MTP', 15),
     ('qwen35-mtp', 'Qwen35ChatHandler', 'Qwen3.5-MTP', 15),
-    ('toriigate', 'Qwen25VLChatHandler', 'ToriiGate', 15),
-    
+('toriigate', 'Qwen25VLChatHandler', 'ToriiGate', 15),
+    # ===== Nex-N2 系列 (基于 Qwen3.5 架构) =====
+    ('huihui-nex-n2-mini', 'Qwen35ChatHandler', 'Huihui-Nex-N2-Mini', 15),
+    ('nex-n2-mini', 'Qwen35ChatHandler', 'Nex-N2-Mini', 15),
+    ('nex-n2', 'Qwen35ChatHandler', 'Nex-N2', 15),
+     
     # ===== MiniCPM 系列 =====
-    ('minicpm-o-4.6', 'MiniCPMv46ChatHandler', 'MiniCPM-O-4.6', 30),
+    ('minicpm-o-4.6', 'GenericMTMDChatHandler', 'MiniCPM-O-4.6', 30),
     ('minicpm-v-4.6', 'MiniCPMv46ChatHandler', 'MiniCPM-v4.6', 30),
-    ('minicpm-o-4.6-thinking', 'MiniCPMv46ChatHandler', 'MiniCPM-O-4.6-Thinking', 30),
+    ('minicpm-o-4.6-thinking', 'GenericMTMDChatHandler', 'MiniCPM-O-4.6-Thinking', 30),
     ('minicpm-v-4.6-thinking', 'MiniCPMv46ChatHandler', 'MiniCPM-v4.6-Thinking', 30),
-    ('minicpm-o-4.5', 'MiniCPMv45ChatHandler', 'MiniCPM-O-4.5', 25),
+    ('minicpm-o-4.5', 'GenericMTMDChatHandler', 'MiniCPM-O-4.5', 25),
     ('minicpm-v-4.5', 'MiniCPMv45ChatHandler', 'MiniCPM-v4.5', 25),
-    ('minicpm-o-4.5-thinking', 'MiniCPMv45ChatHandler', 'MiniCPM-O-4.5-Thinking', 25),
+    ('minicpm-o-4.5-thinking', 'GenericMTMDChatHandler', 'MiniCPM-O-4.5-Thinking', 25),
     ('minicpm-v-4.5-thinking', 'MiniCPMv45ChatHandler', 'MiniCPM-v4.5-Thinking', 25),
     ('minicpm-llama3-v-2.5', 'MiniCPMv26ChatHandler', 'MiniCPM-Llama3-V 2.5', 20),
     ('minicpm-v-2.6', 'MiniCPMv26ChatHandler', 'MiniCPM-v2.6', 20),
-    ('minicpmo2.6', 'MiniCPMv26ChatHandler', 'MiniCPM-v2.6', 20),
+    ('minicpmo2.6', 'GenericMTMDChatHandler', 'MiniCPM-O-2.6', 20),
     
     # ===== GLM 系列 =====
     ('glm-4.6v-thinking', 'GLM46VChatHandler', 'GLM-4.6V-Thinking', 30),
@@ -1585,7 +1639,6 @@ MODEL_REGISTRY = [
     ('nanollava', 'NanoLlavaChatHandler', 'nanoLLaVA', 20),
     
     # ===== Gemma 系列 =====
-    ('gemma-4', 'Gemma4ChatHandler', 'Gemma-4', 20),
     ('gemma-3', 'Gemma3ChatHandler', 'Gemma-3', 20),
     
     # ===== 其他视觉模型 =====
@@ -1873,7 +1926,10 @@ class LLAMA_CPP_STORAGE:
             "Qwen3-VL": "Qwen3VLChatHandler",
             "Qwen3-VL-Thinking": "Qwen3VLChatHandler",
             "Qwen2.5-VL": "Qwen25VLChatHandler",
-            "Qwen2.5-Omni": "Qwen25VLChatHandler",
+             "Qwen2.5-Omni": "GenericMTMDChatHandler",
+            "Qwen3-Omni": "GenericMTMDChatHandler",
+            "Qwen3-Audio": "GenericMTMDChatHandler",
+            "MiMo-Audio": "GenericMTMDChatHandler",
             "ToriiGate": "Qwen25VLChatHandler",
             "MinerU2.5-Pro": "Qwen25VLChatHandler",
             "DeepSeek-OCR": "MTMDChatHandler",
@@ -1888,8 +1944,8 @@ class LLAMA_CPP_STORAGE:
             "MiniCPM-v4.5-Thinking": "MiniCPMv45ChatHandler",
             "MiniCPM-v4.6": "MiniCPMv46ChatHandler",
             "MiniCPM-v4.6-Thinking": "MiniCPMv46ChatHandler",
-            "MiniCPM-O-4.5": "MiniCPMv45ChatHandler",
-            "MiniCPM-O-4.6": "MiniCPMv46ChatHandler",
+             "MiniCPM-O-4.5": "GenericMTMDChatHandler",
+             "MiniCPM-O-4.6": "GenericMTMDChatHandler",
             "Gemma3": "Gemma3ChatHandler",
             "Gemma4": "Gemma4ChatHandler",
             "Gemma-3": "Gemma3ChatHandler",
@@ -1913,7 +1969,7 @@ class LLAMA_CPP_STORAGE:
             return chat_handler_manager.get_handler(handler_name)
         
         if chat_handler_name.startswith("Qwen2.5-Omni-"):
-            return chat_handler_manager.get_handler("Qwen25VLChatHandler")
+            return chat_handler_manager.get_handler("GenericMTMDChatHandler")
         if chat_handler_name.startswith("Qwen3.5"):
             return chat_handler_manager.get_handler("Qwen35ChatHandler")
         if chat_handler_name.startswith("Qwen3.6"):
@@ -1924,10 +1980,12 @@ class LLAMA_CPP_STORAGE:
             return chat_handler_manager.get_handler("Qwen35ChatHandler")
         if chat_handler_name.startswith("Qwen3-VL"):
             return chat_handler_manager.get_handler("Qwen3VLChatHandler")
-        if chat_handler_name.startswith("MiniCPM-v4.6") or chat_handler_name.startswith("MiniCPM-O-4.6"):
+        if chat_handler_name.startswith("MiniCPM-v4.6"):
             return chat_handler_manager.get_handler("MiniCPMv46ChatHandler")
-        if chat_handler_name.startswith("MiniCPM-v4.5") or chat_handler_name.startswith("MiniCPM-v2.6") or chat_handler_name.startswith("MiniCPM-O-"):
+        if chat_handler_name.startswith("MiniCPM-v4.5") or chat_handler_name.startswith("MiniCPM-v2.6"):
             return chat_handler_manager.get_handler("MiniCPMv45ChatHandler")
+        if chat_handler_name.startswith("MiniCPM-O-"):
+            return chat_handler_manager.get_handler("GenericMTMDChatHandler")
         if "Llama3" in chat_handler_name and "MiniCPM" in chat_handler_name:
             return chat_handler_manager.get_handler("MiniCPMv26ChatHandler")
         if chat_handler_name.startswith("GLM-4.6V"):
@@ -1955,8 +2013,24 @@ class LLAMA_CPP_STORAGE:
             handler_name = handler_cls.__name__
             print(f"【ChatHandler初始化】开始初始化：{handler_name}")
             
-            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen2.5-Omni", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "MiMo-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]
-            
+            vl_handlers = ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen2.5-VL", "Qwen3.6-VL", "Qwen3.6-VL-Thinking", "MiMo-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]
+
+            # Omni/音频输入模型：GenericMTMDChatHandler 为模板驱动型，chat_format 必填，
+            # 传 None 由其在首次推理时从 GGUF 元数据 tokenizer.chat_template 解析（支持音频/图像/视频媒体占位符）
+            if handler_name == "GenericMTMDChatHandler":
+                if not mmproj_path:
+                    raise ValueError("Omni/音频模型必须提供mmproj文件（音频/视觉编码模型）")
+                init_params["chat_format"] = None
+                init_params["mmproj_path"] = mmproj_path
+                init_params["use_gpu"] = True
+                if image_max_tokens > 0:
+                    init_params["image_max_tokens"] = image_max_tokens
+                if image_min_tokens > 0:
+                    init_params["image_min_tokens"] = image_min_tokens
+                cls.chat_handler = handler_cls(**init_params)
+                print(f"【ChatHandler初始化】✅ 成功：{handler_name}（模板驱动，支持音频/视觉媒体输入）")
+                return cls.chat_handler
+
             if mmproj_path and chat_handler_name in vl_handlers:
                 init_params["clip_model_path"] = mmproj_path
                 if chat_handler_name in ["Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3.6-VL", "Qwen3.6-VL-Thinking"]:
@@ -1999,6 +2073,33 @@ class LLAMA_CPP_STORAGE:
             print(f"【ChatHandler初始化错误】{e}")
             print(f"【提示】请更新 llama-cpp-python：https://github.com/JamePeng/llama-cpp-python/releases")
             return None
+
+    @classmethod
+    def _probe_mtmd_capabilities(cls):
+        """
+        提前初始化 ChatHandler 的 MTMD 上下文并探测 mmproj 能力。
+        - 初始化后 handler.is_support_vision / is_support_audio / is_support_video 为真实能力，
+          推理节点据此决定是否将音频/视频直接挂到主模型消息（Omni 全模态输入）。
+        - 上下文内部有幂等保护，首次 chat 推理时不会重复初始化。
+        """
+        try:
+            handler = cls.chat_handler
+            if handler is None or cls.llm is None:
+                return
+            # 仅 MTMD 系列处理器具备该接口
+            if not hasattr(handler, "_init_mtmd_context"):
+                return
+            if getattr(handler, "mtmd_ctx", None) is not None:
+                return
+            handler._init_mtmd_context(cls.llm)
+            cap_vision = getattr(handler, "is_support_vision", False)
+            cap_audio = getattr(handler, "is_support_audio", False)
+            cap_video = getattr(handler, "is_support_video", False)
+            print(f"【MMProj能力】视觉={cap_vision}，音频={cap_audio}，视频={cap_video}")
+            if cap_audio:
+                print(f"【Omni支持】检测到音频输入能力，音频可直接送入主模型进行全模态理解（无需独立ASR节点）")
+        except Exception as e:
+            print(f"【MMProj能力探测】提前初始化MTMD上下文失败（将在首次推理时重试）: {e}")
 
     @classmethod
     def load_model(cls, config):
@@ -2110,6 +2211,17 @@ class LLAMA_CPP_STORAGE:
                 is_mtp_model = any(keyword in path_for_mtp_check for keyword in mtp_keywords)
                 if is_mtp_model:
                     print(f"【MTP检测】根据模型路径补充检测到MTP模型：{model_path}")
+
+            # 用户在模型加载节点中的 MTP 手动选项覆盖自动检测结果
+            # Auto=沿用名称检测；Enable=强制开启（模型名不含mtp关键字时）；Disable=强制关闭
+            mtp_mode = config.get("mtp_mode", "Auto")
+            if mtp_mode == "Disable":
+                if is_mtp_model:
+                    print(f"【MTP检测】用户已手动关闭MTP，即使检测到MTP模型也不启用推测解码：{model_path}")
+                is_mtp_model = False
+            elif mtp_mode == "Enable":
+                print(f"【MTP检测】用户手动强制开启MTP推测解码：{model_path}")
+                is_mtp_model = True
             
             # 获取模型格式
             model_ext = os.path.splitext(model)[1].lower()
@@ -2155,6 +2267,14 @@ class LLAMA_CPP_STORAGE:
                 "minicpm-o-4.5",
                 "minicpm-o-2.6",
                 "qwen2.5-omni",
+                "qwen3-omni",
+                "qwen3omni",
+                "qwen3-audio",
+                "qwen3audio",
+                "mimo-audio",
+                "mimo-omni",
+                "gemma-4",
+                "gemma4",
                 "qwen35",
                 "qwen3.5",
                 "qwen36",
@@ -2501,6 +2621,10 @@ class LLAMA_CPP_STORAGE:
                 gpu_info = f", GPU层数={recommended_gpu_layers}" if device_mode == "GPU" else ""
                 print(f"【模型加载】✅ 成功！路径：{model_path}，格式：{model_ext}，上下文：{n_ctx}，设备：{device_mode}{gpu_info}，ChatHandler：{handler_name}，MMProj：{mmproj_status}，n_batch={n_batch}")
 
+                # 提前初始化 MTMD 上下文，使 is_support_vision/is_support_audio/is_support_video
+                # 能力标志在首次推理前即为准确值（Omni 模型原生音频输入判定依赖该标志）
+                cls._probe_mtmd_capabilities()
+
                 # 禁用模型缓存
                 # MODEL_CACHE[cache_key] = cls.llm
                 # print(f"【模型缓存】已缓存模型：{model_path}")
@@ -2530,6 +2654,8 @@ class LLAMA_CPP_STORAGE:
                         mmproj_status = "已启用" if enable_mmproj and mmproj != "None" else "未启用"
                         print(f"【模型加载】✅ CPU模式成功！路径：{model_path}，格式：{model_ext}，上下文：{n_ctx}，ChatHandler：{handler_name}，MMProj：{mmproj_status}，n_batch={n_batch}")
                         print(f"【提示】CPU模式推理速度较慢，建议使用更小的模型")
+
+                        cls._probe_mtmd_capabilities()
 
                         # 禁用模型缓存
                         # MODEL_CACHE[cache_key] = cls.llm
