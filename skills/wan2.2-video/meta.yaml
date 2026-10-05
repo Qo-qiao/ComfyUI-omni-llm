@@ -1,0 +1,7 @@
+display-name-zh: 万相视频提示词优化
+tag-cn: 万相, Wan, 视频
+tag-en: Wan, Prompt, Video
+summary-cn: 按公式把视频想法改写成通义万相（Wan2.2–2.7）就绪的提示词：基础/进阶/图生视频/声音/参考生/多镜头公式、视频编辑指令技巧与电影美学词典
+desc-cn: 万相视频提示词优化器。按官方公式把视频想法改写成通义万相（Wan2.2–2.7）就绪的提示词：基础、进阶、图生视频、声音、参考生与多镜头公式，视频编辑指令技巧（元素增删改、环境/风格/台词/拍摄方式修改、复刻、续写），图/视频指代规则与控制关键词（生成单镜头、无台词、无背景音乐），以及电影美学、运镜、情绪、风格与声音词典。用于撰写、改写或优化万相文生/图生/参考生视频提示词，以及按指令编辑视频。
+display-name-en: wan2.2-video
+desc-en: Wan video prompt optimizer. Rewrites a video idea into Tongyi Wan (Wan2.2–2.7) ready prompts using the official formulas — basic, advanced, image-to-video, sound, reference-generation, and multi-shot — plus video-editing instruction techniques (element add/modify/delete, environment/style/dialogue/camera edits, replication, continuation), image/video reference notation, control keywords (single shot, no dialogue, no background music), and a cinematic aesthetics, camera movement, emotion, style, and sound vocabulary. Use to write, rewrite, or optimize Wan text/image/reference-to-video prompts and to edit video by instruction.

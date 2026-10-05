@@ -1,0 +1,7 @@
+display-name-zh: ACE-Step 1.5 提示词编写
+tag-cn: ACE-Step, 歌词, 音乐
+tag-en: ACE-Step, Prompt, Music
+summary-cn: 把歌曲需求按「简报→约束→风格路由→渲染→验证」转成ComfyUI中ACE-Step节点所需的输入：task_type、caption、lyrics、音乐元数据与音频参考，含18个风格家族的caption词表、结构标记与一致性自检
+desc-cn: ACE-Step 1.5 提示词编写指南。把一首歌的需求转成 ComfyUI 中 ACE-Step 节点所需的输入：task_type、caption、lyrics、音乐元数据（bpm/keyscale/timesignature/vocal_language/duration）与音频参考说明。按「音乐简报 → 约束解析 → 风格路由 → 渲染 → 验证」流程产出：先提取简报并分类显式/推断值，再按流派路由到风格词表小节，最后渲染 caption 与 lyrics 并通过自检清单。覆盖 Caption 写作原则、Lyrics 结构标记、风格词表路由、一致性自检与各任务的提示词重点；也适用于 ACE-Step 生成、翻唱、局部重绘、加轨场景下的提示词与歌词创作。
+display-name-en: ace-step-1.5
+desc-en: ACE-Step 1.5 prompt writing guide. Turns a song request into the inputs the ComfyUI ACE-Step nodes read: task_type, caption, lyrics, music metadata, and audio-conditioning notes. Works in five stages — music brief, constraint resolution, style routing, rendering, validation — extracting supported values, routing the genre to a style-vocabulary section, then rendering caption and lyrics through a self-check checklist. Covers caption writing principles, lyric structure marks, style vocabulary routing, consistency checks, and per-task prompt focus; also for prompting and lyric writing under ACE-Step generation, cover, repaint, and track-addition tasks.

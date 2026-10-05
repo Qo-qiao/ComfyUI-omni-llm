@@ -1,0 +1,7 @@
+display-name-zh: LTX 2.5 提示词优化
+tag-cn: LTX, 提示词, 视频
+tag-en: LTX, Prompt, Video
+summary-cn: 把视频想法改写成 LTX-2.5 就绪的生成提示词：单段落现在时结构、多镜头切点写法、音频与对白、prompt enhancer 建议与自检清单
+desc-cn: LTX 2.5 提示词优化器。把视频想法改写成 LTX-2.5 就绪的生成提示词：单段落、现在时、4–8 句描述、身体化情绪、引号对白、单镜头或多镜头切点结构、音频方向与时长节奏；附 prompt enhancer 用法建议、Dub-It 换声模板与常用词汇表。用于撰写、改写或优化 LTX 视频生成提示词，以及把为其他模型写的提示词重写为 LTX 结构。
+display-name-en: ltx2.5-video
+desc-en: LTX 2.5 prompt optimizer. Rewrites a video idea into a production-ready LTX-2.5 generation prompt — single flowing paragraph, present tense, 4-8 descriptive sentences, physical emotion cues, quoted dialogue, single-shot or multi-shot structure with named cuts, audio direction, and pacing beats; includes prompt-enhancer advice, the Dub-It template, and a helpful-term vocabulary. Use to write, rewrite, or optimize prompts for LTX video generation, or to convert prompts written for other models into LTX structure.
