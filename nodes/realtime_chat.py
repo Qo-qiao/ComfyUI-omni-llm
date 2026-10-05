@@ -1030,27 +1030,6 @@ def _sync_loaded_llm(storage):
     return llm
 
 
-def _reset_llm_state(llm) -> None:
-    try:
-        ctx = getattr(llm, "_ctx", None)
-        if ctx is not None and hasattr(ctx, "memory_clear"):
-            ctx.memory_clear(True)
-    except Exception:
-        pass
-    try:
-        hybrid_cache_mgr = getattr(llm, "_hybrid_cache_mgr", None)
-        if hybrid_cache_mgr is not None and hasattr(hybrid_cache_mgr, "clear"):
-            hybrid_cache_mgr.clear()
-    except Exception:
-        pass
-    try:
-        batch = getattr(llm, "_batch", None)
-        if batch is not None and hasattr(batch, "reset"):
-            batch.reset()
-    except Exception:
-        pass
-
-
 # ---------------------------------------------------------------- 推理调用
 _ENGINE = None
 
@@ -1081,7 +1060,7 @@ def _extract_reply(result) -> str:
 
 
 def _call_chat_completion(llm, messages: list, params: dict) -> dict:
-    _reset_llm_state(llm)
+    # 不手动清空KV：上游 generate(reset=True) 会做前缀匹配与回滚，保留多轮对话的缓存复用
     return _get_engine().create_chat_completion(llm, messages, params)
 
 
@@ -1302,6 +1281,7 @@ _CHAT_PARAMS_KEYS = (
     "mirostat_tau",
     "seed",
     "reasoning_budget",
+    "json_schema",
 )
 
 
@@ -1319,6 +1299,7 @@ def _default_chat_settings() -> dict:
         "presence_penalty": 0.0,
         "seed": -1,
         "reasoning_budget": -1,
+        "json_schema": "",
     }
 
 
@@ -1566,6 +1547,7 @@ class omni_llm_realtime_chat:
             "mirostat_eta": float(settings.get("mirostat_eta", 0.1) or 0.1),
             "mirostat_tau": float(settings.get("mirostat_tau", 5.0) or 5.0),
             "reasoning_budget": int(settings["reasoning_budget"]),
+            "json_schema": str(settings.get("json_schema", "") or ""),
             "timeout": api_timeout,
         }
         seed = settings["seed"]

@@ -15,7 +15,7 @@ import sys
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from common import HARDWARE_INFO, chat_handlers, folder_paths, LLAMA_CPP_STORAGE
+from common import HARDWARE_INFO, chat_handlers, folder_paths, LLAMA_CPP_STORAGE, chat_handler_manager, detect_model_chat_handler
 
 # 导入加速模块
 from common import (
@@ -24,6 +24,34 @@ from common import (
 
 # 应用加速钩子
 apply_acceleration_hooks(LLAMA_CPP_STORAGE)
+
+
+def get_auto_chat_handler(model_name):
+    """根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）"""
+    model_lower = model_name.lower()
+    # Qwen3.8 复用 Qwen35ChatHandler，但使用独立显示名以启用针对性优化
+    if "qwen3.8" in model_lower or "qwen38" in model_lower:
+        return "Qwen3.8-Thinking" if "thinking" in model_lower else "Qwen3.8"
+
+    # 首先尝试使用ChatHandlerManager的智能匹配
+    handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
+    if handler_name and handler_cls:
+        # GenericMTMDChatHandler 对应多个 Omni/音频模型，按注册表细化为具体显示名
+        if handler_name == "GenericMTMDChatHandler":
+            refined = detect_model_chat_handler(model_name)
+            if refined:
+                return refined
+        info = chat_handler_manager.get_handler_info(handler_name)
+        if info:
+            return info['display_name']
+
+    # 回退到原有的检测函数
+    detected = detect_model_chat_handler(model_name)
+    if detected:
+        return detected
+
+    # 默认使用LLaVA-1.6
+    return "LLaVA-1.6"
 
 class omni_llm_model_loader:
     @classmethod
@@ -147,10 +175,11 @@ class omni_llm_model_loader:
                 "n_gpu_layers": ("INT", {"default": default_n_gpu_layers, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载（GPU模式有效）"}),
                 "vram_limit": ("INT", {"default": default_vram_limit, "min": -1, "max": 24, "step": 1, "tooltip": "显存限制（GB），-1=无限制（GPU模式有效）"}),
                 "image_max_tokens": ("INT", {"default": 0, "min": 0, "max": 4096, "step": 32, "tooltip": "图片最大编码token数"}),
-                "attention_type": (["Auto", "Standard", "Flash", "XFormers"], {"default": default_attention_type, "tooltip": "注意力类型：Auto=自动选择，Standard=标准，Flash=Flash Attention（NVIDIA GPU推荐），XFormers=XFormers（实验性）"}),
+                "attention_type": (["Auto", "Standard", "Flash"], {"default": default_attention_type, "tooltip": "注意力类型：Auto=由llama.cpp按硬件自动选择，Standard=标准注意力（禁用FlashAttention），Flash=Flash Attention（NVIDIA GPU推荐）"}),
             },
             "optional": {
                 "tensor_split": ("STRING", {"default": "", "tooltip": "多GPU tensor分割比例，格式：0.5,0.5（单GPU留空）"}),
+                "ctx_checkpoints": ("INT", {"default": 0, "min": 0, "max": 64, "step": 1, "tooltip": "混合注意力模型的KV检查点数量：0=推荐（单轮工作流，消除生成结束时的PCIe I/O卡顿），多轮对话的滑窗模型可设16以启用前缀回滚复用"}),
             }
         }
     
@@ -185,43 +214,13 @@ class omni_llm_model_loader:
         return None
     
     @classmethod
-    def IS_CHANGED(s, model, enable_mmproj, mmproj, mtp_mode, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split=""):
+    def IS_CHANGED(s, model, enable_mmproj, mmproj, mtp_mode, n_ctx, n_gpu_layers, vram_limit, image_max_tokens, attention_type="Auto", tensor_split="", ctx_checkpoints=0):
         if LLAMA_CPP_STORAGE.llm is None:
             return float("NaN") 
         
         # 解析模型路径，确保与 loadmodel 中使用的值一致
         resolved_model_path = s._resolve_llm_model_path(model)
         actual_model = resolved_model_path if resolved_model_path else model
-        
-        # 根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）
-        def get_auto_chat_handler(model_name):
-            import common
-            from common import chat_handler_manager, detect_model_chat_handler
-            
-            model_lower = model_name.lower()
-            # Qwen3.8 复用 Qwen35ChatHandler，但使用独立显示名以启用针对性优化
-            if "qwen3.8" in model_lower or "qwen38" in model_lower:
-                return "Qwen3.8-Thinking" if "thinking" in model_lower else "Qwen3.8"
-            
-            # 首先尝试使用ChatHandlerManager的智能匹配
-            handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
-            if handler_name and handler_cls:
-                # GenericMTMDChatHandler 对应多个 Omni/音频模型，按注册表细化为具体显示名
-                if handler_name == "GenericMTMDChatHandler":
-                    refined = detect_model_chat_handler(model_name)
-                    if refined:
-                        return refined
-                info = chat_handler_manager.get_handler_info(handler_name)
-                if info:
-                    return info['display_name']
-
-            # 回退到原有的检测函数
-            detected = detect_model_chat_handler(model_name)
-            if detected:
-                return detected
-
-            # 默认使用LLaVA-1.6
-            return "LLaVA-1.6"
         
         # 使用解析后的路径来获取chat_handler，确保一致性
         chat_handler = get_auto_chat_handler(actual_model)
@@ -274,10 +273,11 @@ class omni_llm_model_loader:
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
             "tensor_split": tensor_split,
+            "ctx_checkpoints": ctx_checkpoints,
         }
         return json.dumps(custom_config, sort_keys=True, ensure_ascii=False)
     
-    def loadmodel(self, model, enable_mmproj, mmproj, mtp_mode="Auto", n_ctx=8192, n_gpu_layers=-1, vram_limit=-1, image_max_tokens=0, attention_type="Auto", tensor_split="", **kwargs):
+    def loadmodel(self, model, enable_mmproj, mmproj, mtp_mode="Auto", n_ctx=8192, n_gpu_layers=-1, vram_limit=-1, image_max_tokens=0, attention_type="Auto", tensor_split="", ctx_checkpoints=0, **kwargs):
         # 解析完整模型路径，避免同名冲突
         resolved_model_path = self._resolve_llm_model_path(model)
         if resolved_model_path:
@@ -532,36 +532,6 @@ class omni_llm_model_loader:
                 image_max_tokens = image_min_tokens
                 print(f"【GPU模式优化】自动设置image_max_tokens为{image_max_tokens}")
         
-        # 根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）
-        def get_auto_chat_handler(model_name):
-            import common
-            from common import chat_handler_manager, detect_model_chat_handler
-            
-            model_lower = model_name.lower()
-            # Qwen3.8 复用 Qwen35ChatHandler，但使用独立显示名以启用针对性优化
-            if "qwen3.8" in model_lower or "qwen38" in model_lower:
-                return "Qwen3.8-Thinking" if "thinking" in model_lower else "Qwen3.8"
-            
-            # 首先尝试使用ChatHandlerManager的智能匹配
-            handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
-            if handler_name and handler_cls:
-                # GenericMTMDChatHandler 对应多个 Omni/音频模型，按注册表细化为具体显示名
-                if handler_name == "GenericMTMDChatHandler":
-                    refined = detect_model_chat_handler(model_name)
-                    if refined:
-                        return refined
-                info = chat_handler_manager.get_handler_info(handler_name)
-                if info:
-                    return info['display_name']
-
-            # 回退到原有的检测函数
-            detected = detect_model_chat_handler(model_name)
-            if detected:
-                return detected
-
-            # 默认使用LLaVA-1.6
-            return "LLaVA-1.6"
-        
         # 自动选择对话格式处理器，多模态功能由用户控制
         chat_handler = get_auto_chat_handler(model)
         
@@ -583,6 +553,7 @@ class omni_llm_model_loader:
             "image_max_tokens": image_max_tokens,
             "attention_type": attention_type,
             "tensor_split": tensor_split,
+            "ctx_checkpoints": ctx_checkpoints,
         }
         
         # 构建完整的配置字典（包含所有参数，用于实际加载模型）
@@ -594,7 +565,7 @@ class omni_llm_model_loader:
             "image_min_tokens": image_min_tokens, "image_max_tokens": image_max_tokens,
             "n_batch": n_batch, "n_ubatch": n_ubatch, "n_threads": n_threads,
             "n_threads_batch": n_threads_batch, "attention_type": attention_type,
-            "tensor_split": tensor_split,
+            "tensor_split": tensor_split, "ctx_checkpoints": ctx_checkpoints,
         }
         
         # 使用compare_config进行比较，确保与IS_CHANGED返回的配置一致

@@ -38,6 +38,7 @@ class omni_llm_parameters:
             },
             "optional": {
                 "reasoning_budget": ("INT", {"default": -1, "min": -1, "max": 4096, "step": 1, "tooltip": "推理预算：-1=无限制，0=关闭思考模式，N=限制N个思考token"}),
+                "json_schema": ("STRING", {"default": "", "multiline": True, "tooltip": "结构化输出：填写 JSON Schema（留空=不启用），模型输出将被语法约束为符合该 Schema 的 JSON（仅本地模型生效）。用于提取、分类、结构化字段等需要机器解析的场景；常规文本生成与预设提示词模板工作流请留空"}),
             }
         }
     

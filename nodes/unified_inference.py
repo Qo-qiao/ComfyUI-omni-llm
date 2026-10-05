@@ -22,7 +22,7 @@ import wave
 import time
 from PIL import Image
 from typing import Dict, List, Any, Optional, Tuple, Union
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
 # 添加项目根目录到路径
@@ -2014,6 +2014,8 @@ class omni_llm_unified_inference:
             # 应用用户自定义参数
             if parameters:
                 gen_params.update({k: v for k, v in parameters.items() if k != "state_uid"})
+                if str(gen_params.get("json_schema", "") or "").strip() and preset_key:
+                    print("【结构化输出】json_schema 与预设模板的文本输出格式冲突，生成结果将被约束为JSON；预设提示词工作流请将 json_schema 留空")
             
             # ========== 视频处理逻辑 ==========
             video_frames = []
@@ -2049,16 +2051,16 @@ class omni_llm_unified_inference:
             # 先添加视频帧
             if len(video_frames) > 0:
                 # Qwen3-VL视频模式：在推理前清理KV缓存以避免内存不足
+                # 使用公开 reset() 而非私有 memory_clear，保证 n_tokens 与原生状态同步
                 try:
                     from common import LLAMA_CPP_STORAGE
                     if LLAMA_CPP_STORAGE.llm and current_chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.8", "Qwen3.8-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
                         # 清理KV缓存以腾出空间给视频帧
-                        if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
-                            LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
-                            print(f"【Qwen3-VL视频优化】已清理KV缓存，为视频帧腾出空间")
-                        if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
-                            if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
-                                LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
+                        LLAMA_CPP_STORAGE.llm.reset()
+                        hybrid_cache_mgr = getattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr', None)
+                        if LLAMA_CPP_STORAGE.llm.is_hybrid and hybrid_cache_mgr is not None:
+                            hybrid_cache_mgr.clear()
+                        print(f"【Qwen3-VL视频优化】已清理KV缓存，为视频帧腾出空间")
                 except Exception as e:
                     print(f"【Qwen3-VL视频优化】KV缓存清理时出错（忽略）: {e}")
 
@@ -2233,23 +2235,9 @@ class omni_llm_unified_inference:
                         
                         print(f"【批量推理】完成，生成 {len(batch_results)} 个结果")
                         
-                        # Qwen3系列模型特殊内存清理（防止多余内容）
-                        try:
-                            from common import LLAMA_CPP_STORAGE
-                            if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
-                                chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                                if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.8", "Qwen3.8-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
-                                    if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
-                                        LLAMA_CPP_STORAGE.llm.n_tokens = 0
-                                    if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
-                                        LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
-                                    if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
-                                        if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
-                                            LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
-                                    print("【Qwen3优化】已清理模型内存，防止多余内容")
-                        except Exception as e:
-                            print(f"【Qwen3优化】内存清理时出错（忽略）: {e}")
-
+                        # KV缓存不再手动清理：上游 generate(reset=True) 自带前缀匹配与防污染清除，
+                        # 手动全清会破坏跨次运行的前缀复用
+                        
                         # 添加预设模板中的正向约束和负向提示词到输出文本
                         positive_constraints, negative_prompts = "", ""
                         if generator_negative_prompt:
@@ -2301,23 +2289,6 @@ class omni_llm_unified_inference:
                     )
                     generated_text = future.result()
 
-            # Qwen3系列模型特殊内存清理（防止多余内容）
-            try:
-                from common import LLAMA_CPP_STORAGE
-                if LLAMA_CPP_STORAGE.current_config and LLAMA_CPP_STORAGE.llm is not None:
-                    chat_handler = LLAMA_CPP_STORAGE.current_config.get("chat_handler", "")
-                    if chat_handler in ["Qwen3.5", "Qwen3.5-Thinking", "Qwen3.6", "Qwen3.6-Thinking", "Qwen3.8", "Qwen3.8-Thinking", "Qwen3-VL", "MiMo-VL-7B-RL", "MiMo-VL-7B-RL-2508"]:
-                        if hasattr(LLAMA_CPP_STORAGE.llm, 'n_tokens'):
-                            LLAMA_CPP_STORAGE.llm.n_tokens = 0
-                        if hasattr(LLAMA_CPP_STORAGE.llm, '_ctx') and hasattr(LLAMA_CPP_STORAGE.llm._ctx, 'memory_clear'):
-                            LLAMA_CPP_STORAGE.llm._ctx.memory_clear(True)
-                        if hasattr(LLAMA_CPP_STORAGE.llm, 'is_hybrid') and LLAMA_CPP_STORAGE.llm.is_hybrid:
-                            if hasattr(LLAMA_CPP_STORAGE.llm, '_hybrid_cache_mgr') and LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr is not None:
-                                LLAMA_CPP_STORAGE.llm._hybrid_cache_mgr.clear()
-                        print("【Qwen3优化】已清理模型内存，防止多余内容")
-            except Exception as e:
-                print(f"【Qwen3优化】内存清理时出错（忽略）: {e}")
-
             # 强制卸载
             if force_offload:
                 mm.soft_empty_cache()
@@ -2360,78 +2331,6 @@ class omni_llm_unified_inference:
             if mode == "tts":
                 audio_out = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 24000}
             return (error_message, [error_message], locals().get("gen_params", {}).get("seed", 0), audio_out)
-    
-    @classmethod
-    def _run_parallel_inference(cls, llm, tasks, params):
-        """
-        并行执行多个推理任务
-        
-        Args:
-            llm: LLM 模型实例
-            tasks: 任务列表，每个任务包含 messages 和其他参数
-            params: 推理参数
-            
-        Returns:
-            推理结果列表
-        """
-        results = []
-        max_workers = min(4, os.cpu_count() or 4)  # 限制并发数，避免资源过度使用
-        
-        print(f"【并行处理】开始并行执行 {len(tasks)} 个推理任务，使用 {max_workers} 个线程")
-        
-        def inference_task(task):
-            """单个推理任务"""
-            try:
-                messages = task.get('messages', [])
-                task_params = {**params, **task.get('params', {})}
-                
-                # 生成缓存键
-                cache_key = hash(str(messages) + str(task_params))
-                
-                # 尝试从缓存获取结果
-                cached_result = cls.get_from_cache("_inference_cache", cache_key)
-                if cached_result:
-                    print("【并行处理】从缓存获取推理结果")
-                    return cached_result
-                
-                # 执行推理
-                result = llm.create_chat_completion(
-                    messages=messages,
-                    max_tokens=task_params.get('max_tokens', 1024),
-                    temperature=task_params.get('temperature', 0.7),
-                    top_p=task_params.get('top_p', 0.9),
-                    top_k=task_params.get('top_k', 40),
-                    repeat_penalty=task_params.get('repeat_penalty', 1.1),
-                    stop=task_params.get('stop', []),
-                    stream=False
-                )
-                
-                # 处理结果
-                if result and 'choices' in result and len(result['choices']) > 0:
-                    generated_text = result['choices'][0]['message']['content']
-
-                    
-                    # 缓存结果
-                    cls.add_to_cache("_inference_cache", cache_key, generated_text)
-                    return generated_text
-                return ""
-            except Exception as e:
-                print(f"【并行处理】任务执行失败: {e}")
-                return f"处理失败: {str(e)}"
-        
-        # 使用线程池执行任务
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_task = {executor.submit(inference_task, task): task for task in tasks}
-            for future in as_completed(future_to_task):
-                try:
-                    result = future.result()
-                    results.append(result)
-                except Exception as e:
-                    print(f"【并行处理】获取结果失败: {e}")
-                    results.append(f"处理失败: {str(e)}")
-        
-        print(f"【并行处理】完成 {len(results)} 个推理任务")
-        return results
     
     @classmethod
     def get_recommended_model(cls, task_type, input_content=None):
