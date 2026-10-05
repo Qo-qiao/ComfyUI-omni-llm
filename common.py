@@ -23,6 +23,7 @@ import sys
 import functools
 import contextlib
 import subprocess
+import threading
 from typing import Dict, List, Optional, Union
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from PIL import Image, ImageDraw
@@ -2348,8 +2349,10 @@ class LLAMA_CPP_STORAGE:
                     if enable_mmproj and mmproj != "None" and mmproj_path:
                         mmproj_size_gb = os.path.getsize(mmproj_path) * 1.55 / (1024 ** 3)
 
-                    recommended_gpu_layers = calculate_vram_layers(model_path, gpu_vram, mmproj_size_gb)
-                    print(f"【VRAM计算】推荐GPU层数={recommended_gpu_layers}")
+                    # 用户设置的 vram_limit 参与层数计算：-1=不额外限制，否则取设置值与实际显存的较小者
+                    calc_vram = gpu_vram if vram_limit == -1 else min(vram_limit, gpu_vram)
+                    recommended_gpu_layers = calculate_vram_layers(model_path, calc_vram, mmproj_size_gb)
+                    print(f"【VRAM计算】推荐GPU层数={recommended_gpu_layers}（预算{calc_vram}GB）")
                     
                     # Qwen3.5/MiMo-VL/Qwen3.6/Qwen3.8模型特殊内存优化：降低GPU层数以确保推理成功
                     is_qwen35_model = "qwen35" in model_lower or "qwen3.5" in model_lower or \
@@ -2367,21 +2370,15 @@ class LLAMA_CPP_STORAGE:
             # 构建模型参数
             gpu_vendor = HARDWARE_INFO["gpu_vendor"]
 
-            # 根据设备模式和GPU厂商设置参数
+            # 根据设备模式和GPU厂商设置加载模式；
+            # n_batch/n_threads/n_threads_batch 优先使用模型加载节点按硬件性能计算的值（config传入）
             if device_mode == "CPU":
-                n_batch = 1024
                 n_threads = os.cpu_count() or 8
                 n_threads_batch = os.cpu_count() or 8
                 load_mode = 1  # MMAP
             elif gpu_vendor == "amd":
-                n_batch = 1024
-                n_threads = os.cpu_count() or 8
-                n_threads_batch = os.cpu_count() or 8
                 load_mode = 2  # MLOCK（AMD ROCm推荐使用内存锁定避免换页抖动）
             else:
-                n_batch = 2048
-                n_threads = os.cpu_count() or 8
-                n_threads_batch = os.cpu_count() or 16
                 load_mode = 1  # MMAP
             
             # Qwen3.5模型特殊内存优化：降低n_batch以确保推理成功
@@ -2455,6 +2452,9 @@ class LLAMA_CPP_STORAGE:
                 "n_threads_batch": n_threads_batch,
                 "load_mode": load_mode,
                 "offload_kqv": offload_kqv,
+                # 上游 0.3.32 建议 ComfyUI 单轮工作流设 0，消除生成结束时的检查点 PCIe I/O 停顿；
+                # 多轮对话的滑窗/循环混合注意力模型可调大以启用检查点回滚（前缀复用）
+                "ctx_checkpoints": config.get("ctx_checkpoints", 0),
             }
 
             # Qwen3.5/Qwen3.6/Qwen3.8模型需要设置chat_format为qwen以确保消息格式正确
@@ -2475,30 +2475,22 @@ class LLAMA_CPP_STORAGE:
 
             # Flash Attention 配置（llama-cpp-python 0.3.46+ 使用 flash_attn_type 参数）
             # llama.cpp 内置 FlashAttention 内核，与 flash_attn/flash_attn_3 等 PyTorch 包无关，
-            # 无需安装额外依赖；Auto 模式按 GPU 计算能力自动判断是否启用
-            if device_mode == "GPU" and gpu_vendor == "nvidia":
+            # 无需安装额外依赖；Auto 不传参，交由上游默认的 LLAMA_FLASH_ATTN_TYPE_AUTO(-1) 按硬件决定
+            if device_mode == "GPU":
                 attention_type = config.get("attention_type", "Auto")
                 try:
                     llama_sig = inspect.signature(llama_cpp.Llama.__init__)
                     if 'flash_attn_type' in llama_sig.parameters:
-                        if attention_type == "Flash":
+                        if attention_type == "Flash" and gpu_vendor == "nvidia":
                             # LLAMA_FLASH_ATTN_TYPE_ENABLED = 1
                             llama_kwargs["flash_attn_type"] = 1
                             print(f"【Flash Attention】已启用llama.cpp内置FlashAttention（用户指定Flash模式）")
-                        elif attention_type == "Auto":
-                            # 检查GPU计算能力（sm80/Ampere及以上才支持内置FA2内核）
-                            try:
-                                major, _ = torch.cuda.get_device_capability()
-                                if major >= 8:
-                                    llama_kwargs["flash_attn_type"] = 1
-                                    print(f"【Flash Attention】已启用llama.cpp内置FlashAttention（Auto模式，GPU计算能力{major}.x）")
-                                else:
-                                    print(f"【Flash Attention】Auto模式：GPU计算能力{major}.x过低，跳过FlashAttention")
-                            except Exception as cap_err:
-                                print(f"【Flash Attention】Auto模式：获取GPU计算能力失败({cap_err})，跳过FlashAttention")
+                        elif attention_type == "Standard":
+                            # LLAMA_FLASH_ATTN_TYPE_DISABLED = 0
+                            llama_kwargs["flash_attn_type"] = 0
+                            print(f"【Flash Attention】已禁用FlashAttention（用户指定Standard模式）")
                 except Exception as e:
                     print(f"【Flash Attention】配置失败: {e}")
-                    pass
 
             # MoE模型优化配置（完全自动，仅MoE模型生效）
             if is_moe_model and device_mode == "GPU":
@@ -2973,11 +2965,34 @@ class BaseInferenceEngine:
                 if "mirostat_tau" in params:
                     completion_params["mirostat_tau"] = params["mirostat_tau"]
 
-            output = llm.create_chat_completion(**completion_params)
-            return output
+            # 结构化输出：可选 JSON Schema，转为 LlamaGrammar（GBNF）约束生成
+            json_schema_text = str(params.get("json_schema", "") or "").strip()
+            if json_schema_text:
+                completion_params["grammar"] = llama_cpp.LlamaGrammar.from_json_schema(json_schema_text)
+                print(f"【结构化输出】已启用 JSON Schema grammar 约束（{len(json_schema_text)} 字符）")
+
+            # 监听 ComfyUI 中断信号：用户取消时调用 llama.abort() 立即终止本轮生成，
+            # 避免最长等待满 timeout 才响应取消（abort 状态由上游在每次请求开始时自动清除）
+            abort_stop = threading.Event()
+
+            def _watch_interrupt():
+                while not abort_stop.wait(0.1):
+                    if mm.processing_interrupted():
+                        llm.abort()
+                        return
+
+            watcher = threading.Thread(target=_watch_interrupt, daemon=True)
+            watcher.start()
+            try:
+                output = llm.create_chat_completion(**completion_params)
+            finally:
+                abort_stop.set()
+                watcher.join(timeout=1.0)
         except Exception as e:
             print(f"【API调用错误】{e}")
             raise
+        mm.throw_exception_if_processing_interrupted()
+        return output
 
     def get_generation_params(self, perf_level: str = "balanced",
                               video_input: bool = False,

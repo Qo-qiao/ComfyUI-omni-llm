@@ -105,6 +105,13 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 The following updates are based on llama-cpp-python version 0.4.0, so please install this version first
 
+
+#### v3.5.1 （2026-10-05）
+
+- **Node Optimization**: Added json format output, users can customize the json output format, optimized and removed invalid code.
+- **Preset Template Optimization**: Added ACE-Step-1.5, ltx2.5-video, wan2.2-video skill templates based on official documentation.
+
+
 #### v3.5.0 (2026-09-26)
 
 - **ASR Node Overhaul**: ASR no longer runs inference through qwen3-asr, now uses llama-cpp-python for inference. Only GGUF format is supported, and the mmproj model must be loaded at the same time.  
