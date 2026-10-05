@@ -103,7 +103,7 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-The following updates are based on llama-cpp-python version 0.4.0, so please install this version first
+The following updates are based on llama-cpp-python version 0.4.2, so please install this version first
 
 
 #### v3.5.1 （2026-10-05）
