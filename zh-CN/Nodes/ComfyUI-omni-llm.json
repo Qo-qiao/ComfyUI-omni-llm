@@ -104,7 +104,8 @@
       "vram_limit": "显存限制（GB）",
       "image_max_tokens": "图片最大编码token数",
       "attention_type": "注意力类型",
-      "tensor_split": "Tensor分割比例"
+      "tensor_split": "Tensor分割比例",
+      "ctx_checkpoints": "KV检查点数"
     },
     "widgets": {
       "model": "模型文件",
@@ -116,7 +117,8 @@
       "vram_limit": "显存限制（GB）",
       "image_max_tokens": "图片最大编码token数",
       "attention_type": "注意力类型",
-      "tensor_split": "Tensor分割比例"
+      "tensor_split": "Tensor分割比例",
+      "ctx_checkpoints": "KV检查点数"
     },
     "outputs": {
       "llama_model": "Llama模型"
@@ -131,9 +133,10 @@
       "vram_limit": "显存限制（GB）\n• -1：无限制\n• GPU模式有效，CPU模式自动忽略\n• 建议设为实际显存大小减1",
       "image_min_tokens": "图片最小编码token数\n• 保持默认0即可",
       "image_max_tokens": "图片最大编码token数\n• 保持默认0即可",
-      "attention_type": "注意力类型\n• Auto：自动选择（推荐）\n• Standard：标准注意力\n• Flash：Flash Attention（NVIDIA GPU推荐）\n• XFormers：XFormers（实验性）",
+      "attention_type": "注意力类型\n• Auto：由llama.cpp按硬件自动选择（推荐）\n• Standard：标准注意力（禁用FlashAttention）\n• Flash：Flash Attention（NVIDIA GPU推荐）",
       "cache_prompt": "缓存提示词\n• 启用后会缓存提示词以提高性能\n• 适用于重复使用相同提示词的场景",
-      "tensor_split": "多GPU tensor分割比例\n• 格式：0.5,0.5（单GPU留空）\n• 仅多GPU时使用"
+      "tensor_split": "多GPU tensor分割比例\n• 格式：0.5,0.5（单GPU留空）\n• 仅多GPU时使用",
+      "ctx_checkpoints": "KV检查点数（混合注意力模型的KV缓存回滚检查点）\n• 0：推荐，单轮工作流，消除生成结束时的PCIe I/O卡顿\n• 16：多轮对话滑窗模型，启用前缀回滚复用\n• 范围0-64"
     }
   },
   "omni_llm_parameters": {
@@ -153,7 +156,8 @@
       "mirostat_tau": "Mirostat目标困惑度",
       "seed": "随机种子",
       "state_uid": "对话状态ID",
-      "reasoning_budget": "推理预算"
+      "reasoning_budget": "推理预算",
+      "json_schema": "结构化输出（json_schema）"
     },
     "widgets": {
       "max_tokens": "最大token数",
@@ -170,7 +174,8 @@
       "mirostat_tau": "Mirostat目标困惑度",
       "seed": "随机种子",
       "state_uid": "对话状态ID",
-      "reasoning_budget": "推理预算"
+      "reasoning_budget": "推理预算",
+      "json_schema": "结构化输出（json_schema）"
     },
     "outputs": {
       "parameters": "参数"
@@ -190,7 +195,8 @@
       "mirostat_tau": "Mirostat目标困惑度\n• 控制生成多样性\n• 推荐值：5-7",
       "seed": "随机种子\n• -1：每次随机\n• ≥0：固定种子，用于复现结果",
       "state_uid": "对话状态ID\n• -1：使用节点唯一ID\n• 用于多轮对话管理",
-      "reasoning_budget": "推理预算（用于支持thinking模式的模型如Qwen3.5-Thinking）\n• -1：无限制\n• 0：关闭思考模式\n• N：限制N个思考token"
+      "reasoning_budget": "推理预算（用于支持thinking模式的模型如Qwen3.5-Thinking）\n• -1：无限制\n• 0：关闭思考模式\n• N：限制N个思考token",
+      "json_schema": "结构化输出：填写JSON Schema（留空=不启用），模型输出将被语法约束为符合该Schema的JSON（仅本地模型生效）\n• 用于提取、分类、结构化字段等需要机器解析的场景\n• 常规文本生成与预设提示词模板工作流请留空\n• 键名建议使用英文，字段含义需在text_input中说明"
     }
   },
   "omni_llm_unified_inference": {
