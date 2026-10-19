@@ -1,0 +1,7 @@
+display-name-zh: MOSS-Image 提示词增强
+tag-cn: MOSS-Image, 提示词, 排版, 图像
+tag-en: MOSS-Image, Prompt, Layout, Image
+summary-cn: 把图像想法扩写成 MOSS-Image 画面描述或像素级排版布局，并用附带工具把 JSON 草稿编译成可直接粘贴的正向提示词
+display-name-en: moss-image
+desc-cn: MOSS-Image 提示词增强专家。自动分流 caption 与 Layout：普通场景写连贯画面描述，海报/多面板/精确文字排位走像素坐标框布局，附带编译工具校验越界框并输出单行 JSON。当用户要求扩写 MOSS-Image 提示词、生成画面描述、设计海报文字排版或用边界框定位图内文字时调用。
+desc-en: MOSS-Image prompt enhancement expert. Routes between caption and Layout: coherent prose for ordinary scenes, pixel bounding-box layouts for posters, panels and precise text placement, with a bundled compiler that rejects out-of-bounds boxes and emits single-line JSON. Use when expanding MOSS-Image prompts, writing image captions, designing poster typography, or positioning in-image text with bounding boxes.
