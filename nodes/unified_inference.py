@@ -1648,11 +1648,6 @@ class omni_llm_unified_inference:
         max_retries = 3
         success = False
         
-        # 检查是否是MTP模型
-        is_mtp_model = False
-        if model_path:
-            is_mtp_model = "mtp" in model_path.lower() or "multitoken" in model_path.lower()
-        
         while retry_count < max_retries and not success:
             try:
                 # 记录推理开始时间
@@ -1693,15 +1688,6 @@ class omni_llm_unified_inference:
                         raw_content = output['choices'][0]['message']['content']
                         print(f"【调试】原始返回内容: {raw_content[:100]}...")
                         print(f"【调试】原始内容长度: {len(raw_content)}")
-                    
-                    # MTP模型特殊处理：如果推测解码导致空结果，尝试调整参数重试
-                    if is_mtp_model and retry_count == 1:
-                        print(f"【MTP优化】MTP模型生成空结果，尝试禁用推测解码重试...")
-                        # 临时调整参数，移除可能导致问题的MTP相关设置
-                        gen_params = gen_params.copy()
-                        # 增加temperature以鼓励生成
-                        gen_params["temperature"] = min(gen_params.get("temperature", 0.7) + 0.2, 1.0)
-                        print(f"【MTP优化】调整temperature到 {gen_params['temperature']}")
 
             except Exception as e:
                 # 记录推理结束时间（即使出错）
@@ -2159,7 +2145,6 @@ class omni_llm_unified_inference:
                     print(f"【Omni音频】音频挂载失败，按纯文本继续: {e}")
 
             # 回退机制：当ChatHandler为None且没有图像/视频/音频内容时，将列表格式转换为字符串格式
-            # 这是因为某些模型（如MTP模型）不支持列表格式的content
             # 特殊处理：Qwen3.5/3.6启用mmproj时，根据推理模式决定是否使用纯文本格式
             # - text模式：强制使用纯文本格式，避免模型误判为图片反推
             # - images/batch_images/video模式：正常使用多模态功能

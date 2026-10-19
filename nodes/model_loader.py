@@ -30,8 +30,25 @@ def get_auto_chat_handler(model_name):
     """根据模型名称自动推断对话格式处理器（使用ChatHandlerManager）"""
     model_lower = model_name.lower()
     # Qwen3.8 复用 Qwen35ChatHandler，但使用独立显示名以启用针对性优化
-    if "qwen3.8" in model_lower or "qwen38" in model_lower:
+    # ternary：Ternary-Bonsai 等 qwen3.8 底座变体，文件名不含 qwen3.8 关键字，同样按 Qwen3.8 处理
+    if "qwen3.8" in model_lower or "qwen38" in model_lower or "ternary" in model_lower:
         return "Qwen3.8-Thinking" if "thinking" in model_lower else "Qwen3.8"
+
+    # MiniCPM-V 4.5/4.6/4.7 按版本复用对应 ChatHandler；
+    # -Thinking 变体必须显式返回带 -Thinking 的显示名（类名派生的 display 无法区分），
+    # 否则 init_chat_handler 中 think_mode 判定失败，enable_thinking 不会开启
+    if "minicpm-v" in model_lower and "thinking" in model_lower:
+        if "minicpm-v-4.7" in model_lower:
+            return "MiniCPM-v4.7-Thinking"
+        if "minicpm-v-4.6" in model_lower:
+            return "MiniCPM-v4.6-Thinking"
+        if "minicpm-v-4.5" in model_lower:
+            return "MiniCPM-v4.5-Thinking"
+
+    # MiniCPM-V-4.7 复用 MiniCPMV46ChatHandler（与4.6同一套special token模板），
+    # 使用独立显示名以命中 get_chat_handler_cls / init_chat_handler 中的 MiniCPM-v4.7 分支
+    if "minicpm-v-4.7" in model_lower or "minicpmv47" in model_lower:
+        return "MiniCPM-v4.7"
 
     # 首先尝试使用ChatHandlerManager的智能匹配
     handler_name, handler_cls = chat_handler_manager.get_handler_for_model(model_name)
@@ -170,7 +187,7 @@ class omni_llm_model_loader:
                 "model": (model_list, {"tooltip": "选择要加载的LLM模型文件"}),
                 "enable_mmproj": ("BOOLEAN", {"default": False, "tooltip": "启用多模态功能（需要选择mmproj模型）"}),
                 "mmproj": (mmproj_list, {"default": "None", "tooltip": "选择对应的视觉编码模型文件"}),
-                "mtp_mode": (["Auto", "Enable", "Disable"], {"default": "Auto", "tooltip": "MTP多令牌推测解码：Auto=按模型名自动检测，Enable=强制开启（模型名不含mtp时使用），Disable=强制关闭"}),
+                "mtp_mode": (["Auto", "Enable", "Disable"], {"default": "Auto", "tooltip": "MTP多令牌推测解码：Auto=按模型名自动检测，Enable=强制开启（模型名不含mtp时使用），Disable=强制关闭。MTP+多模态组合需llama-cpp-python 0.4.3+"}),
                 "n_ctx": ("INT", {"default": default_n_ctx, "min": 1024, "max": 327680, "step": 128, "tooltip": "上下文长度，影响可处理的文本长度"}),
                 "n_gpu_layers": ("INT", {"default": default_n_gpu_layers, "min": -1, "max": 1000, "step": 1, "tooltip": "加载到GPU的模型层数，-1=全部加载（GPU模式有效）"}),
                 "vram_limit": ("INT", {"default": default_vram_limit, "min": -1, "max": 24, "step": 1, "tooltip": "显存限制（GB），-1=无限制（GPU模式有效）"}),

@@ -67,7 +67,7 @@ class omni_llm_clean_states:
         # 清理TTS模型
         if clean_tts:
             self._clean_tts_model()
-        
+
         # 清理所有缓存
         clear_all_caches()
         
@@ -189,7 +189,7 @@ class omni_llm_clean_states:
             print("【TTS清理】TTS模型已清理")
         except Exception as e:
             print(f"【TTS清理】清理失败: {e}")
-    
+
     def _release_model(self, model):
         """释放模型资源"""
         try:
