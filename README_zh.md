@@ -51,17 +51,18 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
    **轮子选择指南：**
    - **Python版本匹配**：文件名中的`cp312`表示Python 3.12版本，选择与你的Python版本匹配的文件
-   - **CUDA版本匹配**：文件名中的`cu128`表示CUDA 12.8版本，选择与你的CUDA版本兼容的文件
+   - **CUDA版本匹配**：文件名中的`cu128`表示CUDA 12.8版本，选择与你的CUDA版本兼容的文件（可选变体：`cu124`/`cu126`/`cu128`/`cu130`/`cu131`）
    - **操作系统匹配**：`win_amd64`表示Windows 64位系统，确保选择适合你操作系统的文件
    - **功能版本**：`basic`表示基础版本，`full`包含更多功能（如OpenCL等）
 
    **安装命令：**
    - 使用以下命令安装：`pip install 下载的文件名.whl`
-   - 例如：`pip install llama_cpp_python-0.3.32+cu128.basic-cp312-cp312-win_amd64.whl`
+   - 例如：`pip install llama_cpp_python-0.4.3+cu128-cp312-cp312-win_amd64.whl`
 
    **版本选择建议：**
    - **CUDA 12.8**：选择`cu128`版本，性能最佳
-   - **CUDA 12.x**：选择`cu124`版本，向后兼容
+   - **CUDA 13.x**：选择`cu131`/`cu130`版本
+   - **CUDA 12.x**：选择`cu124`/`cu126`版本，向后兼容
 
 ### 2. 模型准备
 
@@ -107,7 +108,13 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
 ## 更新日志
 
-以下更新基于llama-cpp-python 0.4.2版本，请先安装该版本的llama-cpp-python
+以下更新基于llama-cpp-python 0.4.3版本，请先安装该版本的llama-cpp-python
+
+#### v3.5.2 （2026-10-19）
+
+- **节点优化**：新增MTP多令牌推测解码与多模态（mmproj）图像输入组合支持，适配新版本的llama-cpp-python，优化调整部分模型接口
+- **skill新增**：添加moss-image模型技能
+
 
 #### v3.5.1 （2026-10-05）
 

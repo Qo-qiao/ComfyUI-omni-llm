@@ -46,17 +46,18 @@ If you are not familiar with installing dependencies, it is recommended to use t
 
    **Wheel Selection Guide:**
    - **Python Version Match**: `cp312` in the filename indicates Python 3.12, select the file matching your Python version
-   - **CUDA Version Match**: `cu128` in the filename indicates CUDA 12.8, select the file compatible with your CUDA version
+   - **CUDA Version Match**: `cu128` in the filename indicates CUDA 12.8, select the file compatible with your CUDA version (available variants: `cu124`/`cu126`/`cu128`/`cu130`/`cu131`)
    - **OS Match**: `win_amd64` indicates Windows 64-bit system, ensure you select the file suitable for your operating system
    - **Function Version**: `basic` indicates basic version, `full` includes more features (such as OpenCL)
 
    **Installation Command:**
    - Install using: `pip install downloaded_filename.whl`
-   - Example: `pip install llama_cpp_python-0.3.32+cu128.basic-cp312-cp312-win_amd64.whl`
+   - Example: `pip install llama_cpp_python-0.4.3+cu128-cp312-cp312-win_amd64.whl`
 
    **Version Selection Recommendations:**
    - **CUDA 12.8**: Select `cu128` version for best performance
-   - **CUDA 12.x**: Select `cu124` version for backward compatibility
+   - **CUDA 13.x**: Select `cu131`/`cu130` version
+   - **CUDA 12.x**: Select `cu124`/`cu126` version for backward compatibility
 
 
 ### 2. Model Preparation
@@ -103,7 +104,13 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-The following updates are based on llama-cpp-python version 0.4.2, so please install this version first
+The following updates are based on llama-cpp-python version 0.4.3, so please install this version first
+
+
+#### v3.5.2 （2026-10-19）
+
+- **Node Optimization**: Added support for MTP multi-token speculative decoding and multimodal (mmproj) image input combination, adapted to the new version of llama-cpp-python, and optimized some model interfaces
+- **New Skill**: Added moss-image model skill
 
 
 #### v3.5.1 （2026-10-05）

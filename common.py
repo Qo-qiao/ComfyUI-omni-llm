@@ -30,25 +30,25 @@ from PIL import Image, ImageDraw
 from scipy.ndimage import gaussian_filter
 
 LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
-MIN_LLAMA_CPP_VERSION = "0.3.40"
+MIN_LLAMA_CPP_VERSION = "0.4.3"
 MIN_LLAMA_CPP_TTS_VERSION = "0.4.0"
 MIN_LLAMA_CPP_MTMD_AUDIO_VERSION = "0.4.0"
 
 LLAMA_CPP_WHEEL_CONFIG = {
     "Windows": {
-        "date_suffix": "20260608",
+        "date_suffix": "20261017",
         "variant": "cu128",
         "filename_pattern": "llama_cpp_python-{version}+{variant}-{py_tag}-{py_tag}-win_amd64.whl",
         "url_pattern": "https://github.com/JamePeng/llama-cpp-python/releases/download/v{version}-{variant}-win-{date_suffix}/{filename}"
     },
     "Linux": {
-        "date_suffix": "20260607",
+        "date_suffix": "20261017",
         "variant": "cu128",
         "filename_pattern": "llama_cpp_python-{version}+{variant}-{py_tag}-{py_tag}-linux_x86_64.whl",
         "url_pattern": "https://github.com/JamePeng/llama-cpp-python/releases/download/v{version}-{variant}-linux-{date_suffix}/{filename}"
     },
     "Darwin": {
-        "date_suffix": "20260607",
+        "date_suffix": "20261016",
         "variant": "Metal",
         "filename_pattern": "llama_cpp_python-{version}-{py_tag}-{py_tag}-macosx_11_0_arm64.whl",
         "url_pattern": "https://github.com/JamePeng/llama-cpp-python/releases/download/v{version}-{variant}-macos-{date_suffix}/{filename}"
@@ -346,15 +346,15 @@ if _check_and_install_llama_cpp_python():
         
         # MTMD 音频/TTS 支持检查：>= 0.4.0
         _has_mtmd_audio = version.parse(_llama_cpp_version) >= version.parse(MIN_LLAMA_CPP_MTMD_AUDIO_VERSION)
-        
+
         # TTS 支持检查
         _has_tts, _ = _check_llama_cpp_tts_version()
-        
+
         if not _has_mtmd:
             print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD功能")
         if not _has_mtmd_audio:
             print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD音频/TTS功能，建议升级到 {MIN_LLAMA_CPP_TTS_VERSION}+")
-        
+
         print(f"【依赖检查】llama-cpp-python 版本: {_llama_cpp_version}, MTMD: {_has_mtmd}, MTMD音频: {_has_mtmd_audio}, TTS: {_has_tts}")
             
     except ImportError as e:
@@ -1206,7 +1206,7 @@ chat_handler_manager = ChatHandlerManager()
 
 # 基础模型列表（无需ChatHandler的模型 - 保留向后兼容）
 base_models = ["LLaVA-1.6", "nanoLLaVA", "llama-joycaption", "moondream3-preview", "Moondream2", 
-               "MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking", "GLM-4.1V-Thinking", "InternLM-XComposer2-VL", "DreamOmni2", 
+               "MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "MiniCPM-v4.7", "MiniCPM-v4.7-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking", "GLM-4.1V-Thinking", "InternLM-XComposer2-VL", "DreamOmni2", 
                "MiniCPM-Llama3-V 2.5", "Llama-3.2-11B-Vision-Instruct", "CogVLM2", 
                "CogVLM-MOE", "Phi-3.5-vision-instruct", "Phi-3-vision-128k-instruct", 
                "Qwen2.5-VL", "Qwen3-VL", "Qwen3-VL-Thinking", "Qwen3-VL-Chat", "Qwen3-VL-Instruct", 
@@ -1588,6 +1588,15 @@ MODEL_REGISTRY = [
     # Gemma-4 为视觉+音频全模态，使用自带音频模板的 Gemma4ChatHandler
     ('gemma-4', 'Gemma4ChatHandler', 'Gemma-4', 35),
 
+    # ===== Nemotron 系列（libmtmd 运行，无专用 Handler） =====
+    # 图像编码由底层 libmtmd 接管（等价于 Llama(mmproj_path=...) 自动创建的 GenericMTMDChatHandler），
+    # 必须配合 mmproj 文件，禁止兜底到 LLaVA 等旧式 clip Handler；
+    # 末尾的 nemotron 通配用于文件名带其他前缀/参数段的变体（如 Llama-Nemotron-2-16B-VL）
+    ('nemotron-3.5-super-vl', 'GenericMTMDChatHandler', 'Nemotron-3.5-Super-VL', 25),
+    ('nemotron-super-vl', 'GenericMTMDChatHandler', 'Nemotron-Super-VL', 25),
+    ('nemotron-vl', 'GenericMTMDChatHandler', 'Nemotron-VL', 25),
+    ('nemotron', 'GenericMTMDChatHandler', 'Nemotron', 15),
+
     # ===== Qwen 系列 =====
     ('qwen3.6-vl-thinking', 'Qwen3VLChatHandler', 'Qwen3.6-VL-Thinking', 30),
     ('qwen3-vl-thinking', 'Qwen3VLChatHandler', 'Qwen3-VL-Thinking', 30),
@@ -1605,10 +1614,12 @@ MODEL_REGISTRY = [
     ('qwen3.8-thinking', 'Qwen35ChatHandler', 'Qwen3.8-Thinking', 20),
     ('qwen3.8', 'Qwen35ChatHandler', 'Qwen3.8', 15),
     ('qwen38', 'Qwen35ChatHandler', 'Qwen3.8', 15),
+    # Ternary-Bonsai-2-27B 等 qwen3.8 底座变体：文件名不含 qwen3.8 关键字，需单独识别
+    ('ternary', 'Qwen35ChatHandler', 'Qwen3.8', 15),
     ('deepseek-v4-flash', 'Qwen35ChatHandler', 'Qwen3.5-DeepSeek-V4-Flash', 15),
     ('qwen3.5-mtp', 'Qwen35ChatHandler', 'Qwen3.5-MTP', 15),
     ('qwen35-mtp', 'Qwen35ChatHandler', 'Qwen3.5-MTP', 15),
-('toriigate', 'Qwen25VLChatHandler', 'ToriiGate', 15),
+    ('toriigate', 'Qwen25VLChatHandler', 'ToriiGate', 15),
     # ===== Nex-N2 系列 (基于 Qwen3.5 架构) =====
     ('huihui-nex-n2-mini', 'Qwen35ChatHandler', 'Huihui-Nex-N2-Mini', 15),
     ('nex-n2-mini', 'Qwen35ChatHandler', 'Nex-N2-Mini', 15),
@@ -1616,9 +1627,11 @@ MODEL_REGISTRY = [
      
     # ===== MiniCPM 系列 =====
     ('minicpm-o-4.6', 'GenericMTMDChatHandler', 'MiniCPM-O-4.6', 30),
-    ('minicpm-v-4.6', 'MiniCPMv46ChatHandler', 'MiniCPM-v4.6', 30),
+    # 注意：llama-cpp-python 0.4.3 实际类名为 MiniCPMV46ChatHandler（V大写），写错大小写会导致 get_handler 返回 None
+    ('minicpm-v-4.7', 'MiniCPMV46ChatHandler', 'MiniCPM-v4.7', 30),
+    ('minicpm-v-4.6', 'MiniCPMV46ChatHandler', 'MiniCPM-v4.6', 30),
     ('minicpm-o-4.6-thinking', 'GenericMTMDChatHandler', 'MiniCPM-O-4.6-Thinking', 30),
-    ('minicpm-v-4.6-thinking', 'MiniCPMv46ChatHandler', 'MiniCPM-v4.6-Thinking', 30),
+    ('minicpm-v-4.6-thinking', 'MiniCPMV46ChatHandler', 'MiniCPM-v4.6-Thinking', 30),
     ('minicpm-o-4.5', 'GenericMTMDChatHandler', 'MiniCPM-O-4.5', 25),
     ('minicpm-v-4.5', 'MiniCPMv45ChatHandler', 'MiniCPM-v4.5', 25),
     ('minicpm-o-4.5-thinking', 'GenericMTMDChatHandler', 'MiniCPM-O-4.5-Thinking', 25),
@@ -1636,7 +1649,10 @@ MODEL_REGISTRY = [
     
     # ===== LLaVA 系列 =====
     ('llava-1.6', 'Llava16ChatHandler', 'LLaVA-1.6', 20),
+    # 官方仓库命名习惯为 llava-v1.6-mistral-7b / llava-v1.5-7b，与上面不带 v 的模式不相邻，需单独注册
+    ('llava-v1.6', 'Llava16ChatHandler', 'LLaVA-1.6', 20),
     ('llava-1.5', 'Llava15ChatHandler', 'LLaVA-1.5', 20),
+    ('llava-v1.5', 'Llava15ChatHandler', 'LLaVA-1.5', 20),
     ('nanollava', 'NanoLlavaChatHandler', 'nanoLLaVA', 20),
     
     # ===== Gemma 系列 =====
@@ -1943,8 +1959,10 @@ class LLAMA_CPP_STORAGE:
             "MiniCPM-v2.6": "MiniCPMv26ChatHandler",
             "MiniCPM-v4.5": "MiniCPMv45ChatHandler",
             "MiniCPM-v4.5-Thinking": "MiniCPMv45ChatHandler",
-            "MiniCPM-v4.6": "MiniCPMv46ChatHandler",
-            "MiniCPM-v4.6-Thinking": "MiniCPMv46ChatHandler",
+            "MiniCPM-v4.7": "MiniCPMV46ChatHandler",
+            "MiniCPM-v4.7-Thinking": "MiniCPMV46ChatHandler",
+            "MiniCPM-v4.6": "MiniCPMV46ChatHandler",
+            "MiniCPM-v4.6-Thinking": "MiniCPMV46ChatHandler",
              "MiniCPM-O-4.5": "GenericMTMDChatHandler",
              "MiniCPM-O-4.6": "GenericMTMDChatHandler",
             "Gemma3": "Gemma3ChatHandler",
@@ -1981,8 +1999,8 @@ class LLAMA_CPP_STORAGE:
             return chat_handler_manager.get_handler("Qwen35ChatHandler")
         if chat_handler_name.startswith("Qwen3-VL"):
             return chat_handler_manager.get_handler("Qwen3VLChatHandler")
-        if chat_handler_name.startswith("MiniCPM-v4.6"):
-            return chat_handler_manager.get_handler("MiniCPMv46ChatHandler")
+        if chat_handler_name.startswith("MiniCPM-v4.7") or chat_handler_name.startswith("MiniCPM-v4.6"):
+            return chat_handler_manager.get_handler("MiniCPMV46ChatHandler")
         if chat_handler_name.startswith("MiniCPM-v4.5") or chat_handler_name.startswith("MiniCPM-v2.6"):
             return chat_handler_manager.get_handler("MiniCPMv45ChatHandler")
         if chat_handler_name.startswith("MiniCPM-O-"):
@@ -1993,6 +2011,9 @@ class LLAMA_CPP_STORAGE:
             return chat_handler_manager.get_handler("GLM46VChatHandler")
         if chat_handler_name.startswith("MiMo-VL"):
             return chat_handler_manager.get_handler("Qwen25VLChatHandler")
+        # Nemotron-3.5-Super-VL 等 libmtmd 模型：无专用 Handler，走模板驱动 GenericMTMDChatHandler
+        if chat_handler_name.startswith("Nemotron"):
+            return chat_handler_manager.get_handler("GenericMTMDChatHandler")
         if chat_handler_name in ["InternVL-1.5", "InternVL-2.0", "InternLM-XComposer2-VL"]:
             return None
 
@@ -2043,7 +2064,7 @@ class LLAMA_CPP_STORAGE:
             elif mmproj_path:
                 init_params["clip_model_path"] = mmproj_path
             
-            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
+            if chat_handler_name in ["MiniCPM-v4.5", "MiniCPM-v4.5-Thinking", "MiniCPM-v4.6", "MiniCPM-v4.6-Thinking", "MiniCPM-v4.7", "MiniCPM-v4.7-Thinking", "GLM-4.6V", "GLM-4.6V-Thinking"]:
                 init_params["enable_thinking"] = think_mode
             
             # Qwen3.5/Qwen3.6/Qwen3.8 需要特殊处理
@@ -2248,6 +2269,16 @@ class LLAMA_CPP_STORAGE:
                         else:
                             raise FileNotFoundError(f"MMProj文件不存在：{mmproj}")
 
+            # MTP + 多模态(mmproj) 组合需要 llama-cpp-python 0.4.3+
+            # 0.4.3 起上游修复了 MTP 推测解码与 MTMD 图像输入的兼容问题（媒体位置/隐藏态偏移/空结果回滚）
+            # 低版本下强制组合会出现输出错乱或空结果，因此直接禁用 MTP 而非让其带着错误运行
+            if is_mtp_model and mmproj_path is not None:
+                if version.parse(_llama_cpp_version) >= version.parse(MIN_LLAMA_CPP_VERSION):
+                    print(f"【MTP优化】llama-cpp-python {_llama_cpp_version} 支持 MTP+多模态组合，保持启用")
+                else:
+                    print(f"【MTP警告】llama-cpp-python {_llama_cpp_version} 不支持 MTP+多模态组合（需 {MIN_LLAMA_CPP_VERSION}+），已自动禁用 MTP 推测解码，仅使用普通推理")
+                    is_mtp_model = False
+
             # 只有在启用多模态功能时才初始化ChatHandler
             cls.chat_handler = None
             
@@ -2259,6 +2290,7 @@ class LLAMA_CPP_STORAGE:
                 "omni" not in model_lower
             ) or (
                 "llama" in model_lower and "vision" not in model_lower and
+                "vl" not in model_lower and
                 "qwen" not in model_lower and "glm" not in model_lower and
                 "minicpm" not in model_lower and "moondream" not in model_lower
             )
