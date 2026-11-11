@@ -1,0 +1,68 @@
+# 文生图提示词编写指南
+
+## 将简报发展为图像
+
+选择一个清晰的视觉焦点，并围绕它构建完整的场景或设计成品。一个简短的想法就足够：确定使其成立的构图、可见内容与支撑细节。写图像中出现的内容，而不是写给另一位写作者的指令，也不是可能方案的清单。
+
+将指定的实体、名称、数量、公式、数据、风格、媒介、方向和空间关系视为约束。保留有意义的限定词和排除项。将具名系统与产品同通用类别区分开。具名实体不一定需要可见标签。优化现有提示词时，只修改所要求的范围。
+
+为特定目的添加细节：可读的交互、可信的材质、景深、光照或信息层级。保持所要求的媒介和克制程度；抽象艺术不必变成照片级写实，极简标志也不必添加场景。具体的视觉选择比泛泛的质量宣称、隐藏的背景故事或额外的主要主体更有用。
+
+## 设定构图
+
+遵循明确的画布尺寸、方向、分格布局和阅读顺序。区分整幅图像与图像中的物体、屏幕或分格。明确说明网格的行数和列数；它们的数量不决定画布比例。除非要求组合总览或连续构图，否则将轮播页、卡片和幻灯片视为独立画布。
+
+几何关系未指定时，根据交付物和主要内容选择取景：紧凑的主体可以保持紧凑，对比内容需要并排空间，堆叠信息需要垂直空间。“电影感”之类的风格词并不固定画布。先确立主构图，再添加场景元素；不要为了让画面符合偏好的形状而添加内容。推荐宽高比时使用这一构图。
+
+## 确保场景的物理合理性
+
+描述主体可见的状态或动作、视角、环境以及有意义的光照。除非要求表现序列，否则使用单一凝固瞬间。在序列中，通过可见证据表现每个独立事件和指定结果，而不仅靠氛围。
+
+保持场景的拓扑结构以及画面左右、前景/背景、视线和运动方向一致。相对相机的身体朝向、可见身体表面、手部、支撑点和接触关系必须相互吻合。清晰呈现所要求的交互，不要为了迁就姿势而镜像布局或移动目标位置。除非要求改变，否则保留球场、游戏网格、路径、楼梯和房间的结构；让必需的地面标记和标签保持可见。
+
+## 补全设计成品及其内容
+
+按阅读顺序构建信息层级。为每个要求的区域提供实际内容：标题、图示、控件、标签或文案，视情况而定。“一些图标”或“一段文案”并不构成完整设计。当要求撰写文案时，用要求的语言写出实际措辞；未指定时使用用户的语言。普通的创意决策无需请求批准。
+
+- 将字面文字放在其预期表面上。除非要求转换，否则保留其语言、大小写、标点、数字、拼写和行序。提供完整的新措辞或转换后的措辞。禁止添加文字时不要添加。
+- 用单引号或双引号包裹图像中的字面文字。中文文字前后的空格使用全角空格（U+3000）。
+- 在有助于说明成品时加入功能细节：UI 控件和选中状态；图表坐标轴、单位、刻度和图例；科学标签、变量定义和附带箭头；产品材质、结构和连接处。尊重极简设计，而不是把清单填满。
+- 让数据标记与提供的数值和刻度匹配。保留所要求的图表类型和测量方法。计算所要求的可推导结果；不要把计算或文案撰写交给图像模型。没有数值测量时，如果形式开放，可使用有依据的定性比较；否则保留指定图表并说明其数据依赖。不要用装饰性图像替代所要求的数据展示。
+- 为虚构设计编造合适的内容，但不要把编造的真实统计数据、价格、认证或规格当作已核实的事实。可以展示已知范围和趋势，但不要伪造单项测量值或显著性结果。
+- 在成对视图（如平面图/渲染图或正面/背面）之间使用共享的内容清单和坐标框架。保留相同的物体、数量和关系。在网格中，按阅读顺序说明内容，不要强行把刻意不规则排列改成矩形布局。
+
+## 处理依赖并完成检查
+
+使用具体简报和明确约束来补全通用模板。如果同样具体的要求相互冲突，保留兼容内容，仅在冲突导致无法写出有用提示词时提问；不要悄悄修正事实数据。缺失字段不应导致丢弃其余可用设计。
+
+具名资产可以保持为具名引用，而不编造其外观或声称已检查过它。对于未见过的来源，只描述已说明的转换。在提示词中自然提及必要的资产或数据依赖；只有当未知内容妨碍编写提示词时才询问，而不是仅因为后续渲染会用到它。
+
+对照简报检查结果：精确文案和限定词、必需内容与数量、空间绑定、数值与数据标记、标签与箭头端点、身体/接触一致性，以及各视图之间的对应关系。每个要求的区域都应包含可检查的内容。保留刻意的留白并删除重复。
+
+## 示例
+
+以下输出是完整的图像提示词。其细节程度取决于任务：物理交互需要清晰的接触和视角，仪表盘则需要实际信息。
+
+### 带身体接触的场景
+
+查询：`一位女陶艺师在阳光充足的工作室里，从她左侧取景，正在拉坯机上塑形一只碗。重点表现她的双手处理湿陶土。不要文字。`
+
+提示词：
+
+```text
+A naturalistic photograph of a woman potter seated at a pottery wheel in a sunlit workshop, viewed from her left side at approximately hand level. A medium composition includes her profile, shoulders, forearms, hands, and the complete bowl on the wheel, with enough of the wheel and stool visible to make her working posture clear. She leans slightly forward with relaxed shoulders and looks down at the clay. Capture one precise moment as her left hand supports the bowl's outer wall while the fingertips of her right hand shape the inner surface near the rim. Her hands oppose each other gently across the same section of clay; the bowl stays centered on the wheel head. Wet slip coats her fingertips and gathers in fine concentric ridges on the rounded bowl. The rim is smooth, open, and clearly separated from her fingers. Soft sunlight enters from a side window, catching the moisture on the clay and casting gentle shadows beneath her wrists. A worn wooden workbench and quiet shelves recede out of focus, keeping attention on the hands and their contact with the bowl. Warm earth tones, believable skin texture, and subtle workshop wear give the scene a tactile, unposed quality. No lettering or additional people appear.
+```
+
+### 完成的数据仪表盘
+
+查询：`设计一个 16:9 仪表盘，标题为 "Quarterly sales"。产品 A、B、C 分别售出 12、18、9 件。包含柱状图、紧凑数据表、总量和表现最好的产品。保持简洁，不要编造额外的销售数据。`
+
+提示词：
+
+```text
+A clean 16:9 sales dashboard on a warm white background uses a restrained charcoal-and-teal palette, crisp sans-serif typography, and a consistent alignment grid. The title "Quarterly sales" sits at the upper left. Two compact summary cards occupy the top row beneath it: "Total units" with the value "39", and "Best-performing product" with "B — 18 units". These values summarize the supplied three-product dataset.
+
+The lower left contains a large vertical bar chart. Its horizontal axis is labeled "Product", with categories "A", "B", and "C" in that order; its vertical axis is labeled "Units" and has evenly spaced ticks at 0, 5, 10, 15, and 20. All bars share the same zero baseline and equal widths. Their heights correspond exactly to 12, 18, and 9, and each value is printed clearly above its bar. Product B is teal; A and C use the same muted gray. Thin horizontal gridlines make the scale readable without competing with the data.
+
+At the lower right, a compact table has the column headings "Product" and "Units", followed by the rows "A | 12", "B | 18", and "C | 9". Its B row carries a subtle teal accent matching the highlighted bar. Balanced spacing separates the summary cards, chart, and table. There are no invented dates, forecasts, percentage changes, or additional data series.
+```

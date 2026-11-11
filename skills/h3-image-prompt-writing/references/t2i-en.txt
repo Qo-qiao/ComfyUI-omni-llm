@@ -1,0 +1,68 @@
+# Text-to-image prompt writing guide
+
+## Develop the brief into an image
+
+Choose a clear visual focus and build a finished scene or designed artifact around it. A short idea is enough: decide the composition, visible content, and supporting details that make it work. Write what appears in the image, not instructions for another writer or a list of possible approaches.
+
+Treat specified entities, names, counts, formulas, data, style, medium, direction, and spatial relationships as constraints. Preserve meaningful qualifiers and exclusions. Keep named systems and products distinct from generic categories. A named entity need not have a visible label. When refining an existing prompt, change only the requested scope.
+
+Add details for a purpose: readable interaction, convincing material, depth, lighting, or information hierarchy. Keep the requested medium and level of restraint; abstract art need not become photorealistic, and a minimal logo need not acquire scenery. Concrete visual choices are more useful than generic quality claims, hidden backstory, or extra principal subjects.
+
+## Set the composition
+
+Honor explicit canvas dimensions, orientation, panel layout, and reading order. Distinguish the whole image from an object, depicted screen, or panel. State grid rows and columns explicitly; their counts do not determine the canvas ratio. Treat carousel pages, cards, and slides as separate canvases unless a combined overview or continuous composition is requested.
+
+When geometry is unspecified, choose framing from the deliverable and main content: compact subjects can stay compact, comparisons need room side by side, and stacked information needs vertical room. A style word such as “cinematic” does not fix the canvas. Establish the main composition before adding scenery; do not add content to justify a preferred shape. Use this composition when recommending an aspect ratio.
+
+## Make scenes physically readable
+
+Describe the subject's visible state or action, viewpoint, setting, and meaningful light. Use a single frozen moment unless a sequence is requested. In a sequence, show each distinct event and specified outcome through visible evidence, not mood alone.
+
+Keep the scene's topology and screen-left/right, foreground/background, gaze, and movement consistent. The camera-relative body orientation, visible body surfaces, hands, support points, and contact must agree. Frame the requested interaction clearly without mirroring a layout or moving its destination to suit a pose. Preserve the structure of courts, game grids, paths, stairs, and rooms unless the request changes it; keep required ground markings and labels visible.
+
+## Complete designed artifacts and their content
+
+Build the information hierarchy in reading order. Give each requested region actual content: a title, diagram, controls, labels, or copy as appropriate. “Some icons” or “a paragraph of copy” does not complete a design. When asked to author copy, write the actual wording in the requested language, otherwise the user's language; ordinary creative decisions do not require approval.
+
+- Put literal lettering on its intended surface. Preserve its language, capitalization, punctuation, numbers, spelling, and line order unless a transformation is requested. Supply complete new or transformed wording. Do not add text when prohibited.
+- Enclose literal image text in single or double quotes. Use full-width spaces (U+3000) for spaces immediately before or after Chinese text.
+- Include functional details where they explain the artifact: UI controls and selected states; chart axes, units, scales, and legends; scientific labels, variable definitions, and attached arrows; product materials, construction, and joints. Respect a minimal design rather than filling a checklist.
+- Match data marks to supplied values and scales. Retain the requested chart type and measurement method. Compute requested derivable results; do not delegate calculations or copywriting to the image model. Without numerical measurements, use supported qualitative comparisons if the form is open, or preserve the specified chart and state its data dependency. Do not replace a requested data display with decorative imagery.
+- Invent suitable content for a fictional design, but do not present invented real statistics, prices, certifications, or specifications as verified facts. Known ranges and trends can be shown without fabricating individual measurements or significance results.
+- Use a shared inventory and coordinate frame across paired views, such as plan/render or front/back. Preserve the same objects, counts, and relationships. In grids, specify the contents in reading order without imposing a rectangular layout on an intentionally irregular arrangement.
+
+## Resolve dependencies and finish
+
+Resolve generic templates using the specific brief and explicit constraints. If equally specific requirements conflict, keep compatible content and ask only if the conflict prevents a useful prompt; do not silently repair factual data. A missing field should not discard the rest of a usable design.
+
+A named asset can remain a named reference without inventing its appearance or claiming it was inspected. For an unseen source, describe only the stated transformation. Mention a necessary asset or data dependency naturally within the prompt; ask for it only when its unknown contents prevent writing the prompt, rather than merely because rendering will need it later.
+
+Check the result against the brief: exact copy and qualifiers, required content and counts, spatial bindings, values and data marks, labels and arrow endpoints, body/contact consistency, and correspondence across views. Each requested region should contain inspectable content. Retain intentional negative space and remove repetition.
+
+## Examples
+
+The following outputs are complete image prompts. Their detail follows the task: a physical interaction needs clear contact and viewpoint, and a dashboard needs actual information.
+
+### A scene with physical contact
+
+Query: `A woman potter shaping a bowl on a wheel in a sunlit workshop, seen from her left side. Emphasize her hands working the wet clay. No text.`
+
+Prompt:
+
+```text
+A naturalistic photograph of a woman potter seated at a pottery wheel in a sunlit workshop, viewed from her left side at approximately hand level. A medium composition includes her profile, shoulders, forearms, hands, and the complete bowl on the wheel, with enough of the wheel and stool visible to make her working posture clear. She leans slightly forward with relaxed shoulders and looks down at the clay. Capture one precise moment as her left hand supports the bowl's outer wall while the fingertips of her right hand shape the inner surface near the rim. Her hands oppose each other gently across the same section of clay; the bowl stays centered on the wheel head. Wet slip coats her fingertips and gathers in fine concentric ridges on the rounded bowl. The rim is smooth, open, and clearly separated from her fingers. Soft sunlight enters from a side window, catching the moisture on the clay and casting gentle shadows beneath her wrists. A worn wooden workbench and quiet shelves recede out of focus, keeping attention on the hands and their contact with the bowl. Warm earth tones, believable skin texture, and subtle workshop wear give the scene a tactile, unposed quality. No lettering or additional people appear.
+```
+
+### A finished data dashboard
+
+Query: `Design a 16:9 dashboard titled "Quarterly sales". Products A, B, and C sold 12, 18, and 9 units respectively. Include a bar chart, a compact data table, the total, and the best-performing product. Keep it clean and do not invent additional sales data.`
+
+Prompt:
+
+```text
+A clean 16:9 sales dashboard on a warm white background uses a restrained charcoal-and-teal palette, crisp sans-serif typography, and a consistent alignment grid. The title "Quarterly sales" sits at the upper left. Two compact summary cards occupy the top row beneath it: "Total units" with the value "39", and "Best-performing product" with "B — 18 units". These values summarize the supplied three-product dataset.
+
+The lower left contains a large vertical bar chart. Its horizontal axis is labeled "Product", with categories "A", "B", and "C" in that order; its vertical axis is labeled "Units" and has evenly spaced ticks at 0, 5, 10, 15, and 20. All bars share the same zero baseline and equal widths. Their heights correspond exactly to 12, 18, and 9, and each value is printed clearly above its bar. Product B is teal; A and C use the same muted gray. Thin horizontal gridlines make the scale readable without competing with the data.
+
+At the lower right, a compact table has the column headings "Product" and "Units", followed by the rows "A | 12", "B | 18", and "C | 9". Its B row carries a subtle teal accent matching the highlighted bar. Balanced spacing separates the summary cards, chart, and table. There are no invented dates, forecasts, percentage changes, or additional data series.
+```

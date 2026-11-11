@@ -1,0 +1,93 @@
+# 参考图编辑提示词编写指南
+
+根据每张参考图被分配的内容、身份或属性，构建所要求的图像。在所要求范围内补全新场景、设计和文案；用户无需提供完成的目标描述。
+
+按以下顺序写一个连续的纯文本段落：来源定义 → 目标概述与各独立关系 → 已更改或新增的细节。以下阶段用于组织写作，不要输出其标题。叙述最终状态，例如“原位置由连续的桌面填补”，而不是发出编辑命令。必需的字面措辞本身可以包含祈使句。
+
+## 检查来源图像
+
+将观察到的来源内容与期望目标区分开；并不存在可观察的目标图像。身份、数量、颜色、措辞、数据和空间关系都应基于提供的图像。不要猜测被遮挡的部分、不可读的文字、精确色值或不熟悉的物体身份；使用可见线索定位不确定的物体。以可读比例检查密集文本，并重新核对关键名称、缩写、数值和日期，不要将不熟悉的拼写规范化。
+
+将不确定性限制在局部：补全有依据的内容，保留不可读的来源区域，不要声称其翻译或转录是完整的。获取缺失的关键参考图，或仅在未知信息妨碍对主要任务作出有用解释时提问。
+
+## 1. 定义被引用的内容
+
+以简洁、基于来源的定义开头，例如 `The red cup at the left of <Picture 1> is <Subject 1>.`。按提供图像顺序使用 `<Picture N>`，并全程保持 `<Subject N>` 稳定。输入引用如 `@Picture 1` 和 `@图1` 都指向 `<Picture 1>`。当同一身份由多张图像支持时，逐张明确引用，而不要用范围或“所有参考图”。
+
+为每个需要独立关系的范围选择一个 Subject：物体、人物、文本块、背景、姿势、构图或可迁移属性。不要强行每张图像一个 Subject，也不要给每个附带部件编号。未提及内容保持稳定；当变化可能影响或混淆某个显著的非目标元素时，要显式跟踪它。
+
+将仅提供属性的来源定义为属性，而不是完整的物体。仅存在于目标中的新内容，以及没有其他用途的完全移除或替换内容，不分配 Subject 编号；需要时在目标概述中说明移除位置。可追溯的文本编辑或转换保留其来源 Subject。如果不再保留任何来源内容，或来源不提供被引用属性，则省略定义和关系，直接从目标概述开始。
+
+对每个已定义的文本/数据范围，在此处逐行、逐标签、逐数值、逐字段准确转录每个清晰可读内容，且只转录一次，包括将要更改的措辞。保留语言、标点、大小写、分组和阅读顺序。一个连贯的文本块或系列可以是一个 Subject。不要猜测被遮挡内容、悄悄修正来源数据，或把不可读当作删除许可。
+
+## 2. 描述目标及每个来源关系
+
+以 `The target image` 开始概述，并说明主要结果，无论是局部编辑还是新的参考引导构图。在判断保留情况前先确定布局。
+
+### 画布与布局
+
+遵循精确的目标几何或裁切；明确的画布选择优先于冲突的通用方向措辞。否则，在保留构图时沿用被编辑基础图的画布。使用基础图或指定的构图参考图来确定取景，而不是颜色或身份来源图。计算时使用原始显示尺寸，而不是缩放或加边后的预览：高度不变而宽度增至 150%，宽高比会乘以 1.5。改变物体大小不会改变画布。
+
+需要时描述重新取景或新暴露的区域。分格数量和嵌入屏幕不是整幅画布尺寸。对于网格，按阅读顺序说明行、列和内容；保留刻意不规则布局。比例变化不会自动改变每个 Subject，但实际重新取景的构图不算完全保留。
+
+### 独立关系
+
+为每个已定义的 Subject 给出各自的关系，并按其实际定义范围判断：
+
+| 关系 | 表达方式 |
+| --- | --- |
+| 完全保留 | 独立成句，精确写作 `Exactly <Subject N> is fully preserved.` |
+| 部分保留 | 说明它被部分保留、哪些类别保留、哪些发生变化。 |
+| 属性迁移 | 指明属性和目标载体：`<Subject 2> supplies the exact body color transferred to <Subject 1>.` |
+| 弱参考 | 指明借用的品质以及允许变化的内容：`<Subject 2> serves as a weak style reference for the new background, with freely adapted forms.` |
+
+后三种使用自然的英文表达。完全保留覆盖整个已定义范围，包括数量、位置、状态、外观和角色。移动、旋转、复制、重新打光或遮挡元素都属于变化。完全保留的父级不能包含被编辑的子级；缩小定义范围或标记为部分保留。综合评估某个 Subject 在目标中的所有用途，包括额外实例。新增阴影和反射视为对其影响范围的变化。
+
+提供属性的来源不会仅因该属性在别处使用就变成部分保留。精确迁移必须与该属性一致；弱参考允许所述调整。对于精确颜色，使用来源属性，不要猜测 HEX 值或用近似名称替代；遵循用户提供的明确数值。
+
+## 3. 补全已更改和新增的内容
+
+将所要求的结果发展为具体的视觉细节：形状、材质、接触、景深、透视、光照和布局，视需要而定。新的环境或整体风格可能需要大量描述；局部改色则应保持局部。保留明确要求的描绘方式。与相邻内容的必要整合必须与其保留关系一致。
+
+- 通过结果表面或空白来描述移除。移动会重新安置物体；复制会增加实例。保持这些结果彼此区分。
+- 完全保留后，如需锚点，只使用裸 Subject 标记；不要重新描述其外观或部件。对于部分保留，详细说明变化，但不要重复详细的保留外观。对于迁移或弱参考，在目标载体上描述品质，不要引入来源的附带属性。
+- 简化周围文案不意味着可以重新设计保留的图示。除非被指定修改，否则保留其内部结构、标签和数据；调整大小或位置不必改变其内容。
+- 结果描述完整后即停止。如果概述和关系已经覆盖，不要添加填充内容。
+
+### 完成实际措辞
+
+对每处文本编辑给出完整的最终行或字段，而不仅是替换词；省略单独列出的未更改行。翻译时，在此写出实际译文，并在其定义中保留原文。压缩时保留事实限定词、截止日期、数量和范围。
+
+当要求撰写文案时，用要求的语言提供；未指定时使用用户的语言。使用提供或可推导的事实数值，不要编造真实数据。引用字面措辞时保留其自身的撇号；按阅读顺序内联描述多行文本及其预期行位置。
+
+只有打算出现在图像中的文本才成为可见文字。单独要求的散文也要完成，并明确其图像外去向；不要把它变成招牌，也不要要求用户撰写他们请你代写的文案。
+
+检查来源绑定与独立关系、显著非目标内容保留、迁移边界、完整目标措辞、数量、几何关系以及要求的描绘模式。最终细节应覆盖变化和新增内容，而不重复描述保留的外观。
+
+## 完整示例
+
+每个示例都包含参考内容、用户查询和完整的编辑提示词。实际使用需要检查提供的图像。
+
+### 局部颜色编辑
+
+参考图：`@Picture 1` 显示桌面左侧有一个红色杯子，右侧有一个柠檬。
+
+查询：`在 @Picture 1 中，只把红色杯子改成蓝色。其他一切保持不变。`
+
+提示词：
+
+```text
+The red cup on the left in <Picture 1> is <Subject 1>. The lemon on the right in <Picture 1> is <Subject 2>. The target image shows <Subject 1> with a blue finish. <Subject 1> is partially preserved; its shape, material, position, and scale remain while its surface color changes. <Subject 2> is fully preserved. The blue finish follows the existing surface shading and highlights of <Subject 1>, with the rest of the source image unchanged.
+```
+
+### 带有精确属性迁移的新海报
+
+参考图：`@Picture 1` 显示纯色背景前的一件正面米色外套；`@Picture 2` 显示一个彩色釉面花瓶。
+
+查询：`使用 @Picture 1 中的外套制作一张竖版时尚海报。将其颜色精确匹配为 @Picture 2 中花瓶的瓶身颜色，保留其剪裁和面料，并写一句简短的英文标题。不要出现品牌名称或产品宣称。`
+
+提示词：
+
+```text
+The front-facing beige coat in <Picture 1> is <Subject 1>. The body color of the vase in <Picture 2> is <Subject 2>. The target image is a portrait fashion poster featuring <Subject 1> beneath a short headline. <Subject 1> is partially preserved; its cut, fabric texture, folds, and front-facing presentation remain while its color, scale, and placement change. <Subject 2> supplies the exact body color transferred to <Subject 1>. The transferred color follows the existing garment shading without importing the vase's glaze or shape. <Subject 1> is centered in the lower two-thirds of the poster, with its full hem and sleeves visible. A new warm off-white background extends evenly to the edges, leaving generous space around the garment. The headline 'A quieter kind of bold.' appears above it in large charcoal serif lettering, arranged on two centered lines: 'A quieter kind' followed by 'of bold.' The composition contains no other lettering, brand names, or decorative props.
+```

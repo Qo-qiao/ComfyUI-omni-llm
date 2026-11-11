@@ -1,0 +1,7 @@
+display-name-zh: H3图像提示词编写
+tag-cn: MiniMax-H3, 提示词, Image
+tag-en: MiniMax-H3,Prompt,Image
+summary-cn: 为 H3Image 文生图与参考图编辑编写提示词，支持 T2I 与 Edit 模式
+desc-cn: 为 H3Image 文生图与参考图编辑编写提示词，支持 T2I 和 Edit 模式。当需要将想法或简报转化为完整图像提示词、优化现有提示词、或描述编辑与参考引导构图时使用。
+display-name-en: h3-image-prompt-writing
+desc-en: Write H3Image prompts for text-to-image generation and reference-image editing. Use to turn an idea or brief into a complete image prompt, refine an existing prompt, or describe edits and reference-guided compositions.

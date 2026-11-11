@@ -1,0 +1,93 @@
+# Reference-image edit prompt writing guide
+
+Build the requested image using each reference for its assigned content, identity, or properties. Complete new scenes, designs, and copy within the requested scope; the user need not supply a finished target description.
+
+Write one continuous plain-text paragraph in this order: source definitions → target overview and individual relationships → changed or new details. The stages below organize the writing; do not print their headings. Narrate the final state, such as “The former location is filled by continuous tabletop,” rather than issuing an editing command. Required literal wording may itself contain imperatives.
+
+## Inspect the sources
+
+Separate observed source content from the desired target; there is no observed target image. Ground identities, counts, colors, wording, data, and spatial relationships in the supplied images. Do not guess hidden parts, unreadable text, exact color values, or unfamiliar object identities; use visible cues to locate uncertain objects. Inspect dense text at a readable scale and recheck critical names, acronyms, values, and dates without normalizing unfamiliar spellings.
+
+Keep bounded uncertainty local: complete supported content, preserve unreadable source regions, and do not claim their translation or transcription is complete. Obtain an essential missing reference or ask only when the unknown information prevents a useful interpretation of the main task.
+
+## 1. Define the referenced content
+
+Begin with concise, source-grounded definitions such as `The red cup at the left of <Picture 1> is <Subject 1>.` Keep `<Picture N>` in supplied image order and `<Subject N>` stable throughout. Input references such as `@Picture 1` and `@图1` both identify `<Picture 1>`. When one identity is supported by multiple images, cite each image explicitly, not a range or “all references.”
+
+Choose a Subject for each scope needing an independent relationship: an object, person, text block, background, pose, composition, or transferable property. Do not force one Subject per image or number every incidental part. Unmentioned content stays stable; explicitly track a salient non-target element when the change might affect or confuse it.
+
+Define property-only donors as properties, not entire objects. New target-only content and wholly removed or replaced content with no other use receive no Subject number; locate removals in the target overview when needed. A traceable text edit or transformation retains its source Subject. If no source content remains or supplies a referenced property, omit definitions and relationships and start with the target overview.
+
+For each defined text/data scope, transcribe every clearly readable line, label, value, and field exactly once here, including wording that will change. Preserve language, punctuation, capitalization, grouping, and reading order. A coherent text block or series may be one Subject. Do not guess obscured content, silently correct source data, or treat unreadability as permission to delete it.
+
+## 2. Describe the target and each source relationship
+
+Start the overview with `The target image` and state the principal result, whether a local edit or a new reference-guided composition. Resolve the layout before judging preservation.
+
+### Canvas and layout
+
+Honor exact target geometry or crop; an explicit canvas selection governs conflicting generic orientation wording. Otherwise retain the edited base's canvas when its composition is kept. Use the base or designated composition reference, not a color or identity donor, to determine framing. Use original display dimensions for calculations, not resized or padded previews: increasing width to 150 percent with unchanged height multiplies the aspect ratio by 1.5. Changing an object's size does not change the canvas.
+
+Describe reframing or newly exposed regions when needed. Panel counts and embedded screens are not whole-canvas dimensions. For grids, specify rows, columns, and contents in reading order; preserve deliberately irregular layouts. A ratio change does not automatically alter every Subject, but an actually reframed composition is not fully preserved.
+
+### Independent relationships
+
+Give every defined Subject its own relationship, judging the scope actually defined:
+
+| Relationship | Expression |
+| --- | --- |
+| Fully preserved | Exactly `<Subject N> is fully preserved.` as a standalone sentence. |
+| Partially preserved | State that it is partially preserved, which categories remain, and which change. |
+| Attribute transfer | Name the property and target carrier: `<Subject 2> supplies the exact body color transferred to <Subject 1>.` |
+| Weak reference | Name the borrowed quality and what may vary: `<Subject 2> serves as a weak style reference for the new background, with freely adapted forms.` |
+
+The last three use natural English. Full preservation covers the entire defined scope, including count, position, state, appearance, and role. Moving, rotating, duplicating, relighting, or occluding an element is a change. A fully preserved parent cannot contain an edited child; narrow the definition or mark it partially preserved. Assess all target uses of a Subject together, including extra instances. New shadows and reflections count as changes to the scopes they affect.
+
+A donor property does not become partially preserved merely because it is used elsewhere. Exact transfer must match that property; weak reference permits the stated adaptation. For exact colors, use the source property without guessing a HEX value or replacing it with an approximate name; honor explicit user-provided values.
+
+## 3. Complete the changed and new content
+
+Develop the requested result into concrete visual detail: shape, materials, contact, depth, perspective, light, and layout as needed. A new environment or global style can require substantial description; a local recolor should stay local. Preserve explicitly requested modes of depiction. Necessary integration with neighboring content must agree with its preservation relationship.
+
+- Describe removal through the resulting surface or empty space. Moving relocates an object; copying adds an instance. Keep these outcomes distinct.
+- After full preservation, use only the bare Subject token if needed as an anchor; do not re-caption its appearance or parts. For partial preservation, elaborate changes without repeating detailed retained appearance. For transfer or weak reference, describe the quality on its target carrier without importing incidental donor properties.
+- Simplifying surrounding copy does not authorize redesigning retained diagrams. Keep their internal structure, labels, and data unless targeted; resizing or repositioning need not change their contents.
+- Stop once the result is specified. If the overview and relationships already cover it, add no filler.
+
+### Finish the actual wording
+
+Give the complete resulting line or field for each text edit, rather than only the replacement word; omit separate unchanged lines. For translation, write the actual translation here and retain the original in its definition. Preserve factual qualifiers, deadlines, quantities, and scope when condensing.
+
+When asked to author copy, supply it in the requested language, otherwise the user's language. Use supplied or derivable factual values without inventing real data. Quote literal wording, preserving its own apostrophes; describe multiline text inline in reading order with its intended line placement.
+
+Only text intended for the image becomes visible lettering. Complete separately requested prose too, with its outside-image destination explicit; do not turn it into a sign or ask the user to write copy they asked you to author.
+
+Check source bindings and independent relationships, salient non-target preservation, transfer boundaries, complete target wording, counts, geometry, and requested depiction mode. The final details should cover changes and additions without re-describing retained appearance.
+
+## Complete examples
+
+Each example includes the reference contents, the user's query, and a complete edit prompt. Real use requires inspecting the supplied images.
+
+### Local color edit
+
+Reference image: `@Picture 1` shows a red cup on the left and a lemon on the right, on a tabletop.
+
+Query: `In @Picture 1, change only the red cup to blue. Leave everything else unchanged.`
+
+Prompt:
+
+```text
+The red cup on the left in <Picture 1> is <Subject 1>. The lemon on the right in <Picture 1> is <Subject 2>. The target image shows <Subject 1> with a blue finish. <Subject 1> is partially preserved; its shape, material, position, and scale remain while its surface color changes. <Subject 2> is fully preserved. The blue finish follows the existing surface shading and highlights of <Subject 1>, with the rest of the source image unchanged.
+```
+
+### A new poster with exact property transfer
+
+Reference images: `@Picture 1` shows a front-facing beige coat against a plain backdrop; `@Picture 2` shows a colored glazed vase.
+
+Query: `Create a portrait fashion poster using the coat in @Picture 1. Match its color exactly to the vase's body color in @Picture 2, keep its cut and fabric, and write a short English headline. No brand names or product claims.`
+
+Prompt:
+
+```text
+The front-facing beige coat in <Picture 1> is <Subject 1>. The body color of the vase in <Picture 2> is <Subject 2>. The target image is a portrait fashion poster featuring <Subject 1> beneath a short headline. <Subject 1> is partially preserved; its cut, fabric texture, folds, and front-facing presentation remain while its color, scale, and placement change. <Subject 2> supplies the exact body color transferred to <Subject 1>. The transferred color follows the existing garment shading without importing the vase's glaze or shape. <Subject 1> is centered in the lower two-thirds of the poster, with its full hem and sleeves visible. A new warm off-white background extends evenly to the edges, leaving generous space around the garment. The headline 'A quieter kind of bold.' appears above it in large charcoal serif lettering, arranged on two centered lines: 'A quieter kind' followed by 'of bold.' The composition contains no other lettering, brand names, or decorative props.
+```
