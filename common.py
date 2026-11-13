@@ -1906,7 +1906,10 @@ class LLAMA_CPP_STORAGE:
         
         # 清理结果缓存
         try:
-            from nodes.unified_inference import omni_llm_unified_inference
+            _nodes_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nodes')
+            if _nodes_dir not in sys.path:
+                sys.path.insert(0, _nodes_dir)
+            from unified_inference import omni_llm_unified_inference
             if hasattr(omni_llm_unified_inference, "_result_cache"):
                 omni_llm_unified_inference._result_cache.clear()
                 print(f"【结果缓存】已清理所有推理结果缓存")
