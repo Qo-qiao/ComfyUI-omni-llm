@@ -34,10 +34,10 @@
 
 **3. 音频配套文件**
 - 推荐使用提供的模型
-- 用于音频生成和处理的专用模型，包括语音合成（TTS）、语音识别（ASR）等功能
-- 文件名通常包含`tts`、`asr` 关键字
-- **必需场景**：语音合成、音频生成、音频理解、语音识别
-- **示例文件名**：`Qwen3-TTS-12Hz-1.7B-CustomVoice`
+- 用于音频识别和处理的专用模型，包括语音识别（ASR）等功能
+- 文件名通常包含 `asr` 关键字
+- **必需场景**：音频理解、语音识别
+- **示例文件名**：`Qwen3-ASR-1.7B`
 
 
 #### 配套文件下载方法
@@ -74,7 +74,6 @@
 
 ### Qwen系列
 
-
 **模型系列**：Qwen-ASR
 **具体型号**：Qwen3-ASR-1.7B
 **核心特点**：语言覆盖广泛，支持 28+ 种语言及 20+ 种中国方言。相比0.6B版本，识别精度更高，对低质量音频和复杂口音的处理能力更强，支持更长音频的连续识别。
@@ -83,22 +82,10 @@
 **下载链接**：https://huggingface.co/ggml-org/Qwen3-ASR-1.7B-GGUF（含mmproj模型，请下载BF16版本）
 
 
-## TTS系列（语音合成）
-
-### Qwen系列
-
-**模型系列**：Qwen-TTS
-**具体型号**：Qwen3-TTS-12Hz-1.7B-Base
-**核心特点**：语言覆盖广泛，支持 28+ 种语言及 20+ 种中国方言。相比0.6B版本，识别精度更高，对低质量音频和复杂口音的处理能力更强，支持更长音频的连续识别。
-**音频类型**：支持纯语音、歌声和带背景音乐的歌曲（抗噪/音乐场景能力强）。
-**适配场景**：高精度语音合成、实时语音转文字、会议记录、音频内容提取、字幕生成
-**下载链接**：https://huggingface.co/ggml-org/Qwen3-TTS-12Hz-1.7B-Base-GGUF（含mmproj模型，请下载BF16版本）
-
-
-
 ## VLM系列（视觉语言模型，支持所有视觉模型文本生成和图像反推）
 
 ### ToriiGate系列（XL动漫专用）
+
 **模型系列**：ToriiGate
 **具体型号**：ToriiGate-v0.4-7B
 **核心特点**：基于 Qwen2-VL 微调，专注动漫和数字艺术领域的高级理解。支持结构化输出、多种 caption 模式（常规摘要、Midjourney 风格、DeviantArt 风格）、Bounding Box 定位、角色名称识别。描述精确、密度高，避免冗长填充词。
@@ -130,9 +117,10 @@
 **备用链接**：https://huggingface.co/mradermacher/Qwen3-VL-8B-maid-GGUF（含mmproj模型）
 **魔搭链接**：https://www.modelscope.cn/models/Zyi4082/Qwen3-VL-8B-Maid-GGUF（含mmproj模型）
 
+
 ### qwen3.5、qwen3.6等思考类模型使用文本生成模式必须启用加载mmproj模型
 
-**具体型号**：Qwen3.5-9B
+**具体型号**：Huihui-Qwen3.5-9B-abliterated
 **核心特点**：Qwen3.5系列的平衡版本，参数量适中，兼顾推理能力与资源消耗，支持多模态输入和工具调用，适合中等显存设备。
 **适配场景**：中等显存设备部署、高质量多模态推理、复杂图文对话、图像理解分析、视频帧内容识别
 **下载链接（nsfw）**：https://huggingface.co/mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF（含mmproj模型）
@@ -153,6 +141,12 @@
 **下载链接**：https://huggingface.co/Jackrong/Qwen3.5-9B-DeepSeek-V4-Flash-GGUF（含mmproj模型）
 
 
+**具体型号**：Huihui-Nex-N2-mini-abliterated-APEX
+**核心特点**：基于Qwen3.5多模态模型微调的无审查版本，具备优秀的视觉理解能力和图文推理能力，支持图像描述、OCR文本提取和多模态交互，推理速度快，适合日常视觉任务使用。
+**适配场景**：图片反推提示词、OCR文本提取、图文问答、日常视觉推理、多模态交互任务
+**下载链接（nsfw）**：https://huggingface.co/SC117/Huihui-Nex-N2-mini-abliterated-APEX-GGUF（含mmproj模型）
+
+
 ### Qwen3.6系列
 
 **具体型号**：Qwen3.6-27B（大显存专用）
@@ -166,7 +160,8 @@
 **适配场景**：中等显存设备部署、高质量多模态推理、复杂图文分析、长文本理解、视频内容深度分析
 **下载链接（nsfw）**：https://huggingface.co/HauhauCS/Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive（含mmproj模型）
 
-**具体型号**：DavidAU/Qwen3.6-27B-Heretic-Uncensored-FINETUNE-NEO-CODE-Di-IMatrix-MAX-GGUF（大显存专用）
+
+**具体型号**：Qwen3.6-27B-Heretic-Uncensored-FINETUNE-NEO-CODE-Di-IMatrix-MAX（大显存专用）
 **核心特点**：Qwen3.6系列的高性能版本，参数量大、推理能力强，支持复杂多模态任务和长上下文处理，适合大显存设备部署。
 **适配场景**：大显存设备部署、复杂图文推理、专业图像分析、长文本理解、视频内容深度分析、高精度生成任务
 **下载链接（nsfw）**：https://huggingface.co/DavidAU/Qwen3.6-27B-Heretic-Uncensored-FINETUNE-NEO-CODE-Di-IMatrix-MAX-GGUF（含mmproj模型）
@@ -197,6 +192,12 @@
 **下载链接（nsfw）**：https://huggingface.co/mradermacher/MiniCPM-V-4.6-abliterated-MAX-GGUF（含mmproj模型）
 
 
+**具体型号**：MiniCPM-V-4.7-35B-A3B-Uncensored
+**核心特点**：MiniCPM-V-4.6的升级版本，视觉识别精度进一步提升，对复杂场景和小目标的识别能力更强，推理速度优化，支持更长上下文的多模态理解。
+**适配场景**：高精度提示词生成、图片/视频帧精细反推、多语言OCR、复杂场景图像分析、日常视觉推理
+**下载链接（nsfw）**：https://huggingface.co/AtomicChat/MiniCPM-V-4.7-35B-A3B-Uncensored-GGUF（含mmproj模型）
+
+
 ### GLM系列
 
 **模型系列**：GLM-4
@@ -217,20 +218,6 @@
 
 
 ### Gemma系列
-
-**模型系列**：Gemma
-**具体型号**：google_gemma-3-4b-it
-**核心特点**：Google Gemma 3系列多模态模型，具备视觉-语言理解、长上下文处理能力，以及更强的多语言支持能力，单块GPU即可运行，性能超越同参数量模型。
-**适配场景**：多语言提示词生成、复杂视觉推理、长文本理解、多模态交互任务
-**下载链接**：https://huggingface.co/bartowski/google_gemma-3-4b-it-GGUF（含mmproj模型）
-**备用链接（nsfw）**：https://huggingface.co/mlabonne/gemma-3-4b-it-abliterated-GGUF
-
-
-**具体型号**：Gemma-4-E2B-Uncensored-HauhauCS-Aggressive
-**核心特点**：Google Gemma 4系列无审查版本，采用更先进的架构设计，在视觉理解、语言生成和多模态推理方面有显著提升，参数量适中，适合单GPU部署，支持生成更开放的内容。
-**适配场景**：高级视觉推理、多语言对话、创意内容生成、复杂多模态任务、需要无审查内容的场景
-**下载链接（nsfw）**：https://huggingface.co/HauhauCS/Gemma-4-E2B-Uncensored-HauhauCS-Aggressive（含mmproj模型）
-
 
 **具体型号**：Gemma-4-E4B-Uncensored-HauhauCS-Aggressive
 **核心特点**：Google Gemma 4系列无审查旗舰模型，具备更强的视觉理解能力、更长的上下文处理能力和更准确的多语言支持，性能接近更大规模模型，支持生成更开放的内容。
@@ -270,14 +257,4 @@
 **核心特点**：小米开源多模态视觉语言模型，7B参数，基于强化学习训练，四阶段预训练（投影器预热、视觉-语言对齐、通用多模态预训练、长上下文监督微调），小参数量下性能超越百亿级模型。
 **适配场景**：中英双语对话、复杂视觉推理、多模态交互、长上下文理解、创意提示词生成
 **下载链接**：https://huggingface.co/mradermacher/MiMo-VL-7B-RL-2508-GGUF（含mmproj模型）
-
-
-### Nex-N2系列（未测）
-
-**模型系列**：Nex-N2
-**具体型号**：Huihui-Nex-N2-mini-abliterated-APEX
-**核心特点**：基于Nex-N2-mini多模态模型微调的无审查版本，具备优秀的视觉理解能力和图文推理能力，支持图像描述、OCR文本提取和多模态交互，推理速度快，适合日常视觉任务使用。
-**适配场景**：图片反推提示词、OCR文本提取、图文问答、日常视觉推理、多模态交互任务
-**下载链接（nsfw）**：https://huggingface.co/SC117/Huihui-Nex-N2-mini-abliterated-APEX-GGUF（含mmproj模型）
-
 

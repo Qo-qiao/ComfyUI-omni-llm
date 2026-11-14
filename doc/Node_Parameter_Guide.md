@@ -232,10 +232,6 @@ Performs LLM/VLM/Omni model inference, supporting text-only, single image, multi
 - Function: Audio input (for ASR recognition)
 - Recommended Setting: Provide when processing audio
 
-**Parameter Name: TTS Model (tts_model)**
-- Function: TTS model input (for speech synthesis)
-- Recommended Setting: Connect to TTS loader when speech output is needed
-
 **Parameter Name: ASR Model (asr_model)**
 - Function: ASR model input (for speech recognition)
 - Recommended Setting: Connect to ASR loader when speech recognition is needed
@@ -245,7 +241,6 @@ Performs LLM/VLM/Omni model inference, supporting text-only, single image, multi
 - **output**: Generated text output
 - **output_list**: Generated text list (supports batch output)
 - **state_uid**: Conversation state ID
-- **audio**: Generated audio data (only valid in text-to-audio mode)
 
 ## Output Format Options: Natural Paragraph vs Structured Output
 
@@ -431,10 +426,6 @@ Clean up model states and VRAM resources, combining the original cleanup states 
 
 **Parameter Name: Clean ASR (clean_asr)**
 - Function: Clean up ASR model
-- Recommended Setting: True
-
-**Parameter Name: Clean TTS (clean_tts)**
-- Function: Clean up TTS model
 - Recommended Setting: True
 
 **Parameter Name: Clean Aligner (clean_aligner)**
@@ -624,7 +615,7 @@ The preset templates in this plugin use a **semantic priority ordering** mechani
 
 #### Core Priority Rules
 
-Taking the `THICKPAINT_ROLE_ZH` (Next-gen CG Thick Paint 3D Character Portrait) template as an example, its semantic weight priority is:
+Taking the `[Anime] Thick Paint Role` (Next-gen CG Thick Paint 3D Character Portrait) template as an example, its semantic weight priority is:
 
 | Priority | Element Category | Description |
 |----------|-----------------|-------------|
