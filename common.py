@@ -31,7 +31,6 @@ from scipy.ndimage import gaussian_filter
 
 LLAMA_CPP_PYTHON_RELEASES_URL = "https://github.com/JamePeng/llama-cpp-python/releases"
 MIN_LLAMA_CPP_VERSION = "0.4.3"
-MIN_LLAMA_CPP_TTS_VERSION = "0.4.0"
 MIN_LLAMA_CPP_MTMD_AUDIO_VERSION = "0.4.0"
 
 LLAMA_CPP_WHEEL_CONFIG = {
@@ -109,29 +108,6 @@ def _check_llama_cpp_version(min_version=MIN_LLAMA_CPP_VERSION):
     except Exception as e:
         print(f"【错误】版本检查失败: {e}")
         return False, None
-
-def _check_llama_cpp_tts_version():
-    """检查llama-cpp-python版本是否支持MTMD TTS和音频功能(>=0.4.0)"""
-    try:
-        import llama_cpp
-        from packaging import version
-        
-        current_version = getattr(llama_cpp, '__version__', '0.0.0')
-        
-        if version.parse(current_version) >= version.parse(MIN_LLAMA_CPP_TTS_VERSION):
-            return True, current_version
-        else:
-            print(f"【TTS警告】llama-cpp-python版本 {current_version} 低于 {MIN_LLAMA_CPP_TTS_VERSION}，MTMD TTS和音频功能不可用")
-            return False, current_version
-    except ImportError:
-        return False, None
-    except Exception as e:
-        print(f"【TTS错误】版本检查失败: {e}")
-        return False, None
-
-def _check_llama_cpp_mtmd_audio():
-    """检查llama-cpp-python是否支持MTMD音频ASR功能(>=0.4.0)"""
-    return _check_llama_cpp_tts_version()
 
 def _validate_requirements_sync():
     """验证common.py中的wheel配置与requirements.txt是否同步"""
@@ -344,18 +320,15 @@ if _check_and_install_llama_cpp_python():
         # MTMD 支持检查：>= 0.3.35 支持 MTMD 基础功能
         _has_mtmd = version.parse(_llama_cpp_version) >= version.parse("0.3.35")
         
-        # MTMD 音频/TTS 支持检查：>= 0.4.0
+        # MTMD 音频支持检查：>= 0.4.0
         _has_mtmd_audio = version.parse(_llama_cpp_version) >= version.parse(MIN_LLAMA_CPP_MTMD_AUDIO_VERSION)
-
-        # TTS 支持检查
-        _has_tts, _ = _check_llama_cpp_tts_version()
 
         if not _has_mtmd:
             print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD功能")
         if not _has_mtmd_audio:
-            print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD音频/TTS功能，建议升级到 {MIN_LLAMA_CPP_TTS_VERSION}+")
+            print(f"【版本警告】llama-cpp-python {_llama_cpp_version} 不支持MTMD音频功能，建议升级到 {MIN_LLAMA_CPP_MTMD_AUDIO_VERSION}+")
 
-        print(f"【依赖检查】llama-cpp-python 版本: {_llama_cpp_version}, MTMD: {_has_mtmd}, MTMD音频: {_has_mtmd_audio}, TTS: {_has_tts}")
+        print(f"【依赖检查】llama-cpp-python 版本: {_llama_cpp_version}, MTMD: {_has_mtmd}, MTMD音频: {_has_mtmd_audio}")
             
     except ImportError as e:
         print(f"【错误】llama-cpp-python 导入失败: {e}")
@@ -1906,7 +1879,10 @@ class LLAMA_CPP_STORAGE:
         
         # 清理结果缓存
         try:
-            from nodes.unified_inference import omni_llm_unified_inference
+            _nodes_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nodes')
+            if _nodes_dir not in sys.path:
+                sys.path.insert(0, _nodes_dir)
+            from unified_inference import omni_llm_unified_inference
             if hasattr(omni_llm_unified_inference, "_result_cache"):
                 omni_llm_unified_inference._result_cache.clear()
                 print(f"【结果缓存】已清理所有推理结果缓存")
@@ -2147,34 +2123,7 @@ class LLAMA_CPP_STORAGE:
             n_threads = config.get("n_threads", 0)
             n_threads_batch = config.get("n_threads_batch", 0)
             enable_thinking = config.get("enable_thinking", False)
-            
-            # MoE模型优化（完全自动，无需用户配置）
             tensor_split_str = config.get("tensor_split", "")
-            
-            # MoE模型检测：基于模型名称常见MoE关键词
-            moe_keywords = [
-                "mixtral", "mixtral-8x", "mistrals", 
-                "qwen3-", "qwen3.", "qwen2.5-", "qwen2-",
-                "deepseek-v3", "deepseekv3", "deepseek-67b",
-                "llama-4", "llama4", "llama-3.1-70b",
-                "stripedhyena", "openbuddy",
-                "hermes", "nousresearch",
-                "solar", "solar-10.7b",
-                "fuse", "fusenet",
-                "gemma-2-", "gemma2-",
-                "DBRX", "dbrx", "catomix",
-                "moe", "-moe", "_moe",
-                "a3b", "8x22b", "8x7b", "8x141b"
-            ]
-            
-            # 检测是否为MoE模型（基于模型名称）
-            is_moe_model = any(keyword in model.lower() for keyword in moe_keywords)
-            
-            # 记录MoE检测结果
-            if is_moe_model:
-                print(f"【MoE检测】检测到MoE（Mixture of Experts）模型：{model}")
-            else:
-                print(f"【MoE检测】非MoE模型，跳过MoE优化：{model}")
             
             # MTP (Multi-Token Prediction) 模型检测
             # MTP 模型文件名通常包含 "mtp"（如 Qwen3.6-27B-MTP、NEO-IMATRIX-MAX-MTP），
@@ -2349,7 +2298,7 @@ class LLAMA_CPP_STORAGE:
                         print(f"【警告】无法找到ChatHandler：{chat_handler_name}，ChatHandler将为None")
                     else:
                         print(f"【警告】ChatHandler初始化失败：{chat_handler_name}，ChatHandler将为None")
-                        print(f"【提示】模型将以基础模式加载，TTS音频功能仍可使用")
+                        print(f"【提示】模型将以基础模式加载")
                 else:
                     print(f"【成功】已启用MMProj并初始化ChatHandler：{type(cls.chat_handler).__name__}")
             else:
@@ -2357,7 +2306,6 @@ class LLAMA_CPP_STORAGE:
                     print(f"【提示】{model} 是纯文本模型，跳过ChatHandler初始化")
                 else:
                     print(f"【提示】未启用MMProj，ChatHandler为None，模型将以基础模式加载")
-                print(f"【提示】TTS音频功能仍可正常使用")
             
             # 启用CUDA优化
             enable_cuda_optimizations()
@@ -2524,39 +2472,18 @@ class LLAMA_CPP_STORAGE:
                 except Exception as e:
                     print(f"【Flash Attention】配置失败: {e}")
 
-            # MoE模型优化配置（完全自动，仅MoE模型生效）
-            if is_moe_model and device_mode == "GPU":
+            # Tensor Split配置（多GPU支持，仅在用户显式指定时生效）
+            if tensor_split_str and device_mode == "GPU":
                 try:
+                    tensor_split = [float(x.strip()) for x in tensor_split_str.split(',')]
                     llama_sig = inspect.signature(llama_cpp.Llama.__init__)
-                    
-                    # Tensor Split配置（多GPU支持）
-                    if tensor_split_str:
-                        try:
-                            tensor_split = [float(x.strip()) for x in tensor_split_str.split(',')]
-                            if 'tensor_split' in llama_sig.parameters:
-                                llama_kwargs["tensor_split"] = tensor_split
-                                print(f"【MoE优化】已设置tensor_split={tensor_split}")
-                            else:
-                                print(f"【MoE优化】当前llama-cpp-python版本不支持tensor_split参数，跳过")
-                        except ValueError:
-                            print(f"【MoE优化】tensor_split格式错误，应为逗号分隔的数字，如：0.5,0.5")
-                    
-                    # 针对MoE模型的特殊优化：使用--tensor-split标志优化专家分配
-                    # llama.cpp的tensor_split参数可以优化MoE模型的专家层分配
-                    if 'tensor_split' not in llama_kwargs and HARDWARE_INFO["gpu_count"] > 1:
-                        # 多GPU情况：自动计算tensor_split
-                        try:
-                            gpu_count = HARDWARE_INFO["gpu_count"]
-                            # 平均分配
-                            tensor_split = [1.0 / gpu_count] * gpu_count
-                            if 'tensor_split' in llama_sig.parameters:
-                                llama_kwargs["tensor_split"] = tensor_split
-                                print(f"【MoE优化】多GPU自动设置tensor_split={tensor_split}")
-                        except Exception as e:
-                            print(f"【MoE优化】自动设置tensor_split失败: {e}")
-                    
-                except Exception as e:
-                    print(f"【MoE优化】MoE优化配置失败: {e}，跳过MoE优化")
+                    if 'tensor_split' in llama_sig.parameters:
+                        llama_kwargs["tensor_split"] = tensor_split
+                        print(f"【Tensor Split】已设置tensor_split={tensor_split}")
+                    else:
+                        print(f"【Tensor Split】当前llama-cpp-python版本不支持tensor_split参数，跳过")
+                except ValueError:
+                    print(f"【Tensor Split】tensor_split格式错误，应为逗号分隔的数字，如：0.5,0.5")
 
             # MTP (Multi-Token Prediction) 推测解码配置
             # 需要 llama-cpp-python（JamePeng fork）提供的 load_mtp / ctx_type / n_outputs_max 参数，

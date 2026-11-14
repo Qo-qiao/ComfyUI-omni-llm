@@ -32,36 +32,6 @@
       "n_ctx": "上下文长度"
     }
   },
-  "omni_llm_tts_loader": {
-    "title": "Omni-llm TTS模型加载器",
-    "inputs": {
-      "tts_model": "TTS模型",
-      "mmproj": "辅助模型",
-      "n_gpu_layers": "GPU模型层数",
-      "language": "语言",
-      "n_ctx": "上下文长度",
-      "ref_audio_path": "参考音路径"
-    },
-    "widgets": {
-      "tts_model": "TTS模型",
-      "mmproj": "辅助模型",
-      "n_gpu_layers": "GPU模型层数",
-      "language": "语言",
-      "n_ctx": "上下文长度",
-      "ref_audio_path": "参考音路径"
-    },
-    "outputs": {
-      "tts_model": "TTS模型"
-    },
-    "tooltips": {
-      "tts_model": "选择TTS GGUF模型文件（tts目录内）",
-      "mmproj": "手动指定辅助模型(mmproj/tokenizer)；None=自动从模型同目录检测",
-      "n_gpu_layers": "加载到GPU的模型层数，-1=全部加载（强制GPU/CUDA推理）",
-      "language": "合成语言（Qwen3-TTS支持，Pocket TTS自动忽略）",
-      "n_ctx": "上下文长度",
-      "ref_audio_path": "音色克隆参考音路径（wav格式，3~60秒最佳，单声道48000Hz）"
-    }
-  },
   "omni_llm_clean_states": {
     "title": "Omni-llm 模型清理",
     "inputs": {
@@ -69,7 +39,6 @@
       "state_uid": "对话状态ID",
       "clean_llm": "清理LLM",
       "clean_asr": "清理ASR",
-      "clean_tts": "清理TTS",
       "unload_all_comfyui_models": "卸载所有模型"
     },
     "widgets": {
@@ -77,7 +46,6 @@
       "state_uid": "对话状态ID",
       "clean_llm": "清理LLM",
       "clean_asr": "清理ASR",
-      "clean_tts": "清理TTS",
       "unload_all_comfyui_models": "卸载所有模型"
     },
     "outputs": {
@@ -88,7 +56,6 @@
       "state_uid": "要清理的对话状态ID",
       "clean_llm": "清理LLM模型",
       "clean_asr": "清理ASR模型",
-      "clean_tts": "清理TTS模型",
       "unload_all_comfyui_models": "卸载所有模型"
     }
   },
@@ -213,7 +180,6 @@
       "output_format": "输出格式",
       "enable_constraints": "启用正向约束",
       "enable_negative_prompts": "启用负向提示词",
-      "image_model": "图像生成模型",
       "video_model": "视频生成模型",
       "audio_model": "音频生成模型",
       "batch_combination": "批量输出选项",
@@ -225,7 +191,6 @@
       "force_offload": "强制卸载",
       "save_states": "保存状态",
       "asr_model": "ASR模型",
-      "tts_model": "TTS模型",
       "parameters": "参数",
       "images": "图像",
       "video": "视频",
@@ -244,7 +209,6 @@
       "output_format": "输出格式",
       "enable_constraints": "启用正向约束",
       "enable_negative_prompts": "启用负向提示词",
-      "image_model": "图像生成模型",
       "video_model": "视频生成模型",
       "audio_model": "音频生成模型",
       "batch_combination": "批量输出选项",
@@ -256,7 +220,6 @@
       "force_offload": "强制卸载",
       "save_states": "保存状态",
       "asr_model": "ASR模型",
-      "tts_model": "TTS模型",
       "parameters": "参数",
       "images": "图像",
       "video": "视频",
@@ -266,24 +229,22 @@
     "outputs": {
       "output": "输出",
       "output_list": "输出列表",
-      "state_uid": "状态ID",
-      "audio": "音频"
+      "state_uid": "状态ID"
     },
     "tooltips": {
       "llama_model": "选择加载的Llama模型",
       "preset_prompt": "选择预设提示词模板",
       "system_prompt": "系统提示词，定义AI助手的角色和行为",
       "text_input": "用户输入文本",
-      "inference_mode": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [基础] 文本转语音：使用TTS模型将文本合成为语音\n• [高级] 视频理解：从视频中提取帧并进行分析",
+      "inference_mode": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [高级] 视频理解：从视频中提取帧并进行分析",
       "prompt_language": "提示词语言",
       "response_language": "响应语言",
       "asr_language": "ASR语音识别语言",
       "output_format": "输出格式",
       "enable_constraints": "启用预设模板中的正向约束：\n• 正向约束：追加到提示词最前面，引导模型生成符合要求的内容",
       "enable_negative_prompts": "启用预设模板中的负向提示词：\n• 负向提示词：追加到提示词末尾，避免模型生成不想要的内容",
-      "image_model": "图像生成模型选择（通用类型，影响提示词构建风格）：\n• Auto：通用类型，自动适配默认模型\n• Flux1：擅长写实人像/场景/空间逻辑\n• Flux2_klein：擅长快速出图/轻量化/中英双语\n• Z_image：擅长写实人像/风光/静物\n• Qwen_Image2512：擅长长图文/海报/密集排版\n• Krea2：擅长摄影质感/画风融合\n• Boogu：擅长商用海报/商品图/密集文字\n• Mage_Flow：擅长文字生成、指令编辑、商业静物摄影\n• ERNIE_Image：擅长国风/国潮/科普图解",
       "video_model": "视频生成模型选择（仅视频类预设模板生效）：\n• Auto：自动适配默认模型\n• Wan2.2：原生单段最大5秒，仅支持单镜头\n• LTX2.5：原生单段最长20秒，支持音画同步\n• MiniMax-H3：时长4-15秒整数，支持音画同步",
-      "audio_model": "音频生成模型选择（仅音频类预设模板生效）：\n• Auto：自动适配默认模型\n\n────────── TTS 语音合成 ──────────\n• IndexTTS-2.5：精细调情绪\n• VoxCPM2：日常短视频人物对话\n\n────────── 音乐生成 ──────────\n• Ace-Step1.5：控制维度丰富\n• MiniMax-Music3：人声演唱自然度高",
+      "audio_model": "音频生成模型选择（仅音频类预设模板生效）：\n• Auto：自动适配默认模型\n\n────────── TTS 语音合成 ──────────\n• IndexTTS-2.5：精细调情绪\n• VoxCPM2：日常短视频人物对话\n\n────────── 音乐生成 ──────────\n• Ace-Step1.5：控制维度丰富\n• MiniMax-Music3：人声演唱自然度高\n• YuE2：风格串+歌词生成，cot 提供 full（旋律+和声）/melody（仅旋律）/off（无符号规划）三档",
       "video_max_frames": "视频处理的最大帧数",
       "batch_combination": "批量输出选项",
       "image_max_size": "图像处理的最大尺寸",
@@ -296,12 +257,10 @@
       "images": "图像",
       "video": "输入视频",
       "asr_model": "ASR模型输入（用于语音识别）",
-      "tts_model": "TTS模型输入（用于文本转语音）",
       "queue_handler": "队列处理器",
       "output": "生成的文本输出",
       "output_list": "生成的文本输出列表",
       "state_uid": "对话状态ID",
-      "audio": "文本转语音模式输出的合成音频（AUDIO格式）",
       "example_output": "当前预设模板的示例内容，便于提示词书写参考"
     }
   },

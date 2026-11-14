@@ -25,7 +25,6 @@ from unified_inference import omni_llm_unified_inference
 from model_parameters import omni_llm_parameters
 from clean_states import omni_llm_clean_states
 from asr_loader import omni_llm_asr_loader
-from tts_loader import omni_llm_tts_loader
 from multi_image_input import omni_llm_multi_image_input
 from video_loader import omni_llm_video_loader
 from skill_loader import omni_llm_skill_loader
@@ -38,7 +37,6 @@ NODE_CLASS_MAPPINGS = {
     "omni_llm_parameters": omni_llm_parameters,
     "omni_llm_clean_states": omni_llm_clean_states,
     "omni_llm_asr_loader": omni_llm_asr_loader,
-    "omni_llm_tts_loader": omni_llm_tts_loader,
     "omni_llm_multi_image_input": omni_llm_multi_image_input,
     "omni_llm_unified_inference": omni_llm_unified_inference,
     "omni_llm_video_loader": omni_llm_video_loader,
@@ -53,7 +51,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "omni_llm_parameters": "Omni LLM Parameters",
     "omni_llm_clean_states": "Omni LLM Clean States",
     "omni_llm_asr_loader": "Omni LLM ASR Model Loader",
-    "omni_llm_tts_loader": "Omni LLM TTS Model Loader",
     "omni_llm_multi_image_input": "Omni LLM Multi-Image Input (Story Creation)",
     "omni_llm_unified_inference": "Omni LLM Unified Inference",
     "omni_llm_video_loader": "Omni LLM Video Loader",
@@ -69,4 +66,4 @@ WEB_DIRECTORY = "./web"
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
 
 # 版本信息
-VERSION = "3.5.2"
+VERSION = "3.6.0"

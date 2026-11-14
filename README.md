@@ -69,7 +69,7 @@ If you are not familiar with installing dependencies, it is recommended to use t
 2. **Model File Format**:
    - LLM/VLM models support `.gguf` format
    - Visual models require corresponding `mmproj` files
-   - ASR/TTS models require downloading full model files
+   - ASR models require downloading full model files
 
 ## Workflow Examples (Reference examples, please modify parameters according to actual situation)
 
@@ -104,30 +104,33 @@ Please check [Node Parameter Guide](./doc/Node_Parameter_Guide.md)
 
 ## Changelog
 
-The following updates are based on llama-cpp-python version 0.4.3, so please install this version first
+The following updates are based on llama-cpp-python 0.4.7 version update
 
+#### v3.6.0 （2026-11-14）
+
+- **Node Optimization**: Removed low-yield TTS node functions and inference node image generation output options; removed moe processing logic.  
+- **Skill Optimization**: Added the minimaxH3-image model skill; fixed cases where skill errors caused normal reading issues.  
+- **Preset Template Optimization**: Adjusted the semantic weights of preset templates; fixed confusion caused by duplicate rules; added support for the yue2-music preset template.
+
+
+<details>
+<summary>📋 Older Versions</summary>
 
 #### v3.5.2 （2026-10-19）
 
 - **Node Optimization**: Added support for MTP multi-token speculative decoding and multimodal (mmproj) image input combination, adapted to the new version of llama-cpp-python, and optimized some model interfaces
 - **New Skill**: Added moss-image model skill
 
-
 #### v3.5.1 （2026-10-05）
 
 - **Node Optimization**: Added json format output, users can customize the json output format, optimized and removed invalid code.
 - **Preset Template Optimization**: Added ACE-Step-1.5, ltx2.5-video, wan2.2-video skill templates based on official documentation.
-
 
 #### v3.5.0 (2026-09-26)
 
 - **ASR Node Overhaul**: ASR no longer runs inference through qwen3-asr, now uses llama-cpp-python for inference. Only GGUF format is supported, and the mmproj model must be loaded at the same time.  
 - **New TTS Node**: Added a TTS model loader (based on llama-cpp MTMD), supporting Qwen3-TTS and Pocket TTS models (only basic synthesis is supported, voice modulation isn’t available yet. Currently just functional support, due to dependency issues, it’s recommended to use the official pipeline).  
 - **Node Optimization**: Optimized inference and audio support for omni-type models (improved joint inference capabilities for images and audio).
-
-
-<details>
-<summary>📋 Older Versions</summary>
 
 #### v3.4.0 (2026-09-12)
 - **Node Optimization and Adjustments**: Added API loading nodes (expanding model support types to meet different user scenario needs), added multi-turn conversation nodes (for skill usage, making it easier to generate more professional prompt content), added skill loading nodes (expanding text generation capabilities, providing more options for prompt generation), optimized and adjusted parameter node options, adapted for multi-turn conversation node usage. 
@@ -146,10 +149,9 @@ The following updates are based on llama-cpp-python version 0.4.3, so please ins
 #### v3.3.2 （2026-08-15）
 
 - **Node Optimization and Adjustments**: 1. Optimized internal code, adapted parameters for llama-cpp-python 0.3.46, added support for the Qwen3.8 model (untested), and improved MTP processing.  
-2. Added audio model options, supporting IndexTTS-2.5, Ace-Step1.5, and MiniMax-Music3 models.  
+2. Added audio model options, supporting IndexTTS-2.5, Ace-Step1.5, MiniMax-Music3 and YuE2 models.  
 3. Added output model labels to help users confirm results.  
-- **Preset Template Optimization**: The multi-person chat template now aligns with the output of the IndexTTS-2.5 model, the music template aligns with Ace-Step1.5 and MiniMax-Music3 outputs, the video generation template aligns with LTX-2.5 and MiniMax-H3 outputs, and the image creation template hasn't been fully aligned yet due to the volume of content (feedback or co-creation is welcome).
-
+- **Preset Template Optimization**: The multi-person chat template now aligns with the output of the IndexTTS-2.5 model, the music template aligns with Ace-Step1.5, MiniMax-Music3 and YuE2 outputs, the video generation template aligns with LTX-2.5 and MiniMax-H3 outputs, and the image creation template hasn't been fully aligned yet due to the volume of content (feedback or co-creation is welcome).
 
 #### v3.3.1 （2026-08-12）
 
