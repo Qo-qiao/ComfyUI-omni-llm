@@ -16,18 +16,18 @@ This Skill **organizes the prompt in the user input language and recommends Mini
 
 When the user provides any language, understand it as the following workflow requirements and express the final prompt in the dominant language of the user input:
 
-- 基于参考 prompt 创作一个全新的 15 秒视频生成 prompt，不要表面模仿原句。
-- 必须保留影像结构：实拍空间中出现平面的手绘发光动画；动画与真实手或真实物体接触；同一个存在连续变形并逃跑；相机总是慢半拍追赶。
-- 手绘动画质感必须像蜡笔、粉笔、彩色铅笔、粉彩、粗糙笔刷；线条轻微抖动，有涂抹不均、毛边和逐帧重画感。
-- 禁止 3DCG、毛绒玩具感、均匀矢量线、平滑霓虹、恐怖怪物、巨大眼睛、裂口、牙齿、威吓、扑咬、突然黑屏、跳吓。
-- 0-3 秒必须出现实拍手与手绘动画的清晰接触，例如缠住手指、落在掌心、被抓时逃跑、从指尖诞生。
-- 动画必须作为同一个实体连续变形，可在“线条、生物、记号、植物、交通工具、生活小物”等形态之间变化，并保留前一形态的痕迹。
-- 不允许突然出现另一个全新角色。
-- 全片在同一空间或相邻范围内连续展开，不用剪辑跳到另一个地点，像拍摄者真的边走边追。
-- 每个区间 0-3、3-6、6-10、10-13、13-15 秒都要有新的变形、移动、接触、发现、恶作剧或惊喜。
-- 拍摄者也必须参与：伸手、抓、追、打开门或盒子、接住、后退、被恶作剧等。
-- 调性是可爱、生活感、怀旧、温柔、略带切感，不是恐怖喜剧。
-- 13-15 秒必须有空间级变形：之前的线扩散到墙、地板、天花板、窗户、水槽或通道，变成巨大花、星空、夕阳、云、丝带、涂鸦小镇等；结尾要有感动余韵和一点可爱笑点。
+- Create a brand-new 15-second video-generation prompt based on the reference prompt; do not imitate the original sentences on the surface.
+- The visual structure must be preserved: a flat hand-drawn luminous animation appears in a live-action space; the animation contacts a real hand or real object; the same being continuously morphs and escapes; the camera always chases half a beat late.
+- The hand-drawn animation texture must feel like crayon, chalk, colored pencil, pastel, or a rough brush; lines tremble slightly, with uneven smearing, ragged edges, and a frame-by-frame redrawn feel.
+- Prohibit 3DCG, plush-toy feel, uniform vector lines, smooth neon, horror monsters, oversized eyes, slit mouths, teeth, intimidation, lunging bites, sudden black screens, and jump scares.
+- 0-3 seconds must show clear contact between the live-action hand and the hand-drawn animation, for example coiling around a finger, landing in the palm, escaping when grabbed, or being born from a fingertip.
+- The animation must morph continuously as one and the same entity, cycling among forms such as "lines, creatures, marks, plants, vehicles, everyday small objects", while retaining traces of the previous form.
+- No completely new second character may appear out of nowhere.
+- The whole film unfolds continuously within the same space or an adjacent range, without a cut jumping to another location; it should feel as if the shooter is really walking and chasing.
+- Every interval — 0-3, 3-6, 6-10, 10-13, 13-15 seconds — must contain a new transformation, movement, contact, discovery, prank, or surprise.
+- The shooter must also take part: reaching out, grabbing, chasing, opening a door or box, catching, backing away, being pranked, and so on.
+- The tone is cute, slice-of-life, nostalgic, gentle, with a faint bittersweet edge — not horror comedy.
+- 13-15 seconds must deliver a space-scale transformation: the earlier lines spread across the wall, floor, ceiling, windows, sink, or corridor, becoming giant flowers, a starry sky, sunset, clouds, ribbons, a doodled town, and so on; the ending must carry an emotional afterglow plus a small cute punchline.
 
 ## Step 2: Invent all creative content fresh
 
@@ -35,16 +35,16 @@ For every run, create a new combination. Do not reuse the reference prompt's dar
 
 Choose new values for all of these:
 
-1. 实拍空间，但仍是生活化且可连续追踪的相邻范围；
-2. 手绘实体或初始形态；
-3. 中心色彩；
-4. 连续变形链路；
-5. 与真实手或实物的接触方式；
-6. 在空间中的追逐路线；
-7. 拍摄者反应；
-8. 最后的空间级变形与可爱笑点。
+1. Live-action space, but still an everyday adjacent range that can be tracked continuously;
+2. Hand-drawn entity or initial form;
+3. Central color;
+4. Continuous morphing chain;
+5. Way of contacting a real hand or real object;
+6. Chase route through the space;
+7. Shooter's reaction;
+8. Final space-scale transformation and cute punchline.
 
-Good example directions include: 雨天厨房水槽、旧阳台晾衣角、清晨玄关、小书店走廊、火车窗边小桌、浴室镜柜、手作桌、温室通道、自助洗衣店长椅、旧餐桌. Use only one or adjacent connected areas.
+Good example directions include: rainy-day kitchen sink, old balcony drying corner, early-morning entryway, small bookstore corridor, small table by a train window, bathroom mirror cabinet, craft table, greenhouse passage, laundromat bench, old dining table. Use only one space or adjacent connected areas.
 
 ## Step 3: Required output format
 
@@ -52,21 +52,21 @@ The final prompt must begin with a sentence pattern matching the dominant langua
 
 `15秒，16:9横版视频。将实拍的〇〇与手绘发光动画融合的影像。`
 
-Replace “〇〇” with the newly invented live-action space or everyday scene. For non-Chinese input, use an equivalent opening in the same language and include duration, 16:9 landscape format, live-action space, and hand-drawn glowing animation fusion.
+Replace the circled placeholder with the newly invented live-action space or everyday scene. For non-Chinese input, use an equivalent opening in the same language and include duration, 16:9 landscape format, live-action space, and hand-drawn glowing animation fusion.
 
-Do not add titles, auxiliary headings such as 舞台设置 or 色味, or explanatory notes. Keep this paragraph order:
+Do not add titles, auxiliary headings such as "stage setting" or "color tone", or explanatory notes. Keep this paragraph order:
 
-1. 开头句；
-2. 实拍空间与手机拍摄质感；
-3. 0-3 秒；
-4. 3-6 秒；
-5. 6-10 秒；
-6. 10-13 秒；
-7. 13-15 秒；
-8. 手绘质感；
-9. 相机追随方式；
-10. 禁止事项；
-11. 环境音。
+1. Opening sentence;
+2. Live-action space and phone-camera texture;
+3. 0-3 seconds;
+4. 3-6 seconds;
+5. 6-10 seconds;
+6. 10-13 seconds;
+7. 13-15 seconds;
+8. Hand-drawn texture;
+9. Camera chase style;
+10. Prohibitions;
+11. Ambient sound.
 
 ## Step 4: Prompt writing rules
 
@@ -76,7 +76,7 @@ Do not add titles, auxiliary headings such as 舞台设置 or 色味, or explana
 - Do not generate a video, image, audio, storyboard, or intermediate asset until the user explicitly confirms the H3 generation step.
 - Mention Seedance only as a target usage context when the user asks; do not add model parameters inside the creative prompt unless requested.
 - The first 0-3 seconds must make real/hand-drawn fusion obvious through contact.
-- The camera must not neatly center the animation. It should lag behind, pan/tilt/advance after the entity already leaves the frame edge.
+- The camera must not neatly center the animation. It should lag half a beat, panning, tilting, or advancing only after the entity has already left the frame edge.
 - The entity should remain traceable: each new form preserves a line, tail, color smear, body curve, or motif from the previous form.
 - Use soft, emotional, comic, cute beats: tiny stumbles, shy gestures, a dot falling behind, a petal sticking to lens, a star dropping into a palm, confetti sneeze, one small creature lagging behind.
 - Avoid any horror-coded anatomy or threatening motion.
