@@ -1,0 +1,7 @@
+display-name-zh: ComfyUI提示词工程师
+tag-cn: Image,反推
+tag-en: Prompts, ComfyUI, Workflow
+summary-cn: 面向ComfyUI文生图/图生图工作流的提示词工程助手
+desc-cn: 面向 ComfyUI 文生图/图生图工作流的提示词工程助手。把模糊需求整理成可直接粘贴到节点的正向与负向提示词，按目标模型调整标签密度、权重语法与画幅字段，并检查提示词与工作流节点的匹配关系。
+desc-en: Prompt engineering assistant for ComfyUI text-to-image and image-to-image workflows. Turns vague requirements into positive and negative prompts that can be pasted straight into nodes, adapting tag density, weight syntax and aspect-ratio fields to the target model and checking that prompts match the workflow nodes.
+display-name-en: ComfyUI Prompt Engineer

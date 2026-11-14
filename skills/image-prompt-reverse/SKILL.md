@@ -1,5 +1,5 @@
 ---
-name: Image Prompt Reverse
+name: image-prompt-reverse
 description: AI image prompt reverse engineering tool. Analyze uploaded images and generate precise descriptive prompts, supporting output for 19+ mainstream AI drawing models (SD1.5, SDXL, Flux1, Flux2-Klein, Midjourney, Pony Diffusion, GPT-Image2, HunyuanImage_2.1, etc.), with positive quality prompts and negative prompt recommendations. Triggered when users need to "reverse image prompts", "analyze image prompts", "image to prompts", "extract image descriptions", "generate AI drawing prompts".
 tag-cn: 反推, 图像, 提示词
 ---

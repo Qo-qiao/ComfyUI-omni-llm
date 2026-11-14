@@ -6,92 +6,92 @@ tag-cn: Qwen-Image, 提示词, 改写, 图像
 
 # Qwen-Image 2.1 Prompt Rewriter
 
-Qwen-Image-2.1（2026-09-20 发布，7B 单流 DiT，Qwen3-VL 8B 文本编码器，64 通道 RGBA VAE，2K 原生分辨率）统一了**文生图生成**与**图像编辑**，用**流畅的自然语言**提示——不是 SD 风格的标签列表，也不是 `(term:1.5)` 权重语法。本 Skill 把用户模糊的请求转成 Qwen-Image-2.1 真正理解的提示词，加上管道单独读取的画幅比例字段。
+Qwen-Image-2.1 (released 2026-09-20, 7B single-stream DiT, Qwen3-VL 8B text encoder, 64-channel RGBA VAE, native 2K resolution) unifies **text-to-image generation** and **image editing** behind **fluent natural language** prompts — not SD-style tag lists, and not `(term:1.5)` weight syntax. This Skill turns vague user requests into prompts that Qwen-Image-2.1 actually understands, together with the aspect-ratio field that the pipeline reads separately.
 
-## 核心规则（始终适用）
+## Core Rules (Always Apply)
 
-1. **自然语言，禁标签列表。** 用描述强调："with vibrant, striking red hair"。
-2. **主体前置。** 早期 concrete token 权重最高：主体 → 环境 → 风格 → 构图 → 光线。
-3. **必须出现在图像中的文字用双引号原样保留。** 大小写、标点、换行照写；绝不改写、翻译或"美化"用户字符串。
-4. **编辑 = 变更 + 保持条款。** "Change X to Y. Keep everything else unchanged."；一个 pass 一个逻辑编辑，复杂改动拆成 2–3 个小编辑链式执行。
-5. **比例与分辨率只在 `wh_ratio` / `ratio_follow` 中，不在提示词正文里。**
-6. **禁止质量膨胀词**——"masterpiece"、"8K"、"highly detailed"、"award-winning" 对 2.1 不鼓励；描述可见内容。
-7. **文生图描述一律英文**（图像内文字保持原脚本）；编辑散文遵循 edit-rules.md 的语言判定。
+1. **Natural language, no tag lists.** Express emphasis descriptively: "with vibrant, striking red hair".
+2. **Subject first.** Early concrete tokens carry the highest weight: subject → environment → style → composition → lighting.
+3. **Text that must appear in the image is kept verbatim in double quotes.** Reproduce casing, punctuation, and line breaks exactly; never rewrite, translate, or "polish" user strings.
+4. **Edit = change + preservation clause.** "Change X to Y. Keep everything else unchanged."; one logical edit per pass, and split complex changes into a chain of 2–3 small edits.
+5. **Aspect ratio and resolution live only in `wh_ratio` / `ratio_follow`, never in the prompt body.**
+6. **No quality-inflation words** — "masterpiece", "8K", "highly detailed", "award-winning" are not encouraged for 2.1; describe what is visible.
+7. **Text-to-image descriptions are always in English** (in-image text keeps its original script); editing prose follows the language determination in edit-rules.md.
 
-## 工作流
+## Workflow
 
-1. **判断轨道**：无输入图 → **t2i**；有一张或多张输入图 → **edit / 合成**。
-2. **先读对应 reference 再动笔**——不要凭记忆作答，通过 `load_references` 请求并等加载完成：
+1. **Determine the track**: no input image → **t2i**; one or more input images → **edit / compositing**.
+2. **Read the corresponding reference before writing** — do not answer from memory; request it through `load_references` and wait for loading to complete:
    - t2i → `references/t2i-rules.md`
    - edit → `references/edit-rules.md`
-   reference 中的输出 schema、字段名、互斥规则与自检清单全部原样适用。
-3. **若涉及图像内可读文字**，叠加 `references/text-rendering.md` 的引用纪律。
-4. **若输入可视觉检查**（环境支持 vision 工具）：先看清输入图的文字、姿态、服饰、布局再改写；纯文本时只在关键不变量（如哪张是 canvas）无法合理推断时才提问。
-5. **对照核心规则自检**，按输出模式交付。
+   The output schema, field names, mutual-exclusion rules, and self-check list in the reference all apply verbatim.
+3. **If readable text inside the image is involved**, layer on the quoting discipline from `references/text-rendering.md`.
+4. **If the input can be inspected visually** (environment supports a vision tool): first examine the input image's text, pose, clothing, and layout before rewriting; for plain text input, ask only when a key invariant (such as which image is the canvas) cannot be reasonably inferred.
+5. **Self-check against the core rules**, then deliver in the requested output mode.
 
-## 轨道概览
+## Track Overview
 
-### A. 文生图（t2i）
+### A. Text-to-Image (t2i)
 
-- **输出契约**：`{"rewritten_prompt": "<description>", "wh_ratio": "<如 3:2>"}`。
-- **风格选择（动笔前决定）**：
+- **Output contract**: `{"rewritten_prompt": "<description>", "wh_ratio": "<e.g. 3:2>"}`.
+- **Style selection (decided before writing)**:
 
-| 场景 | 风格 |
+| Situation | Style |
 |---|---|
-| 单一明确主体（人像、静物、安静场景） | **精简**：1–3 句流畅自然语言，主体 → 环境 → 风格 → 构图 → 光线，约 30 词 |
-| 海报、版式、UI 界面、信息图、故事板、多元素或需精确定位、多段文字 | **长观察式**：官方八步长段落，约 20 句 / 300–500 词 |
+| A single well-defined subject (portrait, still life, quiet scene) | **Compact**: 1–3 fluent natural-language sentences, subject → environment → style → composition → lighting, about 30 words |
+| Posters, layouts, UI screens, infographics, storyboards, multi-element scenes, or anything needing precise placement or multiple text blocks | **Long observational**: the official eight-step long passage, about 20 sentences / 300–500 words |
 
-不确定时，布局与文字类走长；简单主体走精简。
-- 现在时、第三人称、陈述句。无指令语气，无质量膨胀词。不确定处用 hedge，仅对用户给定的元素斩钉截铁。
-- 比例只写在 `wh_ratio`，绝不在描述正文。默认横向 `3:2` / 纵向 `2:3`，除非用户指定。
+When unsure, go long for layout and text-heavy work; go compact for simple subjects.
+- Present tense, third person, declarative sentences. No imperative tone, no quality-inflation words. Hedge where uncertain, and be categorical only about elements the user specified.
+- Aspect ratio goes only in `wh_ratio`, never in the description body. Default to landscape `3:2` / portrait `2:3` unless the user specifies otherwise.
 
-### B. 图像编辑（edit）
+### B. Image Editing (edit)
 
-- **输出契约**：`{"rewritten_prompt": "<指令>", "wh_ratio": "<比例或空>", "ratio_follow": "<imageN 或空>"}`——三个字段，`wh_ratio` 与 `ratio_follow` 互斥。
-- **属性解耦**：只编辑用户点名的属性并改到位，其余用保持条款锁住输入原样（防泄漏、防欠编辑）。保持锁的是**内容**，不是编辑强度。
-- **身份是最难的不变量**：面部、标志性配饰、产品设计、渲染介质在未被明确瞄准时一律保留；参照图来的身份用图像标签指，不描述。
-- **多图标签**：N ≥ 2 必须 `<image1>`, `<image2>`…；单图自然表述。明确每张图的角色（canvas / 素材提供方）。
-- **编辑是短祈使句 + 保持条款**；复杂任务拆成 2–3 个小 pass，每轮后重验身份与标签保真度。
-- **局部编辑**：若用户标注了区域（红圈/选区/遮罩），把指令限定在该区域内："Within the red box, … Leave everything else unchanged."
+- **Output contract**: `{"rewritten_prompt": "<instruction>", "wh_ratio": "<ratio or empty>", "ratio_follow": "<imageN or empty>"}` — three fields, with `wh_ratio` and `ratio_follow` mutually exclusive.
+- **Attribute decoupling**: edit only the attributes the user names, and change them all the way; lock everything else to the input as-is with preservation clauses (this prevents leakage and under-editing). The lock protects **content**, not editing strength.
+- **Identity is the hardest invariant**: faces, signature accessories, product design, and rendering medium are always preserved when not explicitly targeted; identity coming from a reference image is pointed at with image tags, not described.
+- **Multi-image tags**: with N ≥ 2 you must use `<image1>`, `<image2>`…; for a single image, use natural phrasing. State each image's role clearly (canvas / source-material provider).
+- **Edits are short imperative sentences + preservation clauses**; split complex tasks into 2–3 small passes, re-verifying identity and tag fidelity after each round.
+- **Local edits**: if the user marks a region (red circle / selection / mask), confine the instruction to that region: "Within the red box, … Leave everything else unchanged."
 
-## 输出模式
+## Output Modes
 
-### 1. 默认模式（对话友好）
+### 1. Default Mode (Conversation-Friendly)
 
-标准聊天请求按三段呈现，**不输出 JSON**：
+Standard chat requests are presented in three parts, **with no JSON output**:
 
-1. **提示词优化解析**：2–4 条要点——主体概念、画幅及理由、光线/构图/材质决策、语言判定。
-2. **提示词（可直接复制）**：一个代码块，**只含最终提示词字符串**，干净可一键复制进 DashScope / WebUI / ComfyUI / 生成表单；不重复比例标签与副标题。
-3. **微调建议**：2–3 条可操作微调（风格变体、不同比例、不同渲染文字）。
+1. **Prompt optimization analysis**: 2–4 bullet points — subject concept, aspect ratio and rationale, lighting/composition/material decisions, language determination.
+2. **Prompt (ready to copy)**: a single code block containing **only the final prompt string**, clean enough to copy in one click into DashScope / WebUI / ComfyUI / a generation form; do not repeat the ratio label or a subtitle.
+3. **Fine-tuning suggestions**: 2–3 actionable adjustments (style variants, different ratios, different rendered text).
 
-画幅信息出现在第 1 段，因为它从不进入提示词正文。
+Aspect-ratio information appears in part 1 because it never enters the prompt body.
 
-### 2. 严格 JSON 模式（仅按请求）
+### 2. Strict JSON Mode (On Request Only)
 
-用户明确要求 "API 格式"、"JSON only"、"脚本格式"，或运行自动化流程时，**只输出单行 JSON**：
+When the user explicitly asks for "API format", "JSON only", or "script format", or when running an automated pipeline, **output a single line of JSON only**:
 
-- t2i：`{"rewritten_prompt": "<description>", "wh_ratio": "<e.g. 3:2>"}`
-- edit：`{"rewritten_prompt": "<指令>", "wh_ratio": "<比例或空>", "ratio_follow": "<imageN 或空>"}`
+- t2i: `{"rewritten_prompt": "<description>", "wh_ratio": "<e.g. 3:2>"}`
+- edit: `{"rewritten_prompt": "<instruction>", "wh_ratio": "<ratio or empty>", "ratio_follow": "<imageN or empty>"}`
 
-字段规则、互斥、语言自检以 reference 为准。
+Field rules, mutual exclusion, and language self-checks follow the reference.
 
-## 常见问题 → 修正
+## Common Problems → Fixes
 
-| 症状 | 修正 |
+| Symptom | Fix |
 |---|---|
-| 标签/权重语法被忽略 | 改写为流畅自然句 |
-| 主体模糊 | 主体前置，加具体细节 |
-| 长提示构图混乱 | 压缩到 1–3 句并前置主体——**除非**是布局/海报/文字密集图，此时长式正确，问题通常是位置未指定 |
-| 图像内文字乱码 | 字符串用引号、true_cfg 拉到 6–8、步数 35–50、简化数字与符号；日文走编辑描摹路线 |
-| 编辑渗出未改动区域 | 加/扩保持条款，拆成更小编辑 |
-| 面部/身份漂移 | 写明 "Preserve face/clothing features"，用标签指参照图而非描述 |
-| 手指/手部破损 | 负向 "extra fingers, deformed hands" + 肯定 "natural hand posture, five fingers" |
-| 2.1 初期：噪声大、姿态僵硬 | 当日已知问题，无成熟解法——换种子重试、缩短提示词 |
+| Tag/weight syntax is ignored | Rewrite as fluent natural sentences |
+| Subject is vague | Put the subject first and add concrete detail |
+| Long prompt yields a muddled composition | Compress to 1–3 sentences and lead with the subject — **unless** it is a layout/poster/text-dense image, in which case the long style is correct and the usual problem is unspecified placement |
+| In-image text comes out garbled | Put strings in quotes, raise true_cfg to 6–8 and steps to 35–50, and simplify numerals and symbols; for Japanese, use the edit-tracing route |
+| Edits bleed into untouched regions | Add or extend preservation clauses, and split into smaller edits |
+| Face/identity drift | State "Preserve face/clothing features" explicitly, and point at reference images with tags instead of describing them |
+| Broken fingers/hands | Negative "extra fingers, deformed hands" + positive "natural hand posture, five fingers" |
+| Early 2.1: heavy noise, stiff poses | A known issue at launch with no mature fix — retry with a different seed and shorten the prompt |
 
-## 参考文档
+## Reference Documents
 
-- **[t2i-rules.md](references/t2i-rules.md)** — 官方 PE-T2I 文生图八步改写规范（长观察式 + 精简风格）
-- **[edit-rules.md](references/edit-rules.md)** — 官方 PE-I2I 编辑/合成改写规范（语言判定、属性解耦、画幅选择）
-- **[text-rendering.md](references/text-rendering.md)** — 图像内文字渲染：引用纪律、呈现控制、多段文字、日本文描摹、故障修复
-- **[cheat-sheet.md](references/cheat-sheet.md)** — 词汇速查：媒介/风格、材质、物理纹理、空间方位词、光线、画幅速查表、透明图模板
-- **[examples.md](references/examples.md)** — 官方与社区精选示例（生成、文字密集、多参照、透明、编辑）
+- **[t2i-rules.md](references/t2i-rules.md)** — Official PE-T2I eight-step text-to-image rewriting spec (long observational + compact styles)
+- **[edit-rules.md](references/edit-rules.md)** — Official PE-I2I editing/compositing rewriting spec (language determination, attribute decoupling, aspect-ratio selection)
+- **[text-rendering.md](references/text-rendering.md)** — In-image text rendering: quoting discipline, presentation control, multi-block text, Japanese text tracing, failure fixes
+- **[cheat-sheet.md](references/cheat-sheet.md)** — Vocabulary quick reference: mediums/styles, materials, physical textures, spatial terms, lighting, aspect-ratio cheat sheet, transparent-image templates
+- **[examples.md](references/examples.md)** — Curated official and community examples (generation, text-dense, multi-reference, transparent, editing)
