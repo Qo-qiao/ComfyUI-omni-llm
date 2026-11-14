@@ -7,7 +7,7 @@ GitHub: https://github.com/Qo-qiao
 License: See LICENSE file for details
 """
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 ANIME_PROMPT = {
     "template_id": "anime_dream_visual",
@@ -18,10 +18,8 @@ ANIME_PROMPT = {
 class AnimeDreamVisual:
     def __init__(self):
         # Anime模型固定内容组织规则库，无多模型选择
-        self.anime_formula_library = {
+        self.model_formula_library = {
             "ANIME": {
-                "keyword_dense": False,
-                "mix_lang": False,
                 "formula_zh": "内容组织顺序：构图景别与视觉重心 → 主体角色姿态表情 → 服饰细节 → 主光与特效光叙事 → 色彩配比（主色、辅色、点缀色） → 梦幻动态幻想元素 → 大师风格与整体氛围。natural模式输出2‑4段富有诗意的画面段落，300‑600字；structured模式按指定分类结构化输出。",
                 "formula_en": "Content order: composition shot & visual focus → character pose expression → clothing details → main‑light & special‑effect light narration → color matching(main color, auxiliary color, accent color) → dreamy dynamic fantasy elements → master style & overall atmosphere. Natural mode outputs 2‑4 poetic paragraphs 300‑600 words; structured mode outputs by specified categories."
             }
@@ -32,7 +30,7 @@ class AnimeDreamVisual:
             "zh": """
 你是专业二次元梦幻画面提示词扩写专家，适配Anima等Danbooru标签式动漫模型，覆盖自然奇观、都市幻景、异世界、微缩室内等题材，可引用新海诚、宫崎骏等日漫大师创作风格。
 坚守二次元插画绘画基线，禁止写实真人、照片类词汇。
-标签格式规范：标签使用小写，空格代替下划线（如"looking at viewer"而非"looking_at_viewer"），逗号分隔；score标签使用下划线（score_7）。
+英文标签格式规范：英文标签使用小写，空格代替下划线（如"looking at viewer"而非"looking_at_viewer"），逗号分隔；score标签使用下划线（score_7）。
 标签推荐顺序：[质量/元数据/安全标签] [人数] [角色] [系列] [画师] [通用标签]。
 natural模式输出2‑4段诗意画面描写，总字数300‑600；structured模式严格按照给定分类字段输出。禁止简单罗列术语，构图必须写明引导逻辑与叙事功能，色彩明确主色辅色点缀色并说明色彩服务情绪的逻辑，光影需要具备叙事性。
 完整保留用户输入的角色、场景、姿态、情绪、风格全部信息，仅补充构图、光影、色彩、幻想细节，不新增无关物体多余元素。
@@ -43,7 +41,7 @@ natural模式输出2‑4段诗意画面描写，总字数300‑600；structured�
             "en": """
 You are a professional dreamy anime‑scene prompt expert, compatible with Anima and other Danbooru‑tag‑based anime models. Cover natural wonders, urban fantasy, other‑world, miniature interior, supporting master‑style reference of Makoto Shinkai, Hayao Miyazaki etc.
 Stick to anime illustration baseline, forbid photorealistic / photograph‑related words.
-Tag format: lowercase tags, spaces instead of underscores (e.g. "looking at viewer" not "looking_at_viewer"), comma‑separated; score tags use underscores (score_7).
+English tag format: lowercase tags, spaces instead of underscores (e.g. "looking at viewer" not "looking_at_viewer"), comma‑separated; score tags use underscores (score_7).
 Recommended tag order: [quality/meta/safety tags] [person count] [character] [series] [artist] [general tags].
 Natural mode: 2‑4 poetic paragraphs within 300‑600 words. Structured mode strictly follow given category fields. Avoid plain term listing. Composition shall include guidance logic and narrative function; color shall define main/auxiliary/accent color and emotion logic; lighting shall serve narrative purpose.
 Fully preserve user input character, scene, pose, mood and style, only add composition, lighting, color and fantasy details, no irrelevant extra objects.
@@ -69,7 +67,7 @@ Support natural and structured output format, no extra comments or explanations.
                     "zh": """
 【Anime二次元梦幻视觉专属规则】
 1. 通用基线：natural模式2‑4段文字，300‑600字，语言富有诗意画面感；structured模式完整输出指定分类。强制质量标签：杰作，最佳质量，score_7，安全，超精细，动漫风格，插画。禁用写实相关词汇。
-2. 标签格式：标签使用小写，空格代替下划线，逗号分隔；推荐顺序：[质量/安全标签] [人数] [角色] [系列] [画师] [通用标签]。
+2. 英文标签格式：英文标签使用小写，空格代替下划线，逗号分隔；推荐顺序：[质量/安全标签] [人数] [角色] [系列] [画师] [通用标签]。
 3. 人物题材补充标签：当画面包含人物时，应补充角色面部特征标签（大眼睛，闪亮高光，精致睫毛，小鼻子，柔和轮廓）；无人物场景类题材无需添加。
 4. 自然奇观题材：山川云海、花海、神树、星空；优先丁达尔光效、薄雾雾气，色彩层次丰富，可加入飞舞花瓣、光之蝶、星尘粒子，氛围偏向治愈、壮丽、神圣。
 5. 都市幻景题材：霓虹都市、雨夜街道、浮空都市；多用放射线/对角线构图，霓虹辉光、体积光，冷暖撞色，氛围赛博、迷离。
@@ -81,7 +79,7 @@ Support natural and structured output format, no extra comments or explanations.
                     "en": """
 【Anime Dream‑Visual Preset Rules】
 1. General baseline: natural mode 2‑4 paragraphs 300‑600 words, poetic visual language; structured mode output full categories. Mandatory quality tags: masterpiece, best quality, score_7, safe, ultra‑detailed, anime style, illustration. Forbid photorealistic words.
-2. Tag format: lowercase tags, spaces instead of underscores, comma‑separated; recommended order: [quality/safety tags] [person count] [character] [series] [artist] [general tags].
+2. English tag format: lowercase tags, spaces instead of underscores, comma‑separated; recommended order: [quality/safety tags] [person count] [character] [series] [artist] [general tags].
 3. Character theme supplement: when the image contains characters, add facial feature tags (big eyes, sparkling highlight, delicate eyelashes, small nose, soft contour); not needed for scene‑only themes without characters.
 4. Natural wonder theme: mountain‑sea cloud‑sea, flower sea, sacred tree, starry sky; prioritize tyndall effect, mist, rich color layers, flying petals, light‑butterfly, stardust particles; mood: healing, grand, sacred.
 5. Urban fantasy theme: neon city, rainy street, floating metropolis; use diagonal / radial composition, neon glow, volumetric light, cold‑warm color contrast; mood: cyber, dreamy blurred.
@@ -92,8 +90,8 @@ For all themes: user input has highest priority, add details only, never overwri
 """
                 },
                 "negative_base": {
-                    "zh": "worst quality, low quality, normal quality, lowres, blurry, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate, score_1, score_2, score_3, artist name, 3d, realistic, photo, photorealistic, cinematic, chromatic aberration",
-                    "en": "worst quality, low quality, normal quality, lowres, blurry, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate, score_1, score_2, score_3, artist name, 3d, realistic, photo, photorealistic, cinematic, chromatic aberration"
+                    "zh": "worst quality, low quality, normal quality, lowres, 主体失焦、面部过度虚化, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate, score_1, score_2, score_3, artist name, 3d, realistic, photo, photorealistic, cinematic, chromatic aberration",
+                    "en": "worst quality, low quality, normal quality, lowres, out-of-focus subject, over-blurred face, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate, score_1, score_2, score_3, artist name, 3d, realistic, photo, photorealistic, cinematic, chromatic aberration"
                 }
             }
         }
@@ -107,7 +105,7 @@ For all themes: user input has highest priority, add details only, never overwri
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
 【质量与安全标签】杰作，最佳质量，score_7，安全，超精细，动漫风格，插画
-【类别】动漫二次元 - [具体题材]（自然奇观/都市幻景/异世界/微缩室内，优先画面识别，可使用合规用户关键词辅助校准）
+【类别】动漫二次元 - [具体题材]（自然奇观/都市幻景/异世界/微缩室内，依据用户描述判定题材；用户未给出题材时采用常见二次元题材）
 【构图与景别】
   - 构图方式：对角线/放射线/S型/框架式/三分法（写明具体引导线及其叙事功能）
   - 视点角度：仰视/俯视/平视，动感/平稳，以及该视角带来的情绪感受
@@ -133,7 +131,7 @@ For all themes: user input has highest priority, add details only, never overwri
 【风格标签】3‑5个关键词概括整体视觉气质""",
                 "en": """[Structured Mode] Output strictly in this order:
 【Quality & Safety Tags】masterpiece, best quality, score_7, safe, ultra‑detailed, anime style, illustration
-【Category】Anime illustration - [specific theme](natural wonder / urban fantasy / other‑world / miniature interior, image recognition first, valid user‑keywords assist calibrate)
+【Category】Anime illustration - [specific theme](natural wonder / urban fantasy / other‑world / miniature interior, determine the theme from the user's description; use a common anime theme only when the user gives none)
 【Composition & Shot Scale】
   - Composition method: diagonal / radial / S‑curve / frame / rule‑of‑third (describe guide‑line and narrative function)
   - Viewpoint angle: low‑angle / high‑angle / eye‑level, dynamic / calm, corresponding emotional effect
@@ -169,6 +167,7 @@ For all themes: user input has highest priority, add details only, never overwri
         self,
         user_input: str,
         preset_name: str,
+        downstream_model: Optional[str] = None,
         output_language: str = "auto",
         enable_global_preconstraint: bool = True,
         enable_negative_prompt: bool = True,
@@ -177,7 +176,7 @@ For all themes: user input has highest priority, add details only, never overwri
         if preset_name not in self.preset_library:
             raise ValueError(f"预设模板不存在：{preset_name}")
         preset = self.preset_library[preset_name]
-        anime_config = self.anime_formula_library["ANIME"]
+        anime_config = self.model_formula_library["ANIME"]
 
         if output_language == "auto":
             lang = self.detect_language(user_input)
@@ -206,12 +205,6 @@ For all themes: user input has highest priority, add details only, never overwri
         else:
             prompt_parts.append(natural_guide)
             prompt_parts.append(structured_guide)
-
-        # 输出语言硬性要求：由节点选项传入的 lang 决定最终输出语言
-        if lang == "zh":
-            prompt_parts.append("【输出语言】全部输出内容必须使用中文撰写，禁止输出任何英文或其他语言内容。")
-        else:
-            prompt_parts.append("[Output Language] All output content must be written in English, do not output any Chinese or other language content.")
 
         final_llm_prompt = "\n".join(prompt_parts)
         negative_prompt = preset["negative_base"][lang] if enable_negative_prompt else ""

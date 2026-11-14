@@ -12,7 +12,7 @@ from typing import Dict, Optional
 VIDEO_FRAME_SEQUENCE = {
     "template_id": "video_frame_sequence",
     "name": "视频帧序列反推",
-    "description": "专业的视频分析师与帧序列解读专家，优先基于输入视频帧序列完成解析；同时可接收用户可选关键词，用来校准风格、题材、氛围信息，修正输出结果，输出包含像素级量化参数的帧序列叙事描述，用于精确反推和再现视频内容。专业能力覆盖实拍/动漫类别识别、时间模式识别、相邻帧合并逻辑、镜头语言解读、动作‑情绪映射翻译；支持画幅、坐标、焦段、运镜数值、色温色值、动作时长位移等物理量化参数解析，尽可能实现原画面1:1精准复刻。",
+    "description": "专业的视频分析师与帧序列解读专家，优先基于输入视频帧序列完成解析；同时可接收用户可选关键词，用来校准风格、题材、氛围信息，修正输出结果，输出包含像素级量化参数的帧序列叙事描述，用于精确反推和再现视频内容。专业能力覆盖实拍/动漫类别识别、时间模式识别、相邻帧合并逻辑、镜头语言解读、动作‑情绪映射翻译；支持画幅、坐标、焦段、运镜数值、色温色值、动作时长位移等物理量化参数解析，尽可能实现原画面1:1精准复刻。本预设产出的是逐维度量化拆解（帧序列），不是可直接投放给生成模型的叙事描述；若只需要「生成可用描述」，请改用视频反推提示词专家预设。",
 }
 
 class VideoFrameSequence:
@@ -45,7 +45,7 @@ Support natural / structured output mode, no extra comments or explanations.
             "video_frame_sequence": {
                 "template_id": "video_frame_sequence",
                 "display_name": "视频帧序列反推分析师",
-                "description": "作为专业的视频分析师与帧序列解读专家，优先基于输入视频帧序列完成解析；同时可接收用户可选关键词，用来校准风格、题材、氛围信息，修正输出结果，输出包含像素级量化参数的帧序列叙事描述，用于精确反推和再现视频内容。专业能力覆盖实拍/动漫类别识别、时间模式识别、相邻帧合并逻辑、镜头语言解读、动作‑情绪映射翻译；支持画幅、坐标、焦段、运镜数值、色温色值、动作时长位移等物理量化参数解析，尽可能实现原画面1:1精准复刻。",
+                "description": "作为专业的视频分析师与帧序列解读专家，优先基于输入视频帧序列完成解析；同时可接收用户可选关键词，用来校准风格、题材、氛围信息，修正输出结果，输出包含像素级量化参数的帧序列叙事描述，用于精确反推和再现视频内容。专业能力覆盖实拍/动漫类别识别、时间模式识别、相邻帧合并逻辑、镜头语言解读、动作‑情绪映射翻译；支持画幅、坐标、焦段、运镜数值、色温色值、动作时长位移等物理量化参数解析，尽可能实现原画面1:1精准复刻。本预设产出的是逐维度量化拆解（帧序列），不是可直接投放给生成模型的叙事描述；若只需要「生成可用描述」，请改用视频反推提示词专家预设。",
                 "positive_constraints": {
                     "zh": "完全基于视频帧序列视觉信息客观还原全部可见视觉元素；按叙事逻辑划分逻辑区间、绑定时间戳与转场类型；相似相邻帧合并概括；构图、主体坐标、动作位移时长、镜头运镜、光线色温RGB色值、质感全部附带可量化数值；氛围由可观察视觉细节推导，不使用抽象情绪词；可选用户关键词仅用于辅助校准风格、氛围、题材；关键词与帧画面冲突时以视频帧为准；实拍/动漫分别适配对应量化标准；完整留存像素级细节，不删减关键参数。",
                     "en": "Objectively restore all visible visual elements completely based on source video‑frame‑sequence. Divide logic segments by narrative logic, bind timestamps and transition‑type. Merge similar adjacent‑frames. Composition, subject coordinate, motion duration‑displacement, camera movement, color‑temperature / RGB value, texture shall all carry quantifiable numeric parameters. Atmosphere shall be inferred from observable visual details, avoid abstract‑emotion words. Optional user‑keywords only assist calibrating style, atmosphere, theme. If conflict occurs, video‑frame content takes precedence. Use respective quantization standard for real‑shot and anime. Preserve pixel‑level details, keep key parameters intact."
@@ -53,7 +53,7 @@ Support natural / structured output mode, no extra comments or explanations.
                 "preset_rules": {
                     "zh": """
 【视频帧序列反推专属规则】
-1. 通用基线：主解析来源#VIDEO_FRAME_SEQ#，可选用户关键词#USER_KEYWORDS#；执行10步帧序列解析流程；按叙事单元划分逻辑区间，绑定起止时间戳、标记转场类型；相似相邻帧合并概括，禁止机械逐帧罗列；全部关键视觉维度输出量化数值参数；natural模式按逻辑区间输出自然段落；structured模式最大3000字符。
+1. 通用基线：主解析来源#VIDEO_FRAME_SEQ#，可选用户关键词#USER_KEYWORDS#；执行10步帧序列解析流程；按叙事单元划分逻辑区间，绑定起止时间戳、标记转场类型；相似相邻帧合并概括，禁止机械逐帧罗列；全部关键视觉维度输出量化数值参数；natural模式按逻辑区间输出自然段落；structured模式最大3000字符。本预设产出的是逐维度量化拆解，需要「生成可用描述」时改用视频反推提示词专家预设。
 2. 优先级铁则：视频帧像素视觉信息 > 用户可选关键词。关键词仅做风格、题材、氛围的辅助校准；若关键词描述与视频帧画面冲突，直接舍弃冲突关键词，严格遵从帧画面，绝不根据关键词篡改视频客观视觉内容。无关键词则完全依靠视频帧序列解析。
 3. 题材分支规则：区分实拍类 / 动漫类，两套量化参数标准分别适配镜头、光影、质感体系。
 4. 内容约束：仅以视频帧像素视觉信息为第一依据；氛围、情绪观感必须从可观察动作、表情、光影推导，禁止空洞抽象情绪形容词；关键词不能用来新增画面不存在实体对象，仅用于校准风格氛围。
@@ -63,7 +63,7 @@ Support natural / structured output mode, no extra comments or explanations.
 """,
                     "en": """
 【Video Frame‑Sequence Reverse Preset Rules】
-1. General baseline: primary source #VIDEO_FRAME_SEQ#, optional assist keywords #USER_KEYWORDS#; follow 10‑step frame‑sequence analysis workflow. Segment by narrative unit, bind start‑end timestamp and transition‑type. Merge similar adjacent‑frames, forbid mechanical frame‑by‑frame listing. Output quantifiable numeric parameters for all key visual dimensions. Natural mode output paragraphs per logic segment. Structured mode max length 3000 chars.
+1. General baseline: primary source #VIDEO_FRAME_SEQ#, optional assist keywords #USER_KEYWORDS#; follow 10‑step frame‑sequence analysis workflow. Segment by narrative unit, bind start‑end timestamp and transition‑type. Merge similar adjacent‑frames, forbid mechanical frame‑by‑frame listing. Output quantifiable numeric parameters for all key visual dimensions. Natural mode output paragraphs per logic segment. Structured mode max length 3000 chars. This preset produces a quantified breakdown, not a generation-ready description; use the Video Reverse Prompt preset when you need prose for a video-generation model.
 2. Priority hard‑rule: video‑frame pixel visual information > optional user keywords. Keywords only assist calibrating style, theme and atmosphere. If keywords conflict with frame‑content, discard conflicting keywords and strictly follow frame visuals, never alter objective video content. If no keywords provided, rely entirely on frame‑sequence analysis.
 3. Category branch rule: separate quantization‑standard for real‑shot and anime for camera, lighting and texture system.
 4. Content constraint: video‑frame pixel is primary evidence. Mood‑atmosphere must be inferred from observable action / expression / lighting, forbid hollow abstract‑emotion adjectives. Keywords shall NOT add physical entities absent in frames, only for style‑atmosphere calibration.
@@ -122,7 +122,7 @@ Analysis source: source video frame‑sequence #VIDEO_FRAME_SEQ#; optional assis
     def build_prompt(
             self,
             preset_name: str,
-            user_keywords: Optional[str] = None,
+            user_input: Optional[str] = None,
             output_language: str = "auto",
             output_format: str = "both"
     ) -> Dict:
@@ -131,8 +131,8 @@ Analysis source: source video frame‑sequence #VIDEO_FRAME_SEQ#; optional assis
             raise ValueError(f"预设模板不存在：{preset_name}")
         preset = self.preset_library[preset_name]
 
-        kw_text = user_keywords if (user_keywords and user_keywords.strip()) else "无"
-        detect_input = user_keywords if user_keywords else ""
+        kw_text = user_input if (user_input and user_input.strip()) else "无"
+        detect_input = user_input if user_input else ""
         if output_language == "auto":
             lang = self.detect_language(detect_input)
         else:
@@ -164,8 +164,9 @@ Analysis source: source video frame‑sequence #VIDEO_FRAME_SEQ#; optional assis
             "status": "success",
             "llm_input_prompt": final_llm_prompt,
             "positive_constraint": pos_constraint,
+            "negative_prompt": "",
             "output_language": lang,
             "preset_name": preset_name,
             "preset_display_name": preset["display_name"],
-            "user_keywords": user_keywords
+            "user_input": user_input
         }

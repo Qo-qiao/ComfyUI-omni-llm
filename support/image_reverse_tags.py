@@ -107,11 +107,11 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
         # 双输出格式指引
         self.format_guide = {
             "natural": {
-                "zh": "【自然标签模式】仅输出逗号分隔的简短中文标签词串（SDXL/Danbooru标签式），每个标签为独立名词或形容词，禁止主谓宾句式描述；质量标签置于输出开头（杰作，最佳质量，高分辨率，超精细细节，8K）；总标签数量严格≤60（硬性上限），标签无重复；超出部分一律删除；存在合规用户关键词时将风格/氛围标签自然并入集合，冲突关键词直接舍弃。输出必须全部为标签，禁止输出任何说明、总结、自我陈述类文字（如“标签总数控制在60以内”“质量标签已包含”等），禁止输出英文标签。",
-                "en": "[Natural Tag Mode] Output only comma‑separated short English tag words (SDXL/Danbooru tag style), each tag an independent noun or adjective, no full‑sentence descriptions. Quality tags placed at the very beginning (masterpiece, best quality, high resolution, ultra‑detailed, 8K). Mandatory quality tags, total strictly ≤60 (hard limit) non‑duplicate tags; any excess must be deleted. Merge valid style‑atmosphere tags from user keywords; discard conflicting keywords. Output must be pure tags, forbid any explanatory, summary or self‑descriptive text (e.g. \"tag count within 60\", \"quality tags included\"), do not output Chinese tags."
+                "zh": "【自然标签模式】仅输出逗号分隔的简短标签词串（SDXL/Danbooru标签式，标签使用目标模型语言；Booru风格标签保持英文），每个标签为独立名词或形容词，禁止主谓宾句式描述；质量标签置于输出开头（杰作，最佳质量，高分辨率，超精细细节，8K）；总标签数量严格≤60（硬性上限），标签无重复；超出部分一律删除；存在合规用户关键词时将风格/氛围标签自然并入集合，冲突关键词直接舍弃。输出必须全部为标签，禁止输出任何说明、总结、自我陈述类文字（如“标签总数控制在60以内”“质量标签已包含”等）。",
+                "en": "[Natural Tag Mode] Output only comma‑separated short tag words (SDXL/Danbooru tag style; tag language follows the target model, Booru-style tags stay English), each tag an independent noun or adjective, no full‑sentence descriptions. Quality tags placed at the very beginning (masterpiece, best quality, high resolution, ultra‑detailed, 8K). Mandatory quality tags, total strictly ≤60 (hard limit) non‑duplicate tags; any excess must be deleted. Merge valid style‑atmosphere tags from user keywords; discard conflicting keywords. Output must be pure tags, forbid any explanatory, summary or self‑descriptive text (e.g. \"tag count within 60\", \"quality tags included\")."
             },
             "structured": {
-                "zh": """【结构化标签模式】（全部字段内容一律使用中文输出，禁止英文；所有字段值为逗号分隔的简短标签词，禁止句式描述；质量标签置于字段最前；全部分类标签总数≤60，超出部分一律删除；除模板字段名与标签外，禁止输出任何说明、总结、自我陈述文字）
+                "zh": """【结构化标签模式】（标签与字段值使用目标模型语言，Booru风格标签保持英文；所有字段值为逗号分隔的简短标签词，禁止句式描述；质量标签置于字段最前；全部分类标签总数≤60，超出部分一律删除；除模板字段名与标签外，禁止输出任何说明、总结、自我陈述文字）
 【类别】类别名称（优先图像识别，可使用合规用户关键词辅助校准题材/风格标签）
 【质量标签】杰作，最佳质量，高分辨率，超精细，8K
 【核心要素】
@@ -128,7 +128,7 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
   - 姿态：标签集合，逗号分隔
 【细节元素】标签集合，逗号分隔
 【技术参数】镜头与视角相关标签集合，逗号分隔""",
-                "en": """[Structured Tag Mode] (all field content must be output in English, no Chinese; all field values are comma‑separated short tag words, no sentence descriptions; quality tags placed first; total tags across all fields ≤60, any excess must be deleted; besides template field names and tags, forbid any explanatory, summary or self‑descriptive text)
+                "en": """[Structured Tag Mode] (tag and field values follow the target-model language; Booru-style tags stay English; all field values are comma‑separated short tag words, no sentence descriptions; quality tags placed first; total tags across all fields ≤60, any excess must be deleted; besides template field names and tags, forbid any explanatory, summary or self‑descriptive text)
 【Category】category name(image recognition first, valid user‑keywords assist calibrate theme/style tags)
 【Quality Tags】masterpiece, best quality, high resolution, ultra‑detailed, 8K
 【Core Elements】
@@ -156,7 +156,7 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
     def build_prompt(
             self,
             preset_name: str,
-            user_keywords: Optional[str] = None,
+            user_input: Optional[str] = None,
             output_language: str = "auto",
             output_format: str = "both"
     ) -> Dict:
@@ -165,8 +165,8 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
             raise ValueError(f"预设模板不存在：{preset_name}")
         preset = self.preset_library[preset_name]
 
-        kw_text = user_keywords if (user_keywords and user_keywords.strip()) else "无"
-        detect_input = user_keywords if user_keywords else ""
+        kw_text = user_input if (user_input and user_input.strip()) else "无"
+        detect_input = user_input if user_input else ""
         if output_language == "auto":
             lang = self.detect_language(detect_input)
         else:
@@ -192,12 +192,6 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
             prompt_parts.append(natural_guide)
             prompt_parts.append(structured_guide)
 
-        # 输出语言硬性要求：由节点选项传入的 lang 决定最终输出语言
-        if lang == "zh":
-            prompt_parts.append("【输出语言】全部输出内容（标签、字段值）必须使用中文撰写，禁止输出任何英文或其他语言内容。")
-        else:
-            prompt_parts.append("[Output Language] All output content (tags, field values) must be written in English, do not output any Chinese or other language content.")
-
         # 硬性数量上限：最终标签总数不得超过60，超出部分一律删除
         if lang == "zh":
             prompt_parts.append("【硬性数量上限】最终输出的标签总数必须≤60个，超出60个的标签一律删除，禁止任何超过60个标签的输出；禁止输出哲学、心理学、社会学、文化理论等抽象概念性标签及与画面视觉无关的延伸性修饰词汇。")
@@ -215,5 +209,5 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
             "output_language": lang,
             "preset_name": preset_name,
             "preset_display_name": preset["display_name"],
-            "user_keywords": user_keywords
+            "user_input": user_input
         }

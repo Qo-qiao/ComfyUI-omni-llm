@@ -17,80 +17,12 @@ HYPER_REALISTIC_MALE = {
 
 class HyperRealisticMale:
     def __init__(self):
-        # 下游生图模型内容组织公式库，与女性模板结构一致
+        # 下游模型内容组织公式库（12 个图像模型整合为单一通用输出）
         self.model_formula_library = {
-            "Flux1": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：整体画面氛围光影 → 人物气质姿态 → 肌肤发丝质感 → 背景留白。侧重氛围叙事，弱化细碎关键词堆砌，画面柔和高级，写实肤质发丝高度细致，纹理清晰可见。",
-                 "formula_en": "Content order: overall atmosphere lighting → character pose → skin hair texture → negative space. Focus on atmospheric narration, realistic skin and hair highly detailed with clear texture."
+            "Universal": {
+                "formula_zh": "内容组织顺序：男性身份、年龄、穿搭与硬朗神情 → 超写实肌理、胡须与皮肤细节 → 偏冷侧光或伦勃朗光塑造立体骨相 → 胸像或特写、浅景深。用户指定元素优先保留，仅补充未指定维度；以连贯自然语言叙述为主，不堆砌细碎关键词与权重符号；需渲染的文字直接写入提示词；缺陷与畸变写入负向提示词，正向只做纯加法；画面精简克制，避免无关元素堆砌。",
+                "formula_en": "Content order: male identity, age, outfit and firm expression → photorealistic texture with beard and skin details → cool side light or Rembrandt light shaping the bone structure → chest-up or close-up, shallow depth of field. Keep user-specified elements first and only fill unspecified dimensions; narrate in coherent natural language instead of stacking fragmented keywords or weight symbols; write any rendered text directly into the prompt; put defects and distortions into the negative prompt and keep the positive prompt purely additive; keep the frame concise and avoid irrelevant clutter."
             },
-            "Flux2_klein": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：一位超写实男性（年龄、发型、妆容、服饰与神态）→ 照片级写实与皮肤质感 → 自然光或棚拍布光、清新氛围 → 半身特写、浅景深，逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: a photorealistic male (age, hairstyle, makeup, outfit and expression) → photo-level realism and skin texture → natural or studio lighting, fresh atmosphere → half-body close-up, shallow depth of field, realistic, highly detailed skin and hair texture"
-            },
-            "Z_image": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：一位超写实男性主体（年龄、发型、妆容、服饰）→ 照片级写实与皮肤质感 → 柔和自然光或棚拍布光、清新氛围 → 半身或特写、浅景深；建议描述他的神态与目光（需渲染文字直接写入，支持中英双语），逼真，皮肤和头发纹理高度细致。",
-                "formula_en": "Content order: a photorealistic male subject (age, hairstyle, makeup, outfit) → photo-level realism with skin texture → soft natural or studio lighting, fresh atmosphere → half-body or close-up, shallow depth of field; describe his expression and gaze (write any rendered text directly, supports Chinese and English), realistic, highly detailed skin and hair texture."
-            },
-            "Qwen_Image2512": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：男性身份、年龄与神态表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然光或窗光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: male identity, age and expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural or window light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
-            },
-            "Qwen_Image2.1": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：男性身份、年龄与神态表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然段落混排冒号标签块（姿势动作：/表情：/发型发色：/穿搭：/场景：）与光影效果关键词列表（光影斑驳/边缘发光/高光溢出/胶片颗粒等） → 自然光或窗光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致；支持负向提示词通道，肢体畸变、解剖错误、坏手等缺陷写入负向提示词，正向只做纯加法",
-                "formula_en": "Content order: male identity, age and expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural paragraph mixed with colon label blocks (pose:/expression:/hairstyle:/outfit:/scene:) and lighting effect keyword list (dappled light, rim glow, highlight bloom, film grain, etc.) → natural or window light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture; supports a negative prompt channel, write limb distortion, anatomical errors and bad hands into the negative prompt, keep the positive prompt purely additive"
-            },
-            "Krea2": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：开篇（风格画质定调，或人物主体直接切入）→ 人物主体（发型发色、五官神态、妆容、肤质纹理、姿态动作与手部细节）→ 服饰配件（款式剪裁、面料材质纹理、鞋履配饰）→ 背景环境（空间层次、材质细节、远景虚化）→ 光影（光源方向、明暗过渡、高光位置）→ 色彩基调（主色与点缀色）→ 画质与构图（焦点位置、背景虚化、微细节清晰度、杂志封面质感）→ 整体氛围收尾。以连贯自然语言分段散文为主，细节密集但不堆砌标签；亦可用密集关键词加权重、质量词置头尾的中英混排写法；画面含文字时直接写出文字内容，无文字时以“画面中无文字”声明收尾；可选附相机镜头技术参数段（焦距、光圈、快门、ISO）。",
-                "formula_en": "Content order: opening (style and quality statement, or straight to the subject) → subject (hairstyle, facial features, makeup, skin texture, pose and hand details) → outfit and accessories (cut, fabric texture, shoes, jewelry) → background (spatial layers, material details, distant blur) → lighting (light direction, light-to-shadow transitions, highlight placement) → color palette (main and accent colors) → quality and composition (focus point, background bokeh, micro-detail sharpness, magazine-cover feel) → closing atmosphere. Write as flowing natural-language paragraphs with dense detail but no tag stacking; a dense weighted-tag style with quality tags at head and tail (Chinese-English mixed) also works; if the image contains text, write it out directly, otherwise end with a 'No text present in image' statement; optionally append a camera and lens technical block (focal length, aperture, shutter speed, ISO)."
-            },
-            "Boogu": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：整体画面基调（温暖柔和氛围）→ 人物松弛姿态与神情 → 自然肌肤质感与细节 → 简约留白环境，写实风格，肤质发丝高度细致，纹理清晰。",
-                 "formula_en": "Content order: overall image tone (warm and soft atmosphere) → relaxed pose with expression → natural skin texture and details → simple negative-space environment, realistic style, highly detailed skin and hair with clear texture."
-            },
-            "Mage_Flow": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：面部五官肤质、年龄气质 → 体态姿态、松弛神情 → 光影层次、柔光窗光 → 服饰细节、面料质感 → 轻量环境、minimal background（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: facial features and skin, age and temperament → body pose, relaxed expression → lighting layers, soft window light → clothing details, fabric texture → lightweight environment, minimal background (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
-            },
-            "ERNIE_Image": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：男性身份、年龄与神态、超写实电影质感 → 风格与画质（真实肤质、发丝与微表情） → 自然光或窗光勾勒轮廓氛围 → 半身或特写、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: male identity, age and expression, photorealistic cinematic texture → style and quality (real skin, hair strands and micro-expressions) → natural or window light outlining silhouette and atmosphere → half-body or close-up, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
-            },
-            "GLM_Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：超写实男性面部与半身肖像 → 高清写实摄影风格、皮肤肌理与发丝质感 → 柔和窗光与暖调氛围 → 浅景深特写、眼神平视 → 强调真实无磨皮、避免卡通与畸变。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词，肤质发丝高度细致。",
-                "formula_en": "Content order: photorealistic male face and half-body portrait → high-definition realistic photography style, skin texture and hair details → soft window light and warm tone → shallow depth close-up, eye-level gaze → emphasize real un-retouched skin, avoid cartoon and distortion. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt, highly detailed skin and hair texture."
-            },
-            "LongCat_Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹，肤质发丝高度细致，纹理清晰可见。",
-                 "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks, highly detailed skin and hair with clear texture."
-            },
-            "HiDream-O1-Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：超写实男性主体与神态表情 → 场景与构图（浅景深特写）→ 光影与氛围（柔和窗光暖调）→ 画种/摄影风格（高清写实摄影）→ 需渲染文字用引号包裹，肤质发丝高度细致。",
-                "formula_en": "Content order: photorealistic male subject & expression → scene & composition (shallow depth close-up) → light & atmosphere (soft window light, warm tone) → art/photography style (high-definition realistic photography) → wrap rendered text in quotes, highly detailed skin and hair texture."
-            }
         }
 
         # 全局底层通用规则，中英双语，适配男性人像
@@ -103,7 +35,7 @@ class HyperRealisticMale:
 完整保留用户输入的风格、服饰、场景、色调、姿态、视角所有信息，仅补充摄影、材质、光影、肤质、胡茬、发丝专业细节，不新增无关物体、多余元素。
 所有男士穿搭、国风锦袍、职场西装、时尚大衣均作为高端男士人像题材，姿态沉稳克制、硬朗高级，禁止夸张畸形体态、过度柔弱造型。
 输出禁忌：禁止权重符号、多余相机参数、冗余堆砌；禁止卡通二次元、畸形肢体、坏手烂指、网红假脸、磨皮蜡皮；禁止杂乱背景、空洞假笑、抓拍自拍、透视畸变。
-严格输出两种格式，不添加额外注释、说明、解释。
+严格按当前指定的输出格式输出，不添加额外注释、说明、解释。
 """,
             "en": """
 You are a professional universal photorealistic male portrait prompt expert. This preset covers all styles: ancient chinese style, modern urban, retro film, dark luxury, fashion magazine, business elite, minimalist studio, sci-fi male portrait.
@@ -124,13 +56,13 @@ Strictly output two formats without extra comments.
                 "display_name": HYPER_REALISTIC_MALE["name"],
                 "description": HYPER_REALISTIC_MALE["description"],
                 "positive_constraints": {
-                    "zh": "超写实真人质感，硬朗男性面部骨骼，清晰下颌线条，眉眼唇轻微不对称，区分亚洲/欧美男性特征；面部干净无痘印瑕疵，保留毛孔、自然肌理与浅细纹，无过度磨皮与塑胶假肤、无AI模板脸；原生蓬松发丝与自然胡茬，干净布景，专业男模沉稳姿态，真实情绪；所有风格分支均保持真人写实基线，姿态挺拔硬朗有力量感",
-                    "en": "photorealistic real human texture, tough male facial bone structure, clear jawline, natural slight asymmetry of eyes, eyebrows and lips, distinguish Asian/European male features; clean face without acne marks or blemishes, retain pores, natural texture and shallow fine lines, no excessive skin smoothing or plastic wax skin or AI template face; layered fluffy hair and natural stubble, restrained clean scene, steady professional male model pose, calm expression; all styles maintain photorealistic baseline with upright powerful posture"
+                    "zh": "超写实真人质感，硬朗男性面部骨骼，清晰下颌线条，眉眼唇轻微不对称，区分亚洲/欧美男性特征；面部干净，保留毛孔、自然肌理与浅细纹，皮肤质感真实有层次；原生蓬松发丝与自然胡茬，干净布景，专业男模沉稳姿态，真实情绪；所有风格分支均保持真人写实基线，姿态挺拔硬朗有力量感",
+                    "en": "photorealistic real human texture, tough male facial bone structure, clear jawline, natural slight asymmetry of eyes, eyebrows and lips, distinguish Asian/European male features; clean face, retain pores, natural texture and shallow fine lines with real layered skin quality; layered fluffy hair and natural stubble, restrained clean scene, steady professional male model pose, calm expression; all styles maintain photorealistic baseline with upright powerful posture"
                 },
                 "preset_rules": {
                     "zh": """
 【男士全风格超写实专属规则】
-1. 通用基线：男士面部干净精致，无痘印、无明显瑕疵，保留皮肤原生毛孔、浅细纹、自然肤色层次；保留面部轻微不对称，杜绝完美蜡像脸、网红过度磨皮帅哥脸；肤色过渡自然均匀，高光不过曝，暗部不死黑，光影层次通透，强化自然胡茬生长肌理。
+1. 通用基线：男士面部干净精致，无痘印、无明显瑕疵，保留皮肤原生毛孔、浅细纹、自然肤色层次；保留面部轻微不对称，杜绝完美蜡像脸、网红过度磨皮帅哥脸；肤色过渡自然均匀，高光不过曝，暗部不死黑，光影层次通透，强化自然胡茬生长肌理；色彩严格执行主色70%、辅助色25%、点缀色5%配比，低饱和优先。
 2. 古风国风风格：强化东方男士利落下颌、内敛清俊骨相、温润沉稳气质，适配锦袍、素色汉服、玉饰古风造型；优先柔和侧逆柔光、漫射棚布光，低饱和素雅清冷色调。
 3. 现代职场风格：适配西装、轻奢通勤穿搭、极简灰度影棚；光影干净立体塑型，色调低饱和冷调高级，体态挺拔规整，适配轻奢室内、纯色棚拍场景。
 4. 复古胶片风格：保留真实胶片颗粒、复古暖调褪色质感、柔和漫射光；肤质保留原生毛孔、浅细纹、自然肤色层次，不重度精修，氛围怀旧儒雅。
@@ -142,7 +74,7 @@ Strictly output two formats without extra comments.
 """,
                     "en": """
 【Universal Photorealistic Preset Rules for Male Portrait】
-1. General baseline: Male face is clean and exquisite, no acne marks, no obvious blemishes, retain original skin pores, shallow fine lines and natural skin tone layers; keep slight facial asymmetry, no perfect wax face or over-retouched internet celebrity male face. Natural uniform skin tone, no overexposed highlight or crushed shadow, transparent light and shadow layers, emphasize natural stubble texture.
+1. General baseline: Male face is clean and exquisite, no acne marks, no obvious blemishes, retain original skin pores, shallow fine lines and natural skin tone layers; keep slight facial asymmetry, no perfect wax face or over-retouched internet celebrity male face. Natural uniform skin tone, no overexposed highlight or crushed shadow, transparent light and shadow layers, emphasize natural stubble texture. Color strictly follows a main 70% / auxiliary 25% / accent 5% ratio.
 2. Ancient Chinese style: Sharp jawline and gentle oriental bone structure for asian men, suitable for hanfu and jade accessories; soft side backlight, low saturation elegant tone.
 3. Modern business style: Suits and commute outfits, minimalist gray studio; clean three-dimensional lighting, low saturation cold tone, upright body in light luxury indoor or solid color studio.
 4. Retro film style: Authentic film grain, warm faded tone, soft diffused light, retain skin pores, shallow fine lines and natural skin tone layers without heavy retouching, retro elegant atmosphere.
@@ -177,7 +109,7 @@ All styles: user-specified content takes priority, only supplement professional 
                 "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, no optical numeric parameters, 300-800 words pure visual: 1) Shot type & composition (snapshot/studio hard light/environmental/candid, angle/framing); 2) Lighting atmosphere (source type, direction, effects on hair/skin/clothing: dappled light, dynamic spots, rim glow, soft haze, highlight bloom, film grain, particles, motion blur edges, HDR, high saturation contrast); 3) Full pose & expression (head/torso/limbs position, gaze direction, facial emotion, dynamic details); 4) Face details & styling (facial features, stubble, skin texture, hairstyle); 5) Outfit accessories & environment (clothing details, props, scene setting with background elements, overall color tone)."
             },
             "structured": {
-                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度对齐参考示例，画面元素精简克制，不堆砌无关细节：
+                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度以用户输入与预设规则为准，画面元素精简克制，不堆砌无关细节：
 
 **图片风格与剧情介绍**
 点明图片风格定位与题材（高级时装杂志/美妆广告/生活纪实/棚拍硬照/街头抓拍等），概括画面讲述的瞬间（人物在做什么、神情如何），交代整体色调与氛围基调，不虚构画面不存在的情节。
@@ -261,7 +193,7 @@ Background tone and tonal transition (gradient / solid / bokeh environment), sim
         if enable_global_preconstraint:
             prompt_parts.append(f"【Hard Precondition Baseline】\n{pos_constraint}")
             prompt_parts.append(global_rule)
-        prompt_parts.append(f"下游模型内容组织公式：{formula_hint}")
+        prompt_parts.append(f"通用输出公式：{formula_hint}")
         prompt_parts.append(preset_rule)
         prompt_parts.append(f"用户原始需求：{user_input}")
         if output_format == "natural":

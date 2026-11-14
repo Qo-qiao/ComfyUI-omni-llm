@@ -17,80 +17,12 @@ WESTERN_FEMALE = {
 
 class WesternFemale:
     def __init__(self):
-        # 下游生图模型内容组织公式库，完全沿用参考原版无修改
+        # 下游模型内容组织公式库（12 个图像模型整合为单一通用输出）
         self.model_formula_library = {
-            "Flux1": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：整体画面氛围光影 → 人物气质姿态 → 肌肤发丝质感 → 背景留白。侧重氛围叙事，弱化细碎关键词堆砌，画面柔和高级，写实肤质发丝高度细致，纹理清晰可见。",
-                 "formula_en": "Content order: overall atmosphere lighting → character pose → skin hair texture → negative space. Focus on atmospheric narration, realistic skin and hair highly detailed with clear texture."
+            "Universal": {
+                "formula_zh": "内容组织顺序：欧美女性的立体五官与自信神情 → 风格与画质（立体骨相、真实肤质） → 明亮侧光或棚拍光塑造轮廓 → 半身或特写、背景虚化。用户指定元素优先保留，仅补充未指定维度；以连贯自然语言叙述为主，不堆砌细碎关键词与权重符号；需渲染的文字直接写入提示词；缺陷与畸变写入负向提示词，正向只做纯加法；画面精简克制，避免无关元素堆砌。",
+                "formula_en": "Content order: Western female with sculpted features and confident expression → style and quality (three-dimensional bone structure, realistic skin) → bright side light or studio light shaping the silhouette → half-body or close-up with blurred background. Keep user-specified elements first and only fill unspecified dimensions; narrate in coherent natural language instead of stacking fragmented keywords or weight symbols; write any rendered text directly into the prompt; put defects and distortions into the negative prompt and keep the positive prompt purely additive; keep the frame concise and avoid irrelevant clutter."
             },
-            "Flux2_klein": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：一位超写实女性（年龄、发型、妆容、服饰与神态）→ 照片级写实与皮肤质感 → 自然光或棚拍布光、清新氛围 → 半身特写、浅景深，逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: a photorealistic female (age, hairstyle, makeup, outfit and expression) → photo-level realism and skin texture → natural or studio lighting, fresh atmosphere → half-body close-up, shallow depth of field, realistic, highly detailed skin and hair texture"
-            },
-            "Z_image": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：一位超写实女性主体（年龄、发型、妆容、服饰）→ 照片级写实与皮肤质感 → 柔和自然光或棚拍布光、清新氛围 → 半身或特写、浅景深；建议描述她的神态与目光（需渲染文字直接写入，支持中英双语），逼真，皮肤和头发纹理高度细致。",
-                "formula_en": "Content order: a photorealistic female subject (age, hairstyle, makeup, outfit) → photo-level realism with skin texture → soft natural or studio lighting, fresh atmosphere → half-body or close-up, shallow depth of field; describe her expression and gaze (write any rendered text directly, supports Chinese and English), realistic, highly detailed skin and hair texture."
-            },
-            "Qwen_Image2512": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：女性身份、年龄与神态表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然光或窗光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: female identity, age and expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural or window light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
-            },
-            "Qwen_Image2.1": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：女性身份、年龄与神态表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然段落混排冒号标签块（姿势动作：/表情：/发型发色：/穿搭：/场景：）与光影效果关键词列表（光影斑驳/边缘发光/高光溢出/胶片颗粒等） → 自然光或窗光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致；支持负向提示词通道，肢体畸变、解剖错误、坏手等缺陷写入负向提示词，正向只做纯加法",
-                "formula_en": "Content order: female identity, age and expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural paragraph mixed with colon label blocks (pose:/expression:/hairstyle:/outfit:/scene:) and lighting effect keyword list (dappled light, rim glow, highlight bloom, film grain, etc.) → natural or window light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture; supports a negative prompt channel, write limb distortion, anatomical errors and bad hands into the negative prompt, keep the positive prompt purely additive"
-            },
-            "Krea2": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：开篇（风格画质定调，或人物主体直接切入）→ 人物主体（发型发色、五官神态、妆容、肤质纹理、姿态动作与手部细节）→ 服饰配件（款式剪裁、面料材质纹理、鞋履配饰）→ 背景环境（空间层次、材质细节、远景虚化）→ 光影（光源方向、明暗过渡、高光位置）→ 色彩基调（主色与点缀色）→ 画质与构图（焦点位置、背景虚化、微细节清晰度、杂志封面质感）→ 整体氛围收尾。以连贯自然语言分段散文为主，细节密集但不堆砌标签；亦可用密集关键词加权重、质量词置头尾的中英混排写法；画面含文字时直接写出文字内容，无文字时以“画面中无文字”声明收尾；可选附相机镜头技术参数段（焦距、光圈、快门、ISO）。",
-                "formula_en": "Content order: opening (style and quality statement, or straight to the subject) → subject (hairstyle, facial features, makeup, skin texture, pose and hand details) → outfit and accessories (cut, fabric texture, shoes, jewelry) → background (spatial layers, material details, distant blur) → lighting (light direction, light-to-shadow transitions, highlight placement) → color palette (main and accent colors) → quality and composition (focus point, background bokeh, micro-detail sharpness, magazine-cover feel) → closing atmosphere. Write as flowing natural-language paragraphs with dense detail but no tag stacking; a dense weighted-tag style with quality tags at head and tail (Chinese-English mixed) also works; if the image contains text, write it out directly, otherwise end with a 'No text present in image' statement; optionally append a camera and lens technical block (focal length, aperture, shutter speed, ISO)."
-            },
-            "Boogu": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：整体画面基调（温暖柔和氛围）→ 人物松弛姿态与神情 → 自然肌肤质感与细节 → 简约留白环境，写实风格，肤质发丝高度细致，纹理清晰。",
-                 "formula_en": "Content order: overall image tone (warm and soft atmosphere) → relaxed pose with expression → natural skin texture and details → simple negative-space environment, realistic style, highly detailed skin and hair with clear texture."
-            },
-            "Mage_Flow": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：面部五官肤质、年龄气质 → 体态姿态、松弛神情 → 光影层次、柔光窗光 → 服饰细节、面料质感 → 轻量环境、minimal background（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: facial features and skin, age and temperament → body pose, relaxed expression → lighting layers, soft window light → clothing details, fabric texture → lightweight environment, minimal background (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
-            },
-            "ERNIE_Image": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：女性身份、年龄与神态、超写实电影质感 → 风格与画质（真实肤质、发丝与微表情） → 自然光或窗光勾勒轮廓氛围 → 半身或特写、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: female identity, age and expression, photorealistic cinematic texture → style and quality (real skin, hair strands and micro-expressions) → natural or window light outlining silhouette and atmosphere → half-body or close-up, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
-            },
-            "GLM_Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：超写实女性面部与半身肖像 → 高清写实摄影风格、皮肤肌理与发丝质感 → 柔和窗光与暖调氛围 → 浅景深特写、眼神平视 → 强调真实无磨皮、避免卡通与畸变。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词，肤质发丝高度细致。",
-                "formula_en": "Content order: photorealistic female face and half-body portrait → high-definition realistic photography style, skin texture and hair details → soft window light and warm tone → shallow depth close-up, eye-level gaze → emphasize real un-retouched skin, avoid cartoon and distortion. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt, highly detailed skin and hair texture."
-            },
-            "LongCat_Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹，肤质发丝高度细致，纹理清晰可见。",
-                 "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks, highly detailed skin and hair with clear texture."
-            },
-            "HiDream-O1-Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：超写实女性主体与神态表情 → 场景与构图（浅景深特写）→ 光影与氛围（柔和窗光暖调）→ 画种/摄影风格（高清写实摄影）→ 需渲染文字用引号包裹，肤质发丝高度细致。",
-                "formula_en": "Content order: photorealistic female subject & expression → scene & composition (shallow depth close-up) → light & atmosphere (soft window light, warm tone) → art/photography style (high-definition realistic photography) → wrap rendered text in quotes, highly detailed skin and hair texture."
-            }
         }
 
         # 全局底层规则，纯纪实欧美女性人像，无任何超写实词汇
@@ -102,17 +34,17 @@ class WesternFemale:
 姿态必须完整描述动态抓拍过程，禁止静态摆拍表述；光线使用具象生活化实体光源描述，删除空泛抽象光影修辞；人物为绝对画面主体，环境仅服务人物叙事，不新增无关道具、行人、装饰。
 严格执行色彩70%/25%/5%面积配比，统一标注饱和度层级，视觉留有舒适留白；全程强化欧美女性原生面部特征，保留雀斑、毛孔、细纹、肤色不均、淡痣等原生肌肤痕迹，杜绝AI虚假光滑人脸。
 完整保留用户输入的风格、服饰、场景、色调、视角所有信息，仅补充摄影、材质、光影、肤质、发丝专业细节，不篡改用户指定内容。
-输出禁忌：禁止权重符号、冗余堆砌；禁止完美对称五官、零瑕疵塑料假皮、规整僵硬发丝、空洞假笑、无神凝视；禁止舞台强光、杂乱背景、透视畸变、极端俯仰视角；natural模式禁用全部光学数字参数，仅structured模式限定字段可使用指定摄影参数。
-严格输出两种格式，不添加额外注释、说明、解释。
+输出禁忌：禁止权重符号、冗余堆砌；禁止完美对称五官、零瑕疵塑料假皮、规整僵硬发丝、空洞假笑、无神凝视；禁止舞台强光、杂乱背景、透视畸变、极端俯仰视角；natural模式禁用全部光学数字参数。
+严格按当前指定的输出格式输出，不添加额外注释、说明、解释。
 """,
             "en": """
 You are a professional European and American female portrait prompt expansion expert. This preset is [Realistic European American Female Portrait], covering workplace commuting, sports fitness, wedding dresses, street fashion, swimwear and general themes.
 All styles adhere strictly to real documentary portrait baseline, differentiated only by styling, lighting, tone and atmosphere, no illustration, anime or oil painting texture.
 Semantic weight priority: facial skin and facial features > character posture and clothing > light and shadow color > scene environment > composition shot > photographic parameters.
 Posture must fully describe dynamic capture process, static posing description is forbidden; light is described with concrete real-life physical light sources, empty abstract light and shadow rhetoric is deleted; character is absolute frame subject, environment only serves character narration, no irrelevant props, pedestrians or decorations added.
-Strictly implement color area ratio of 70%/25%, mark saturation level uniformly, reserve comfortable blank space visually; always strengthen native facial features of European and American women, retain original skin traces such as freckles, pores, fine lines, uneven skin tone and faint moles, eliminate AI fake smooth human face.
+Strictly implement color area ratio of 70%/25%/5%, mark saturation level uniformly, reserve comfortable blank space visually; always strengthen native facial features of European and American women, retain original skin traces such as freckles, pores, fine lines, uneven skin tone and faint moles, eliminate AI fake smooth human face.
 Completely retain all user input information including style, clothing, scene, tone and perspective, only supplement professional details of photography, material, light and shadow, skin and hair without altering user-specified content.
-Forbidden: no weight symbols, redundant stacking; perfectly symmetrical facial features, blemish-free plastic fake skin, rigid neat hair, empty fake smile, empty staring gaze; stage strong light, messy background, perspective distortion, extreme pitch angle; natural mode disables all optical digital parameters, only structured mode allows designated photographic parameters in limited fields.
+Forbidden: no weight symbols, redundant stacking; perfectly symmetrical facial features, blemish-free plastic fake skin, rigid neat hair, empty fake smile, empty staring gaze; stage strong light, messy background, perspective distortion, extreme pitch angle; natural mode disables all optical digital parameters.
 Strictly output two formats without extra comments.
 """
         }
@@ -125,14 +57,14 @@ Strictly output two formats without extra comments.
                 "description": WESTERN_FEMALE["description"],
                 # 中英正向约束，原文完整迁移无修改
                 "positive_constraints": {
-                    "zh": "真实欧美女性面部，眉眼唇轻微不对称，深邃双眼皮，深眼窝，高立体鼻梁，清晰面部轮廓，蓝绿棕系天然瞳孔，保留毛孔、淡细纹、细微肤色不均、自然雀斑、淡痣，原生肌肤质感，自然毛躁碎发，画面干净简洁，环境仅衬托主体，姿态松弛自然，抓拍真实情绪，无刻意摆拍，视角符合纪实人像逻辑，无透视畸变",
-                    "en": "real European American female face, natural slight asymmetry of brows eyes lips, deep double eyelids, deep eye sockets, tall nose bridge, clear facial contour, natural blue/green/brown pupils, retain pores fine lines uneven tone freckles faint moles, original skin texture, natural frizzy hair, clean frame, environment only sets off subject, relaxed natural posture, captured real emotion, no deliberate posing, perspective conforms to documentary portrait logic, no perspective distortion"
+                    "zh": "真实欧美女性面部，眉眼唇轻微不对称，深邃双眼皮，深眼窝，高立体鼻梁，清晰面部轮廓，蓝绿棕系天然瞳孔，保留毛孔、淡细纹、细微肤色不均、自然雀斑、淡痣，原生肌肤质感，自然毛躁碎发，画面干净简洁，环境仅衬托主体，姿态松弛自然，抓拍真实情绪，自然抓拍瞬间，视角符合纪实人像逻辑",
+                    "en": "real European American female face, natural slight asymmetry of brows eyes lips, deep double eyelids, deep eye sockets, tall nose bridge, clear facial contour, natural blue/green/brown pupils, retain pores fine lines uneven tone freckles faint moles, original skin texture, natural frizzy hair, clean frame, environment only sets off subject, relaxed natural posture, captured real emotion, candid captured moment, perspective conforms to documentary portrait logic"
                 },
                 # 全题材细分专属规则，取自WESTERN_FEMALE_ZH原文
                 "preset_rules": {
                     "zh": """
 【欧美女性纪实人像全题材专属规则】
-1. 通用基线：双重肤质约束叠加，保留毛孔、细纹、肤色不均、自然雀斑、淡痣等真实肌理，杜绝虚假光滑肤质；面部天然轻微不对称，拒绝完美对称五官；光线全部采用具象生活化光源描写，规避舞台式强光；色彩严格执行70%/25%/5%面积配比，标注饱和度层级，无高饱和撞色堆砌。
+1. 通用基线：双重肤质约束叠加，保留毛孔、细纹、肤色不均、自然雀斑、淡痣等真实肌理，杜绝虚假光滑肤质；面部天然轻微不对称，拒绝完美对称五官；光线全部采用具象生活化光源描写，规避舞台式强光；色彩严格执行主色70%、辅助色25%、点缀色5%面积配比，标注饱和度层级，无高饱和撞色堆砌。
 2. 职场/通勤：写字楼简约办公场景，西装通勤穿搭；冷白窗光+室内暖混合柔光，中性低饱和色调，松弛放空气质。
 3. 运动/健身：工业健身房器械场景，顶均匀柔光，小麦健康肌肤带汗珠，舒展毛孔，专注坚韧神态。
 4. 婚纱/礼服：海边、草坪、极简棚，日落/窗纱侧逆光，蕾丝薄纱通透质感，温柔静谧氛围，浅暖低饱和。
@@ -143,7 +75,7 @@ Strictly output two formats without extra comments.
 """,
                     "en": """
 【Documentary European American Female Portrait Theme Rules】
-1. General baseline: Double skin texture constraints, retain pores, fine lines, uneven tone, freckles, faint moles, no fake smooth skin; natural slight facial asymmetry; use daily physical light sources, avoid stage harsh light; strictly follow 70%/25%/5% color ratio with saturation marked.
+1. General baseline: Double skin texture constraints, retain pores, fine lines, uneven tone, freckles, faint moles, no fake smooth skin; natural slight facial asymmetry; use daily physical light sources, avoid stage harsh light; strictly follow a main 70% / auxiliary 25% / accent 5% color ratio with saturation marked.
 2. Workplace/Commuting: Simple office buildings, suit outfits; mixed cold window natural light and indoor warm soft light, neutral low saturation, relaxed vibe.
 3. Sports/Fitness: Industrial gym equipment, even top soft light, wheat skin with sweat, open pores, focused expression.
 4. Wedding/Dress: Seaside, lawn, minimalist studio, sunset or sheer side backlight, sheer lace tulle, quiet gentle mood, light warm low saturation.
@@ -177,7 +109,7 @@ All themes: User specified shot, horizontal angle, vertical pitch must be priori
                 "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, no optical numeric parameters, 300-800 words pure visual: 1) Shot type & composition (snapshot/street candid/indoor daily/outdoor documentary, angle/framing); 2) Lighting atmosphere (physical source type, direction, effects on hair/skin/clothing: dappled light, dynamic spots, rim glow, soft haze, highlight bloom, film grain, particles, motion blur edges, HDR, high saturation contrast); 3) Full pose & expression (head/torso/limbs position, gaze direction, facial emotion, dynamic details like wind-blown hair); 4) Face details & styling (facial features, skin texture, makeup style, hairstyle with accessories); 5) Outfit accessories & environment (clothing details, props, scene setting with background elements, overall color tone)."
             },
             "structured": {
-                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度对齐参考示例，画面元素精简克制，不堆砌无关细节：
+                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度以用户输入与预设规则为准，画面元素精简克制，不堆砌无关细节：
 
 **图片风格与剧情介绍**
 点明图片风格定位与题材（高级时装杂志/美妆广告/生活纪实/棚拍硬照/街头抓拍等），概括画面讲述的瞬间（人物在做什么、神情如何），交代整体色调与氛围基调，不虚构画面不存在的情节。
@@ -261,7 +193,7 @@ Background tone and tonal transition (gradient / solid / bokeh environment), sim
         if enable_global_preconstraint:
             prompt_parts.append(f"【Hard Precondition Baseline】\n{pos_constraint}")
             prompt_parts.append(global_rule)
-        prompt_parts.append(f"下游模型内容组织公式：{formula_hint}")
+        prompt_parts.append(f"通用输出公式：{formula_hint}")
         prompt_parts.append(preset_rule)
         prompt_parts.append(f"用户原始需求：{user_input}")
         if output_format == "natural":

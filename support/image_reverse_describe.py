@@ -35,7 +35,7 @@ You are professional image reverse‑description expert. This preset is 【Unive
 Primary analysis source is input image #IMAGE_SOURCE#. Optional user keywords are accepted only for calibrating style, theme and atmosphere. Image pixel information has highest priority. If keywords conflict with visual content of image, image shall prevail.
 Support landscape, photography, portrait, illustration, IP character, cosplay, game character, product, architecture‑interior, animal, food, UI, fashion‑outfit, general category.
 Baseline rule: only extract objective visual elements inside image, reject abstract inner emotion and fictional plot. Must output composition type, subject position, perspective type, depth‑of‑field effect. Interaction between person and object obey real‑world physics.
-Natural mode: 300‑600 words, multi‑paragraph allowed. Structured mode output full structured fields strictly follow template definition.
+Natural mode: 150‑300 words, multi‑paragraph allowed. Structured mode output full structured fields strictly follow template definition.
 Topic logic: output full character fields for portrait; omit portrait‑only fields for still‑life / landscape.
 Preserve all visual elements from source image, only reorganize structure, DO NOT add non‑existing objects. Describe light source, hardness‑softness, color‑temperature; define main color, saturation, cold‑warm tendency.
 Taboo: do NOT invent objects not exist in picture; no fictional story; no aperture / focal‑length numeric value; no weight syntax.
@@ -65,7 +65,7 @@ Support natural / structured output mode, no extra comments or explanations.
 """,
                     "en": """
 【Image Reverse Preset Rules】
-1. General baseline: primary source #IMAGE_SOURCE#, optional assist keywords #USER_KEYWORDS#; follow 7‑step image‑analysis workflow. Must output composition, subject position, perspective type, depth‑of‑field effect. Natural mode 300‑600 words; structured mode max 800 characters.
+1. General baseline: primary source #IMAGE_SOURCE#, optional assist keywords #USER_KEYWORDS#; follow 7‑step image‑analysis workflow. Must output composition, subject position, perspective type, depth‑of‑field effect. Natural mode 150‑300 words; structured mode max 800 characters.
 2. Priority hard‑rule: image pixel visual information > optional user keywords. Keywords only assist calibrating style, theme and atmosphere. If keywords conflict with image visual content, discard conflicting keywords and strictly follow image content, never alter objective visual content according to keywords. If no keywords provided, rely entirely on image analysis.
 3. Shot‑range judgment rule: 【Portrait Category】macro close‑up / standard close‑up / shoulder shot / three‑quarter / nine‑tenth / full‑scene portrait; 【Non‑portrait Category】macro close‑up / close‑up / medium shot / wide shot / full scene. Category branch rule: output full character fields for portrait category; omit character fields for landscape, product, food, animal and other non‑portrait topics.
 4. Content constraint: image pixel is primary evidence, forbid fictional story and abstract mental emotion. Must NOT invent objects or props not shown on source image. Keywords shall NOT add physical entities absent in image, only for style‑atmosphere calibration.
@@ -81,10 +81,10 @@ Analysis source: source image #IMAGE_SOURCE#; optional assist keywords: #USER_KE
         self.format_guide = {
             "natural": {
                 "zh": "【自然段落模式】可多个段落，融合全部视觉元素，包含构图方式、主体位置、视角类型、景深效果、光线色彩、空间层次和细节质感；存在合规用户关键词时将风格/氛围校准信息自然融入描述，冲突关键词直接舍弃。建议按主体、构图与空间、光线与色彩、氛围与细节分层分段，每段聚焦一个维度。语言流畅专业，字数300‑600。",
-                "en": "[Natural Paragraph Mode] Multiple paragraphs allowed. Integrate all visual elements: composition, subject position, perspective type, depth‑of‑field, light‑color, spatial hierarchy and texture detail. When valid user keywords exist, merge style‑atmosphere calibration naturally; discard conflicting keywords. Suggest grouping paragraphs by subject / composition‑space / light‑color / atmosphere‑detail. Professional fluent language. 300‑600 words."
+                "en": "[Natural Paragraph Mode] Multiple paragraphs allowed. Integrate all visual elements: composition, subject position, perspective type, depth‑of‑field, light‑color, spatial hierarchy and texture detail. When valid user keywords exist, merge style‑atmosphere calibration naturally; discard conflicting keywords. Suggest grouping paragraphs by subject / composition‑space / light‑color / atmosphere‑detail. Professional fluent language. 150‑300 words."
             },
             "structured": {
-                "zh": """【结构化模式】按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度对齐参考示例。人像题材按下列要求完整输出；非人像题材将人物相关分段改写为对应主体（"角色与主体"→画面主体本身及其外观、"服装与配饰"→主体表面纹理与附属覆盖物、"道具与动态"→画面物体状态与交互），必填项构图方式、主体位置、视角类型、景深效果一项不可少：
+                "zh": """【结构化模式】按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度以用户输入与预设规则为准。人像题材按下列要求完整输出；非人像题材将人物相关分段改写为对应主体（"角色与主体"→画面主体本身及其外观、"服装与配饰"→主体表面纹理与附属覆盖物、"道具与动态"→画面物体状态与交互），必填项构图方式、主体位置、视角类型、景深效果一项不可少：
 
 **图片风格与剧情介绍**
 点明风格定位与题材（时尚杂志/美妆广告/纪实摄影/插画/产品/建筑室内/美食等），概括画面讲述的瞬间与整体色调氛围；存在有效用户关键词时，将不冲突的风格、题材校准信息自然融入本段，冲突关键词直接舍弃；仅依据画面可读信息概括，禁止虚构情节。
@@ -141,7 +141,7 @@ Background type, tone and brightness, simplicity or environment detail, foregrou
     def build_prompt(
             self,
             preset_name: str,
-            user_keywords: Optional[str] = None,
+            user_input: Optional[str] = None,
             output_language: str = "auto",
             output_format: str = "both"
     ) -> Dict:
@@ -150,8 +150,8 @@ Background type, tone and brightness, simplicity or environment detail, foregrou
             raise ValueError(f"预设模板不存在：{preset_name}")
         preset = self.preset_library[preset_name]
 
-        kw_text = user_keywords if (user_keywords and user_keywords.strip()) else "无"
-        detect_input = user_keywords if user_keywords else ""
+        kw_text = user_input if (user_input and user_input.strip()) else "无"
+        detect_input = user_input if user_input else ""
         if output_language == "auto":
             lang = self.detect_language(detect_input)
         else:
@@ -186,5 +186,5 @@ Background type, tone and brightness, simplicity or environment detail, foregrou
             "output_language": lang,
             "preset_name": preset_name,
             "preset_display_name": preset["display_name"],
-            "user_keywords": user_keywords
+            "user_input": user_input
         }

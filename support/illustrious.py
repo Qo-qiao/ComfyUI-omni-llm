@@ -8,7 +8,7 @@ GitHub: https://github.com/Qo-qiao
 License: See LICENSE file for details
 """
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 # 模板元数据常量（绑定预设库，避免类实例化时未定义引用）
 ILLUSTRIOUS = {
@@ -20,12 +20,10 @@ ILLUSTRIOUS = {
 class Illustrious:
     def __init__(self):
         # SDXL固定内容组织规则库（仅SDXL，无多模型选择）
-        self.sdxl_formula_library = {
+        self.model_formula_library = {
             "SDXL": {
-                "keyword_dense": True,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：角色基础属性 → 发型瞳色面部细节 → 姿势肢体动作 → 表情神态眼部嘴部细节 → 服饰配件道具 → 场景环境光线氛围 → 画风质量标签。输出Danbooru风格中文短标签，逗号分隔，标签总数30‑60个（硬性上限，超出60个一律删除），拒绝长句描述。",
-                "formula_en": "Content order: character basic attributes → hair, eye and facial details → pose and limb movement → expression, eye and mouth details → clothing accessories props → scene environment lighting atmosphere → art style quality tags. Output Danbooru‑style short English tags separated by commas, tag count 30‑60 (hard limit, any tags beyond 60 must be deleted), no long sentences."
+                "formula_zh": "内容组织顺序：角色基础属性 → 发型瞳色面部细节 → 姿势肢体动作 → 表情神态眼部嘴部细节 → 服饰配件道具 → 场景环境光线氛围 → 画风质量标签。输出Danbooru风格英文短标签（标签为英文Booru词汇，中文仅用于解释），逗号分隔；natural模式30-40个英文标签，structured模式不适用标签数量约束；拒绝长句描述。",
+                "formula_en": "Content order: character basic attributes → hair, eye and facial details → pose and limb movement → expression, eye and mouth details → clothing accessories props → scene environment lighting atmosphere → art style quality tags. Output Danbooru‑style short English tags separated by commas; natural mode 30-40 English tags, structured mode not subject to a tag-count limit; no long sentences."
             }
         }
 
@@ -66,7 +64,7 @@ Support natural and structured output format, no extra comments or explanations.
                 "preset_rules": {
                     "zh": """
 【SDXL二次元标签专属规则】
-1. 标签基线：标签总数30‑60个（硬性上限，超出60个一律删除），全部为中文短标签，逗号分隔；禁止重复标签（完全相同的标签）与同义标签堆砌（如"开心"与"快乐"不得同时出现）；每个标签仅单一语义单元，使用Danbooru高频视觉短词。强制必带画风标签：动漫风格，干净线稿。
+1. 标签基线：natural模式30-40个英文标签，structured模式不适用标签数量约束；全部为英文Booru短标签（中文仅用于解释），逗号分隔；禁止重复标签（完全相同的标签）与同义标签堆砌（如"happy"与"joyful"不得同时出现）；每个标签仅单一语义单元，使用Danbooru高频视觉短词。强制必带画风标签：动漫风格，干净线稿。
 2. 校园题材：适配校服、水手服、百褶裙、教室校园场景；多用柔和窗光、室内自然光，色调温暖，突出青春角色神态。
 3. 奇幻魔法题材：适配魔法少女、战斗服饰、法杖宝石、披风；增加魔法光晕、粒子光效、动态线条，可搭配废墟、奇幻城堡场景。
 4. 和风题材：适配和服、发簪发饰、油纸伞；庭院、樱花、灯笼布景，可搭配花瓣飘落，柔和暖调光线。
@@ -77,7 +75,7 @@ Support natural and structured output format, no extra comments or explanations.
 """,
                     "en": """
 【SDXL Anime Tag Preset Rules】
-1. Tag baseline: tag count 30‑60 (hard limit, any tags beyond 60 must be deleted), all short English tags separated by commas; no duplicate tags (identical tags) or synonym‑tag padding (e.g. do NOT output both "happy" and "joyful"); each tag carries only one visual meaning, use high‑frequency Danbooru short words. Mandatory style tags: anime style, clean line art.
+1. Tag baseline: natural mode 30-40 English tags, structured mode not subject to a tag‑count limit, all short English tags separated by commas; no duplicate tags (identical tags) or synonym‑tag padding (e.g. do NOT output both "happy" and "joyful"); each tag carries only one visual meaning, use high‑frequency Danbooru short words. Mandatory style tags: anime style, clean line art.
 2. Campus theme: school uniform, sailor suit, pleated skirt, classroom campus scene; soft window light, indoor natural light, warm tone, youthful expression.
 3. Fantasy magic theme: magical girl, battle outfit, staff and gem, cloak; magic glow, particle effects, dynamic lines, ruins or fantasy castle background.
 4. Japanese style theme: kimono, hairpin, oil‑paper umbrella; courtyard, cherry blossom, lantern, falling petals, soft warm light.
@@ -88,8 +86,8 @@ For all themes: user input features have highest priority, only add detail tags,
 """
                 },
                 "negative_base": {
-                    "zh": "EasyNegative, badhandv4, ng_deepnegative_v1_75t, bad-picture-chill-75v, bad_prompt_version2, negative_hand-neg, worst quality, low quality, normal quality, lowres, blurry, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate",
-                    "en": "EasyNegative, badhandv4, ng_deepnegative_v1_75t, bad-picture-chill-75v, bad_prompt_version2, negative_hand-neg, worst quality, low quality, normal quality, lowres, blurry, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate"
+                    "zh": "worst quality, low quality, normal quality, lowres, blurry, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate",
+                    "en": "worst quality, low quality, normal quality, lowres, blurry, jpeg artifacts, text, watermark, signature, username, bad anatomy, bad hands, bad feet, extra fingers, fewer fingers, fused fingers, too many fingers, extra limbs, missing limbs, mutated hands, deformed, bad proportions, gross proportions, long neck, cross-eyed, skin spots, acnes, blemishes, age spot, cropped, out of frame, mirrored image, duplicate"
                 }
             }
         }
@@ -97,8 +95,8 @@ For all themes: user input features have highest priority, only add detail tags,
         # 双输出格式指引
         self.format_guide = {
             "natural": {
-                "zh": "【自然标签模式】仅输出逗号分隔中文标签串，标签总数30‑60个（硬性上限，超出60个一律删除），只输出标签本体，不包含任何解释、标题、填充文字。",
-                "en": "[Natural Tag Mode] Output only comma‑separated English tag string, tag count 30‑60 (hard limit, any tags beyond 60 must be deleted), tags only, no explanation, title or extra text."
+                "zh": "【自然标签模式】仅输出逗号分隔英文标签串，30-40个英文标签，只输出标签本体，不包含任何解释、标题、填充文字。",
+                "en": "[Natural Tag Mode] Output only comma‑separated English tag string, 30-40 English tags, tags only, no explanation, title or extra text."
             },
             "structured": {
                 "zh": """【结构化模式】严格顺序输出：
@@ -183,6 +181,7 @@ For all themes: user input features have highest priority, only add detail tags,
         self,
         user_input: str,
         preset_name: str,
+        downstream_model: Optional[str] = None,
         output_language: str = "auto",
         enable_global_preconstraint: bool = True,
         enable_negative_prompt: bool = True,
@@ -191,7 +190,7 @@ For all themes: user input features have highest priority, only add detail tags,
         if preset_name not in self.preset_library:
             raise ValueError(f"预设模板不存在：{preset_name}")
         preset = self.preset_library[preset_name]
-        sdxl_config = self.sdxl_formula_library["SDXL"]
+        sdxl_config = self.model_formula_library["SDXL"]
         if output_language == "auto":
             lang = self.detect_language(user_input)
         else:
@@ -218,12 +217,6 @@ For all themes: user input features have highest priority, only add detail tags,
         else:
             prompt_parts.append(natural_guide)
             prompt_parts.append(structured_guide)
-
-        # 输出语言硬性要求：由节点选项传入的 lang 决定最终输出语言
-        if lang == "zh":
-            prompt_parts.append("【输出语言】全部输出内容（标签、字段值）必须使用中文撰写，禁止输出任何英文或其他语言内容。")
-        else:
-            prompt_parts.append("[Output Language] All output content (tags, field values) must be written in English, do not output any Chinese or other language content.")
 
         final_llm_prompt = "\n".join(prompt_parts)
         negative_prompt = preset["negative_base"][lang] if enable_negative_prompt else ""

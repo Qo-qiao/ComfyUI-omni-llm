@@ -7,23 +7,21 @@ GitHub: https://github.com/Qo-qiao
 License: See LICENSE file for details
 """
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 PROMPT_EXPANDER = {
     "template_id": "prompt_expander",
     "name": "通用提示词扩写",
-    "description": "专业的AI图像生成提示词优化工具，为全品类视觉生成提供标准化、高可控的自然语言扩写方案。采用正负向彻底分离架构，正向文本纯加法塑造画面美学，负向统一汇总规避生成通病。内置标准化8步扩写逻辑、固定语义权重优先级、三维度可控镜头视角、7:2.5:0.5色彩配比规则与画面精简约束，强化光影叙事、质感表达与构图美学，彻底规避主体失真、质感塑料、色彩杂乱、元素堆砌、构图失衡等常见问题。覆盖人像（真实/网红双风格）、产品、cosplay、游戏角色、场景、动物、美食等全品类赛道，适配主流文生图模型语义习惯，自动识别类别输出对应维度的精致描述，长文本分段控制避免后置约束失效，适配全平台文生图工作流。",
+    "description": "专业的AI图像生成提示词优化工具，为全品类视觉生成提供标准化、高可控的自然语言扩写方案。采用正负向彻底分离架构，正向文本纯加法塑造画面美学，负向统一汇总规避生成通病。内置标准化8步扩写逻辑、固定语义权重优先级、三维度可控镜头视角、70%/25%/5%色彩配比规则与画面精简约束，强化光影叙事、质感表达与构图美学，彻底规避主体失真、质感塑料、色彩杂乱、元素堆砌、构图失衡等常见问题。覆盖人像（真实/网红双风格）、产品、cosplay、游戏角色、场景、动物、美食等全品类赛道，适配主流文生图模型语义习惯，自动识别类别输出对应维度的精致描述，长文本分段控制避免后置约束失效，适配全平台文生图工作流。",
 }
 
 class PromptExpander:
     def __init__(self):
         # 通用扩写固定内容组织规则，无多模型切换
-        self.expand_formula_library = {
+        self.model_formula_library = {
             "UNIVERSAL": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：类别识别与核心主体提取 → 三维镜头视角与构图布局 → 色彩配比方案 → 光影叙事构建 → 主体细节刻画 → 环境氛围烘托 → 风格一致性校验 → 生成模式输出。严格执行70%/25%/5%色彩配比；natural模式300‑600字，分层叙述【环境与光线 → 主体与姿态 → 细节与质感】，禁止焦距、光圈、分辨率等数字参数；structured模式完整输出全部字段，技术参数仅做定性描述，禁止数值。",
-                "formula_en": "Content order: category recognition & core subject extraction → 3‑dimensional camera perspective & composition → color proportion scheme → light‑shadow narration construction → subject detail depiction → environmental atmosphere rendering → style consistency check → mode output. Strictly follow 70%/25%/5% color ratio. Natural mode 300‑600 words, layered: environment‑light → subject‑pose → detail‑texture, forbid numeric camera parameters. Structured mode output full fields, only qualitative description for tech items, no numeric values."
+                "formula_zh": "内容组织顺序：类别识别与核心主体提取 → 三维镜头视角与构图布局 → 色彩配比方案 → 光影叙事构建 → 主体细节刻画 → 环境氛围烘托 → 风格一致性校验 → 生成模式输出。严格执行70%/25%/5%色彩配比；natural模式300‑600字，分层叙述【环境与光线 → 主体与姿态 → 细节与质感】，禁止焦距、光圈、分辨率等数字参数；structured模式严格按6个分段输出，禁止一切数值参数。",
+                "formula_en": "Content order: category recognition & core subject extraction → 3‑dimensional camera perspective & composition → color proportion scheme → light‑shadow narration construction → subject detail depiction → environmental atmosphere rendering → style consistency check → mode output. Strictly follow 70%/25%/5% color ratio. Natural mode 300‑600 words, layered: environment‑light → subject‑pose → detail‑texture, forbid numeric camera parameters. Structured mode output the six sections in order, no numeric values."
             }
         }
 
@@ -32,8 +30,7 @@ class PromptExpander:
             "zh": """
 你是专业全品类AI图像提示词扩写专家，覆盖人像真实风格、人像网红风格、cosplay、游戏角色、产品、场景、动物、美食、通用类。
 坚守画面精简约束，不自动新增无关摆件、装饰杂物；文本权重从前向后逐级递减，主体构图光影前置，细节参数后置；超长文本分段，防止末尾约束失效。
-natural模式输出300‑600字多段分层画面描写，**严禁焦距、光圈、分辨率、DPI等任何数字技术参数**；structured模式完整输出全部结构化字段，【技术参数建议】仅允许定性效果描述，禁止一切数值参数。
-焦距+拍摄距离组合逻辑：24mm广角+靠近=空间拉伸变形；35mm小广角+适中距离=人文纪实；50mm标准+常规距离=透视自然；85mm中长焦+远离=人像黄金焦段背景压缩；100mm微距+极近=细节放大；200mm长焦+远距=空间强烈压缩。
+natural模式输出300‑600字多段分层画面描写，**严禁焦距、光圈、分辨率、DPI等任何数字技术参数**；structured模式严格按6个分段输出，同样禁止一切数值参数。
 人像自动区分风格：关键词含网红/精致/完美/滤镜/美颜 → 网红风格；含真实/自然/写实/纪实或未指定 → 真实风格，两类质感表现明确区分。
 完整保留用户全部输入信息，只做细节补充，不篡改主体、动作、场景；光影必须写明光源方向、色温、软硬以及叙事作用，符合物理逻辑；严格执行70%主色‑25%辅助‑5%点缀色彩配比。
 输出禁忌：禁止权重符号；禁止猎奇违和镜头角度；禁止元素堆砌；禁止塑料虚假质感；禁止主体变形失真；natural模式禁止任何相机数字参数。
@@ -43,8 +40,7 @@ natural模式输出300‑600字多段分层画面描写，**严禁焦距、光�
 You are a multi‑category AI‑art prompt expansion expert. Cover real‑portrait, influencer‑portrait, cosplay, game character, product, scene, animal, food and general categories.
 Follow frame‑simplify rule: never auto‑add irrelevant ornaments or clutter. Text weight decays from beginning to end: subject‑composition‑light ahead, details‑hints behind. Split long paragraphs to avoid trailing constraint failure.
 Natural mode: 300‑600 multi‑segment visual description, strictly forbid numeric camera parameters such as focal length, aperture, resolution, DPI.
-Structured mode: output all defined sections. In【Tech Suggestion】only qualitative effect description allowed, no numeric parameters.
-Focal length + distance combo logic: 24mm wide + close = space stretch distortion; 35mm semi-wide + moderate = humanistic documentary; 50mm standard + normal = natural perspective; 85mm medium tele + far = portrait golden focal length background compression; 100mm macro + extreme close = detail magnification; 200mm tele + far = strong space compression.
+Structured mode: output the six defined sections in order, no numeric parameters.
 Auto‑detect portrait style: keywords like influencer / delicate / filter → influencer style; real / natural / documentary or unspecified → real‑texture style, keep obvious texture difference between two styles.
 Fully preserve user input, only enrich details without altering subject, action or scene. Light‑shadow must define light direction, color‑temperature, hardness‑softness and narrative purpose, obey physical logic. Enforce 70%‑25%‑5% color proportion rule.
 Taboo: no weight syntax; no weird or grotesque camera angles; no element over‑stacking; no fake plastic texture; no subject distortion; no numeric camera values in natural mode.
@@ -89,8 +85,8 @@ For all categories: user input has highest priority, add details only, never ove
 """
                 },
                 "negative_base": {
-                    "zh": "主体变形失真，质感虚假塑料感，光影杂乱过曝，色彩脏污溢出，元素堆砌冗余，构图失衡杂乱，透视比例错误，低分辨率模糊，多余杂物乱入，字幕水印logo，光影生硬断层，过度锐化生硬，边缘锯齿毛躁。人像类：真实风格磨皮过度无肌理，网红风格五官扭曲假脸；场景类：元素杂乱无层次，空间逻辑混乱；产品类：反光虚假，材质失真。",
-                    "en": "subject deformation & distortion, fake plastic texture, messy over‑exposed lighting, muddy overflowing color, redundant stacked elements, unbalanced composition, wrong perspective‑proportion, low‑resolution blurriness, random clutter, subtitle watermark logo, harsh broken shadow, over‑sharpening, jagged edge. Portrait: real‑style over‑smoothed skin losing texture; influencer‑style distorted fake face. Scene: messy unlayered elements, broken spatial logic. Product: fake reflection, distorted material."
+                    "zh": "主体变形失真，质感虚假塑料感，光影杂乱过曝，色彩脏污溢出，元素堆砌冗余，构图失衡杂乱，透视比例错误，低分辨率、细节糊成一团，多余杂物乱入，字幕水印logo，光影生硬断层，过度锐化生硬，边缘锯齿毛躁。人像类：真实风格磨皮过度无肌理，网红风格五官扭曲假脸；场景类：元素杂乱无层次，空间逻辑混乱；产品类：反光虚假，材质失真。",
+                    "en": "subject deformation & distortion, fake plastic texture, messy over‑exposed lighting, muddy overflowing color, redundant stacked elements, unbalanced composition, wrong perspective‑proportion, low resolution, mushy detail, random clutter, subtitle watermark logo, harsh broken shadow, over‑sharpening, jagged edge. Portrait: real‑style over‑smoothed skin losing texture; influencer‑style distorted fake face. Scene: messy unlayered elements, broken spatial logic. Product: fake reflection, distorted material."
                 }
             }
         }
@@ -101,108 +97,52 @@ For all categories: user input has highest priority, add details only, never ove
                 "en": "[Natural Paragraph Mode] Multi‑segment descriptive text, integrate subject feature, space environment, light‑shadow tone and texture detail. No numeric parameters. Visual‑aesthetic language. Forbid focal‑length, aperture, resolution numeric values. Emphasize subject priority, realistic texture and frame‑simplify constraint. 300‑600 words."
             },
             "structured": {
-                "zh": """【结构化模式】严格顺序输出：
-【类别】类别名称（人像标注真实风格/网红风格，其余品类直接标注）
-【全局正向约束】
-  - 主体基础：主体形态比例准确，核心特征完整，无变形失真
-  - 质感基础：对应品类专属材质表现真实，肌理细腻，光影过渡自然
-  - 画面逻辑：三维视角符合专业摄影审美，构图聚焦主体，无冗余元素抢戏
-【画面构图】
-  - 视觉引导：视线流动逻辑，依托主体形态、光线高光、环境线条三重引导，焦点始终落在核心主体
-  - 主体位置：水平百分比+垂直百分比，主体占据 70% 视觉权重，背景环境共占 30%
-  - 画面比例：宽高比（16:9 / 9:16 / 4:3 / 1:1等）
-  - 画面精简约束：仅保留核心主体与必要衬托元素，不额外生成多余摆件、装饰、杂物
-【景别与三维镜头视角】
-  - 距离维度（景别对应）：微距特写（细节放大）/ 标准特写（面部五官）/ 肩特写（头肩胸）/ 七分人像（膝盖以上）/ 九分人像（脚踝以上）/ 全景人像（全身）/ 远景大场景（环境为主），对应叙事重心与细节展现层级
-  - 水平视角维度：正面（对称庄重）/ 四分之三斜侧（立体生动）/ 正侧面（轮廓剪影），标注主体展现效果与叙事特点
-  - 垂直俯仰维度：小俯视角（亲切俯视）/ 平视（客观中立）/ 小仰视角（威严仰视），对应心理感受与画面张力
-  - 景深氛围：浅景深柔焦虚化（主体突出）/ 中景深环境兼顾（主次平衡）/ 深景深全景清晰（环境叙事），标注虚实层次对应的主次关系
-【主体描述】
-  - 核心主体：外貌/物种/物体核心特征，突出最鲜明视觉元素
-  - 头部姿态：微侧/仰头/低头/回眸，颈部线条与视线方向
-  - 躯干姿态：挺直/放松/前倾/后仰，肩线角度与身体重心
-  - 上肢姿态：手臂弯曲角度、手部摆放位置（叉腰/托腮/自然下垂/手持道具）
-  - 下肢姿态：站姿重心分配、坐姿腿部交叠、动态迈步/静止支撑
-  - 表情神态：眼神聚焦方向、嘴角弧度、眉宇情绪（平静/专注/柔和/自信）
-  - 外观细节：服装/材质、颜色、款式及装饰细节
-【风格专属细节】
-  - 人像真实风格：肤质肌理、毛发特征、面部自然非对称特征
-  - 人像网红风格：妆容肤质、五官神态、滤镜氛围质感
-  - 非人像类：核心材质肌理、细节纹理、专属质感表现
-【环境与光影】
-  - 环境场景：具体空间与背景元素，衬托主体的作用
-  - 主光类型：伦勃朗光（鼻翼三角光影）/蝴蝶光（鼻下对称阴影）/侧光（明暗分割）/环形光（面部均匀立体）
-  - 光源方向：正侧光45°/90°侧光/逆光轮廓/顶光戏剧/底光诡异
-  - 光质软硬：硬光（清晰边缘阴影）/柔光（渐变过渡阴影）/散射光（均匀无影）
-  - 环境光：补光比例、反光板效果、环境反射色调
-  - 细节刻画：环境中的质感元素（纹理、反光、阴影）
-【色彩配比】
-  - 主色调：占比70%，奠定整体基调（暖调/冷调/中性）
-  - 辅助色：占比25%，丰富层次与环境过渡
-  - 点缀色：占比5%，制造视觉焦点与细节提亮
-【技术参数建议】（仅 structured 模式使用，natural模式禁用）
-  - 焦距+拍摄距离组合逻辑：
-    · 24mm广角+靠近：空间拉伸变形，前景夸张放大，透视张力强烈
-    · 35mm小广角+适中距离：人文纪实视角，环境人像兼顾
-    · 50mm标准+常规距离：透视自然，所见即所得，叙事平实
-    · 85mm中长焦+远离：人像黄金焦段，背景压缩虚化，主体突出
-    · 100mm微距+极近：细节极致放大，纹理清晰可见
-    · 200mm长焦+远距：空间强烈压缩，背景完全虚化，主体孤立
-  - 允许完整相机参数描述（焦距、光圈、快门速度、ISO、白平衡），附带空间效果释义
-  - 技术参数支持：焦距（24mm/35mm/50mm/85mm/100mm/200mm）、光圈（f/1.4-f/22）、快门速度（1/8000s-30s）、ISO（100-12800）、白平衡（日光/阴天/钨丝灯/荧光灯/自定义K值）
-【风格标签】3‑5个关键词概括整体气质与视觉调性
-【画面收尾精简约束】画面无额外无关元素、多余装饰、杂乱背景填充，所有元素仅服务主体塑造与情绪表达，不抢夺主体视觉焦点，全程风格高度统一。""",
-                "en": """[Structured Mode] Output strictly in this order:
-【Category】category name(portrait mark real‑style / influencer‑style; others direct label)
-【Global Positive Constraints】
-  - Subject Base: accurate form‑proportion, complete core feature, no distortion
-  - Texture Base: category‑specific realistic material performance, fine grain, smooth light‑shadow transition
-  - Frame Logic: 3‑D view follows professional photography aesthetic, composition focuses subject, no distracting redundant elements
-【Frame Composition】
-  - Visual Guidance: sight‑flow logic guided by subject shape, highlight, environment line; focus locked on core subject
-  - Subject Position: horizontal percent + vertical percent, subject occupies 70% visual weight, background 30%
-  - Aspect Ratio:16:9 /9:16 /4:3 /1:1 etc.
-  - Simplify Constraint: keep only core subject & necessary supporting elements; no extra ornaments or clutter
-【Shot & 3‑D Camera View】
-  - Distance(shot type): macro close‑up (detail放大) / standard close‑up (facial features) / shoulder shot (head‑shoulder‑chest) / three‑quarter portrait (above knee) / nine‑tenth portrait (above ankle) / full‑scene portrait (full body) / wide landscape (environment focus), mark narrative focus
-  - Horizontal View: front (symmetric formal) / three‑quarter (dimensional vivid) / profile (silhouette), describe display effect & narrative feature
-  - Vertical Pitch: slight high‑angle (intimate) / eye‑level (objective neutral) / slight low‑angle (majestic), describe mental feeling & frame tension
-  - Depth‑of‑field: shallow‑dof soft blur (subject突出) / medium‑dof balance subject‑background (主次平衡) / deep‑dof full sharpness (environment narrative), mark virtual‑real hierarchy
-【Subject Description】
-  - Core Subject: key visual feature of human / creature / object
-  - Head pose: slight tilt/up/down/turn back, neck line & gaze direction
-  - Torso pose: upright/relaxed/lean forward/back, shoulder angle & body weight
-  - Upper limb: arm bend angle, hand placement (on waist/under chin/hanging/holding props)
-  - Lower limb: standing weight distribution/leg cross sitting/dynamic stepping/static support
-  - Expression: eye focus direction, mouth curve, brow emotion (calm/focused/soft/confident)
-  - Appearance Detail: costume / material / color / style / ornament detail
-【Style‑Specific Detail】
-  - Real‑portrait: skin texture, hair feature, natural facial asymmetry
-  - Influencer‑portrait: makeup skin, facial expression, filter atmosphere
-  - Non‑portrait: core material grain, fine texture, category‑unique texture performance
-【Environment & Lighting】
-  - Scene: concrete space & background element, explain how background supports subject
-  - Key light type: Rembrandt (triangle under nose) / butterfly (symmetric shadow under nose) / side light (light-dark split) / ring light (even facial dimension)
-  - Light direction: 45° side / 90° side / backlit轮廓 / top dramatic / bottom eerie
-  - Light quality: hard (clear edge shadow) / soft (gradual transition) / diffused (even shadowless)
-  - Ambient light: fill light ratio, reflector effect, environmental reflection tone
-  - Texture Detail: environment texture, reflection, shadow
-【Color Proportion】
-  - Main Color: 70%, set overall tone (warm/cool/neutral)
-  - Auxiliary Color: 25%, enrich hierarchy & environment transition
-  - Accent Color: 5%, create visual focal point & detail highlight
-【Tech Suggestion】(structured‑only, natural mode forbidden)
-  - Focal length + distance combo logic:
-    · 24mm wide + close: space stretch distortion, exaggerated foreground, strong perspective tension
-    · 35mm semi-wide + moderate distance: humanistic documentary view, environmental portrait balanced
-    · 50mm standard + normal distance: natural perspective, what-you-see-is-what-you-get, plain narrative
-    · 85mm medium tele + far: portrait golden focal length, background compression blur, subject highlight
-    · 100mm macro + extreme close: extreme detail magnification, clear texture visible
-    · 200mm tele + far distance: strong space compression, complete background blur, subject isolation
-  - Allow complete camera parameter description (focal length, aperture, shutter speed, ISO, white balance) with spatial effect explanation
-  - Tech parameters supported: focal length (24mm/35mm/50mm/85mm/100mm/200mm), aperture (f/1.4-f/22), shutter speed (1/8000s-30s), ISO (100-12800), white balance (daylight/cloudy/tungsten/fluorescent/custom K value)
-【Style Tags】3‑5 keywords summarize overall visual temperament
-【Final Simplify Constraint】No irrelevant extra elements, redundant ornament or messy background. All elements serve subject & mood, never steal visual focus; consistent style throughout frame."""
+                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度以用户输入与预设规则为准，画面元素精简克制，不堆砌无关细节。人像题材按下列要求完整输出；非人像题材将人物相关分段改写为对应主体（"角色与主体"→画面主体本身及其外观、"服装与配饰"→主体表面纹理与附属覆盖物、"道具与动态"→画面物体状态与交互）：
+
+**图片风格与剧情介绍**
+点明图片风格定位与题材（人像写真/电商产品/美食/场景/角色插画等），概括画面讲述的瞬间，交代整体色调与氛围基调，不虚构画面不存在的情节。
+
+**角色与主体**
+（人像题材）人物年龄、人种、五官特点与眼神状态，皮肤质感与原生肌理，发型发色与散落状态；（非人像题材）写明画面主体对象及其核心外观特征，本段不写人物字段。
+
+**服装与配饰**
+（人像题材）衣着款式、面料质感、颜色及剪裁层次，配饰的材质、颜色与设计感；（非人像题材）写明主体表面的纹理、图案、覆盖物或附属配件。
+
+**道具与动态**
+（人像题材）肢体姿态与重心、手部与道具的互动细节、视线方向、表情神态；（非人像题材）写明画面物体的姿态、位置关系与交互状态；无动态时写明静态体态。
+
+**环境与背景**
+背景类型与色调明暗、简洁程度或环境细节，前景/中景/背景的空间层次与虚化程度，负空间留白关系。
+
+**摄影风格与质感**
+*   **视角：** 景别（人像：微距特写/肩特写/七分人像/全景人像；非人像：微距特写/近景特写/中景/远景/全景）、水平视角（正面/四分之三斜侧/正侧面）、垂直俯仰（小俯视角/平视/小仰视角）、景深虚实（浅景深主体突出/中景深环境兼顾/深景深全景清晰）及各自带来的视觉感受。
+*   **构图：** 构图方式（对称/三分法/中心/对角线/框架等）、主体位置用自然方位描述（如画面中央/偏上/偏左）；画幅比例由工作流分辨率决定，除用户明确要求外不写入提示词。
+*   **光影：** 主光类型（伦勃朗光/蝴蝶光/侧光/窗光/自然光等）、光源方向与光质软硬（硬光/柔光/散射光），主体与环境的明暗层次，以及光影在皮肤、材质与背景上的视觉效果。
+*   **质感：** 材质、纹理与表面细节的表现（人像为肤质发丝，非人像为品类专属材质肌理）；色彩标注主色调、饱和度层级与冷暖倾向（写作以主色为主、辅助色过渡、点缀色提亮为准则，百分比数值不写入提示词）。
+*   **氛围：** 从可观察的神情、光影与细节推导整体氛围与情绪意境，避免空洞抽象形容词堆砌。""",
+                "en": """[Structured Mode] Output strictly in these 6 sections in order. Use **bold** section headers, each followed by one coherent natural-language paragraph; all six sections must be present and filled, completeness determined by user input and preset rules; keep the frame concise, no irrelevant detail stacking. Output portrait category fully as specified; for non-portrait category rewrite character-oriented sections to the actual subject ("Character and Subject" -> the main subject and its appearance, "Outfit and Accessories" -> surface texture and covering of the subject, "Props and Pose" -> state and interaction of objects in frame):
+
+**Image Style and Story Introduction**
+State the style positioning and theme (portrait photo / e-commerce product / food / scene / character illustration), summarize the captured moment and overall color tone; do not invent anything absent from frame.
+
+**Character and Subject**
+(portrait) age, ethnicity, facial features and gaze state, skin texture and native details, hairstyle, hair color and how strands fall; (non-portrait) state the main subject and its core appearance, no character fields here.
+
+**Outfit and Accessories**
+(portrait) clothing cut, fabric texture, color and layering, accessory material, color and design; (non-portrait) surface texture, pattern, covering or attached accessories of the subject.
+
+**Props and Pose**
+(portrait) body gesture and weight, hand-prop interaction detail, gaze direction, facial expression; (non-portrait) posture, position relation and interaction state of objects in frame; if no motion, state a relaxed static stance.
+
+**Environment and Background**
+Background type, tone and brightness, simplicity or environment detail, foreground / mid-ground / background hierarchy and blur level, negative-space relation.
+
+**Photography Style and Texture**
+*   **Viewpoint:** shot type (portrait: macro close-up / shoulder shot / three-quarter portrait / full-scene portrait; non-portrait: macro close-up / close-up / medium shot / wide shot / full scene), horizontal angle (front / three-quarter / profile), vertical pitch (slight high-angle / eye-level / slight low-angle), depth of field (shallow subject focus / medium environment balanced / deep full sharpness) and the visual feeling each brings.
+*   **Composition:** composition type (symmetric / rule-of-thirds / central / diagonal / frame), subject position in natural wording (e.g. centered in frame / slightly upper / to one side); aspect ratio is set by workflow resolution, do not write it into the prompt unless the user explicitly asks.
+*   **Lighting:** key light type (Rembrandt / butterfly / side light / window light / natural light), light direction and quality (hard / soft / diffused), light-dark hierarchy of subject and environment, and light effects on skin, material and background.
+*   **Texture:** material, texture and surface detail (portrait: skin and hair; non-portrait: category-unique material grain); color noted as dominant tone, saturation level and cold-warm tendency (write with main color dominant, auxiliary color transitioning and accent color highlighting, but never write percentage numbers into the prompt).
+*   **Atmosphere:** derive overall atmosphere and mood from observable expression, lighting and detail; avoid empty abstract adjective stacking."""
             }
         }
 
@@ -215,6 +155,7 @@ For all categories: user input has highest priority, add details only, never ove
         self,
         user_input: str,
         preset_name: str,
+        downstream_model: Optional[str] = None,
         output_language: str = "auto",
         enable_global_preconstraint: bool = True,
         enable_negative_prompt: bool = True,
@@ -223,7 +164,7 @@ For all categories: user input has highest priority, add details only, never ove
         if preset_name not in self.preset_library:
             raise ValueError(f"预设模板不存在：{preset_name}")
         preset = self.preset_library[preset_name]
-        expand_config = self.expand_formula_library["UNIVERSAL"]
+        expand_config = self.model_formula_library["UNIVERSAL"]
 
         if output_language == "auto":
             lang = self.detect_language(user_input)

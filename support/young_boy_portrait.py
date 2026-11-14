@@ -17,80 +17,12 @@ YOUNG_BOY_PORTRAIT = {
 
 class YoungBoyPortrait:
     def __init__(self):
-        # 下游生图模型内容组织公式库 完全沿用参考原版无改动
+        # 下游模型内容组织公式库（12 个图像模型整合为单一通用输出）
         self.model_formula_library = {
-            "Flux1": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：整体画面氛围光影 → 孩童气质灵动姿态 → 肌肤发丝质感 → 背景留白。侧重童真氛围叙事，弱化细碎关键词堆砌，画面柔和治愈，写实肤质发丝高度细致，纹理清晰可见。",
-                 "formula_en": "Content order: overall atmosphere lighting → kid lively pose → skin hair texture → negative space. Focus on innocent atmosphere narration, realistic skin and hair highly detailed with clear texture."
+            "Universal": {
+                "formula_zh": "内容组织顺序：儿童或少年身份、天真活泼的表情与动作 → 风格与画质（娇嫩肤质、清澈眼神） → 明亮自然光或户外柔光、轻盈氛围 → 平视或蹲位特写、大光圈背景虚化。用户指定元素优先保留，仅补充未指定维度；以连贯自然语言叙述为主，不堆砌细碎关键词与权重符号；需渲染的文字直接写入提示词；缺陷与畸变写入负向提示词，正向只做纯加法；画面精简克制，避免无关元素堆砌。",
+                "formula_en": "Content order: child or teenager identity with innocent lively expression and gesture → style and quality (delicate skin, clear eyes) → bright natural or outdoor soft light, light-hearted atmosphere → eye-level or squatting close-up with wide-aperture background blur. Keep user-specified elements first and only fill unspecified dimensions; narrate in coherent natural language instead of stacking fragmented keywords or weight symbols; write any rendered text directly into the prompt; put defects and distortions into the negative prompt and keep the positive prompt purely additive; keep the frame concise and avoid irrelevant clutter."
             },
-            "Flux2_klein": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：一位超写实孩童（年龄、发型、服饰与表情）→ 照片级写实与皮肤质感 → 自然光或柔和布光、活泼氛围 → 半身特写、浅景深，逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: a photorealistic child (age, hairstyle, outfit and expression) → photo-level realism and skin texture → natural or soft lighting, lively atmosphere → half-body close-up, shallow depth of field, realistic, highly detailed skin and hair texture"
-            },
-            "Z_image": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：一位超写实孩童主体（年龄、发型、服饰）→ 照片级写实与皮肤质感 → 柔和自然光、活泼氛围 → 半身或特写、浅景深；建议描述孩子的神态与目光（需渲染文字直接写入，支持中英双语），逼真，皮肤和头发纹理高度细致。",
-                "formula_en": "Content order: a photorealistic child subject (age, hairstyle, outfit) → photo-level realism with skin texture → soft natural light, lively atmosphere → half-body or close-up, shallow depth of field; describe the child's expression and gaze (write any rendered text directly, supports Chinese and English), realistic, highly detailed skin and hair texture."
-            },
-            "Qwen_Image2512": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：孩童身份、年龄与天真表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然光或柔和光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: child identity, age and innocent expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural or soft light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
-            },
-            "Qwen_Image2.1": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：孩童身份、年龄与天真表情、超写实与电影级皮肤质感 → 风格与画质（真实肤质、发丝细节、柔焦景深） → 自然段落混排冒号标签块（姿势动作：/表情：/发型发色：/穿搭：/场景：）与光影效果关键词列表（光影斑驳/边缘发光/高光溢出/胶片颗粒等） → 自然光或柔和光勾勒轮廓与氛围 → 半身或特写构图、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致；支持负向提示词通道，肢体畸变、解剖错误、坏手等缺陷写入负向提示词，正向只做纯加法",
-                "formula_en": "Content order: child identity, age and innocent expression, photorealistic cinematic skin texture → style and quality (real skin, hair strand details, soft-focus depth of field) → natural paragraph mixed with colon label blocks (pose:/expression:/hairstyle:/outfit:/scene:) and lighting effect keyword list (dappled light, rim glow, highlight bloom, film grain, etc.) → natural or soft light outlining silhouette and atmosphere → half-body or close-up composition, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture; supports a negative prompt channel, write limb distortion, anatomical errors and bad hands into the negative prompt, keep the positive prompt purely additive"
-            },
-            "Krea2": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：开篇（风格画质定调，或孩童主体直接切入）→ 孩童主体（发型、五官神态、稚嫩肤质、活泼姿态与手部细节）→ 服饰配件（衣款面料、童趣道具、鞋履）→ 背景环境（空间层次、材质细节、远景虚化）→ 光影（治愈柔光、自然光、明暗过渡）→ 色彩基调（主色与点缀色）→ 画质与构图（焦点位置、背景虚化、微细节清晰度、杂志封面质感）→ 整体氛围收尾。以连贯自然语言分段散文为主，细节密集但不堆砌标签；亦可用密集关键词加权重、质量词置头尾的中英混排写法；画面含文字时直接写出文字内容，无文字时以“画面中无文字”声明收尾；可选附相机镜头技术参数段（焦距、光圈、快门、ISO）。",
-                "formula_en": "Content order: opening (style and quality statement, or straight to the child subject) → child subject (hairstyle, facial features, youthful skin, lively pose and hand details) → outfit and accessories (clothing fabric, playful props, shoes) → background (spatial layers, material details, distant blur) → lighting (healing soft light, natural light, light-to-shadow transitions) → color palette (main and accent colors) → quality and composition (focus point, background bokeh, micro-detail sharpness, magazine-cover feel) → closing atmosphere. Write as flowing natural-language paragraphs with dense detail but no tag stacking; a dense weighted-tag style with quality tags at head and tail (Chinese-English mixed) also works; if the image contains text, write it out directly, otherwise end with a 'No text present in image' statement; optionally append a camera and lens technical block (focal length, aperture, shutter speed, ISO)."
-            },
-            "Boogu": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：整体画面基调（治愈柔和氛围）→ 孩童松弛灵动姿态 → 自然肌肤质感与细节 → 简约童趣留白环境，写实风格，肤质发丝高度细致，纹理清晰。",
-                 "formula_en": "Content order: overall image tone (healing soft atmosphere) → kid relaxed lively pose → natural skin texture and details → simple playful negative-space environment, realistic style, highly detailed skin and hair with clear texture."
-            },
-            "Mage_Flow": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：孩童五官肤质、年龄气质 → 灵动体态姿态 → 光影层次、柔和自然光 → 服饰细节、面料质感 → 轻量环境、minimal background（密集关键词，中英术语并列），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: kid facial features and skin, age and temperament → lively body pose → lighting layers, soft natural light → clothing details, fabric texture → lightweight environment, minimal background (dense keywords, Chinese-English terms in parallel), realistic, highly detailed skin and hair texture"
-            },
-            "ERNIE_Image": {
-                "keyword_dense": True,
-                "mix_lang": True,
-                "formula_zh": "内容组织顺序：孩童身份、年龄与天真表情、超写实电影质感 → 风格与画质（真实肤质、发丝与微表情） → 自然光或柔和光勾勒轮廓氛围 → 半身或特写、浅景深突出人物 →（需渲染文字直接写入提示词，支持中英双语），逼真，皮肤和头发纹理高度细致",
-                "formula_en": "Content order: child identity, age and innocent expression, photorealistic cinematic texture → style and quality (real skin, hair strands and micro-expressions) → natural or soft light outlining silhouette and atmosphere → half-body or close-up, shallow depth highlighting the subject → (write any rendered text directly into the prompt, supports Chinese and English), realistic, highly detailed skin and hair texture"
-            },
-            "GLM_Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：超写实孩童面部与半身肖像 → 高清写实摄影风格、皮肤肌理与发丝质感 → 柔和自然光与温暖氛围 → 浅景深特写、眼神平视 → 强调真实无磨皮、避免畸变与成人化。中文自然语言描述效果最佳，无负向提示词通道，负面意图正向化写入提示词，肤质发丝高度细致。",
-                "formula_en": "Content order: photorealistic child face and half-body portrait → high-definition realistic photography style, skin texture and hair details → soft natural light and warm tone → shallow depth close-up, eye-level gaze → emphasize real un-retouched skin, avoid distortion and adultification. Best described in Chinese natural language; no negative prompt channel, write negative intent positively into prompt, highly detailed skin and hair texture."
-            },
-            "LongCat_Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-"formula_zh": "内容组织顺序：主体衣着与特质描写 → 神态与动作刻画 → 环境与背景交代 → 光线与氛围渲染 → 景别与构图说明。纯中文长自然语言描述效果最佳，需渲染文字用引号包裹，肤质发丝高度细致，纹理清晰可见。",
-                 "formula_en": "Content order: subject clothing & traits → expression & action → environment & background → light & atmosphere → shot & composition. Long Chinese natural language describes best; wrap any rendered text in quotation marks, highly detailed skin and hair with clear texture."
-            },
-            "HiDream-O1-Image": {
-                "keyword_dense": False,
-                "mix_lang": False,
-                "formula_zh": "内容组织顺序：超写实孩童主体与天真表情 → 场景与构图（浅景深特写）→ 光影与氛围（柔和自然光温暖）→ 画种/摄影风格（高清写实摄影）→ 需渲染文字用引号包裹，肤质发丝高度细致。",
-                "formula_en": "Content order: photorealistic child subject & innocent expression → scene & composition (shallow depth close-up) → light & atmosphere (soft natural light, warm) → art/photography style (high-definition realistic photography) → wrap rendered text in quotes, highly detailed skin and hair texture."
-            }
         }
         # 全局底层规则 改为少年儿童专用
         self.global_base_rules = {
@@ -102,7 +34,7 @@ class YoungBoyPortrait:
 完整保留用户输入年龄、性别、场景、服饰、色调、姿态，仅补充孩童肤质、胎发、棉质面料、童真光影细节，不添加成人道具、成熟装饰。
 所有孩童穿搭、户外造型、校园校服均为童真纪实人像，体态柔软灵动，禁止畸形肢体、夸张动作。
 输出禁忌：权重符号、冗余相机参数、卡通二次元、畸形手脚、多手指、空洞假笑、成人沉稳神态、高饱和刺眼撞色、杂乱网红布景、透视畸变。
-严格输出两种格式，不额外增加注释说明。
+严格按当前指定的输出格式输出，不额外增加注释说明。
 """,
             "en": """
 You are a professional photorealistic portrait expert exclusively for kids and teenagers. This preset covers infants, preschool, primary school, teens aged 13-17, including outdoor spring, forest adventure, campus, home daily, retro film, minimalist studio.
@@ -122,13 +54,13 @@ Strictly output two formats without extra notes.
                 "display_name": YOUNG_BOY_PORTRAIT["name"],
                 "description": YOUNG_BOY_PORTRAIT["description"],
                 "positive_constraints": {
-                    "zh": "影视级超写实真人质感，亚洲/欧美孩童原生圆润稚嫩面部骨骼，眉眼唇天然轻微不对称；无厚重妆造，完整保留细嫩毛孔、运动泛红、浅晒痕、细小绒毛，零过度磨皮、无塑胶假肤、无AI网红精致童颜；蓬松胎发细碎毛躁有通透感，生活化简约童趣布景，原生灵动抓拍姿态，纯粹治愈童真情绪，无透视畸变。户外/校园/居家/胶片/棚拍均为孩童题材分支，全程杜绝成人成熟体态与神态",
-                    "en": "Cinematic photorealistic texture, round tender facial bone for Asian/Western kids, natural slight asymmetry of eyes, eyebrows and lips; no heavy makeup, fully retain tender pores, activity flush, faint sun marks, fine fuzz, no over-smoothing, no plastic fake skin, no AI perfect kid face; fluffy messy translucent baby hair, simple daily child scene, natural lively snapshot pose, pure healing innocent mood, no perspective distortion. Outdoor/campus/home/film/studio are kid-only themes, no mature adult body or expression."
+                    "zh": "影视级超写实真人质感，亚洲/欧美孩童原生圆润稚嫩面部骨骼，眉眼唇天然轻微不对称；原生裸妆质感，完整保留细嫩毛孔、运动泛红、浅晒痕、细小绒毛，皮肤肌理真实通透；蓬松胎发细碎毛躁有通透感，生活化简约童趣布景，自然抓拍瞬间的灵动姿态，纯粹治愈童真情绪，纪实视角端正。户外/校园/居家/胶片/棚拍均为孩童题材分支，全程遵循孩童体态与神态",
+                    "en": "Cinematic photorealistic texture, round tender facial bone for Asian/Western kids, natural slight asymmetry of eyes, eyebrows and lips; natural bare-skin makeup, fully retain tender pores, activity flush, faint sun marks, fine fuzz with real translucent skin texture; fluffy messy translucent baby hair, simple daily child scene, naturally captured lively snapshot pose, pure healing innocent mood, documentary perspective. Outdoor/campus/home/film/studio are kid-only themes, always with natural kid body and expression."
                 },
                 "preset_rules": {
                     "zh": """
 【少年儿童人像专属规则】
-1. 通用基线：仅刻画1-17岁孩童少年，完整保留细嫩肌肤、胎碎发、孩童圆润脸型；禁止成人紧致轮廓、厚重磨皮、零瑕疵完美脸蛋、成熟沉稳神态。
+1. 通用基线：仅刻画1-17岁孩童少年，完整保留细嫩肌肤、胎碎发、孩童圆润脸型；禁止成人紧致轮廓、厚重磨皮、零瑕疵完美脸蛋、成熟沉稳神态；色彩严格执行主色70%、辅助色25%、点缀色5%配比，低饱和优先。
 2. 亚洲孩童刻画：柔和圆润娃娃脸，内双浅眼，乌黑透亮瞳孔，细腻薄嫩肌肤，浅淡晒红；适配公园、教室、居家卧室，午后漫射柔光，马卡龙低饱和配色。
 3. 欧美孩童刻画立体柔和五官，多彩浅瞳色，蓬松浅棕/金胎发，通透白皙嫩皮；适配林间、郊外草坪，阴天漫射天光，多巴胺清新色系。
 4. 春日户外童真风格：纯棉浅色系童装，气球/小花道具，草坪树荫斑驳柔光，动态追逐抓拍，鲜活治愈笑容。
@@ -140,7 +72,7 @@ Strictly output two formats without extra notes.
 """,
                     "en": """
 【Exclusive Rules for Kid & Teen Portraits】
-1. General baseline: Only depict kids 1-17, retain tender skin, fluffy baby hair, round kid face; no tight adult facial shape, heavy smoothing, flawless perfect face, mature calm expression.
+1. General baseline: Only depict kids 1-17, retain tender skin, fluffy baby hair, round kid face; no tight adult facial shape, heavy smoothing, flawless perfect face, mature calm expression. Color strictly follows a main 70% / auxiliary 25% / accent 5% ratio, low saturation preferred.
 2. Asian kids: Soft round baby face, shallow inner double eyelids, black clear pupils, thin tender skin, faint sun flush; suitable for park, classroom, bedroom, afternoon soft light, low-saturation macaron palette.
 3. Western kids: Soft stereo facial features, light colorful pupils, fluffy light baby hair, translucent fair tender skin; suitable for forest, lawn, overcast natural light, fresh dopamine colors.
 4. Spring outdoor innocent style: Cotton light kid clothes, balloon/flower props, dappled tree shade light, lively chasing snapshot, healing genuine smile.
@@ -174,7 +106,7 @@ All kid themes keep user specified scene & outfit, only add tender skin, baby ha
                 "en": "[Natural Paragraph Mode] 4-5 coherent paragraphs, strict order, no optical numeric parameters, 300-800 words pure visual: 1) Shot type & composition (snapshot/outdoor play/indoor daily/studio, crouching eye-level/angle/framing); 2) Lighting atmosphere (bright natural light/soft window light, effects on hair/skin/clothing: dappled light, dynamic spots, rim glow, soft haze, highlight bloom, film grain); 3) Full pose & expression (running/squatting/standing/holding toys, gaze direction, facial emotion, hair wind-blown details); 4) Face details & styling (round face, big eyes, tender lips, smooth skin, hairstyle); 5) Outfit accessories & environment (kids clothing details, toys/props, scene setting with background elements, overall color tone)."
             },
             "structured": {
-                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度对齐参考示例，画面元素精简克制，不堆砌无关细节：
+                "zh": """【结构化模式】严格按以下6个分段顺序输出，分段标题用**加粗**标注，标题后接一段连贯自然语言描述；六个分段齐全、不留空段，内容完整度以用户输入与预设规则为准，画面元素精简克制，不堆砌无关细节：
 
 **图片风格与剧情介绍**
 点明图片风格定位与题材（高级时装杂志/美妆广告/生活纪实/棚拍硬照/街头抓拍等），概括画面讲述的瞬间（人物在做什么、神情如何），交代整体色调与氛围基调，不虚构画面不存在的情节。
@@ -258,7 +190,7 @@ Background tone and tonal transition (gradient / solid / bokeh environment), sim
         if enable_global_preconstraint:
             prompt_parts.append(f"【Hard Precondition Baseline】\n{pos_constraint}")
             prompt_parts.append(global_rule)
-        prompt_parts.append(f"下游模型内容组织公式：{formula_hint}")
+        prompt_parts.append(f"通用输出公式：{formula_hint}")
         prompt_parts.append(preset_rule)
         prompt_parts.append(f"用户原始需求：{user_input}")
         if output_format == "natural":

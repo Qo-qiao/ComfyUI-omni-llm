@@ -27,20 +27,14 @@ class MultiSpeakerDialogue:
         # Default = 默认输出模型接口：未指定/Auto 时使用的默认优化输出，聚焦四要素组合台词语气等通用文本处理优化
         self.model_formula_library = {
             "Default": {
-                "keyword_dense": True,
-                "mix_lang": True,
                 "formula_zh": "内容组织顺序：说话人角色ID与音色大类 → 细分声线基底 → 逐句情感判定（8种情感之一或多情感混合）与情绪过渡逻辑 → 四要素组合台词语气（发声方式+节奏+音调+标点四项严格协同，参考【情感↔四要素组合映射表】）→ 量化TTS声学参数（语速倍率、音高偏移值、人声基准音量dB、句内停顿秒数、句尾停顿秒数）→ 重读关键词 → 交叠对话标记 → 空间声学参数（空间类型、混响强度、回音时长）→ 音轨分层配比 → SRT时间码。",
                 "formula_en": "Content order: speaker ID & timbre category → fine-grained voice base → sentence-wise emotion (one of 8 emotions or mixed) & emotion-transition logic → four-element combined speech tone (vocal-mode + rhythm + intonation + punctuation strictly cooperate, refer to 【Emotion ↔ Four-Element Mapping Table】) → quantized TTS acoustic params (speed-ratio, pitch-offset, vocal-baseline-dB, intra-sentence-pause-s, sentence-end-pause-s) → stress keywords → overlapping-dialogue mark → spatial-acoustic params (space type, reverb strength, echo duration) → multi-track volume ratio → SRT time-code."
             },
             "IndexTTS-2.5": {
-                "keyword_dense": True,
-                "mix_lang": True,
                 "formula_zh": "内容组织顺序：说话人角色ID与音色大类 → 细分声线基底 → 逐句情感判定（8维情感向量emo_vector[高兴,愤怒,悲伤,害怕,厌恶,忧郁,惊讶,平静]或显式情感描述emo_text，向量总和≤0.8）→ 情感强度emo_alpha（0.0‑1.0，推荐0.6）→ 语速duration_factor（0.5‑2.0）→ 发音控制（中文拼音<行|XING2>/英文CMU音素<minute|M IH1 . N AH0 T>/日语假名<上手|じょうず>）→ 空间声学参数 → 音轨分层配比 → SRT时间码。",
                 "formula_en": "Content order: speaker ID & timbre category → fine-grained voice base → sentence-wise emotion (8-dim emo_vector[happy,angry,sad,afraid,disgusted,melancholic,surprised,calm] or explicit emo_text, vector sum ≤0.8) → emotion strength emo_alpha (0.0‑1.0, 0.6 recommended) → speech speed duration_factor (0.5‑2.0) → pronunciation control (Chinese pinyin <行|XING2>/English CMU phonemes <minute|M IH1 . N AH0 T>/Japanese kana <上手|じょうず>) → spatial acoustic params → multi-track volume ratio → SRT time-code."
             },
             "VoxCPM2": {
-                "keyword_dense": True,
-                "mix_lang": True,
                 "formula_zh": "内容组织顺序：说话人角色ID与音色大类 → 细分声线基底 → 逐句情感判定与情绪过渡逻辑 → 文本规范化控制（normalize=True/False）→ 发音控制（中文拼音<行|XING2>/英文CMU音素<minute|M IH1 . N AH0 T>）→ 标点韵律控制（句号/问号停顿、逗号缩短、省略号迟疑）→ 方言适配（粤语/闽南语/四川话等）→ 空间声学参数 → 音轨分层配比 → SRT时间码。",
                 "formula_en": "Content order: speaker ID & timbre category → fine-grained voice base → sentence-wise emotion & emotion-transition logic → text normalization control (normalize=True/False) → pronunciation control (Chinese pinyin <行|XING2>/English CMU phonemes <minute|M IH1 . N AH0 T>) → punctuation prosody control (period/question mark pause, comma shortening, ellipsis hesitation) → dialect adaptation (Cantonese/Minnan/Sichuan etc.) → spatial acoustic params → multi-track volume ratio → SRT time-code."
             }
@@ -56,7 +50,7 @@ class MultiSpeakerDialogue:
 适配IndexTTS‑2.5情感化参数库：
 支持8种情感：高兴happy/愤怒angry/悲伤sad/害怕afraid/厌恶disgusted/忧郁melancholic/惊讶surprised/平静calm；
 情感控制方式：8维情感向量emo_vector（顺序固定[高兴,愤怒,悲伤,害怕,厌恶,忧郁,惊讶,平静]，取值0.0‑1.2，向量总和≤0.8）、显式情感描述emo_text（配合use_emo_text=True与emo_alpha=0.6）；
-情感强度emo_alpha（0.0‑1.0，默认1.0，推荐0.6；有声书0.3‑0.5/广播剧0.6‑0.8/动画配音0.7‑0.9/游戏配音0.8‑1.0/语音助手0.2‑0.4）；
+情感强度emo_alpha（0.0‑1.0，推荐0.6，未指定场景时取0.6；有声书0.3‑0.5/广播剧0.6‑0.8/动画配音0.7‑0.9/游戏配音0.8‑1.0/语音助手0.2‑0.4）；
 语速duration_factor（0.5‑2.0，默认1.0；快速播报0.7‑0.9/正常对话1.0/慢速朗读1.1‑1.3/诗歌朗诵1.2‑1.5/儿童故事0.9‑1.1）；
 发音控制：中文拼音标注<文字|拼音+声调数字>（如<行|XING2>）、英文CMU音素<单词|音素序列>（如<minute|M IH1 . N AH0 T>）、日语假名<汉字|假名>（如<上手|じょうず>）；合法拼音参考checkpoints/pinyin.vocab；
 语言代码lang：ZH/EN/JA/ES/AR；
@@ -74,7 +68,7 @@ Baseline rule: assign global unique numeric speaker‑ID for each character, no 
 Adapt IndexTTS‑2.5 emotional parameter library:
 8 emotions supported: happy / angry / sad / afraid / disgusted / melancholic / surprised / calm;
 Emotion control: 8‑dim emo_vector (fixed order [happy,angry,sad,afraid,disgusted,melancholic,surprised,calm], range 0.0‑1.2, vector sum ≤0.8), explicit emo_text (with use_emo_text=True and emo_alpha=0.6);
-Emotion strength emo_alpha (0.0‑1.0, default 1.0, 0.6 recommended; audiobook 0.3‑0.5 / drama 0.6‑0.8 / animation 0.7‑0.9 / game 0.8‑1.0 / voice assistant 0.2‑0.4);
+Emotion strength emo_alpha (0.0‑1.0, 0.6 recommended, 0.6 when no scene specified; audiobook 0.3‑0.5 / drama 0.6‑0.8 / animation 0.7‑0.9 / game 0.8‑1.0 / voice assistant 0.2‑0.4);
 Speech speed duration_factor (0.5‑2.0, default 1.0; fast broadcast 0.7‑0.9 / normal dialogue 1.0 / slow reading 1.1‑1.3 / poetry 1.2‑1.5 / children story 0.9‑1.1);
 Pronunciation control: Chinese pinyin annotation <char|PINYIN+tone number> (e.g. <行|XING2>), English CMU phonemes <word|phoneme sequence> (e.g. <minute|M IH1 . N AH0 T>), Japanese kana <kanji|kana> (e.g. <上手|じょうず>); valid pinyin reference checkpoints/pinyin.vocab;
 Language code lang: ZH/EN/JA/ES/AR;
@@ -339,7 +333,6 @@ Analysis source: raw script dialogue #DIALOGUE_SOURCE#; optional assist keywords
             prompt_parts.append(global_rule)
         prompt_parts.append(f"下游TTS模型内容组织公式（{model_display}）：{formula_hint}")
         prompt_parts.append(preset_rule)
-        prompt_parts.append(f"解析对象：#DIALOGUE_SOURCE#；用户辅助关键词：{detect_input if detect_input else '无'}；目标模型：{model_display}；关键词仅用于音色情绪声场风格校准，原始剧本信息优先级最高，冲突则舍弃关键词。")
 
         # 默认输出模式覆盖声明：聚焦四要素组合台词语气等通用文本处理优化，不输出任何模型专属情感参数
         if downstream_model == "Default":
@@ -375,7 +368,31 @@ Analysis source: raw script dialogue #DIALOGUE_SOURCE#; optional assist keywords
         # 仅支持natural输出格式，任何 output_format 一律输出目标模型的natural指引
         prompt_parts.append(natural_guide)
 
-        final_llm_prompt = "\n".join(prompt_parts)
+        # 用户输入即原始剧本文本本身，注入主解析来源槽位；可选关键词仅作次级校准
+        source_text = detect_input.strip() if detect_input and detect_input.strip() else ("（未提供）" if lang == "zh" else "(not provided)")
+        if lang == "zh":
+            source_ref = "（见下方【解析对象】）"
+            keyword_ref = "（见下方【解析对象】）"
+            target_line = (
+                f"【解析对象】原始剧本对白（逐句保留原文，禁止改写）：{source_text}；"
+                f"可选辅助关键词（仅用于校准音色、情绪、声场风格，与剧本冲突时舍弃）：无；"
+                f"目标模型：{model_display}。"
+            )
+        else:
+            source_ref = "(see the 【Analysis Target】 line below)"
+            keyword_ref = "(see the 【Analysis Target】 line below)"
+            target_line = (
+                f"【Analysis Target】Raw script dialogue (preserve verbatim, do not rewrite): {source_text}; "
+                f"optional assist keywords (calibrate timbre / emotion / acoustic-field style only, discard on conflict with script): none; "
+                f"target model: {model_display}."
+            )
+        final_llm_prompt = (
+            "\n".join(prompt_parts)
+            .replace("#DIALOGUE_SOURCE#", source_ref)
+            .replace("#USER_KEYWORDS#", keyword_ref)
+            .replace("#DOWNSTREAM_MODEL#", model_display)
+        )
+        final_llm_prompt = f"{final_llm_prompt}\n{target_line}"
         negative_prompt = negative_base if enable_negative_prompt else ""
 
         return {
