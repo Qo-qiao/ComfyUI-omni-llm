@@ -300,11 +300,11 @@ from support.video_to_prompt import (
     VideoToPrompt,
 )
 #视频分镜拆解
-from support.video_scene_breskdown import (
+from support.video_scene_breakdown import (
     VideoSceneBreakdown,
 )
 #视频情绪字幕分析器与TTS合成指导
-from support.video_subtutle_format import (
+from support.video_subtitle_format import (
     VideoSubtitleFormat,
 )
 #多人对话
@@ -316,18 +316,15 @@ from support.song_creation import (
     SongCreation,
 )
 
-# 图像生成模型选项（通用类型）：Auto 为默认通用项，其余模型从 HyperRealisticFemale 生成器类动态读取保持同步（不含 SDXL）
-IMAGE_MODEL_OPTIONS = ["Auto"] + [m for m in HyperRealisticFemale().model_formula_library.keys() if m != "SDXL"]
-
 # 视频生成模型选项
 VIDEO_MODEL_OPTIONS = ["Auto"] + list(ContinuingT2V().video_model_formula_library.keys())
 
 # 音频生成模型选项（TTS语音合成 + 音乐生成，Auto 为默认通用项）
-AUDIO_MODEL_OPTIONS = ["Auto", "IndexTTS-2.5", "VoxCPM2", "Ace-Step1.5", "MiniMax-Music3"]
+AUDIO_MODEL_OPTIONS = ["Auto", "IndexTTS-2.5", "VoxCPM2", "Ace-Step1.5", "MiniMax-Music3", "YuE2"]
 
 # 音频模型分类：TTS语音合成 与 音乐生成（用于按预设校验所选模型是否合法）
 AUDIO_TTS_MODELS = {"IndexTTS-2.5", "VoxCPM2"}
-AUDIO_MUSIC_MODELS = {"Ace-Step1.5", "MiniMax-Music3"}
+AUDIO_MUSIC_MODELS = {"Ace-Step1.5", "MiniMax-Music3", "YuE2"}
 
 class VideoProcessor:
     """视频处理器 - 处理视频输入、视频帧提取和视频理解功能"""
@@ -713,15 +710,14 @@ class omni_llm_unified_inference:
                         "[基础] 图像理解 (Image Understanding)",
                         "[基础] 批量图像理解 (Batch Image Understanding)",
                         "[基础] 音频转文本 (Audio to Text)",
-                        "[基础] 文本转语音 (Text to Speech)",
                         "[高级] 视频理解 (Video Understanding)"
                     ], {
                         "default": "[基础] 文本生成 (Text Generation)",
-                        "tooltip": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [基础] 文本转语音：使用TTS模型将文本合成为语音\n• [高级] 视频理解：从视频中提取帧并进行分析"
+                        "tooltip": "选择推理模式：\n• [基础] 文本生成：使用语言模型生成文本内容\n• [基础] 图像理解：处理单张图像内容并生成描述\n• [基础] 批量图像理解：一次性处理多张图片，减少推理调用次数\n• [基础] 音频转文本：使用ASR模型将音频转换为文本\n• [高级] 视频理解：从视频中提取帧并进行分析"
                     }),
                 
                 # ========== 提示词配置 ==========
-                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：图片反推SDXL模型提示词内容\n• [Reverse] Describe：图片反推自然语言提示词内容\n• [Normal] Expand：通用提示词文本优化扩写\n• [Anime] Illustrious：二次元角色专用优化扩写\n• [Anime] Anime Prompt Expand：二次元内容优化扩写\n• [Anime] Thick Paint Role：角色厚涂CG人物内容优化扩写\n• [Portrait] Asian Female：真实亚洲女性人像内容优化扩写\n• [Portrait] Asian Male：真实亚洲男性人像内容优化扩写\n• [Portrait] Western Female：真实欧美女性人像内容优化扩写\n• [Portrait] Western Male：真实欧美男性人像内容优化扩写\n• [Portrait] Hyper Realistic Female：超写实女性人像内容优化扩写\n• [Portrait] Hyper Realistic Male：超写实男性人像内容优化扩写\n• [Portrait] Young Boy：儿童人像内容优化扩写\n• [Portrait] Middle Elderly Female：中老年女性人像内容优化扩写\n• [Portrait] Middle Elderly Male：中老年男性人像内容优化扩写\n• [Design] Art Illustration：艺术插画内容优化扩写\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计内容优化扩写\n• [Design] Interior Design：室内装修设计内容优化扩写\n• [Design] Architecture Rendering：建筑外观与园林渲染内容优化扩写\n• [Design] Ecommerce Product：电商产品内容优化扩写\n• [Design] Food Photography：美食摄影内容优化扩写\n• [Text to Video] T2V：根据关键词内容优化扩写\n• [Image to Video] I2V：根据图片内容优化扩写\n• [Image to Video] FL2V：根据首尾帧图片内容优化扩写\n• [Image to Video] Multi Storyboard:根据图片与文本内容优化扩写\n• [Video Reverse] Frame Sequence：按帧序列反推视频内容\n• [Video Reverse] Describe：通用视频提示词反推\n• [Video Reverse] Scene Breakdown：按分镜场景反推视频内容\n• [Video Reverse] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化调整\n• [Music] Song Creation：歌词创作内容优化扩写"}),
+                "preset_prompt": (s.preset_tags, {"default": s.preset_tags[1], "tooltip": "选择预设提示词模板（默认是 [Reverse] Tags 图片反推，按需切换）：\n• Empty - Nothing：无预设，完全自定义\n• [Reverse] Tags：图片反推SDXL模型提示词内容\n• [Reverse] Describe：图片反推自然语言提示词内容\n• [Normal] Expand：通用提示词文本优化扩写\n• [Anime] Illustrious：二次元角色专用优化扩写\n• [Anime] Anime Prompt Expand：二次元内容优化扩写\n• [Anime] Thick Paint Role：角色厚涂CG人物内容优化扩写\n• [Portrait] Asian Female：真实亚洲女性人像内容优化扩写\n• [Portrait] Asian Male：真实亚洲男性人像内容优化扩写\n• [Portrait] Western Female：真实欧美女性人像内容优化扩写\n• [Portrait] Western Male：真实欧美男性人像内容优化扩写\n• [Portrait] Hyper Realistic Female：超写实女性人像内容优化扩写\n• [Portrait] Hyper Realistic Male：超写实男性人像内容优化扩写\n• [Portrait] Young Boy：儿童人像内容优化扩写\n• [Portrait] Middle Elderly Female：中老年女性人像内容优化扩写\n• [Portrait] Middle Elderly Male：中老年男性人像内容优化扩写\n• [Design] Art Illustration：艺术插画内容优化扩写\n• [Design] Poster Design：海报设计文本优化\n• [Design] Scene Design：场景设计内容优化扩写\n• [Design] Interior Design：室内装修设计内容优化扩写\n• [Design] Architecture Rendering：建筑外观与园林渲染内容优化扩写\n• [Design] Ecommerce Product：电商产品内容优化扩写\n• [Design] Food Photography：美食摄影内容优化扩写\n• [Text to Video] T2V：根据关键词内容优化扩写\n• [Image to Video] I2V：根据图片内容优化扩写\n• [Image to Video] FL2V：根据首尾帧图片内容优化扩写\n• [Image to Video] Multi：根据图片与文本内容优化扩写\n• [Video Reverse] Frame Sequence：按帧序列反推视频内容\n• [Video Reverse] Describe：通用视频提示词反推\n• [Video Reverse] Scene Breakdown：按分镜场景反推视频内容\n• [Video Reverse] Subtitle：结合字幕与视频反推情绪化文本\n• [Audio] Multi-Speaker Dialogue：多人对话情绪化优化调整\n• [Music] Song Creation：歌词创作内容优化扩写"}),
                 "system_prompt": ("STRING", {"multiline": True, "default": "提示词书写结构：主体+细节/特征+环境/场景+构图/视角+风格/媒介+画质/光影", "tooltip": "系统提示词，定义AI助手的角色和行为，可包含预设模板占位符#和自定义内容"}),
                 "text_input": ("STRING", {"default": "", "multiline": True, "tooltip": "用户输入文本，作为对话的用户消息内容"}),
                 
@@ -732,21 +728,17 @@ class omni_llm_unified_inference:
                 # ========== 输出格式设置 ==========
                 "output_format": (["natural", "structured"], {
                     "default": "natural",
-                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容，推荐日常使用\n• structured：输出结构化文本内容，适用于强理解模型（仅支持文生图预设模板）"
+                    "tooltip": "输出格式控制：\n• natural：以自然段落格式输出纯文本内容，推荐日常使用\n• structured：输出结构化文本内容，适用于强理解模型\n（仅对含 structured 格式指导的预设生效；视频/音频预设强制 natural）"
                 }),
                 "enable_constraints": ("BOOLEAN", {"default": False, "tooltip": "启用预设模板中的正向约束：\n• 正向约束：会添加到提示词最前面，引导模型生成更符合要求的内容，适用于SDXL/Base模型"}),
                 "enable_negative_prompts": ("BOOLEAN", {"default": False, "tooltip": "启用预设模板中的负向提示词：\n• 负向提示词：会追加到提示词末尾，避免模型生成不想要的内容，部分模型不需要负向提示词"}),
-                "image_model": (IMAGE_MODEL_OPTIONS, {
-                    "default": "Auto",
-                    "tooltip": "图像生成模型选择（通用类型，影响提示词构建风格）：\n• Auto：通用类型，自动适配默认模型\n• Flux1：擅长写实人像/场景/空间逻辑\n• Flux2_klein：擅长快速出图/多参考图编辑\n• Z_image：擅长写实人像/风光/静物\n• Krea2：擅长摄影质感/自然语言写实/电影感\n• Qwen_Image2512：擅长长图文/海报/密集排版\n• Qwen_Image2.1：自然段落+冒号标签块混合组织，支持负向提示词\n• Boogu：擅长极简产品图/电商/室内渲染\n• ERNIE_Image：擅长文字渲染/社媒图文/商业海报\n• HiDream-O1-Image：擅长高清写实人像/时尚编辑级\n• Mage_Flow：擅长指令编辑/任意比例构图/双语文字渲染\n• LongCat_Image：擅长复杂场景/多角色/长文本描述理解\n• GLM_Image：擅长创意图解/科学科普/文字渲染"
-                }),
                 "video_model": (VIDEO_MODEL_OPTIONS, {
                     "default": "Auto",
                     "tooltip": "视频生成模型选择（仅视频类预设模板生效）：\n• Auto：自动适配默认模型\n• Wan2.2：原生单段最大5秒，仅支持单镜头\n• LTX2.5：原生单段最长20秒，支持音画同步\n• MiniMax-H3：时长4-15秒整数，支持音画同步"
                 }),
                 "audio_model": (AUDIO_MODEL_OPTIONS, {
                     "default": "Auto",
-                    "tooltip": "音频生成模型选择（仅音频类预设模板生效）：\n• Auto：自动适配默认模型\n\n────────── TTS 语音合成 ──────────\n• IndexTTS-2.5：精细调情绪\n• VoxCPM2：日常短视频人物对话\n\n────────── 音乐生成 ──────────\n• Ace-Step1.5：控制维度丰富\n• MiniMax-Music3：人声演唱自然度高"
+                    "tooltip": "音频生成模型选择（仅音频类预设模板生效）：\n• Auto：自动适配默认模型\n\n────────── TTS 语音合成 ──────────\n• IndexTTS-2.5：精细调情绪\n• VoxCPM2：日常短视频人物对话\n\n────────── 音乐生成 ──────────\n• Ace-Step1.5：控制维度丰富\n• MiniMax-Music3：人声演唱自然度高\n• YuE2：风格串+歌词生成，cot 提供 full（旋律+和声）/melody（仅旋律）/off（无符号规划）三档"
                 }),
                 
                 # ========== 视频处理参数 ==========
@@ -780,7 +772,6 @@ class omni_llm_unified_inference:
                 "llama_model": ("LLAMACPPMODEL", {"tooltip": "加载的VL模型，用于图像理解和文本生成（API模式可不连接）"}),
                 "api_config": ("OMNI_LLM_API_CONFIG", {"tooltip": "API 配置（用于 API 推理模式）"}),
                 "asr_model": ("ASRMODEL", {"tooltip": "ASR模型输入（用于语音识别）"}),
-                "tts_model": ("TTSMODEL", {"tooltip": "TTS模型输入（用于文本转语音）"}),
                 "parameters": ("LLAMACPPARAMS", {"tooltip": "额外的生成参数配置"}),
                 "images": ("IMAGE", {"tooltip": "图像输入（用于图像理解模式）"}),
                 "video": ("VIDEO", {"tooltip": "视频输入（用于视频理解模式）"}),
@@ -789,9 +780,9 @@ class omni_llm_unified_inference:
             },
         }
     
-    RETURN_TYPES = ("STRING", "STRING", "INT", "AUDIO")
-    RETURN_NAMES = ("output", "output_list", "state_uid", "audio")
-    OUTPUT_IS_LIST = (False, True, False, False)
+    RETURN_TYPES = ("STRING", "STRING", "INT")
+    RETURN_NAMES = ("output", "output_list", "state_uid")
+    OUTPUT_IS_LIST = (False, True, False)
     FUNCTION = "process"
     CATEGORY = "omni-llm"
     
@@ -800,9 +791,14 @@ class omni_llm_unified_inference:
         self.model_info = None
         self.video_processor = VideoProcessor()
     
-    def _build_preset_map(self):
-        """构建预设键名到 (生成器实例, template_id) 的映射（类实例内置中英双语，无需语言拆分）"""
-        return {
+    _preset_generator_map = None
+
+    @classmethod
+    def _build_preset_map(cls):
+        """构建预设键名到 (生成器实例, template_id) 的映射（生成器无状态，进程内只构建一次）"""
+        if cls._preset_generator_map is not None:
+            return cls._preset_generator_map
+        cls._preset_generator_map = {
             "IMAGE_REVERSE_TAGS": (ImageReverseTags(), "image_reverse_tags"),
             "IMAGE_REVERSE_DESCRIBE": (ImageReverseDescribe(), "image_reverse_describe"),
             "PROMPT_EXPANDER": (PromptExpander(), "prompt_expander"),
@@ -836,6 +832,7 @@ class omni_llm_unified_inference:
             "MULTI_SPEAKER_DIALOGUE": (MultiSpeakerDialogue(), "multi_speaker_dialogue"),
             "SONG_CREATION": (SongCreation(), "song_creation"),
         }
+        return cls._preset_generator_map
     
     def _get_generator_entry(self, preset_key):
         """获取预设对应的 (生成器实例, template_id)，不存在返回 (None, None)"""
@@ -867,71 +864,6 @@ class omni_llm_unified_inference:
         if preset_key == "SONG_CREATION":
             return audio_model if audio_model in AUDIO_MUSIC_MODELS else "Auto"
         return "Auto"
-
-    def _process_tts(self, tts_model, text, speaker_audio, parameters=None):
-        """文本转语音：调用 TTS 模型合成音频，采样参数来自参数设置节点"""
-        if tts_model is None:
-            raise RuntimeError("未连接TTS模型，请先连接TTS模型加载器")
-        if not text or not text.strip():
-            raise RuntimeError("文本输入为空，无法合成语音")
-
-        text = text.strip()
-        print(f"【TTS合成】文本长度: {len(text)}字符")
-
-        speaker_ref = None
-        if speaker_audio is not None:
-            speaker_ref = self._audio_to_wav_bytes(speaker_audio)
-            print(f"【TTS合成】使用说话人参考音频 ({len(speaker_ref)}字节)")
-
-        params = parameters if isinstance(parameters, dict) else {}
-        seed = params.get("seed", -1)
-        try:
-            seed = int(seed) & 0xFFFFFFFF
-            seed = seed if seed > 0 else None
-        except (ValueError, TypeError):
-            seed = None
-
-        audio_result = tts_model.synthesize(
-            text=text,
-            speaker_reference=speaker_ref,
-            seed=seed,
-            temperature=params.get("temperature", 0.8),
-            top_k=params.get("top_k", 40),
-            top_p=params.get("top_p", 0.95),
-            min_p=params.get("min_p", 0.05),
-            repeat_penalty=params.get("repeat_penalty", 1.05),
-        )
-        if audio_result is None:
-            raise RuntimeError("TTS合成失败：未生成音频")
-        waveform = self._decode_generated_audio(audio_result)
-
-        print(f"【TTS合成】完成，时长: {audio_result.duration:.2f}秒, 采样率: {audio_result.sample_rate}")
-        return ("", [""], 0, {"waveform": waveform, "sample_rate": audio_result.sample_rate})
-
-    @staticmethod
-    def _decode_generated_audio(audio):
-        """将 GeneratedAudio 解码为 ComfyUI AUDIO 格式"""
-        import wave
-        if audio.format == "wav":
-            with wave.open(io.BytesIO(audio.data), "rb") as wf:
-                n_channels = wf.getnchannels()
-                sampwidth = wf.getsampwidth()
-                raw = wf.readframes(wf.getnframes())
-        else:
-            n_channels = 1
-            raw = audio.data
-
-        if sampwidth == 2:
-            data = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
-        elif sampwidth == 4:
-            data = np.frombuffer(raw, dtype=np.float32)
-        else:
-            raise RuntimeError(f"不支持的采样位深: {sampwidth * 8}bit")
-
-        if n_channels > 1:
-            data = data.reshape(-1, n_channels).mean(axis=1)
-
-        return torch.from_numpy(data).unsqueeze(0).unsqueeze(0)
 
     @staticmethod
     def _audio_to_wav_bytes(audio_input):
@@ -997,13 +929,13 @@ class omni_llm_unified_inference:
             print(f"【Omni音频】能力检测失败: {e}")
         return False
 
-    def _resolve_effective_model(self, preset_key, image_model="Auto", video_model="Auto", audio_model="Auto"):
+    def _resolve_effective_model(self, preset_key, video_model="Auto", audio_model="Auto"):
         """按预设模板内可用的模型接口解析实际生效模型，忽略其他类型的模型选择：
         - 反推/无模型预设 → Auto
         - 音频类预设 → 按 TTS/音乐分类校验 audio_model，非法回退 Auto
         - 视频类预设 → video_model 必须在接口库内，否则回退库内默认模型（库为空回退 Auto）
-        - 图像类预设 → image_model 必须在接口库内，否则回退库内默认模型（库为空回退 Auto）
-        保证图像/视频/音频三个选项同时切换时，只按预设自身的模型接口输出且不产生错误
+        - 图像类预设 → 固定使用库内默认模型（库为空回退 Auto）
+        保证视频/音频选项切换时，只按预设自身的模型接口输出且不产生错误
         """
         if not preset_key or self._is_reverse_preset(preset_key):
             return "Auto"
@@ -1016,10 +948,10 @@ class omni_llm_unified_inference:
         if self._is_video_preset(preset_key):
             lib = generator.video_model_formula_library
             return video_model if video_model in lib else (next(iter(lib)) if lib else "Auto")
-        # 图像类预设：仅使用 image_model 接口
+        # 图像类预设：固定使用库内默认模型
         if self._is_image_model_preset(preset_key):
             lib = generator.model_formula_library
-            return image_model if image_model in lib else (next(iter(lib)) if lib else "Auto")
+            return next(iter(lib)) if lib else "Auto"
         return "Auto"
     
     def _is_video_preset(self, preset_key):
@@ -1028,10 +960,37 @@ class omni_llm_unified_inference:
         return generator is not None and hasattr(generator, 'video_model_formula_library')
     
     def _is_image_model_preset(self, preset_key):
-        """判断是否为图像模型类预设（使用 image_model 切换）"""
+        """判断是否为图像模型类预设"""
         generator, _ = self._get_generator_entry(preset_key)
         return generator is not None and hasattr(generator, 'model_formula_library')
     
+    @staticmethod
+    def _suppress_negative_prompt_instructions(prompt_text, language):
+        """
+        负向提示词开关关闭时，清除模板中引导模型输出负向提示的词句，
+        并追加禁用声明，防止模型在正文末尾自行生成【负向提示词】段落。
+        """
+        if not prompt_text:
+            return prompt_text
+        prompt_text = prompt_text.replace(
+            "缺陷与畸变写入负向提示词，正向只做纯加法；", ""
+        ).replace(
+            "put defects and distortions into the negative prompt and keep the positive prompt purely additive; ",
+            ""
+        )
+        if language == "English":
+            prompt_text += (
+                "\n\n[Negative Prompt Disabled] Negative prompts are not enabled for this request: "
+                "do not output any negative prompt, 'avoid' list or negative constraint section; "
+                "output positive visual description only."
+            )
+        else:
+            prompt_text += (
+                "\n\n【负向提示词禁用】本次请求未启用负向提示词："
+                "禁止输出【负向提示词】、negative prompt、avoid 列表或任何负面规避段落，仅输出正向画面描述内容。"
+            )
+        return prompt_text
+
     def _get_generator_negative_prompt(self, preset_key, language, model="Auto"):
         """
         获取类生成器格式的负向提示词
@@ -1072,28 +1031,14 @@ class omni_llm_unified_inference:
             )
             return result.get("negative_prompt", "")
         
-        # 反推/无模型预设：尝试提取负向提示词
-        try:
-            result = generator.build_prompt(
-                preset_name=template_id,
-                user_keywords="",
-                output_language=lang_code,
-                output_format="both"
-            )
-            return result.get("negative_prompt", "")
-        except Exception:
-            try:
-                result = generator.build_prompt(
-                    user_input="",
-                    preset_name=template_id,
-                    output_language=lang_code,
-                    enable_global_preconstraint=False,
-                    enable_negative_prompt=True,
-                    output_format="both"
-                )
-                return result.get("negative_prompt", "")
-            except Exception:
-                return ""
+        # 反推/无模型预设：统一使用 preset_name + user_input 签名
+        result = generator.build_prompt(
+            preset_name=template_id,
+            user_input="",
+            output_language=lang_code,
+            output_format="both"
+        )
+        return result.get("negative_prompt", "")
     
     def _get_generator_positive_prompt(self, preset_key, language, model="Auto"):
         """
@@ -1133,47 +1078,18 @@ class omni_llm_unified_inference:
                 enable_negative_prompt=False,
                 output_format="both"
             )
-            return f"【下游模型】{model}\n{result.get('positive_constraint', '')}"
+            # 图像类预设统一走通用输出接口，输出文本不携带任何模型名称
+            return result.get('positive_constraint', '')
         
-        # 音频类预设：使用 audio_model，输出附带下游模型标识
-        if self._is_audio_preset(preset_key):
-            model = self._resolve_audio_model(preset_key, model)
-            try:
-                result = generator.build_prompt(
-                    preset_name=template_id,
-                    user_keywords="",
-                    output_language=lang_code,
-                    output_format="both"
-                )
-                positive = result.get("positive_constraint", "")
-                if model != "Auto":
-                    return f"【下游模型】{model}\n{positive}"
-                return positive
-            except Exception:
-                return ""
-        
-        # 反推/无模型预设：支持正向约束
-        try:
-            result = generator.build_prompt(
-                preset_name=template_id,
-                user_keywords="",
-                output_language=lang_code,
-                output_format="both"
-            )
-            return result.get("positive_constraint", "")
-        except Exception:
-            try:
-                result = generator.build_prompt(
-                    user_input="",
-                    preset_name=template_id,
-                    output_language=lang_code,
-                    enable_global_preconstraint=True,
-                    enable_negative_prompt=False,
-                    output_format="both"
-                )
-                return result.get("positive_constraint", "")
-            except Exception:
-                return ""
+        # 音频类预设同样持有 model_formula_library，由上方图像分支统一处理
+        # 反推/无模型预设：统一使用 preset_name + user_input 签名
+        result = generator.build_prompt(
+            preset_name=template_id,
+            user_input="",
+            output_language=lang_code,
+            output_format="both"
+        )
+        return result.get("positive_constraint", "")
     
     def _get_generator_model_marker(self, preset_key, model="Auto"):
         """
@@ -1182,6 +1098,12 @@ class omni_llm_unified_inference:
         该标识与正向约束开关解耦，未启用正向约束时也可单独输出
         """
         if not self._is_generator_preset(preset_key):
+            return ""
+        # 音频类预设保留下游模型标识（部分音频预设同样使用 model_formula_library）
+        if self._is_audio_preset(preset_key):
+            return "" if model in ("Auto", "") else f"【下游模型】{model}"
+        # 图像类预设统一走通用输出接口，输出文本不携带任何模型名称
+        if self._is_image_model_preset(preset_key):
             return ""
         if model in ("Auto", ""):
             return ""
@@ -1226,6 +1148,20 @@ class omni_llm_unified_inference:
         return model_info
     
     def get_preset_text_by_language(self, preset_key, language, output_format="natural", input_mode="text",
+                                    custom_prompt="", model="Auto",
+                                    enable_constraints=True, enable_negative_prompts=True):
+        """
+        获取预设提示词文本；负向提示词关闭时同步清除模板中的负向输出指令。
+        """
+        text = self._get_preset_text_by_language_raw(
+            preset_key, language, output_format, input_mode, custom_prompt, model,
+            enable_constraints, enable_negative_prompts
+        )
+        if not enable_negative_prompts:
+            text = self._suppress_negative_prompt_instructions(text, language)
+        return text
+
+    def _get_preset_text_by_language_raw(self, preset_key, language, output_format="natural", input_mode="text",
                                     custom_prompt="", model="Auto",
                                     enable_constraints=True, enable_negative_prompts=True):
         """
@@ -1286,70 +1222,23 @@ class omni_llm_unified_inference:
                 enable_negative_prompt=enable_negative_prompts,
                 output_format=output_format
             )
-            print(f"【类生成器-图像】{preset_key} → 下游模型={model}，语言={lang_code}，格式={output_format}")
-            # 前置输出实际生效的下游模型名称，与内容组织公式保持一致，便于用户判定模型选择是否正确
-            return f"【目标模型适配：{model}】\n{result['llm_input_prompt']}"
+            print(f"【类生成器】{preset_key} → {'模型库输出' if self._is_audio_preset(preset_key) else '通用输出'}，语言={lang_code}，格式={output_format}")
+            # 音频类预设保留模型标识；图像类预设统一走通用输出接口，输出文本不携带任何模型名称
+            preset_text = result['llm_input_prompt']
+            if self._is_audio_preset(preset_key) and model not in ("Auto", ""):
+                return f"【目标模型适配：{model}】\n{preset_text}"
+            return preset_text
 
-        # 音频类预设：使用 audio_model（生成器无模型库，提示词末尾追加目标模型指示）
-        if self._is_audio_preset(preset_key):
-            model = self._resolve_audio_model(preset_key, model)
-            try:
-                result = generator.build_prompt(
-                    preset_name=template_id,
-                    user_keywords=custom_prompt,
-                    output_language=lang_code,
-                    output_format=output_format
-                )
-                prompt = result["llm_input_prompt"]
-                if model and model != "Auto":
-                    prompt += f"\n\n【目标音频模型】{model}"
-                print(f"【类生成器-音频】{preset_key} → 音频模型={model}，语言={lang_code}，格式={output_format}")
-                return prompt
-            except Exception as e:
-                print(f"【类生成器-音频】{preset_key} 调用 build_prompt 失败: {e}")
-
-        # 反推/无模型预设：使用 preset_name + user_keywords 签名
-        try:
-            result = generator.build_prompt(
-                preset_name=template_id,
-                user_keywords=custom_prompt,
-                output_language=lang_code,
-                output_format=output_format
-            )
-            print(f"【类生成器-反推】{preset_key} → 语言={lang_code}，格式={output_format}")
-            return result["llm_input_prompt"]
-        except Exception:
-            # 尝试带 user_input 的签名（AnimeDreamVisual, Illustrious 等）
-            try:
-                result = generator.build_prompt(
-                    user_input=custom_prompt,
-                    preset_name=template_id,
-                    output_language=lang_code,
-                    enable_global_preconstraint=enable_constraints,
-                    enable_negative_prompt=enable_negative_prompts,
-                    output_format=output_format
-                )
-                print(f"【类生成器-通用】{preset_key} → 语言={lang_code}，格式={output_format}")
-                return result["llm_input_prompt"]
-            except Exception as e:
-                print(f"【类生成器错误】{preset_key} 调用 build_prompt 失败: {e}")
-                return preset_key
-    
-    def get_preset_examples(self, preset_key, language, output_format="natural", custom_prompt=""):
-        """
-        获取预设模板的示例内容（新类生成器格式无示例字段，返回空字符串）
-        """
-        return ""
-    
-    def get_preset_constraints(self, preset_key, language):
-        """
-        获取预设模板中的正向约束和负向提示词
-        （新类生成器格式已通过 _get_generator_positive/negative_prompt 处理，此方法作为兜底返回空）
-        
-        Returns:
-            tuple: (positive_constraints, negative_prompts)
-        """
-        return "", ""
+        # 音频类预设同样持有 model_formula_library，由上方图像分支统一处理
+        # 反推/无模型预设：统一使用 preset_name + user_input 签名
+        result = generator.build_prompt(
+            preset_name=template_id,
+            user_input=custom_prompt,
+            output_language=lang_code,
+            output_format=output_format
+        )
+        print(f"【类生成器-反推】{preset_key} → 语言={lang_code}，格式={output_format}")
+        return result["llm_input_prompt"]
     
     def _process_batch_inference(self, llama_model, images, system_prompt, final_prompt,
                                   image_max_size, batch_combination, gen_params,
@@ -1741,8 +1630,8 @@ class omni_llm_unified_inference:
                 video_max_frames, video_sampling, video_manual_indices, image_max_size, batch_combination,
                 force_offload,
                 api_config=None, parameters=None, images=None, video=None, audio=None,
-                asr_model=None, tts_model=None, queue_handler=None, unique_id=None,
-                image_model="Auto", video_model="Auto", audio_model="Auto",
+                asr_model=None, queue_handler=None, unique_id=None,
+                video_model="Auto", audio_model="Auto",
                 video_audio=True,
                 llama_model=None):
         """处理推理请求"""
@@ -1766,14 +1655,9 @@ class omni_llm_unified_inference:
                 "[基础] 图像理解 (Image Understanding)": "images",
                 "[基础] 批量图像理解 (Batch Image Understanding)": "batch_images",
                 "[基础] 音频转文本 (Audio to Text)": "audio",
-                "[基础] 文本转语音 (Text to Speech)": "tts",
                 "[高级] 视频理解 (Video Understanding)": "video"
             }
             mode = mode_map.get(inference_mode, "text")
-
-            # TTS 模式：直接调用 TTS 模型合成语音，不经过 LLM 推理
-            if mode == "tts":
-                return self._process_tts(tts_model, text_input, audio, parameters)
 
             # 检查输入
             has_images = images is not None and (hasattr(images, 'numel') and images.numel() > 0)
@@ -1797,10 +1681,10 @@ class omni_llm_unified_inference:
             # 获取预设提示词
             preset_key = self.preset_prompts.get(preset_prompt, "")
             
-            # 模型切换逻辑：按预设模板可用的模型接口解析实际模型（图像/视频/音频可同时切换，互不干扰）
-            effective_model = self._resolve_effective_model(preset_key, image_model, video_model, audio_model)
+            # 模型切换逻辑：按预设模板可用的模型接口解析实际模型（视频/音频可同时切换，互不干扰）
+            effective_model = self._resolve_effective_model(preset_key, video_model, audio_model)
             
-            print(f"【模型切换】{preset_prompt} → 实际模型={effective_model}（image_model={image_model}，video_model={video_model}，audio_model={audio_model}）")
+            print(f"【模型切换】{preset_prompt} → 实际模型={effective_model}（video_model={video_model}，audio_model={audio_model}）")
             
             # 获取预设提示词文本
             preset_text = self.get_preset_text_by_language(
@@ -1828,10 +1712,42 @@ class omni_llm_unified_inference:
             else:
                 # 兜底：直接使用 preset_text
                 final_prompt = preset_text
+            # 输出语言：只在此处声明一次，避免与预设内的语言要求互相冲突
+            # JSON 输出（json_schema 或系统提示词内的 JSON Schema）时，字段值语言同样跟随 response_language 切换
+            schema_text = f"{system_prompt or ''}\n{custom_prompt or ''}"
+            json_output = bool(
+                (parameters and str(parameters.get("json_schema", "") or "").strip())
+                or '"properties"' in schema_text or '"$schema"' in schema_text
+            )
             if output_language == "中文":
-                final_prompt += "\n\n【输出语言硬性要求】最终输出的全部内容（包括所有标签、字段、描述文本）必须使用中文撰写，禁止输出任何英文或其他语言内容。"
+                if json_output:
+                    final_prompt += (
+                        "\n\n【输出语言硬性要求】本次输出为 JSON：JSON 键名保持英文原样，"
+                        "所有描述性字段值（主体、风格、画质、光影、构图、背景、细节等）必须使用中文书写；"
+                        "仅 prompt/negative 等供下游模型直接使用的标签字段保留英文标签，不要翻译、音译或改写。"
+                        "不输出任何其他语言的说明文字。"
+                    )
+                else:
+                    final_prompt += (
+                        "\n\n【输出语言硬性要求】说明性文字（段落、字段说明、约束描述）必须使用中文；"
+                        "提示词标签本身使用目标模型要求的语言（例如 Booru/SDXL 的英文标签），"
+                        "不要翻译、音译或改写这些标签。不输出任何其他语言的说明文字。"
+                    )
             elif output_language == "English":
-                final_prompt += "\n\n[Output Language Hard Requirement] All final output content (including all tags, fields and description text) must be written in English only. Do not output any Chinese or other language content."
+                if json_output:
+                    final_prompt += (
+                        "\n\n[Output Language Hard Requirement] This response is JSON: keep the JSON keys as-is and write "
+                        "every descriptive string value (subject, style, quality, lighting, composition, background, details, etc.) "
+                        "in English. Only target-model tag fields such as prompt/negative keep their tag language; "
+                        "do not translate, transliterate or rewrite those tags. Do not output explanatory text in any other language."
+                    )
+                else:
+                    final_prompt += (
+                        "\n\n[Output Language Hard Requirement] Explanatory text (paragraphs, field labels, constraint descriptions) "
+                        "must be written in English. Prompt tags themselves keep the language the target model expects "
+                        "(for example English Booru/SDXL tags); do not translate, transliterate or rewrite those tags. "
+                        "Do not output explanatory text in any other language."
+                    )
             
             # MiMo-VL模型在文本生成模式下需要特殊指令，避免输出思考过程
             try:
@@ -1883,7 +1799,7 @@ class omni_llm_unified_inference:
             if self.model_info["type"] == "none":
                 if mode == "audio" and asr_text:
                     print("【无模型模式】音频转文本模式，仅返回ASR识别结果")
-                    return (generated_text, [generated_text], 0, None)
+                    return (generated_text, [generated_text], 0)
 
                 # 尝试 API 推理
                 api_base_url = ""
@@ -1916,13 +1832,13 @@ class omni_llm_unified_inference:
                         generated_text = self._filter_thinking_content(generated_text)
                         _uid = parameters.get("state_uid", None) if parameters else None
                         uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-                        return (generated_text, [generated_text], int(uid), None)
+                        return (generated_text, [generated_text], int(uid))
                     except Exception as e:
                         print(f"【API推理错误】{e}")
-                        return (str(e), [str(e)], 0, None)
+                        return (str(e), [str(e)], 0)
                 else:
                     print(f"【无模型模式】模式: {mode}，未选择LLM模型且无API配置，返回空结果")
-                    return ("", [""], 0, None)
+                    return ("", [""], 0)
 
             # 非音频转文本模式清空预置文本
             if mode != "audio":
@@ -2224,13 +2140,11 @@ class omni_llm_unified_inference:
                         # 手动全清会破坏跨次运行的前缀复用
                         
                         # 添加预设模板中的正向约束和负向提示词到输出文本
+                        # 正向约束与负向提示词彼此独立：任一存在即可注入，实际是否输出由各自开关决定
                         positive_constraints, negative_prompts = "", ""
-                        if generator_negative_prompt:
-                            # 新格式模板：正向约束与负向提示词均由生成器返回，正向约束附带下游模型标识
+                        if generator_positive_prompt or generator_negative_prompt:
                             positive_constraints = generator_positive_prompt
                             negative_prompts = generator_negative_prompt
-                        elif (enable_constraints or enable_negative_prompts) and preset_key:
-                            positive_constraints, negative_prompts = self.get_preset_constraints(preset_key, output_language)
                         
                         # 下游模型标识：类生成器预设始终输出，不依赖正向约束开关
                         model_marker = self._get_generator_model_marker(preset_key, effective_model)
@@ -2259,7 +2173,7 @@ class omni_llm_unified_inference:
                         # 直接返回结果
                         _uid = parameters.get("state_uid", None) if parameters else None
                         uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
-                        return (generated_text, output_list, int(uid), None)
+                        return (generated_text, output_list, int(uid))
             
             # 执行推理（异步）
             import asyncio
@@ -2284,13 +2198,11 @@ class omni_llm_unified_inference:
             generated_text = self._filter_thinking_content(generated_text)
 
             # 添加预设模板中的正向约束和负向提示词到输出文本
+            # 正向约束与负向提示词彼此独立：任一存在即可注入，实际是否输出由各自开关决定
             positive_constraints, negative_prompts = "", ""
-            if generator_negative_prompt:
-                # 新格式模板：正向约束与负向提示词均由生成器返回，正向约束附带下游模型标识
+            if generator_positive_prompt or generator_negative_prompt:
                 positive_constraints = generator_positive_prompt
                 negative_prompts = generator_negative_prompt
-            elif (enable_constraints or enable_negative_prompts) and preset_key:
-                positive_constraints, negative_prompts = self.get_preset_constraints(preset_key, output_language)
             
             # 下游模型标识：类生成器预设始终输出，不依赖正向约束开关
             model_marker = self._get_generator_model_marker(preset_key, effective_model)
@@ -2307,15 +2219,12 @@ class omni_llm_unified_inference:
             _uid = parameters.get("state_uid", None) if parameters else None
             uid = unique_id.rpartition('.')[-1] if _uid in (None, -1) else _uid
 
-            return (generated_text, [generated_text], int(uid), None)
+            return (generated_text, [generated_text], int(uid))
         
         except Exception as e:
             error_message = ErrorHandler.handle_error(e, context={"mode": mode, "model_type": self.model_info.get("type", "unknown")})
             print(f"【处理错误】{str(e)}")
-            audio_out = None
-            if mode == "tts":
-                audio_out = {"waveform": torch.zeros(1, 1, 1), "sample_rate": 24000}
-            return (error_message, [error_message], locals().get("gen_params", {}).get("seed", 0), audio_out)
+            return (error_message, [error_message], locals().get("gen_params", {}).get("seed", 0))
     
     @classmethod
     def get_recommended_model(cls, task_type, input_content=None):

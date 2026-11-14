@@ -33,35 +33,6 @@ def _read_text(path: str) -> str:
         return file.read()
 
 
-def _parse_frontmatter(text: str) -> dict:
-    if not text.startswith("---"):
-        return {}
-    end = text.find("\n---", 3)
-    if end < 0:
-        return {}
-
-    values = {}
-    lines = text[3:end].splitlines()
-    index = 0
-    while index < len(lines):
-        match = re.match(r"^([\w-]+):\s*(.*)$", lines[index])
-        if not match:
-            index += 1
-            continue
-        key, value = match.groups()
-        if value in ("|", ">"):
-            index += 1
-            parts = []
-            while index < len(lines) and (not lines[index].strip() or lines[index][:1].isspace()):
-                parts.append(lines[index].strip())
-                index += 1
-            values[key] = " ".join(part for part in parts if part)
-            continue
-        values[key] = value.strip().strip("\"'")
-        index += 1
-    return values
-
-
 def _read_meta_value(skill_dir: str, key: str) -> str:
     path = os.path.join(skill_dir, "meta.yaml")
     if not os.path.isfile(path):
@@ -73,17 +44,23 @@ def _read_meta_value(skill_dir: str, key: str) -> str:
     return ""
 
 
+REFERENCE_DIRS = ("references", "templates", "assets")
+REFERENCE_EXTENSIONS = (".md", ".txt", ".yaml", ".yml", ".json", ".html")
+
+
 def _list_references(skill_dir: str) -> list:
-    reference_dir = os.path.join(skill_dir, "references")
-    if not os.path.isdir(reference_dir):
-        return []
+    """收集 Skill 内可被 load_references 加载的文件（references/templates/assets）"""
     files = []
-    for root, _, names in os.walk(reference_dir):
-        for name in names:
-            if os.path.splitext(name)[1].lower() not in (".md", ".txt", ".yaml", ".yml", ".json"):
-                continue
-            relative = os.path.relpath(os.path.join(root, name), skill_dir).replace("\\", "/")
-            files.append(relative)
+    for dir_name in REFERENCE_DIRS:
+        base_dir = os.path.join(skill_dir, dir_name)
+        if not os.path.isdir(base_dir):
+            continue
+        for root, _, names in os.walk(base_dir):
+            for name in names:
+                if os.path.splitext(name)[1].lower() not in REFERENCE_EXTENSIONS:
+                    continue
+                relative = os.path.relpath(os.path.join(root, name), skill_dir).replace("\\", "/")
+                files.append(relative)
     return sorted(files)
 
 
@@ -143,7 +120,6 @@ def discover_skills(lang: str = "zh") -> list:
                 "skill_file": skill_file,
                 "references": _list_references(skill_dir),
                 "issues": [],
-                "needs_optimization": False,
             }
         )
     return skills

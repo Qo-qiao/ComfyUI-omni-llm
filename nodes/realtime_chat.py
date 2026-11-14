@@ -1217,7 +1217,30 @@ def _auto_select_skill(llm, skills: list, user_text: str) -> str:
     raise ValueError(f"自动选择 Skill 失败，模型返回：{selected[:120]}。请在 Skill加载器中手动选择。")
 
 
-def _build_skill_system_prompt(base_system: str, skill: dict, flow_state: dict) -> str:
+REFERENCE_CATALOGUE_LIMIT = 60
+
+
+def _format_reference_catalogue(paths: list, limit: int = REFERENCE_CATALOGUE_LIMIT) -> str:
+    """把可加载文件列成清单；超过上限时只列前 N 个并给出目录文件数，避免大模板库撑爆上下文"""
+    if not paths:
+        return "- 无"
+    if len(paths) <= limit:
+        return "\n".join(f"- {path}" for path in paths)
+
+    counts = {}
+    for path in paths:
+        group = path.split("/", 1)[0]
+        counts[group] = counts.get(group, 0) + 1
+    lines = [f"- {path}" for path in paths[:limit]]
+    lines.append(
+        f"- ……其余 {len(paths) - limit} 个文件未逐条列出；"
+        "按 Skill 正文或索引文件给出的相对路径，直接写入 load_references 即可加载。"
+    )
+    lines.append("各目录文件数：" + "；".join(f"{name}/ {count} 个" for name, count in counts.items()))
+    return "\n".join(lines)
+
+
+def _build_skill_system_prompt(base_system: str, skill: dict, flow_state: dict, lang: str = "zh") -> str:
     loaded = []
     for relative_path in flow_state["loaded_references"]:
         if relative_path not in skill["references"]:
@@ -1225,7 +1248,7 @@ def _build_skill_system_prompt(base_system: str, skill: dict, flow_state: dict) 
         loaded.append(
             f"\n\n===== reference: {relative_path} =====\n{read_reference(skill, relative_path)}"
         )
-    catalogue = "\n".join(f"- {path}" for path in skill["references"]) or "- 无"
+    catalogue = _format_reference_catalogue(skill["references"])
     loaded_names = "、".join(flow_state["loaded_references"]) or "无"
     parts = [base_system.strip()]
     parts.append(
@@ -1233,7 +1256,7 @@ def _build_skill_system_prompt(base_system: str, skill: dict, flow_state: dict) 
         f"当前流程阶段：{flow_state['stage']}\n"
         f"可用 references：\n{catalogue}\n"
         f"已加载 references：{loaded_names}\n\n"
-        f"===== {skill['skill_file']} =====\n{read_skill_body(skill)}"
+        f"===== {skill['skill_file']} =====\n{read_skill_body(skill, lang)}"
     )
     parts.extend(loaded)
     parts.append(SKILL_EXECUTION_PROTOCOL)
@@ -1482,13 +1505,15 @@ class omni_llm_realtime_chat:
 
         system_text = str(settings["system_prompt"] or "").strip()
         skill = None
+        skill_lang = "zh"
         if isinstance(skill_loader, dict):
+            skill_lang = str(skill_loader.get("language") or "zh").strip() or "zh"
             selected_id = str(skill_loader.get("selected") or "").strip()
             if selected_id and flow_state.get("skill") and flow_state["skill"] != selected_id:
                 flow_state = _default_flow_state()
             if selected_id:
                 flow_state["skill"] = selected_id
-                skill = get_skill(selected_id)
+                skill = get_skill(selected_id, skill_lang)
             elif not flow_state.get("skill"):
                 if llm is not None:
                     skill_id = _auto_select_skill(llm, skill_loader.get("skills") or [], user_text)
@@ -1497,14 +1522,14 @@ class omni_llm_realtime_chat:
                     available_skills = skill_loader.get("skills") or []
                     skill_id = available_skills[0]["id"] if available_skills else ""
                 flow_state["skill"] = skill_id
-                skill = get_skill(skill_id)
+                skill = get_skill(skill_id, skill_lang)
             else:
-                skill = get_skill(flow_state["skill"])
+                skill = get_skill(flow_state["skill"], skill_lang)
             if skill is None:
                 raise ValueError("Skill 已不存在，请刷新 Skill加载器并重新选择。")
             flow_state["skill_name"] = skill["name"]
             # Skill 节点优先：忽略用户自定义系统提示词，仅使用 Skill 提示词
-            system_text = _build_skill_system_prompt("", skill, flow_state)
+            system_text = _build_skill_system_prompt("", skill, flow_state, skill_lang)
         elif not system_text:
             system_text = _DEFAULT_CHAT_SYSTEM_PROMPT
 
@@ -1580,7 +1605,7 @@ class omni_llm_realtime_chat:
                 break
             flow_state["loaded_references"].extend(requested)
             system_text = _build_skill_system_prompt(
-                str(settings["system_prompt"] or "").strip(), skill, flow_state
+                str(settings["system_prompt"] or "").strip(), skill, flow_state, skill_lang
             )
             history_before_reference_trim = len(model_history)
             if llm is not None:

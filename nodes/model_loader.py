@@ -97,7 +97,7 @@ class omni_llm_model_loader:
         # 注意：含 audio/speech/voice 但不属于上述专用类型的 gguf 是全模态（Omni）骨干，
         # 必须保留（如 Qwen3-Omni/Qwen3-Audio）；语音编码器文件统一以 mmproj 开头已另行排除。
         _speech_only_keywords = (
-            "tts", "asr", "whisper", "parakeet", "forcedalign",
+            "tts", "soprano", "asr", "whisper", "parakeet", "forcedalign",
             "aligner", "transcrib", "speech-to-text",
         )
 
@@ -305,7 +305,7 @@ class omni_llm_model_loader:
 
         # 处理"None"模型的情况
         if model == "None":
-            print("【模型加载】未选择模型（ASR/TTS由各自独立加载器节点连接后自动启用）")
+            print("【模型加载】未选择模型（ASR由独立加载器节点连接后自动启用）")
             # 清空当前模型状态
             LLAMA_CPP_STORAGE.clean()
             # 返回空的storage对象
