@@ -23,7 +23,7 @@ ComfyUI-omni-llm是一款功能全面的ComfyUI插件，基于ComfyUI-llama-cpp-
 
 ## 中文翻译
 
-将zh-CN文件放入翻译插件(ComfyUI-Chinese-Translation/AIGODLIKE-ComfyUI-Translation/ComfyUI-DD-Translation)对应的文件夹内覆盖即可,推荐安装[ComfyUI-Chinese-Translation](https://github.com/a63976659/ComfyUI-Chinese-Translation)插件，汉化更全面，翻译更新速度更快更全。
+将zh-CN文件放入翻译插件(ComfyUI-Global-Translation/AIGODLIKE-ComfyUI-Translation/ComfyUI-DD-Translation)对应的文件夹内覆盖即可。
 
 ## 协同插件推荐
 
@@ -33,7 +33,7 @@ SDXL模型限制提示词长度，为了解决限制问题，提高控制性，�
 
 ## 安装说明
 
-如果你不会安装依赖，建议使用安装[ComfyNexus启动器](https://github.com/Allen-xxa/ComfyNexus/releases/)。
+如果你不会安装依赖，建议使用安装[ComfyLauncher启动器](https://github.com/Qo-qiao/ComfyLauncher)。
 启动器提供更加直观的安装方式，方便查看安装依赖文件，解决依赖冲突问题
 
 ### 1. 基本安装
